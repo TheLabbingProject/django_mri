@@ -1,4 +1,4 @@
-# django-dicom
+# django-mri
 
 
 
@@ -14,7 +14,7 @@ Quick start
 <pre>
     INSTALLED_APPS = [  
         ...  
-        'django_dicom',  
+        'django_mri',  
     ]  
 </pre>
 
