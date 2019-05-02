@@ -4,19 +4,26 @@ from django.test import TestCase
 from django_dicom.data_import import LocalImport
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
-from tests.fixtures import DICOM_IMAGE_PATH
+from tests.fixtures import (
+    DICOM_SERIES_PATH,
+    SIEMENS_DWI_SERIES,
+    SIEMENS_DWI_SERIES_PATH,
+)
 
 
 class NIfTIModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        LocalImport.import_local_dcm(DICOM_IMAGE_PATH)
+        LocalImport(DICOM_SERIES_PATH).run(verbose=False)
+        LocalImport(SIEMENS_DWI_SERIES_PATH).run(verbose=False)
 
     def setUp(self):
-        self.scan = Scan.objects.first()
-        if not self.scan:
+        self.simple_scan = Scan.objects.first()
+        self.dwi_scan = Scan.objects.last()
+        if not self.simple_scan or not self.dwi_scan:
             self.fail("Test scan not created! Check signals.")
-        self.nifti = self.scan.nifti
+        self.simple_nifti = self.simple_scan.nifti
+        self.dwi_nifti = self.dwi_scan.nifti
 
     ##########
     # Fields #
@@ -33,9 +40,9 @@ class NIfTIModelTestCase(TestCase):
         self.assertEqual(field.max_length, 500)
 
     def test_path_value(self):
-        destination = self.scan.get_default_nifti_destination()
+        destination = self.dwi_scan.get_default_nifti_destination()
         expected = destination + ".nii.gz"
-        self.assertEqual(self.nifti.path, expected)
+        self.assertEqual(self.dwi_nifti.path, expected)
 
     # is_raw
     def test_is_raw_blank_and_null(self):
@@ -58,12 +65,41 @@ class NIfTIModelTestCase(TestCase):
     ###########
 
     def test_get_data(self):
-        data = self.nifti.get_data()
+        data = self.dwi_nifti.get_data()
         self.assertIsInstance(data, np.ndarray)
 
-    # TODO: Fix test, doesn't work with single image given as dir
-    # def test_get_b_value(self):
-    #     result = self.nifti.get_b_value()
-    #     expected = [0, 0, 100]
-    #     self.assertListEqual(result, expected)
+    def test_get_b_value(self):
+        result = self.dwi_nifti.get_b_value()
+        self.assertListEqual(result, SIEMENS_DWI_SERIES["b_value"])
 
+    def test_get_b_vector(self):
+        result = self.dwi_nifti.get_b_vector()
+        self.assertListEqual(result, SIEMENS_DWI_SERIES["b_vector"])
+
+    ##############
+    # Properties #
+    ##############
+
+    def test_b_value(self):
+        result = self.dwi_nifti.b_value
+        expected = self.dwi_nifti.get_b_value()
+        self.assertListEqual(result, expected)
+
+    def test_b_value_for_non_DWI_returns_none(self):
+        self.assertIsNone(self.simple_nifti.b_value)
+
+    def test_b_vector(self):
+        result = self.dwi_nifti.b_vector
+        expected = self.dwi_nifti.get_b_vector()
+        self.assertListEqual(result, expected)
+
+    def test_b_vector_for_non_DWI_returns_none(self):
+        self.assertIsNone(self.simple_nifti.b_vector)
+
+    def test_subject_id(self):
+        subject_id = "TESTSUB"
+        self.simple_scan.subject_id = subject_id
+        self.assertEqual(self.simple_nifti.subject_id, subject_id)
+
+    def test_subject_id_with_no_subject(self):
+        self.assertIsNone(self.dwi_nifti.subject_id)
