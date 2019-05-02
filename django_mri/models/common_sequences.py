@@ -6,37 +6,37 @@ A list of common MRI sequences and their respective DICOM header attributes.
 
 sequences = [
     {
-        "name": "MPRAGE",
+        "title": "MPRAGE",
         "description": "",
         "scanning_sequence": ["GR", "IR"],
         "sequence_variant": ["SK", "SP", "MP"],
     },
     {
-        "name": "Localizer",
+        "title": "Localizer",
         "description": "",
         "scanning_sequence": ["GR"],
         "sequence_variant": ["SP", "OSP"],
     },
     {
-        "name": "IR-EPI",
+        "title": "IR-EPI",
         "description": "",
         "scanning_sequence": ["EP", "IR"],
         "sequence_variant": ["SK", "SP", "MP", "OSP"],
     },
     {
-        "name": "FLAIR",
+        "title": "FLAIR",
         "description": "",
         "scanning_sequence": ["SE", "IR"],
         "sequence_variant": ["SK", "SP", "MP"],
     },
     {
-        "name": "DWI",
+        "title": "DWI",
         "description": "",
         "scanning_sequence": ["EP"],
         "sequence_variant": ["SK", "SP"],
     },
     {
-        "name": "Resting-state fMRI",
+        "title": "Resting-state fMRI",
         "description": "",
         "scanning_sequence": ["EP"],
         "sequence_variant": ["SK", "SS"],

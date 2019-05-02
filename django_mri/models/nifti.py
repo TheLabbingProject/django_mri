@@ -4,7 +4,6 @@ import os
 
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django_mri.models.managers import NIfTIManager
 
 
 class NIfTI(TimeStampedModel):
@@ -33,8 +32,6 @@ class NIfTI(TimeStampedModel):
         blank=True,
         null=True,
     )
-
-    objects = NIfTIManager()
 
     def get_data(self) -> np.ndarray:
         """
@@ -112,7 +109,7 @@ class NIfTI(TimeStampedModel):
         return self.get_b_vector()
 
     @property
-    def subject(self) -> int:
+    def subject_id(self) -> int:
         """
         If this instance has a single (Scan) origin, returns the related subject's primary key.
         
@@ -122,7 +119,4 @@ class NIfTI(TimeStampedModel):
             The subject ID to which this NIfTI file's origin is related with.
         """
 
-        try:
-            return self.parent.subject
-        except AttributeError:
-            return None
+        return self.parent.subject_id

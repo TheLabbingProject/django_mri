@@ -3,7 +3,6 @@ import subprocess
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 DCM2NIIX = os.path.join(BASE_DIR, "utils", "dcm2niix")
-# DCM2NIIX = os.getenv("DCM2NIIX")
 
 
 class Dcm2niix:

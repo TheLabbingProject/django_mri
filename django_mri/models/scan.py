@@ -7,7 +7,6 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django_mri.interfaces.dcm2niix import Dcm2niix
-from django_mri.models.managers import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 
@@ -87,12 +86,10 @@ class Scan(TimeStampedModel):
     # to be used as a property that automatically returns an existing instance
     # or creates one.
     _nifti = models.OneToOneField(
-        "django_mri.NIfTI", on_delete=models.PROTECT, blank=True, null=True
+        "django_mri.NIfTI", on_delete=models.SET_NULL, blank=True, null=True
     )
 
     subject_id = models.PositiveIntegerField(blank=True, null=True)
-
-    objects = ScanManager()
 
     class Meta:
         ordering = ("time",)
@@ -134,8 +131,15 @@ class Scan(TimeStampedModel):
         """
         Returns the spatial resolution of the MRI scan as infered from a
         related DICOM series. In DICOM headers, "*x*" and "*y*" resolution
-        (the rows and columns of each instance) are listed as "PixelSpacing"
-        and the "*z*" plane resolution corresponds to "SliceThickness".
+        (the rows and columns of each instance) are listed as "`Pixel Spacing`_"
+        and the "*z*" plane resolution corresponds to "`Slice Thickness`_".
+        `Pixel Spacing`_ is a `required (type 1)`_ DICOM attribute, and therefore
+        has to be returned, however `Slice Thickness`_ may be empty (`type 2`).
+
+        .. _Pixel Spacing: https://dicom.innolitics.com/ciods/mr-image/image-plane/00280030
+        .. _Slice Thickness: https://dicom.innolitics.com/ciods/mr-image/image-plane/00180050
+        .. _required (type 1): http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.4.html
+        .. _type 2: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.4.html
         
         Returns
         -------
@@ -143,12 +147,12 @@ class Scan(TimeStampedModel):
             "*[x, y, z]*" spatial resolution in millimeters.
         """
 
-        try:
-            return self.dicom.pixel_spacing + [
-                self.dicom.image_set.first().header.get_value("SliceThickness")
-            ]
-        except TypeError:
-            return []
+        sample_image = self.dicom.image_set.first()
+        slice_thickness = sample_image.header.get_value("SliceThickness")
+        if slice_thickness:
+            return self.dicom.pixel_spacing + [slice_thickness]
+        else:
+            return self.dicom.pixel_spacing
 
     def infer_sequence_type_from_dicom(self) -> SequenceType:
         """
@@ -272,3 +276,6 @@ class Scan(TimeStampedModel):
             self._nifti = self.dicom_to_nifti()
             self.save()
             return self._nifti
+        else:
+            raise AttributeError("No NIfTI version available for this scan!")
+

@@ -1,20 +1,19 @@
 import os
-import shutil
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django_dicom.data_import import LocalImport
 from django_mri.models import Scan, NIfTI
-from tests.fixtures import TEST_SCAN_FIELDS, DICOM_IMAGE_PATH
+from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
 
 
 class ScanModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        LocalImport.import_local_dcm(DICOM_IMAGE_PATH)
+        LocalImport(SIEMENS_DWI_SERIES_PATH).run(verbose=False)
 
     def setUp(self):
-        self.scan = Scan.objects.first()
+        self.scan = Scan.objects.last()
         if not self.scan:
             self.fail("Test scan not created! Check signals.")
 
@@ -25,7 +24,7 @@ class ScanModelTestCase(TestCase):
     def test_ordering(self):
         self.assertTupleEqual(Scan._meta.ordering, ("time",))
 
-    def test_vebose_name_plural(self):
+    def test_verbose_name_plural(self):
         self.assertTrue(Scan._meta.verbose_name_plural, "MRI Scans")
 
     ##########
@@ -35,7 +34,7 @@ class ScanModelTestCase(TestCase):
     # time
     def test_time_value(self):
         result = self.scan.time
-        expected = TEST_SCAN_FIELDS["time"]
+        expected = SIEMENS_DWI_SERIES["time"]
         self.assertEqual(result, expected)
 
     def test_time_blank_and_null(self):
@@ -45,7 +44,7 @@ class ScanModelTestCase(TestCase):
 
     # description
     def test_description_value(self):
-        expected = TEST_SCAN_FIELDS["description"]
+        expected = SIEMENS_DWI_SERIES["description"]
         self.assertEqual(self.scan.description, expected)
 
     def test_description_blank_and_null(self):
@@ -59,7 +58,7 @@ class ScanModelTestCase(TestCase):
 
     # number
     def test_number_value(self):
-        expected = TEST_SCAN_FIELDS["number"]
+        expected = SIEMENS_DWI_SERIES["number"]
         self.assertEqual(self.scan.number, expected)
 
     def test_number_blank_and_null(self):
@@ -76,7 +75,7 @@ class ScanModelTestCase(TestCase):
 
     # echo_time
     def test_echo_time_value(self):
-        expected = TEST_SCAN_FIELDS["echo_time"]
+        expected = SIEMENS_DWI_SERIES["echo_time"]
         self.assertEqual(self.scan.echo_time, expected)
 
     def test_echo_time_blank_and_null(self):
@@ -93,7 +92,7 @@ class ScanModelTestCase(TestCase):
 
     # repetition_time
     def test_repetition_time_value(self):
-        expected = TEST_SCAN_FIELDS["repetition_time"]
+        expected = SIEMENS_DWI_SERIES["repetition_time"]
         self.assertEqual(self.scan.repetition_time, expected)
 
     def test_repetition_time_blank_and_null(self):
@@ -127,7 +126,7 @@ class ScanModelTestCase(TestCase):
     # spatial_resolution
     def test_spatial_resolution_value(self):
         result = self.scan.spatial_resolution
-        expected = TEST_SCAN_FIELDS["spatial_resolution"]
+        expected = SIEMENS_DWI_SERIES["spatial_resolution"]
         self.assertEqual(result, expected)
 
     def test_spatial_resolution_blank_and_null(self):
@@ -192,6 +191,17 @@ class ScanModelTestCase(TestCase):
         with self.assertRaises(AttributeError):
             self.scan.update_fields_from_dicom()
 
+    def test_get_spatial_resolution_from_dicom(self):
+        result = self.scan.spatial_resolution
+        expected = SIEMENS_DWI_SERIES["spatial_resolution"]
+        self.assertListEqual(result, expected)
+
+    # TODO: Add test for 2D scan with no "SliceThickness"
+    # def test_get_spatial_resolution_from_dicom_without_slice_thickness_attribute(self):
+    #     result = self.scan.spatial_resolution
+    #     expected = TWO_DIM_TEST_SERIES["spatial_resolution"]
+    #     self.assertListEqual(result, expected)
+
     def test_infer_sequence_type_from_dicom_returns_none(self):
         result = self.scan.infer_sequence_type_from_dicom()
         self.assertIsNone(result)
@@ -200,6 +210,11 @@ class ScanModelTestCase(TestCase):
         result = self.scan.get_default_nifti_dir()
         expected = self.scan.dicom.get_path().replace("DICOM", "NIfTI")
         self.assertEqual(result, expected)
+
+    def test_get_default_nifti_dir_without_dicom(self):
+        self.scan.dicom = None
+        result = self.scan.get_default_nifti_dir()
+        self.assertIsNone(result)
 
     def test_default_nifti_name(self):
         name = self.scan.get_default_nifti_name()
@@ -222,5 +237,24 @@ class ScanModelTestCase(TestCase):
         nifti = self.scan.dicom_to_nifti()
         self.assertIsInstance(nifti, NIfTI)
 
+    ##############
+    # Properties #
+    ##############
+
     def test_nifti_property_returns_nifti_instance(self):
+        result = self.scan.nifti
+        self.assertIsInstance(result, NIfTI)
+        again = self.scan.nifti
+        self.assertEqual(result, again)
+
+    def test_nifti_property_with_conversion_from_dicom(self):
+        self.assertIsNone(self.scan._nifti)
         self.assertIsInstance(self.scan.nifti, NIfTI)
+        self.assertIsInstance(self.scan._nifti, NIfTI)
+
+    def test_nifti_property_with_no_dicom(self):
+        self.scan.dicom = None
+        self.assertIsNone(self.scan._nifti)
+        with self.assertRaises(AttributeError):
+            self.scan.nifti
+
