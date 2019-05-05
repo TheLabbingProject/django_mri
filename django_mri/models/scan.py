@@ -7,6 +7,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django_mri.interfaces.dcm2niix import Dcm2niix
+from django_mri.models.managers import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 
@@ -90,6 +91,8 @@ class Scan(TimeStampedModel):
     )
 
     subject_id = models.PositiveIntegerField(blank=True, null=True)
+
+    objects = ScanManager()
 
     class Meta:
         ordering = ("time",)

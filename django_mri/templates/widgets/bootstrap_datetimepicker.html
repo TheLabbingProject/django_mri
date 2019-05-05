@@ -1,0 +1,31 @@
+{% comment %} Load jQuery and FontAwesome {% endcomment %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+{% comment %} Datetime widget {% endcomment %}
+<div class="input-group date" id="{{ widget.datetimepicker_id }}" data-target-input="nearest">
+  {% include "django/forms/widgets/input.html" %}
+  <div class="input-group-append" data-target="#{{ widget.datetimepicker_id }}" data-toggle="datetimepicker">
+    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+  </div>
+</div>
+
+
+<script>
+    $(function() {
+        $("#{{ widget.datetimepicker_id }}").datetimepicker({
+            format: 'DD/MM/YYYY HH:mm',
+            icons: {
+                time: 'far fa-clock',
+                date: 'far fa-calendar-alt',
+                up: 'fas fa-arrow-up',
+                down: 'fas fa-arrow-down',
+                previous: 'fas fa-chevron-left',
+                next: 'fas fa-chevron-right',
+                today: 'far fa-calendar-check',
+                clear: 'far fa-trash-alt',
+                close: 'fas fa-times'
+            }
+        });
+    });
+</script>
