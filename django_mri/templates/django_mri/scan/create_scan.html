@@ -1,11 +1,11 @@
-{% comment %} {% extends 'django_mri/scan/upload_scan.html' %}  {% endcomment %}
+{% extends 'django_mri/scan/upload_scan.html' %} 
 {% load crispy_forms_tags %} 
 
-{% comment %} {% block scan_review %} {% endcomment %}
+{% block scan_review %}
     <h2>Review Scan Information</h2>
     <form action="" method="post">
         {% csrf_token %} 
         {{ form | crispy }}
         <button class="btn btn-success ml-2" type="submit">Save</button>
     </form>
-{% comment %} {% endblock scan_review %} {% endcomment %}
+{% endblock scan_review %}
