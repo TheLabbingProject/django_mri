@@ -17,6 +17,7 @@
 {% endblock %}
 
 {% block content %}
+    <link rel="stylesheet" href="{% static 'django_mri/css/base.css' %}" />
     <div class="row">
         <div class="col-xs-6 m-2">
             {# 1. BUTTON TO TRIGGER THE ACTION #}
@@ -51,25 +52,38 @@
             </div>                
             <hr>
             {# 3. Table to display unaffiliated DICOM data  #}
-            <table id="gallery" class="table table-bordered">
-            <thead>
-                <tr>
-                <th>DICOM (Pending review)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for series in new_dicoms %}
-                <tr>
-                    {% comment %} <td><a href="{{ series.get_absolute_url }}">{{ series.id }}</a></td> {% endcomment %}
-                    <td>{{ series.description }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+            DICOM (pending review)
+            <table id="gallery" class="table table-sm table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for series in new_dicoms %}
+                    <tr data-href="{% url 'mri:scan_create_from_dcm' series.id %}">
+                        <td>{{ series.id }}</td>
+                        <td>{{ series.description }}</td>
+                        <td>{{ series.date }}</td>
+                        <td>{{ series.time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
         <div class="col-xs-6 m-2">
-            {% comment %} {% block scan_review %}{% endblock scan_review %} {% endcomment %}
-            {% include "django_mri/scan/create_scan.html" %}
+            {% block scan_review %}{% endblock scan_review %}
         </div>
     </div>
+
+    <script>
+        jQuery(document).ready(function($) {
+            $('*[data-href]').on('click', function() {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
 {% endblock content %}
