@@ -1,13 +1,20 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView
 from django.views.generic.edit import ModelFormMixin
-from django_dicom.models import Series
+from django_dicom.models import Series, Patient
+from django_mri.filters.django_dicom import UnreviewedDicomSeriesFilter
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.forms import ScanReview
 from django_mri.models import Scan
-from django_mri.serializers import ScanSerializer
+from django_mri.serializers import (
+    ScanSerializer,
+    DicomSeriesToTreeNode,
+    DicomPatientToTreeNode,
+)
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import authentication, filters, permissions, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 class DefaultsMixin:
@@ -65,6 +72,26 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "spatial_resolution",
         "institution_name",
     )
+
+
+class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):
+    queryset = Patient.objects.all()
+    serializer_class = DicomPatientToTreeNode
+
+    def get_queryset(self):
+        patients_with_unreviewed_series = (
+            Series.objects.filter(scan__isnull=True)
+            .order_by()
+            .values_list("patient", flat=True)
+            .distinct()
+        )
+        return Patient.objects.filter(id__in=patients_with_unreviewed_series)
+
+
+class UnreviewedDicomSeriesViewSet(DefaultsMixin, viewsets.ModelViewSet):
+    queryset = Series.objects.filter(scan__isnull=True)
+    serializer_class = DicomSeriesToTreeNode
+    filter_class = UnreviewedDicomSeriesFilter
 
 
 class CreateScanView(CreateView, ModelFormMixin, LoginRequiredMixin):
