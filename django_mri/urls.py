@@ -5,6 +5,8 @@ from rest_framework import routers
 app_name = "mri"
 router = routers.DefaultRouter()
 router.register(r"scan", views.ScanViewSet)
+router.register(r"tree/unreviewed_dicom_patients", views.UnreviewedDicomPatientViewSet)
+router.register(r"tree/unreviewed_dicom_series", views.UnreviewedDicomSeriesViewSet)
 
 
 mripatterns = (
