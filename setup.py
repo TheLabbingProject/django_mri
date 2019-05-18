@@ -4,6 +4,13 @@ from setuptools import find_packages, setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("requirements/common.txt") as fh:
+    requirements = fh.read().splitlines()
+
+with open("requirements/dev.txt") as fh:
+    dev_requirements = fh.read().splitlines()
+
+
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
@@ -20,6 +27,8 @@ setup(
     author="Zvi Baratz",
     author_email="z.baratz@gmail.com",
     keywords="django mri neuroimaging research",
+    install_requires=requirements,
+    extras_require={"dev": dev_requirements},
     classifiers=[
         "Environment :: Web Environment",
         "Framework :: Django",
