@@ -2,6 +2,7 @@ import os
 import pytz
 
 from datetime import datetime
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -21,6 +22,7 @@ class Scan(TimeStampedModel):
     
     """
 
+    institution_name = models.CharField(max_length=64, blank=True, null=True)
     time = models.DateTimeField(
         blank=True, null=True, help_text="The time in which the scan was acquired."
     )
@@ -90,7 +92,13 @@ class Scan(TimeStampedModel):
         "django_mri.NIfTI", on_delete=models.SET_NULL, blank=True, null=True
     )
 
-    subject_id = models.PositiveIntegerField(blank=True, null=True)
+    subject = models.ForeignKey(
+        settings.SUBJECT_MODEL,
+        on_delete=models.PROTECT,
+        related_name="mri_scans",
+        blank=True,
+        null=True,
+    )
 
     objects = ScanManager()
 

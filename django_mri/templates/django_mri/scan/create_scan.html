@@ -1,11 +1,11 @@
-{% extends 'data_review/index.html' %} 
+{% include "load_styles.html" %}
+{% include "load_scripts.html" %}
 {% load crispy_forms_tags %} 
 
-{% block data-review %}
-    <h2>Review Scan Information</h2>
-    <form action="" method="post">
-        {% csrf_token %} 
-        {{ form | crispy }}
-        <button class="btn btn-success ml-2" type="submit">Save</button>
-    </form>
-{% endblock data-review %}
+
+<h2>Review Scan Information</h2>
+<form action="" method="post">
+    {% csrf_token %} 
+    {{ form | crispy }}
+    <button class="btn btn-success ml-2" type="submit">Save</button>
+</form>

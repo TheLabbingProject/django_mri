@@ -1,8 +1,10 @@
 from django.urls import path, include
 from django_mri import views
+from rest_framework import routers
 
-
-app_name = "django_mri"
+app_name = "mri"
+router = routers.DefaultRouter()
+router.register(r"scan", views.ScanViewSet)
 
 
 mripatterns = (
@@ -13,13 +15,12 @@ mripatterns = (
             views.CreateScanFromDicom.as_view(),
             name="scan_create_from_dcm",
         ),
-        path("dicom/", include("django_dicom.urls", namespace="dicom")),
     ],
     app_name,
 )
 
 urlpatterns = [
     path("", include(mripatterns)),
-    # path("api/", include(router.urls)),
-    # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("api/", include(router.urls)),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
