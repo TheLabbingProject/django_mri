@@ -1,20 +1,16 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView
-from django.views.generic.edit import ModelFormMixin
 from django_dicom.models import Series, Patient
-from django_mri.filters.django_dicom import UnreviewedDicomSeriesFilter
 from django_mri.filters.scan_filter import ScanFilter
-from django_mri.forms import ScanReview
-from django_mri.models import Scan
+from django_mri.models import Scan, NIfTI
+from django_mri.models.sequence_type import SequenceType
 from django_mri.serializers import (
     ScanSerializer,
+    NiftiSerializer,
+    SequenceTypeSerializer,
     DicomSeriesToTreeNode,
     DicomPatientToTreeNode,
 )
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import authentication, filters, permissions, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
 
 
 class DefaultsMixin:
@@ -74,6 +70,16 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     )
 
 
+class NiftiViewSet(viewsets.ModelViewSet):
+    queryset = NIfTI.objects.all()
+    serializer_class = NiftiSerializer
+
+
+class SequenceTypeViewSet(viewsets.ModelViewSet):
+    queryset = SequenceType.objects.all()
+    serializer_class = SequenceTypeSerializer
+
+
 class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = DicomPatientToTreeNode
@@ -91,20 +97,5 @@ class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):
 class UnreviewedDicomSeriesViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Series.objects.filter(scan__isnull=True)
     serializer_class = DicomSeriesToTreeNode
-    filter_class = UnreviewedDicomSeriesFilter
-
-
-class CreateScanView(CreateView, ModelFormMixin, LoginRequiredMixin):
-    model = Scan
-    form_class = ScanReview
-    success_url = "/data_review/"
-    template_name = "django_mri/scan/create_scan.html"
-
-
-class CreateScanFromDicom(CreateScanView):
-    def get_context_data(self, **kwargs):
-        series = Series.objects.get(id=self.kwargs.get("pk"))
-        self.object = Scan(dicom=series)
-        self.object.update_fields_from_dicom()
-        return super().get_context_data(**kwargs)
+    filter_fields = ("patient__id",)
 

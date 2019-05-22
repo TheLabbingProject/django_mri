@@ -10,15 +10,22 @@ Subject = apps.get_model(app_label=subject_app_label, model_name=subject_model_n
 
 
 class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name="mri:sequencetype-detail")
+
     class Meta:
         model = SequenceType
         fields = "__all__"
 
 
 class NiftiSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name="mri:nifti-detail")
+    parent = serializers.HyperlinkedRelatedField(
+        view_name="mri:scan-detail", queryset=Scan.objects.all()
+    )
+
     class Meta:
         model = NIfTI
-        fields = "__all__"
+        exclude = ("path",)
 
 
 class ScanSerializer(serializers.HyperlinkedModelSerializer):
@@ -26,24 +33,30 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     dicom = serializers.HyperlinkedRelatedField(
         view_name="dicom:series-detail", queryset=Series.objects.all()
     )
-    # subject = serializers.HyperlinkedRelatedField(
-    #     view_name="research:subject-detail", queryset=Subject.objects.all()
-    # )
+    subject = serializers.HyperlinkedRelatedField(
+        view_name="research:subject-detail", queryset=Subject.objects.all()
+    )
+    _nifti = serializers.HyperlinkedRelatedField(
+        view_name="mri:nifti-detail", queryset=NIfTI.objects.all()
+    )
+    sequence_type = serializers.HyperlinkedRelatedField(
+        view_name="mri:sequencetype-detail", queryset=SequenceType.objects.all()
+    )
 
     class Meta:
         model = Scan
-        exclude = ("subject", "_nifti", "sequence_type")
+        fields = "__all__"
 
 
 class DicomPatientToTreeNode(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
-    file = serializers.SerializerMethodField()
+    icon = serializers.SerializerMethodField()
 
     class Meta:
         model = Patient
-        fields = ("id", "name", "children", "file")
+        fields = ("id", "name", "children", "icon")
 
     def get_id(self, patient):
         return f"dicom_patient_{patient.id}"
@@ -54,22 +67,22 @@ class DicomPatientToTreeNode(serializers.ModelSerializer):
     def get_children(self, patient):
         return []
 
-    def get_file(self, patient):
+    def get_icon(self, patient):
         return "subject"
 
 
 class DicomSeriesToTreeNode(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     name = serializers.CharField(source="description")
-    file = serializers.SerializerMethodField()
+    icon = serializers.SerializerMethodField()
 
     class Meta:
         model = Patient
-        fields = ("id", "name", "file")
+        fields = ("id", "name", "icon")
 
     def get_id(self, series):
         return f"dicom_series_{series.id}"
 
-    def get_file(self, series):
+    def get_icon(self, series):
         return "dcm"
 
