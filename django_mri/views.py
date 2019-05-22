@@ -98,4 +98,3 @@ class UnreviewedDicomSeriesViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Series.objects.filter(scan__isnull=True)
     serializer_class = DicomSeriesToTreeNode
     filter_fields = ("patient__id",)
-
