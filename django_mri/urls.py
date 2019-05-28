@@ -13,5 +13,8 @@ router.register(r"tree/unreviewed_dicom_series", views.UnreviewedDicomSeriesView
 
 urlpatterns = [
     path("mri/", include(router.urls)),
-    # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path(
+        "mri/scan/from_dicom/<int:series_id>/",
+        views.ScanViewSet.as_view({"get": "get_fields_from_dicom_series"}),
+    ),
 ]

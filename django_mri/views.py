@@ -11,6 +11,9 @@ from django_mri.serializers import (
 )
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import authentication, filters, permissions, viewsets
+from rest_framework.decorators import action
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
 
 
 class DefaultsMixin:
@@ -68,6 +71,14 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "spatial_resolution",
         "institution_name",
     )
+
+    @action(detail=False)
+    def get_fields_from_dicom_series(self, request, series_id: int):
+        series = Series.objects.get(id=series_id)
+        scan = Scan(dicom=series)
+        scan.update_fields_from_dicom()
+        serializer = ScanSerializer(scan, context={"request": request})
+        return Response(serializer.data)
 
 
 class NiftiViewSet(viewsets.ModelViewSet):
