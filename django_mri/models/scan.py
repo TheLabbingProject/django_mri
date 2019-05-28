@@ -120,6 +120,7 @@ class Scan(TimeStampedModel):
         """
 
         if self.dicom:
+            self.institution_name = self.dicom.institution_name
             self.number = self.dicom.number
             self.time = datetime.combine(
                 self.dicom.date, self.dicom.time, tzinfo=pytz.UTC
