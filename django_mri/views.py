@@ -1,18 +1,19 @@
 from django_dicom.models import Series, Patient
+from django_dicom.serializers import PatientSerializer, SeriesSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan, NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.serializers import (
-    ScanSerializer,
     NiftiSerializer,
+    ScanSerializer,
     SequenceTypeSerializer,
-    DicomSeriesToTreeNode,
-    DicomPatientToTreeNode,
 )
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import authentication, filters, permissions, viewsets
+from rest_framework import viewsets
+from rest_framework.authentication import BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.renderers import JSONRenderer
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
@@ -22,19 +23,12 @@ class DefaultsMixin:
     
     """
 
-    authentication_classes = (
-        authentication.BasicAuthentication,
-        authentication.TokenAuthentication,
-    )
-    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (BasicAuthentication, TokenAuthentication)
+    permission_classes = (IsAuthenticated,)
     paginate_by = 25
     paginate_by_param = "page_size"
     max_paginate_by = 100
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    )
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -93,7 +87,7 @@ class SequenceTypeViewSet(viewsets.ModelViewSet):
 
 class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Patient.objects.all()
-    serializer_class = DicomPatientToTreeNode
+    serializer_class = PatientSerializer
 
     def get_queryset(self):
         patients_with_unreviewed_series = (
@@ -107,5 +101,5 @@ class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):
 
 class UnreviewedDicomSeriesViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Series.objects.filter(scan__isnull=True)
-    serializer_class = DicomSeriesToTreeNode
+    serializer_class = SeriesSerializer
     filter_fields = ("patient__id",)

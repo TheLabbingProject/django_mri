@@ -39,9 +39,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     _nifti = serializers.HyperlinkedRelatedField(
         view_name="mri:nifti-detail", queryset=NIfTI.objects.all()
     )
-    sequence_type = serializers.HyperlinkedRelatedField(
-        view_name="mri:sequencetype-detail", queryset=SequenceType.objects.all()
-    )
+    sequence_type = SequenceTypeSerializer()
 
     class Meta:
         model = Scan
