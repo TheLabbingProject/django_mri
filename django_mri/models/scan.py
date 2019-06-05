@@ -99,6 +99,10 @@ class Scan(TimeStampedModel):
         null=True,
     )
 
+    study_groups = models.ManyToManyField(
+        settings.STUDY_GROUP_MODEL, related_name="mri_scans", blank=True
+    )
+
     class Meta:
         ordering = ("time",)
         verbose_name_plural = "MRI Scans"

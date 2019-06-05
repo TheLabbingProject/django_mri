@@ -7,6 +7,8 @@ from rest_framework import serializers
 
 subject_app_label, subject_model_name = settings.SUBJECT_MODEL.split(".")
 Subject = apps.get_model(app_label=subject_app_label, model_name=subject_model_name)
+group_app_label, group_model_name = settings.STUDY_GROUP_MODEL.split(".")
+Group = apps.get_model(app_label=group_app_label, model_name=group_model_name)
 
 
 class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
@@ -38,6 +40,9 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     )
     _nifti = serializers.HyperlinkedRelatedField(
         view_name="mri:nifti-detail", queryset=NIfTI.objects.all()
+    )
+    study_groups = serializers.HyperlinkedRelatedField(
+        view_name="research:group-detail", queryset=Group.objects.all(), many=True
     )
     sequence_type = SequenceTypeSerializer()
 

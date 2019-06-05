@@ -2,6 +2,7 @@ from django_dicom.models import Series, Patient
 from django_dicom.serializers import PatientSerializer, SeriesSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django_mri.filters.scan_filter import ScanFilter
+from django_mri.filters.sequence_type_filter import SequenceTypeFilter
 from django_mri.models import Scan, NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.serializers import (
@@ -66,6 +67,7 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "institution_name",
     )
 
+    # Should be removed (remained from previous workflow)
     @action(detail=False)
     def get_fields_from_dicom_series(self, request, series_id: int):
         series = Series.objects.get(id=series_id)
@@ -75,14 +77,15 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class NiftiViewSet(viewsets.ModelViewSet):
+class NiftiViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = NIfTI.objects.all()
     serializer_class = NiftiSerializer
 
 
-class SequenceTypeViewSet(viewsets.ModelViewSet):
+class SequenceTypeViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = SequenceType.objects.all()
     serializer_class = SequenceTypeSerializer
+    filter_class = SequenceTypeFilter
 
 
 class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):

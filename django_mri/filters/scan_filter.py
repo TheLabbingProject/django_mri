@@ -39,5 +39,6 @@ class ScanFilter(filters.FilterSet):
             # "spatial_resolution",
             "institution_name",
             "is_updated_from_dicom",
+            "dicom__id",
         )
 
