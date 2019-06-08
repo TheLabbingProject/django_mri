@@ -36,19 +36,34 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         view_name="dicom:series-detail", queryset=Series.objects.all()
     )
     subject = serializers.HyperlinkedRelatedField(
-        view_name="research:subject-detail", queryset=Subject.objects.all()
+        view_name="research:subject-detail",
+        queryset=Subject.objects.all(),
+        required=False,
     )
     _nifti = serializers.HyperlinkedRelatedField(
-        view_name="mri:nifti-detail", queryset=NIfTI.objects.all()
+        view_name="mri:nifti-detail", queryset=NIfTI.objects.all(), required=False
     )
     study_groups = serializers.HyperlinkedRelatedField(
-        view_name="research:group-detail", queryset=Group.objects.all(), many=True
+        view_name="research:group-detail",
+        queryset=Group.objects.all(),
+        many=True,
+        required=False,
     )
-    sequence_type = SequenceTypeSerializer()
+    sequence_type = serializers.HyperlinkedRelatedField(
+        view_name="mri:sequencetype-detail",
+        queryset=SequenceType.objects.all(),
+        required=False,
+    )
 
     class Meta:
         model = Scan
         fields = "__all__"
+
+    def create(self, validated_data):
+        scan, created = Scan.objects.get_or_create(**validated_data)
+        if created and scan.dicom:
+            scan.update_fields_from_dicom()
+        return scan
 
 
 class DicomPatientToTreeNode(serializers.ModelSerializer):
