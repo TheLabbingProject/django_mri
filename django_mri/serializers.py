@@ -57,7 +57,24 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Scan
-        fields = "__all__"
+        fields = (
+            "id",
+            "url",
+            "dicom",
+            "subject",
+            "_nifti",
+            "study_groups",
+            "sequence_type",
+            "institution_name",
+            "time",
+            "description",
+            "number",
+            "echo_time",
+            "repetition_time",
+            "inversion_time",
+            "spatial_resolution",
+            "comments",
+        )
 
     def create(self, validated_data):
         scan, created = Scan.objects.get_or_create(**validated_data)

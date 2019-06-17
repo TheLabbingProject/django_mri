@@ -12,10 +12,8 @@ from django_mri.serializers import (
 )
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
-from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 
 class DefaultsMixin:
@@ -66,15 +64,6 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "spatial_resolution",
         "institution_name",
     )
-
-    # Should be removed (remained from previous workflow)
-    @action(detail=False)
-    def get_fields_from_dicom_series(self, request, series_id: int):
-        series = Series.objects.get(id=series_id)
-        scan = Scan(dicom=series)
-        scan.update_fields_from_dicom()
-        serializer = ScanSerializer(scan, context={"request": request})
-        return Response(serializer.data)
 
 
 class NiftiViewSet(DefaultsMixin, viewsets.ModelViewSet):
