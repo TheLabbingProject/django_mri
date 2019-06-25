@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django_dicom.models import Series, Patient
 from django_dicom.serializers import PatientSerializer, SeriesSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,10 +11,12 @@ from django_mri.serializers import (
     ScanSerializer,
     SequenceTypeSerializer,
 )
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
 class DefaultsMixin:
@@ -64,6 +67,25 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "spatial_resolution",
         "institution_name",
     )
+
+    @action(detail=True, methods=["get"])
+    def from_dicom(self, request, series_id: int = None):
+        try:
+            series = Series.objects.get(id=series_id)
+        except ObjectDoesNotExist:
+            return Response(
+                "Invalid DICOM primary key!", status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            scan = Scan.objects.get(dicom=series)
+            return Response(
+                ScanSerializer(scan, context={"request": request}).validated_data
+            )
+        except ObjectDoesNotExist:
+            scan = Scan(dicom=series)
+            scan.update_fields_from_dicom()
+            serializer = ScanSerializer(scan, context={"request": request})
+            return Response(serializer.data)
 
 
 class NiftiViewSet(DefaultsMixin, viewsets.ModelViewSet):
