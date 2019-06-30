@@ -87,7 +87,7 @@ class Scan(TimeStampedModel):
     # The reason it is suffixed with an underline is to allow for "nifti"
     # to be used as a property that automatically returns an existing instance
     # or creates one.
-    _nifti = models.OneToOneField(
+    nifti = models.OneToOneField(
         "django_mri.NIfTI", on_delete=models.SET_NULL, blank=True, null=True
     )
 
@@ -136,6 +136,7 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.get_spatial_resolution_from_dicom()
             self.sequence_type = self.infer_sequence_type_from_dicom()
             self.is_updated_from_dicom = True
+            self.subject = self.dicom.patient.subject
             return True
         else:
             raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")
@@ -271,24 +272,4 @@ class Scan(TimeStampedModel):
             raise AttributeError(
                 f"Failed to convert scan #{self.id} from DICOM to NIfTI! No DICOM series is related to this scan."
             )
-
-    @property
-    def nifti(self) -> NIfTI:
-        """
-        Gets or creates a NIfTI version of this scan.
-        
-        Returns
-        -------
-        NIfTI
-            A :class:`django_mri.NIfTI` instance referencing the appropriate file.
-        """
-
-        if self._nifti:
-            return self._nifti
-        elif not self._nifti and self.dicom:
-            self._nifti = self.dicom_to_nifti()
-            self.save()
-            return self._nifti
-        else:
-            raise AttributeError("No NIfTI version available for this scan!")
 

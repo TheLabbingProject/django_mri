@@ -40,5 +40,6 @@ class ScanFilter(filters.FilterSet):
             "institution_name",
             "is_updated_from_dicom",
             "dicom__id",
+            "subject",
         )
 

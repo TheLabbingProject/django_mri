@@ -40,7 +40,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         queryset=Subject.objects.all(),
         required=False,
     )
-    _nifti = serializers.HyperlinkedRelatedField(
+    nifti = serializers.HyperlinkedRelatedField(
         view_name="mri:nifti-detail", queryset=NIfTI.objects.all(), required=False
     )
     study_groups = serializers.HyperlinkedRelatedField(
@@ -62,7 +62,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
             "url",
             "dicom",
             "subject",
-            "_nifti",
+            "nifti",
             "study_groups",
             "sequence_type",
             "institution_name",
@@ -78,8 +78,9 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         scan, created = Scan.objects.get_or_create(**validated_data)
-        if created and scan.dicom:
+        if created and scan.dicom and len(validated_data) == 1:
             scan.update_fields_from_dicom()
+            scan.save()
         return scan
 
 
