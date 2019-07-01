@@ -13,12 +13,9 @@ router.register(r"unreviewed_dicom_series", views.UnreviewedDicomSeriesViewSet)
 
 urlpatterns = [
     path("mri/", include(router.urls)),
-    path(
-        "mri/scan/from_dicom/<int:subject_id>/",
-        views.ScanViewSet.as_view({"put": "from_dicom"}),
-    ),
+    path("mri/scan/from_file/", views.ScanViewSet.as_view({"POST": "from_file"})),
     path(
         "mri/scan/from_dicom/<int:series_id>/",
-        views.ScanViewSet.as_view({"get": "from_dicom"}),
+        views.ScanViewSet.as_view({"GET": "from_dicom"}),
     ),
 ]
