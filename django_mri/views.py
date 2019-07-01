@@ -1,4 +1,7 @@
+from django.apps import apps
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django_dicom.data_import import ImportImage
 from django_dicom.models import Series, Patient
 from django_dicom.serializers import PatientSerializer, SeriesSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -17,6 +20,9 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+subject_app_label, subject_model_name = settings.SUBJECT_MODEL.split(".")
+Subject = apps.get_model(app_label=subject_app_label, model_name=subject_model_name)
 
 
 class DefaultsMixin:
@@ -68,24 +74,67 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "institution_name",
     )
 
-    @action(detail=True, methods=["get"])
-    def from_dicom(self, request, series_id: int = None):
-        try:
-            series = Series.objects.get(id=series_id)
-        except ObjectDoesNotExist:
-            return Response(
-                "Invalid DICOM primary key!", status=status.HTTP_400_BAD_REQUEST
-            )
-        try:
-            scan = Scan.objects.get(dicom=series)
-            return Response(
-                ScanSerializer(scan, context={"request": request}).validated_data
-            )
-        except ObjectDoesNotExist:
-            scan = Scan(dicom=series)
-            scan.update_fields_from_dicom()
-            serializer = ScanSerializer(scan, context={"request": request})
-            return Response(serializer.data)
+    # def put(self, request, format=None):
+    #     file_obj = request.data["file"]
+    #     if file_obj.name.endswith(".dcm"):
+    #         dicom_image, created = ImportImage(file_obj).run()
+    #         scan, created = Scan.objects.get_or_create(dicom=dicom_image)
+    #         if created:
+    #             scan.update_fields_from_dicom()
+    #     # elif file_obj.name.endswith(".zip"):
+    #     #     content = ContentFile(file_obj.read())
+    #     #     temp_file_name = default_storage.save("tmp.zip", content)
+    #     #     temp_file_path = opj(settings.MEDIA_ROOT, temp_file_name)
+    #     #     LocalImport.import_local_zip_archive(temp_file_path, verbose=False)
+    #     #     return Response(
+    #     #         {"message": "Successfully imported ZIP archive!"},
+    #     #         status=status.HTTP_201_CREATED,
+    #     #     )
+    #     if created:
+    #         return Response(
+    #             {"message": f"Success! [Scan #{scan.id}]"},
+    #             status=status.HTTP_201_CREATED,
+    #         )
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["GET", "POST"])
+    def from_dicom(self, request, series_id: int = None, subject_id: int = None):
+        if request.method == "GET":
+            try:
+                series = Series.objects.get(id=series_id)
+            except ObjectDoesNotExist:
+                return Response(
+                    "Invalid DICOM primary key!", status=status.HTTP_400_BAD_REQUEST
+                )
+            try:
+                scan = Scan.objects.get(dicom=series)
+                return Response(
+                    ScanSerializer(scan, context={"request": request}).validated_data
+                )
+            except ObjectDoesNotExist:
+                scan = Scan(dicom=series)
+                scan.update_fields_from_dicom()
+                serializer = ScanSerializer(scan, context={"request": request})
+                return Response(serializer.data)
+        elif request.method == "PUT":
+            file_obj = request.data["file"]
+            if file_obj.name.endswith(".dcm"):
+                print("recognized dcm")
+                dicom_image, created = ImportImage(file_obj).run()
+                if created:
+                    print("created image instance")
+                    subject = Subject.objects.get(id=subject_id)
+                    scan, created = Scan.objects.get_or_create(
+                        dicom=dicom_image.series, subject=subject
+                    )
+                    if created:
+                        print("created scan instance")
+                        scan.update_fields_from_dicom()
+                        scan.save()
+                        serializer = ScanSerializer(scan, context={"request": request})
+                        print('updated scan instance')
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class NiftiViewSet(DefaultsMixin, viewsets.ModelViewSet):
