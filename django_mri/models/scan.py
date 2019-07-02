@@ -136,7 +136,7 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.get_spatial_resolution_from_dicom()
             self.sequence_type = self.infer_sequence_type_from_dicom()
             self.is_updated_from_dicom = True
-            self.subject = self.dicom.patient.subject
+            # self.subject = self.dicom.patient.subject
             return True
         else:
             raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")

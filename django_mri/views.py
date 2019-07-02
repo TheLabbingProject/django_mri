@@ -107,7 +107,6 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["GET"])
     def from_dicom(self, request, series_id: int = None, subject_id: int = None):
-        # if request.method == "GET":
         try:
             series = Series.objects.get(id=series_id)
         except ObjectDoesNotExist:
@@ -124,30 +123,6 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             scan.update_fields_from_dicom()
             serializer = ScanSerializer(scan, context={"request": request})
             return Response(serializer.data)
-        # elif request.method == "PUT":
-        #     file_obj = request.data["file"]
-        #     if file_obj.name.endswith(".dcm"):
-        #         dicom_image, created = ImportImage(file_obj).run()
-        #         if created:
-        #             scan, created = Scan.objects.get_or_create(dicom=dicom_image.series)
-        #             if created:
-        #                 scan.update_fields_from_dicom()
-        #                 subject = Subject.objects.get(id=subject_id)
-        #                 scan.subject = subject
-        #                 scan.save()
-        #                 serializer = ScanSerializer(scan, context={"request": request})
-        #                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        #     elif file_obj.name.endswith(".zip"):
-        #         content = ContentFile(file_obj.read())
-        #         temp_file_name = default_storage.save("tmp.zip", content)
-        #         temp_file_path = os.path.join(settings.MEDIA_ROOT, temp_file_name)
-        #         LocalImport.import_local_zip_archive(temp_file_path, verbose=False)
-        #         os.remove(temp_file_path)
-        #         return Response(
-        #             {"message": "Successfully imported ZIP archive!"},
-        #             status=status.HTTP_201_CREATED,
-        #         )
-        # return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class NiftiViewSet(DefaultsMixin, viewsets.ModelViewSet):
