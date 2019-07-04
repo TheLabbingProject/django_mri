@@ -41,7 +41,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         required=False,
     )
     nifti = serializers.HyperlinkedRelatedField(
-        view_name="mri:nifti-detail", queryset=NIfTI.objects.all(), required=False
+        view_name="mri:nifti-detail", queryset=NIfTI.objects.all(), required=False, allow_null=True,
     )
     study_groups = serializers.HyperlinkedRelatedField(
         view_name="research:group-detail",
