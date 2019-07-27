@@ -56,6 +56,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         view_name="mri:sequencetype-detail",
         queryset=SequenceType.objects.all(),
         required=False,
+        allow_null=True,
     )
 
     class Meta:
