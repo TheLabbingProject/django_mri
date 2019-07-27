@@ -36,8 +36,8 @@ sequences = [
         "sequence_variant": ["SK", "SP"],
     },
     {
-        "title": "Resting-state fMRI",
-        "description": "Resting state fMRI (rsfMRI or R-fMRI) is a method of functional magnetic resonance imaging (fMRI) that is used in brain mapping to evaluate regional interactions that occur in a resting or task-negative state, when an explicit task is not being performed.",
+        "title": "fMRI",
+        "description": "Functional magnetic resonance imaging or functional MRI (fMRI) measures brain activity by detecting changes associated with blood flow. This technique relies on the fact that cerebral blood flow and neuronal activation are coupled. When an area of the brain is in use, blood flow to that region also increases.",
         "scanning_sequence": ["EP"],
         "sequence_variant": ["SK", "SS"],
     },
