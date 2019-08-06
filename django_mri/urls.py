@@ -7,8 +7,6 @@ router = routers.DefaultRouter()
 router.register(r"scan", views.ScanViewSet)
 router.register(r"nifti", views.NiftiViewSet)
 router.register(r"sequence_type", views.SequenceTypeViewSet)
-router.register(r"unreviewed_dicom_patients", views.UnreviewedDicomPatientViewSet)
-router.register(r"unreviewed_dicom_series", views.UnreviewedDicomSeriesViewSet)
 
 
 urlpatterns = [
