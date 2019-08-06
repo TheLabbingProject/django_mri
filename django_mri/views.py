@@ -6,10 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django_mri.data_import import ImportScan, LocalImport
-
-# from django_dicom.data_import import ImportImage, LocalImport
-from django_dicom.models import Series, Patient
-from django_dicom.serializers import PatientSerializer, SeriesSerializer
+from django_dicom.models import Series
 from django_filters.rest_framework import DjangoFilterBackend
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.filters.sequence_type_filter import SequenceTypeFilter
@@ -32,11 +29,6 @@ subject_app_label, subject_model_name = settings.SUBJECT_MODEL.split(".")
 Subject = apps.get_model(app_label=subject_app_label, model_name=subject_model_name)
 
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 25
-    page_size_query_param = "page_size"
-
-
 class DefaultsMixin:
     """
     Default settings for view authentication, permissions and filtering.
@@ -46,6 +38,11 @@ class DefaultsMixin:
     authentication_classes = (BasicAuthentication, TokenAuthentication)
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = "page_size"
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -134,23 +131,3 @@ class SequenceTypeViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = SequenceType.objects.all()
     serializer_class = SequenceTypeSerializer
     filter_class = SequenceTypeFilter
-
-
-class UnreviewedDicomPatientViewSet(DefaultsMixin, viewsets.ModelViewSet):
-    queryset = Patient.objects.all()
-    serializer_class = PatientSerializer
-
-    def get_queryset(self):
-        patients_with_unreviewed_series = (
-            Series.objects.filter(scan__isnull=True)
-            .order_by()
-            .values_list("patient", flat=True)
-            .distinct()
-        )
-        return Patient.objects.filter(id__in=patients_with_unreviewed_series)
-
-
-class UnreviewedDicomSeriesViewSet(DefaultsMixin, viewsets.ModelViewSet):
-    queryset = Series.objects.filter(scan__isnull=True)
-    serializer_class = SeriesSerializer
-    filter_fields = ("patient__id",)
