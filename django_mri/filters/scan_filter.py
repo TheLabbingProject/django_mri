@@ -2,6 +2,10 @@ from django_filters import rest_framework as filters
 from django_mri.models.scan import Scan
 
 
+class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
+    pass
+
+
 class ScanFilter(filters.FilterSet):
     """
     Provides useful filtering options for the :class:`~django_dicom.models.series.Series`
@@ -23,6 +27,7 @@ class ScanFilter(filters.FilterSet):
     scan_time = filters.DateTimeFromToRangeFilter("time")
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
+    dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
 
     class Meta:
         model = Scan
