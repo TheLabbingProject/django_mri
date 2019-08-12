@@ -12,6 +12,6 @@ class ScanReview(forms.ModelForm):
 
     class Meta:
         model = Scan
-        exclude = ["is_updated_from_dicom", "_nifti", "dicom"]
+        exclude = ["is_updated_from_dicom", "nifti", "dicom"]
         localized_fields = ("time",)
         labels = {"subject_id": "Subject ID"}
