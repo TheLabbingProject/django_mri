@@ -28,6 +28,7 @@ class SequenceType(TitleDescriptionModel):
 
     class Meta:
         unique_together = ("scanning_sequence", "sequence_variant")
+        ordering = ("title",)
 
     def __str__(self) -> str:
         return self.title
