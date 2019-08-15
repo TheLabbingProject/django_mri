@@ -44,4 +44,4 @@ venv
 
 pip-wheel-metadata/
 docs/build/
-django_mri/migrations/
+*/migrations/*
