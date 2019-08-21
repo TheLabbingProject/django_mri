@@ -7,3 +7,4 @@ nibabel==2.4.0
 numpy==1.16.3
 psycopg2-binary==2.8.2
 tqdm==4.31.1
+https://github.com/ZviBaratz/django_dicom/archive/master.zip
