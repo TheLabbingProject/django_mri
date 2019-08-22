@@ -77,6 +77,7 @@ class Scan(TimeStampedModel):
         on_delete=models.PROTECT,
         blank=True,
         null=True,
+        related_name="scan",
         verbose_name="DICOM Series",
     )
     # Keep track of whether we've updated the instance's fields from the DICOM

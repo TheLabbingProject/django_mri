@@ -1,6 +1,8 @@
 import os
 
+from django.db.models.query import QuerySet
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -52,6 +54,23 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "spatial_resolution",
         "institution_name",
     )
+
+    def get_queryset(self) -> QuerySet:
+        """
+        Filter the returned scans according to the studies the requesting
+        user is a collaborator in, unless the user is staff, in which case
+        return all scans.
+        
+        Returns
+        -------
+        QuerySet
+            Scan instances.
+        """
+
+        user = get_user_model().objects.get(username=self.request.user)
+        if user.is_staff:
+            return Scan.objects.all()
+        return Scan.objects.filter(study_groups__study__collaborators=user)
 
     @action(detail=False, methods=["POST"])
     def from_file(self, request):
