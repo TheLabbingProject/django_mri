@@ -2,6 +2,7 @@ import os
 import pytz
 
 from datetime import datetime
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
@@ -102,6 +103,14 @@ class Scan(TimeStampedModel):
 
     study_groups = models.ManyToManyField(
         settings.STUDY_GROUP_MODEL, related_name="mri_scans", blank=True
+    )
+
+    added_by = models.ForeignKey(
+        get_user_model(),
+        related_name="mri_uploads",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
 
     class Meta:
