@@ -89,9 +89,12 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         """
         file_obj = request.data["file"]
         subject = get_subject_model().objects.get(id=request.data["subject_id"])
+        user = get_user_model().objects.get(username=self.request.user)
 
         if file_obj.name.endswith(".dcm"):
-            scan, created = ImportScan(subject, file_obj).run()
+            scan, created = ImportScan(
+                subject, file_obj, scan_type="dcm", user=user
+            ).run()
             serializer = ScanSerializer(scan, context={"request": request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -99,7 +102,7 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             content = ContentFile(file_obj.read())
             temp_file_name = default_storage.save("tmp.zip", content)
             temp_file_path = os.path.join(settings.MEDIA_ROOT, temp_file_name)
-            LocalImport(subject, temp_file_path).run()
+            LocalImport(subject, temp_file_path, user=user).run()
             os.remove(temp_file_path)
             return Response(
                 {"message": "Successfully imported ZIP archive!"},

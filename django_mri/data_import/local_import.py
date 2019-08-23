@@ -1,16 +1,15 @@
-# import itertools
 import os
 import zipfile
 
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django_mri.data_import.import_scan import ImportScan
-
-# from django_mri.models import NIfTI
 
 
 subject_app_label, subject_model_name = settings.SUBJECT_MODEL.split(".")
 Subject = apps.get_model(app_label=subject_app_label, model_name=subject_model_name)
+User = get_user_model()
 
 
 class LocalImport:
@@ -22,26 +21,46 @@ class LocalImport:
     
     """
 
-    def __init__(self, subject: Subject, path: str):
+    def __init__(self, subject: Subject, path: str, user: User = None):
         """
         Initializes the :class:`~django_mri.data_import.local_import.LocalImport`
         class with the base directory path.
         
         Parameters
         ----------
+        subject : Subject
+            The research subject to whom the scan belongs.
         path : str
             Base directory for local MRI data import.
         """
 
         self.subject = subject
         self.path = path
+        self.user = user
 
     @classmethod
-    def import_local_dcm(cls, subject: Subject, path: str) -> tuple:
-        with open(path, "rb") as dcm_buffer:
-            return ImportScan(subject, dcm_buffer, scan_type="dcm").run()
+    def import_local_dcm(cls, subject: Subject, path: str, user: User = None) -> tuple:
+        """
+        Imports a single DICOM image (.dcm file) using *django_dicom*'s
+        :class:`~django_dicom.data_import.import_scan.ImportScan` class.
+        
+        Parameters
+        ----------
+        subject : Subject
+            The research subject to whom the scan belongs.
+        path : str
+            Full path of the DICOM image.
+        
+        Returns
+        -------
+        tuple
+            (Resulting :class:`~django_dicom.models.image.Image` instance, Created [bool])
+        """
 
-    def import_zip_archive(cls, subject: Subject, path: str) -> None:
+        with open(path, "rb") as dcm_buffer:
+            return ImportScan(subject, dcm_buffer, scan_type="dcm", user=user).run()
+
+    def import_zip_archive(cls, subject: Subject, path: str, user: User = None) -> None:
         """
         Iterates over the files within a ZIP archive and imports any "*.dcm*" files.
         
@@ -57,7 +76,9 @@ class LocalImport:
             for file_name in archive.namelist():
                 if file_name.endswith(".dcm"):
                     with archive.open(file_name) as dcm_buffer:
-                        ImportScan(subject, dcm_buffer, scan_type="dcm").run()
+                        ImportScan(
+                            subject, dcm_buffer, scan_type="dcm", user=user
+                        ).run()
 
     def path_generator(self, extension: str = "") -> str:
         """
@@ -117,13 +138,13 @@ class LocalImport:
         if os.path.isdir(self.path):
             dcm_generator = self.path_generator(extension="dcm")
             for dcm_path in dcm_generator:
-                self.import_local_dcm(self.subject, dcm_path)
+                self.import_local_dcm(self.subject, dcm_path, user=self.user)
             archives = self.path_generator(extension="zip")
             for archive in archives:
-                self.import_zip_archive(self.subject, archive)
+                self.import_zip_archive(self.subject, archive, user=self.user)
 
         elif os.path.isfile(self.path):
             if self.path.endswith(".dcm"):
-                self.import_local_dcm(self.subject, self.path)
+                self.import_local_dcm(self.subject, self.path, user=self.user)
             elif self.path.endswith(".zip"):
-                self.import_zip_archive(self.subject, self.path)
+                self.import_zip_archive(self.subject, self.path, user=self.user)
