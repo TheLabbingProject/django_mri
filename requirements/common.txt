@@ -6,4 +6,4 @@ nibabel==2.4.0
 numpy==1.16.3
 psycopg2-binary==2.8.2
 tqdm==4.31.1
-git+https://github.com/TheLabbingProject/django_dicom.git
+django-dicom==0.0.1
