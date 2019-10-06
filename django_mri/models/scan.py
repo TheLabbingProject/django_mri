@@ -15,11 +15,11 @@ from django_mri.models.sequence_type import SequenceType
 
 class Scan(TimeStampedModel):
     """
-    A model used to represent an MRI scan independently from the file-format in 
+    A model used to represent an MRI scan independently from the file-format in
     which it is saved. This model handles any conversions between formats in case
     they are required, and allows for easy querying of MRI scans based on universal
     attributes.
-    
+
     """
 
     institution_name = models.CharField(max_length=64, blank=True, null=True)
@@ -164,7 +164,7 @@ class Scan(TimeStampedModel):
         .. _Slice Thickness: https://dicom.innolitics.com/ciods/mr-image/image-plane/00180050
         .. _required (type 1): http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.4.html
         .. _type 2: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.4.html
-        
+
         Returns
         -------
         list
@@ -202,7 +202,7 @@ class Scan(TimeStampedModel):
         """
         Returns the default location for the creation of a NIfTI version of the
         scan. Currently only conversion from DICOM is supported.
-        
+
         Returns
         -------
         str
@@ -215,7 +215,7 @@ class Scan(TimeStampedModel):
     def get_default_nifti_name(self) -> str:
         """
         Returns the default file name for a NIfTI version of this scan.
-        
+
         Returns
         -------
         str
@@ -227,7 +227,7 @@ class Scan(TimeStampedModel):
     def get_default_nifti_destination(self) -> str:
         """
         Returns the default path for a NIfTI version of this scan.
-        
+
         Returns
         -------
         str
