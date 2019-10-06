@@ -1,5 +1,8 @@
+import bokeh
 import os
 
+from bokeh.plotting import figure
+from bokeh.embed import components
 from django.db.models.query import QuerySet
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -60,7 +63,7 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         Filter the returned scans according to the studies the requesting
         user is a collaborator in, unless the user is staff, in which case
         return all scans.
-        
+
         Returns
         -------
         QuerySet
@@ -76,12 +79,12 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     def from_file(self, request):
         """
         Creates a new scan instance from a file (currently only DICOM format files are accepted).
-        
+
         Parameters
         ----------
-        request : 
+        request :
             A request from the client.
-        
+
         Returns
         -------
         Response
@@ -114,14 +117,14 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         """
         Returns scan information from a :class:`~django_dicom.models.series.Series` instance
         without serializing.
-        
+
         Parameters
         ----------
         request :
             A request from the client.
         series_id : int, optional
             :class:`~django_dicom.models.series.Series` primary key, by default None
-        
+
         Returns
         -------
         Response
@@ -143,3 +146,14 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             scan.update_fields_from_dicom()
             serializer = ScanSerializer(scan, context={"request": request})
             return Response(serializer.data)
+
+    @action(detail=True, methods=["GET"])
+    def plot(self, request, scan_id: int):
+        # scan = Scan.objects.get(id=scan_id)
+        plot = figure(plot_height=250)
+        plot.circle([1, 2], [3, 4])
+        script, div = components(plot, wrap_script=False)
+        return Response(
+            {"bokehVersion": bokeh.__version__, "div": [div], "script": [script]}
+        )
+
