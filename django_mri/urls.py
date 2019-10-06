@@ -16,4 +16,5 @@ urlpatterns = [
         "mri/scan/from_dicom/<int:series_id>/",
         views.ScanViewSet.as_view({"GET": "from_dicom"}),
     ),
+    path("mri/scan/plot/<int:scan_id>/", views.ScanViewSet.as_view({"get": "plot"})),
 ]
