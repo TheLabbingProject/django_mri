@@ -7,4 +7,11 @@ class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = SequenceType
-        fields = "__all__"
+        fields = (
+            "id",
+            "title",
+            "description",
+            "scanning_sequence",
+            "sequence_variant",
+            "url",
+        )
