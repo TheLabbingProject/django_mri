@@ -2,6 +2,7 @@ from django_dicom.models import Series
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.sequence_type import SequenceType
+from django_mri.serializers.sequence_type import SequenceTypeSerializer
 from django_mri.utils.utils import get_subject_model, get_group_model
 from rest_framework import serializers
 
@@ -28,12 +29,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         many=True,
         required=False,
     )
-    sequence_type = serializers.HyperlinkedRelatedField(
-        view_name="mri:sequencetype-detail",
-        queryset=SequenceType.objects.all(),
-        required=False,
-        allow_null=True,
-    )
+    sequence_type = SequenceTypeSerializer(source="infer_sequence_type_from_dicom")
 
     class Meta:
         model = Scan
@@ -44,7 +40,6 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
             "subject",
             "nifti",
             "study_groups",
-            "sequence_type",
             "institution_name",
             "time",
             "description",
@@ -54,6 +49,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
             "inversion_time",
             "spatial_resolution",
             "comments",
+            "sequence_type",
         )
 
     def create(self, validated_data):
