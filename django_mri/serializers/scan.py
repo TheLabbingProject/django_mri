@@ -29,7 +29,9 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         many=True,
         required=False,
     )
-    sequence_type = SequenceTypeSerializer(source="infer_sequence_type_from_dicom")
+    sequence_type = SequenceTypeSerializer(
+        source="infer_sequence_type_from_dicom", read_only=True
+    )
 
     class Meta:
         model = Scan
