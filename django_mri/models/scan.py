@@ -60,9 +60,9 @@ class Scan(TimeStampedModel):
         help_text="The time between the 180-degree inversion pulse and the following spin-echo (SE) sequence (in milliseconds).",
     )
     spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
-    sequence_type = models.ForeignKey(
-        "django_mri.SequenceType", on_delete=models.PROTECT, blank=True, null=True
-    )
+    # sequence_type = models.ForeignKey(
+    #     "django_mri.SequenceType", on_delete=models.PROTECT, blank=True, null=True
+    # )
 
     comments = models.TextField(
         max_length=1000,
@@ -144,7 +144,7 @@ class Scan(TimeStampedModel):
             self.inversion_time = self.dicom.inversion_time
             self.repetition_time = self.dicom.repetition_time
             self.spatial_resolution = self.get_spatial_resolution_from_dicom()
-            self.sequence_type = self.infer_sequence_type_from_dicom()
+            # self.sequence_type = self.infer_sequence_type_from_dicom()
             self.is_updated_from_dicom = True
             # self.subject = self.dicom.patient.subject
             return True
