@@ -28,6 +28,7 @@ class ScanFilter(filters.FilterSet):
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
     dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
+    sequence_type = filters.NumberFilter(method="filter_by_sequence_type")
 
     class Meta:
         model = Scan
@@ -46,5 +47,14 @@ class ScanFilter(filters.FilterSet):
             "is_updated_from_dicom",
             "dicom__id",
             "subject",
+        )
+
+    def filter_by_sequence_type(self, queryset, field_name, value):
+        return queryset.filter(
+            id__in=[
+                scan.id
+                for scan in queryset
+                if scan.infer_sequence_type_from_dicom().id == value
+            ]
         )
 
