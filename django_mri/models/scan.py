@@ -198,6 +198,10 @@ class Scan(TimeStampedModel):
         except models.ObjectDoesNotExist:
             return None
 
+    def infer_sequence_type(self) -> SequenceType:
+        if self.dicom:
+            return self.infer_sequence_type_from_dicom()
+
     def get_default_nifti_dir(self) -> str:
         """
         Returns the default location for the creation of a NIfTI version of the
@@ -283,3 +287,6 @@ class Scan(TimeStampedModel):
                 f"Failed to convert scan #{self.id} from DICOM to NIfTI! No DICOM series is related to this scan."
             )
 
+    @property
+    def sequence_type(self) -> SequenceType:
+        return self.infer_sequence_type()
