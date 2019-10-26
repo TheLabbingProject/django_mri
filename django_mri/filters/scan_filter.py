@@ -6,11 +6,23 @@ class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
     pass
 
 
+def filter_by_sequence_type(queryset, field_name, value):
+    value = [int(pk) for pk in value]
+    filtered_scan_ids = [
+        scan.id
+        for scan in queryset
+        if scan.sequence_type and scan.sequence_type.id in value
+    ]
+    if -1 in value:
+        filtered_scan_ids += [scan.id for scan in queryset if not scan.sequence_type]
+    return queryset.filter(id__in=filtered_scan_ids)
+
+
 class ScanFilter(filters.FilterSet):
     """
     Provides useful filtering options for the :class:`~django_dicom.models.series.Series`
     class.
-    
+
     """
 
     description = filters.LookupChoiceFilter(
@@ -28,7 +40,7 @@ class ScanFilter(filters.FilterSet):
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
     dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
-    sequence_type = NumberInFilter(method="filter_by_sequence_type")
+    sequence_type = NumberInFilter(method=filter_by_sequence_type)
 
     class Meta:
         model = Scan
@@ -48,14 +60,4 @@ class ScanFilter(filters.FilterSet):
             "dicom__id",
             "subject",
         )
-
-    def filter_by_sequence_type(self, queryset, field_name, value):
-        value = [int(pk) for pk in value]
-        filtered_scan_ids = [
-            scan.id
-            for scan in queryset
-            if scan.infer_sequence_type_from_dicom()
-            and scan.infer_sequence_type_from_dicom().id in value
-        ]
-        return queryset.filter(id__in=filtered_scan_ids)
 
