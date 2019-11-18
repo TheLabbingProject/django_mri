@@ -119,4 +119,4 @@ class NIfTI(TimeStampedModel):
             The subject ID to which this NIfTI file's origin is related with.
         """
 
-        return self.parent.subject_id
+        return self.parent.subject if self.parent else None
