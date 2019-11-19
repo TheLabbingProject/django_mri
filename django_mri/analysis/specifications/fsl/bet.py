@@ -20,7 +20,7 @@ BET_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Desired output file path.",
         "is_output_path": True,
-        "default": "brain",
+        "default": "brain.nii.gz",
     },
     "outline": {
         "type": BooleanInputDefinition,
@@ -101,6 +101,7 @@ BET_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Output file format.",
         "choices": ["NIFTI", "NIFTI_PAIR", "NIFTI_GZ", "NIFTI_PAIR_GZ"],
+        "default": "NIFTI_GZ",
     },
 }
 
