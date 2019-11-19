@@ -25,6 +25,7 @@ FLIRT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "The resulting registered image.",
         "is_output_path": True,
+        "default": "registered.nii.gz",
     },
     "out_matrix_file": {
         "type": StringInputDefinition,
@@ -181,7 +182,7 @@ FLIRT_INPUT_SPECIFICATION = {
     },
     "save_log": {
         "type": BooleanInputDefinition,
-        "default": True,
+        "default": False,
         "description": "Whether to save a run log.",
     },
     "verbose": {
