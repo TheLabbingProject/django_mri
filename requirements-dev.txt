@@ -1,0 +1,8 @@
+black==19.10b0
+coverage~=4.5
+factory-boy~=2.12
+flake8~=3.7
+ipython~=7.10
+pytest~=5.3
+sphinx~=2.2
+sphinx-rtd-theme~=0.4
