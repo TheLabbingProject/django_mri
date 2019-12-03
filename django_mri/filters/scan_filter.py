@@ -34,8 +34,6 @@ class ScanFilter(filters.FilterSet):
         ],
     )
     number = filters.NumberFilter("number")
-    # sequence_type = filters.AllValuesMultipleFilter("sequence_type")
-    # spatial_resolution = filters.AllValuesFilter("spatial_resolution")
     scan_time = filters.DateTimeFromToRangeFilter("time")
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
@@ -53,8 +51,6 @@ class ScanFilter(filters.FilterSet):
             "echo_time",
             "inversion_time",
             "repetition_time",
-            # "sequence_type",
-            # "spatial_resolution",
             "institution_name",
             "is_updated_from_dicom",
             "dicom__id",

@@ -1,4 +1,4 @@
-from django_analysis.models.input.definitions import (
+from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
     FloatInputDefinition,
@@ -7,7 +7,7 @@ from django_analysis.models.input.definitions import (
     StringInputDefinition,
 )
 
-from django_analysis.models.output.definitions import FileOutputDefinition
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 BET_INPUT_SPECIFICATION = {
     "in_file": {

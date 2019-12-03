@@ -1,11 +1,5 @@
-import bokeh
 import os
 
-from bokeh.plotting import figure
-from bokeh.embed import components
-
-# from bokeh.server.server import Server
-from bokeh.embed import server_document
 from django.db.models.query import QuerySet
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -23,9 +17,6 @@ from django_mri.views.pagination import StandardResultsSetPagination
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-# from series_viewer import SeriesViewer
-# from series_viewer.embed import embed_series_viewer
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -152,16 +143,3 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             scan.update_fields_from_dicom()
             serializer = ScanSerializer(scan, context={"request": request})
             return Response(serializer.data)
-
-    @action(detail=True, methods=["GET"])
-    def plot(self, request, scan_id: int):
-        # scan = Scan.objects.get(id=scan_id)
-        # plot = figure(plot_height=250)
-        # plot.circle([1, 2], [3, 4])
-        # app = SeriesViewer(scan.dicom.get_data())
-        # plot = app.create_main_layout()
-        # script, div = components(plot, wrap_script=False)
-        return Response(
-            {"bokehVersion": bokeh.__version__, "script": server_document()[1:]}
-            # {"bokehVersion": bokeh.__version__, "div": [div], "script": [script]}
-        )
