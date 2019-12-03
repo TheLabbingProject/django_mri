@@ -44,5 +44,3 @@ venv
 
 pip-wheel-metadata/
 docs/build/
-*/migrations/*
-!*/migrations/__init__.py
