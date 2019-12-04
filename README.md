@@ -1,4 +1,8 @@
+[![PyPI version](https://img.shields.io/pypi/v/django-mri.svg)](https://pypi.python.org/pypi/django-mri/)
+[![PyPI status](https://img.shields.io/pypi/status/django-mri.svg)](https://pypi.python.org/pypi/django-mri/)
+
 # _django_mri_
+
 
 A django app to manage MRI data.
 
