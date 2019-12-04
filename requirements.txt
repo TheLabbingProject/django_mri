@@ -1,6 +1,7 @@
 Django==2.*
 djangorestframework~=3.10
-django-dicom>=0.0.2
+django-analyses>=0.0.3
+django-dicom>=0.0.4
 django-extensions~=2.2
 django-filter~=2.2
 nipype~=1.3
