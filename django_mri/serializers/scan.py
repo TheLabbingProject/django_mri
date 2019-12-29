@@ -1,21 +1,18 @@
 from django_dicom.models import Series
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
-from django_mri.models.sequence_type import SequenceType
 from django_mri.serializers.sequence_type import SequenceTypeSerializer
 from django_mri.utils.utils import get_subject_model, get_group_model
 from rest_framework import serializers
-from django.conf import settings
 
 
 class ScanSerializer(serializers.HyperlinkedModelSerializer):
-    app = "tests" if getattr(settings, "TEST", False) else "research"
     url = serializers.HyperlinkedIdentityField(view_name="mri:scan-detail")
     dicom = serializers.HyperlinkedRelatedField(
         view_name="dicom:series-detail", queryset=Series.objects.all()
     )
     subject = serializers.HyperlinkedRelatedField(
-        view_name=f"{app}:subject-detail",
+        view_name=f"research:subject-detail",
         queryset=get_subject_model().objects.all(),
         required=False,
     )
@@ -26,7 +23,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
     )
     study_groups = serializers.HyperlinkedRelatedField(
-        view_name=f"{app}:group-detail",
+        view_name=f"research:group-detail",
         queryset=get_group_model().objects.all(),
         many=True,
         required=False,
