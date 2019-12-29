@@ -1,0 +1,65 @@
+Metadata-Version: 2.1
+Name: django-analyses
+Version: 0.0.3
+Summary: A reusable Django app to manage analyses.
+Home-page: https://github.com/TheLabbingProject/django_analyses
+Author: Zvi Baratz
+Author-email: baratzz@pm.me
+License: AGPLv3
+Keywords: django research analysis pipeline
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django :: 2.2
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Description-Content-Type: text/markdown
+Requires-Dist: Django (==2.*)
+Requires-Dist: djangorestframework (~=3.10)
+Requires-Dist: django-extensions (~=2.2)
+Requires-Dist: django-filter (~=2.2)
+Requires-Dist: django-model-utils (~=3.2)
+Provides-Extra: dev
+Requires-Dist: black (==19.10b0) ; extra == 'dev'
+Requires-Dist: coverage (~=4.5) ; extra == 'dev'
+Requires-Dist: factory-boy (~=2.12) ; extra == 'dev'
+Requires-Dist: flake8 (~=3.7) ; extra == 'dev'
+Requires-Dist: ipython (~=7.10) ; extra == 'dev'
+Requires-Dist: pytest (~=5.3) ; extra == 'dev'
+Requires-Dist: sphinx (~=2.2) ; extra == 'dev'
+Requires-Dist: sphinx-rtd-theme (~=0.4) ; extra == 'dev'
+
+# django-analyses
+
+
+A reusable Django app to manage analyses.
+
+Quick start
+-----------
+
+1. Add "django_analyses" to your INSTALLED_APPS setting:
+
+<pre>
+    INSTALLED_APPS = [  
+        ...  
+        'django_analyses',  
+    ]  
+</pre>
+
+2. Include the `analysis` URLconf in your project urls.py:
+
+<pre>
+    path("api/", include("django_analyses.urls", namespace="analysis")),
+</pre>
+
+3. Run `python manage.py migrate` to create the analyses models.
+
+4. Start the development server and visit http://127.0.0.1:8000/admin/.
+
+5. Visit http://127.0.0.1:8000/api/analysis/.
+
+

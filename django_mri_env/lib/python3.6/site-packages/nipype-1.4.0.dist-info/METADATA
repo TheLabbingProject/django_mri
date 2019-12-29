@@ -1,0 +1,138 @@
+Metadata-Version: 2.1
+Name: nipype
+Version: 1.4.0
+Summary: Neuroimaging in Python: Pipelines and Interfaces
+Home-page: http://nipy.org/nipype
+Author: nipype developers
+Author-email: neuroimaging@python.org
+Maintainer: nipype developers
+Maintainer-email: neuroimaging@python.org
+License: Apache License, 2.0
+Download-URL: http://github.com/nipy/nipype/archives/master
+Platform: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Topic :: Scientific/Engineering
+Provides: nipype
+Requires-Python: >= 3.5
+Requires-Dist: click (>=6.6.0)
+Requires-Dist: networkx (>=1.9)
+Requires-Dist: nibabel (>=2.1.0)
+Requires-Dist: packaging
+Requires-Dist: prov (>=1.5.2)
+Requires-Dist: pydot (>=1.2.3)
+Requires-Dist: pydotplus
+Requires-Dist: python-dateutil (>=2.2)
+Requires-Dist: scipy (>=0.14)
+Requires-Dist: simplejson (>=3.8.0)
+Requires-Dist: traits (!=5.0,>=4.6)
+Requires-Dist: filelock (>=3.0.0)
+Requires-Dist: etelemetry
+Requires-Dist: neurdflib
+Requires-Dist: numpy (>=1.12) ; python_version < "3.7"
+Requires-Dist: numpy (>=1.15.3) ; python_version >= "3.7"
+Provides-Extra: all
+Requires-Dist: coverage (<5) ; extra == 'all'
+Requires-Dist: psutil (>=5.0) ; extra == 'all'
+Requires-Dist: numpydoc ; extra == 'all'
+Requires-Dist: datalad ; extra == 'all'
+Requires-Dist: pytest-cov ; extra == 'all'
+Requires-Dist: duecredit ; extra == 'all'
+Requires-Dist: pytest ; extra == 'all'
+Requires-Dist: codecov ; extra == 'all'
+Requires-Dist: pydot (>=1.2.3) ; extra == 'all'
+Requires-Dist: pybids (>=0.7.0) ; extra == 'all'
+Requires-Dist: black ; extra == 'all'
+Requires-Dist: nilearn (<0.5.0) ; extra == 'all'
+Requires-Dist: paramiko ; extra == 'all'
+Requires-Dist: nitime ; extra == 'all'
+Requires-Dist: mock ; extra == 'all'
+Requires-Dist: nipy ; extra == 'all'
+Requires-Dist: pytest-env ; extra == 'all'
+Requires-Dist: matplotlib ; extra == 'all'
+Requires-Dist: pydotplus ; extra == 'all'
+Requires-Dist: Sphinx (>=1.4) ; extra == 'all'
+Requires-Dist: xvfbwrapper ; extra == 'all'
+Requires-Dist: dipy ; extra == 'all'
+Provides-Extra: data
+Requires-Dist: datalad ; extra == 'data'
+Provides-Extra: dev
+Requires-Dist: pytest-env ; extra == 'dev'
+Requires-Dist: coverage (<5) ; extra == 'dev'
+Requires-Dist: numpydoc ; extra == 'dev'
+Requires-Dist: pytest ; extra == 'dev'
+Requires-Dist: matplotlib ; extra == 'dev'
+Requires-Dist: pydotplus ; extra == 'dev'
+Requires-Dist: pytest-cov ; extra == 'dev'
+Requires-Dist: Sphinx (>=1.4) ; extra == 'dev'
+Requires-Dist: black ; extra == 'dev'
+Requires-Dist: codecov ; extra == 'dev'
+Requires-Dist: mock ; extra == 'dev'
+Requires-Dist: pydot (>=1.2.3) ; extra == 'dev'
+Provides-Extra: doc
+Requires-Dist: Sphinx (>=1.4) ; extra == 'doc'
+Requires-Dist: numpydoc ; extra == 'doc'
+Requires-Dist: matplotlib ; extra == 'doc'
+Requires-Dist: pydotplus ; extra == 'doc'
+Requires-Dist: pydot (>=1.2.3) ; extra == 'doc'
+Provides-Extra: duecredit
+Requires-Dist: duecredit ; extra == 'duecredit'
+Provides-Extra: nipy
+Requires-Dist: nitime ; extra == 'nipy'
+Requires-Dist: nilearn (<0.5.0) ; extra == 'nipy'
+Requires-Dist: dipy ; extra == 'nipy'
+Requires-Dist: nipy ; extra == 'nipy'
+Requires-Dist: matplotlib ; extra == 'nipy'
+Provides-Extra: profiler
+Requires-Dist: psutil (>=5.0) ; extra == 'profiler'
+Provides-Extra: pybids
+Requires-Dist: pybids (>=0.7.0) ; extra == 'pybids'
+Provides-Extra: specs
+Requires-Dist: black ; extra == 'specs'
+Provides-Extra: ssh
+Requires-Dist: paramiko ; extra == 'ssh'
+Provides-Extra: tests
+Requires-Dist: codecov ; extra == 'tests'
+Requires-Dist: coverage (<5) ; extra == 'tests'
+Requires-Dist: mock ; extra == 'tests'
+Requires-Dist: pytest ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: pytest-env ; extra == 'tests'
+Provides-Extra: xvfbwrapper
+Requires-Dist: xvfbwrapper ; extra == 'xvfbwrapper'
+
+========================================================
+NIPYPE: Neuroimaging in Python: Pipelines and Interfaces
+========================================================
+
+Current neuroimaging software offer users an incredible opportunity to
+analyze data using a variety of different algorithms. However, this has
+resulted in a heterogeneous collection of specialized applications
+without transparent interoperability or a uniform operating interface.
+
+*Nipype*, an open-source, community-developed initiative under the
+umbrella of `NiPy <http://nipy.org>`_, is a Python project that provides a
+uniform interface to existing neuroimaging software and facilitates interaction
+between these packages within a single workflow. Nipype provides an environment
+that encourages interactive exploration of algorithms from different
+packages (e.g., AFNI, ANTS, BRAINS, BrainSuite, Camino, FreeSurfer, FSL, MNE,
+MRtrix, MNE, Nipy, Slicer, SPM), eases the design of workflows within and
+between packages, and reduces the learning curve necessary to use different packages. Nipype is creating a collaborative platform for neuroimaging software development in a high-level language and addressing limitations of existing pipeline systems.
+
+*Nipype* allows you to:
+
+* easily interact with tools from different software packages
+* combine processing steps from different software packages
+* develop new workflows faster by reusing common steps from old ones
+* process data faster by running it in parallel on many cores/machines
+* make your research easily reproducible
+* share your processing workflows with the community
+
+

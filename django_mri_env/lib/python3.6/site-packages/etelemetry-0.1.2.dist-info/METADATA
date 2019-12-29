@@ -1,0 +1,36 @@
+Metadata-Version: 2.1
+Name: etelemetry
+Version: 0.1.2
+Summary: Etelemetry python client API
+Home-page: https://github.com/mgxd/etelemetry-client
+Author: Senseable Intelligence Group
+Maintainer: Mathias Goncalves
+Maintainer-email: mathiasg@mit.edu
+License: Apache License, 2.0
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Provides: etelemetry
+Requires-Python: >= 2.7
+Requires-Dist: requests
+Provides-Extra: all
+Requires-Dist: pytest ; extra == 'all'
+Requires-Dist: pytest-cov ; extra == 'all'
+Requires-Dist: codecov ; extra == 'all'
+Provides-Extra: test
+Requires-Dist: pytest ; extra == 'test'
+Requires-Dist: pytest-cov ; extra == 'test'
+Requires-Dist: codecov ; extra == 'test'
+Provides-Extra: tests
+Requires-Dist: pytest ; extra == 'tests'
+Requires-Dist: pytest-cov ; extra == 'tests'
+Requires-Dist: codecov ; extra == 'tests'
+
+UNKNOWN
+
+

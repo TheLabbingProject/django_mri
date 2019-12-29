@@ -1,0 +1,34 @@
+Metadata-Version: 2.1
+Name: neurdflib
+Version: 5.0.1
+Summary: TEMP RELEASE of new features for RDFLib
+Home-page: https://github.com/tgbugs/rdflib
+Maintainer-email: tgbugs@gmail.com
+License: BSD-3-Clause
+Platform: any
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Operating System :: OS Independent
+Classifier: Natural Language :: English
+Requires-Dist: six
+Requires-Dist: isodate
+Requires-Dist: pyparsing
+Provides-Extra: html
+Requires-Dist: html5lib ; extra == 'html'
+
+This is a temporary convenience package for changes waiting to be
+merged into the primary rdflib repo.
+https://github.com/RDFLib/rdflib/pull/649
+
+Unless you have a specific use case for these changes you should
+install upstream rdflib.  https://pypi.org/project/rdflib/
+
+
