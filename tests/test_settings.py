@@ -7,10 +7,12 @@ env = environ.Env(
     SECRET_KEY=(str, "asdf5sag231sd$#%SADF2341a"),
     BOKEH_SECRET_KEY=(str, ""),
     BOKEH_SIGN_SESSIONS=(bool, True),
-    DB_NAME=(str, ""),
+    DB_NAME=(str, "django_mri"),
     DB_USER=(str, ""),
     DB_PASSWORD=(str, ""),
+    RAW_SUBJECT_TABLE_PATH=(str, "subjects.xlsx"),
 )
+environ.Env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = env("SECRET_KEY")
@@ -85,6 +87,11 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, "tests")
 MEDIA_URL = "/media/"
 ROOT_URLCONF = "django_mri.urls"
+
+SUBJECT_MODEL = "tests.Fake_Subject"
+STUDY_GROUP_MODEL = "tests.Fake_Group"
+RAW_SUBJECT_TABLE_PATH = env("RAW_SUBJECT_TABLE_PATH")
+TEST = True
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
