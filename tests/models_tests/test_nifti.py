@@ -1,9 +1,11 @@
 import numpy as np
+import os
 
 from django.test import TestCase
-from django_dicom.data_import import LocalImport
+from django_mri.data_import import LocalImport
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
+from ..models import Subject
 from tests.fixtures import (
     DICOM_SERIES_PATH,
     SIEMENS_DWI_SERIES,
@@ -14,16 +16,21 @@ from tests.fixtures import (
 class NIfTIModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        LocalImport(DICOM_SERIES_PATH).run(verbose=False)
-        LocalImport(SIEMENS_DWI_SERIES_PATH).run(verbose=False)
+        cls.subject = Subject.objects.create()
+        LocalImport(cls.subject, DICOM_SERIES_PATH).run()
+        LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
 
     def setUp(self):
         self.simple_scan = Scan.objects.first()
         self.dwi_scan = Scan.objects.last()
         if not self.simple_scan or not self.dwi_scan:
             self.fail("Test scan not created! Check signals.")
-        self.simple_nifti = self.simple_scan.nifti
-        self.dwi_nifti = self.dwi_scan.nifti
+        self.simple_nifti = self.simple_scan.dicom_to_nifti()
+        self.dwi_nifti = self.dwi_scan.dicom_to_nifti()
+
+    def tearDown(self):
+        os.remove(self.simple_nifti.path)
+        os.remove(self.dwi_nifti.path)
 
     ##########
     # Fields #
@@ -83,7 +90,7 @@ class NIfTIModelTestCase(TestCase):
     def test_b_value(self):
         result = self.dwi_nifti.b_value
         expected = self.dwi_nifti.get_b_value()
-        self.assertListEqual(result, expected)
+        self.assertEqual(result, expected)
 
     def test_b_value_for_non_DWI_returns_none(self):
         self.assertIsNone(self.simple_nifti.b_value)
@@ -91,15 +98,14 @@ class NIfTIModelTestCase(TestCase):
     def test_b_vector(self):
         result = self.dwi_nifti.b_vector
         expected = self.dwi_nifti.get_b_vector()
-        self.assertListEqual(result, expected)
+        self.assertEqual(result, expected)
 
     def test_b_vector_for_non_DWI_returns_none(self):
         self.assertIsNone(self.simple_nifti.b_vector)
 
     def test_subject_id(self):
-        subject_id = "TESTSUB"
-        self.simple_scan.subject_id = subject_id
-        self.assertEqual(self.simple_nifti.subject_id, subject_id)
+        self.simple_scan.subject = self.subject
+        self.assertEqual(self.simple_nifti.subject_id, self.subject)
 
-    def test_subject_id_with_no_subject(self):
-        self.assertIsNone(self.dwi_nifti.subject_id)
+    # def test_subject_id_with_no_subject(self):
+    #     self.assertIsNone(self.dwi_nifti.subject_id)
