@@ -19,8 +19,7 @@ class ScanModelTestCase(TestCase):
         LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
 
     def setUp(self):
-        self.scan2 = Scan.objects.last()
-        self.scan = Scan.objects.get(description="Ax1D_advdiff_d12D21_TE51_B1000")
+        self.scan = Scan.objects.last()
         if not self.scan:
             self.fail("Test scan not created! Check signals.")
 

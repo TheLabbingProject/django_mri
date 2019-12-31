@@ -5,20 +5,20 @@ from django_dicom.models import Series, Image
 from django_mri.data_import.local_import import LocalImport
 from django.contrib.auth import get_user_model
 # from django_mri.models import NIfTI
-from tests.fixtures import TEST_FILES_PATH, SIEMENS_DWI_SERIES_PATH
+from tests.fixtures import TEST_FILES_PATH, LONELY_FILES_PATH
 from ..models import Subject  # , Group
 
 
 class LocalImportTestCase(TestCase):
     def setUp(self):
-        SIEMENS_DWI_SERIES_DCM_1 = os.path.join(SIEMENS_DWI_SERIES_PATH, '001.dcm')
-        SIEMENS_DWI_SERIES_ZIP_1 = os.path.join(SIEMENS_DWI_SERIES_PATH, '001.zip')
+        LONELY_FILES_DCM_1 = os.path.join(LONELY_FILES_PATH, '001.dcm')
+        LONELY_FILES_ZIP_1 = os.path.join(LONELY_FILES_PATH, '001.zip')
         User = get_user_model()
         self.user = User.objects.create()
         self.subject = Subject.objects.create()
         self.importer = LocalImport(self.subject, TEST_FILES_PATH, self.user)
-        self.importer_dcm = LocalImport(self.subject, SIEMENS_DWI_SERIES_DCM_1, self.user)
-        self.importer_zip = LocalImport(self.subject, SIEMENS_DWI_SERIES_ZIP_1, self.user)
+        self.importer_dcm = LocalImport(self.subject, LONELY_FILES_DCM_1, self.user)
+        self.importer_zip = LocalImport(self.subject, LONELY_FILES_ZIP_1, self.user)
 
     def test_initialization(self):
         result = self.importer.path
@@ -39,7 +39,7 @@ class LocalImportTestCase(TestCase):
             is_under_base_dir = path.startswith(TEST_FILES_PATH)
             self.assertTrue(is_under_base_dir)
             counter += 1
-        self.assertEqual(counter, 41)
+        self.assertEqual(counter, 42)
 
     def test_path_generator_with_extension(self):
         """
@@ -49,7 +49,7 @@ class LocalImportTestCase(TestCase):
         """
 
         # A dictionary of extensions and the number of files we expect
-        extensions = {"nii.gz": 1, "dcm": 39}
+        extensions = {"nii.gz": 1, "dcm": 40}
 
         for extension in extensions:
             counter = 0
