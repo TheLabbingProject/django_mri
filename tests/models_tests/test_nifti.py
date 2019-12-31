@@ -1,5 +1,4 @@
 import numpy as np
-import os
 
 from django.test import TestCase
 from django_mri.data_import import LocalImport
@@ -27,10 +26,6 @@ class NIfTIModelTestCase(TestCase):
             self.fail("Test scan not created! Check signals.")
         self.simple_nifti = self.simple_scan.dicom_to_nifti()
         self.dwi_nifti = self.dwi_scan.dicom_to_nifti()
-
-    def tearDown(self):
-        os.remove(self.simple_nifti.path)
-        os.remove(self.dwi_nifti.path)
 
     ##########
     # Fields #

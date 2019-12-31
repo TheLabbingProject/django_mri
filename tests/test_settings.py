@@ -64,7 +64,7 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "tests")
 MEDIA_URL = "/media/"
-# ROOT_URLCONF = "django_mri.urls"
+ROOT_URLCONF = "django_mri.urls"
 
 SUBJECT_MODEL = "tests.Subject"
 STUDY_GROUP_MODEL = "tests.Group"
