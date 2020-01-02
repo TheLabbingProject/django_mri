@@ -12,7 +12,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         view_name="dicom:series-detail", queryset=Series.objects.all()
     )
     subject = serializers.HyperlinkedRelatedField(
-        view_name=f"research:subject-detail",
+        view_name="research:subject-detail",
         queryset=get_subject_model().objects.all(),
         required=False,
     )
@@ -23,7 +23,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         allow_null=True,
     )
     study_groups = serializers.HyperlinkedRelatedField(
-        view_name=f"research:group-detail",
+        view_name="research:group-detail",
         queryset=get_group_model().objects.all(),
         many=True,
         required=False,
