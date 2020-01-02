@@ -163,3 +163,12 @@ SIEMENS_DWI_SERIES = {
         ],
     ],
 }
+
+SIEMENS_DWI_SERIES_FOR_CREATE_SCAN = {
+    "time": datetime(2018, 5, 1, 12, 37, 55, 433000, tzinfo=pytz.utc),
+    "description": "Ax1D_advdiff_d12D21_TE51_B1000",
+    "number": 4,
+    "echo_time": 51.0,
+    "repetition_time": 2500.0,
+    "subject_id": "304848286"
+}
