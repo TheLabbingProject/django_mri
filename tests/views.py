@@ -12,10 +12,6 @@ class SubjectViewSet(DefaultsMixin, viewsets.ModelViewSet):
 
     queryset = Subject.objects.order_by("-id").all()
 
-    def get_queryset(self):
-        # TODO: Implement filtering according to the user's collaborations
-        return Subject.objects.all()
-
 
 class GroupViewSet(DefaultsMixin, viewsets.ModelViewSet):
     """

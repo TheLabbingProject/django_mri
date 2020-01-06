@@ -4,7 +4,6 @@ omit = ../*migrations*
     *tests*
     venv/**
     setup.py
-    django_mri_env/*
 
 source = .
 branch = True
