@@ -4,9 +4,8 @@ from django.test import TestCase
 from django_dicom.models import Series, Image
 from django_mri.data_import.local_import import LocalImport
 from django.contrib.auth import get_user_model
-# from django_mri.models import NIfTI
 from tests.fixtures import TEST_FILES_PATH, LONELY_FILES_PATH
-from ..models import Subject  # , Group
+from ..models import Subject
 
 
 class LocalImportTestCase(TestCase):
@@ -62,14 +61,8 @@ class LocalImportTestCase(TestCase):
                 counter += 1
             self.assertEqual(counter, extensions.get(extension))
 
-    # def test_import_nifti_files(self):
-    #     self.importer.import_nifti_files(verbose=False)
-    #     self.assertEqual(NIfTI.objects.count(), 1)
-    #     NIfTI.objects.all().delete()
-
     def test_run(self):
         self.importer.run()
-        # self.assertEqual(NIfTI.objects.count(), 1)
         self.assertEqual(Series.objects.count(), 4)
 
     def test_run_one_dcm(self):
