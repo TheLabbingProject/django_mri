@@ -4,12 +4,12 @@ from django.test import TestCase
 from django_mri.data_import import LocalImport
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
-from ..models import Subject
 from tests.fixtures import (
     DICOM_SERIES_PATH,
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
+from tests.models import Subject
 
 
 class NIfTIModelTestCase(TestCase):
@@ -93,7 +93,7 @@ class NIfTIModelTestCase(TestCase):
     def test_b_vector(self):
         result = self.dwi_nifti.b_vector
         expected = self.dwi_nifti.get_b_vector()
-        self.assertEqual(result, expected)
+        self.assertListEqual(result, expected)
 
     def test_b_vector_for_non_DWI_returns_none(self):
         self.assertIsNone(self.simple_nifti.b_vector)
