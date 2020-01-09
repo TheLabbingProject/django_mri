@@ -2,6 +2,7 @@ from django.urls import path, include
 from django_mri import views
 from rest_framework import routers
 
+app_name = "mri"
 router = routers.DefaultRouter()
 router.register(r"scan", views.ScanViewSet)
 router.register(r"nifti", views.NiftiViewSet)
