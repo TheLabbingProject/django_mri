@@ -2,15 +2,21 @@ import os
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django_dicom.data_import import LocalImport
+from django_mri.data_import import LocalImport
 from django_mri.models import Scan, NIfTI
+from django_mri.models.common_sequences import sequences
+from django_mri.models.sequence_type import SequenceType
+from ..models import Subject
 from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
 
 
 class ScanModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        LocalImport(SIEMENS_DWI_SERIES_PATH).run(verbose=False)
+        cls.subject = Subject.objects.create()
+        for sequence in sequences:
+            SequenceType.objects.create(**sequence)
+        LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
 
     def setUp(self):
         self.scan = Scan.objects.last()
@@ -138,12 +144,6 @@ class ScanModelTestCase(TestCase):
         field = Scan._meta.get_field("spatial_resolution")
         self.assertEqual(field.size, 3)
 
-    # sequence_type
-    def test_sequence_type_blank_and_null(self):
-        field = Scan._meta.get_field("sequence_type")
-        self.assertTrue(field.blank)
-        self.assertTrue(field.null)
-
     # comments
     def test_comments_blank_and_null(self):
         field = Scan._meta.get_field("comments")
@@ -172,7 +172,7 @@ class ScanModelTestCase(TestCase):
 
     # _nifti
     def test__nifti_blank_and_null(self):
-        field = Scan._meta.get_field("_nifti")
+        field = Scan._meta.get_field("nifti")
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
 
@@ -202,9 +202,9 @@ class ScanModelTestCase(TestCase):
     #     expected = TWO_DIM_TEST_SERIES["spatial_resolution"]
     #     self.assertListEqual(result, expected)
 
-    def test_infer_sequence_type_from_dicom_returns_none(self):
-        result = self.scan.infer_sequence_type_from_dicom()
-        self.assertIsNone(result)
+    # def test_infer_sequence_type_from_dicom_returns_none(self):
+    #     result = self.scan.infer_sequence_type_from_dicom()
+    #     self.assertIsNone(result)
 
     def test_get_default_nifti_dir(self):
         result = self.scan.get_default_nifti_dir()
@@ -241,20 +241,23 @@ class ScanModelTestCase(TestCase):
     # Properties #
     ##############
 
-    def test_nifti_property_returns_nifti_instance(self):
-        result = self.scan.nifti
-        self.assertIsInstance(result, NIfTI)
-        again = self.scan.nifti
-        self.assertEqual(result, again)
+    # def test_nifti_property_returns_nifti_instance(self):
+    #     result = self.scan._nifti
+    #     self.assertIsInstance(result, NIfTI)
+    #     again = self.scan._nifti
+    #     self.assertEqual(result, again)
 
-    def test_nifti_property_with_conversion_from_dicom(self):
-        self.assertIsNone(self.scan._nifti)
-        self.assertIsInstance(self.scan.nifti, NIfTI)
-        self.assertIsInstance(self.scan._nifti, NIfTI)
+    # def test_nifti_property_with_conversion_from_dicom(self):
+    #     self.assertIsNone(self.scan._nifti)
+    #     self.assertIsInstance(self.scan._nifti, NIfTI)
+    #     self.assertIsInstance(self.scan._nifti, NIfTI)
 
-    def test_nifti_property_with_no_dicom(self):
-        self.scan.dicom = None
-        self.assertIsNone(self.scan._nifti)
-        with self.assertRaises(AttributeError):
-            self.scan.nifti
+    # def test_nifti_property_with_no_dicom(self):
+    #     self.scan.dicom = None
+    #     self.assertIsNone(self.scan._nifti)
+    #     with self.assertRaises(AttributeError):
+    #         self.scan.nifti
 
+    # sequence_type
+    def test_sequence_type(self):
+        self.assertEqual(self.scan.sequence_type, SequenceType.objects.get(title="DWI"))
