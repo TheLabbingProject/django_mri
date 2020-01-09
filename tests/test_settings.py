@@ -1,19 +1,9 @@
-import environ
 import os
 
-env = environ.Env(
-    DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, ["*"]),
-    SECRET_KEY=(str, "asdf5sag231sd$#%SADF2341a"),
-    BOKEH_SECRET_KEY=(str, ""),
-    BOKEH_SIGN_SESSIONS=(bool, True),
-    DB_NAME=(str, ""),
-    DB_USER=(str, ""),
-    DB_PASSWORD=(str, ""),
-)
-
+DEBUG = False
+ALLOWED_HOSTS = "*"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = '$up3r-S3cRe7'
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -39,12 +29,8 @@ MIDDLEWARE = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
-        "HOST": "localhost",
-        "PORT": "",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": 'django_mri',
     }
 }
 
@@ -65,13 +51,7 @@ TEMPLATES = [
     }
 ]
 
-LANGUAGE_CODE = "en-GB"
-
 TIME_ZONE = "UTC"
-
-USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -84,7 +64,11 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "tests")
 MEDIA_URL = "/media/"
-ROOT_URLCONF = "django_mri.urls"
+
+ROOT_URLCONF = "tests.urls"
+
+SUBJECT_MODEL = "tests.Subject"
+STUDY_GROUP_MODEL = "tests.Group"
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -95,3 +79,5 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }
+
+MIGRATION_MODULES = {'django_mri': "django_mri.migrations.tests"}

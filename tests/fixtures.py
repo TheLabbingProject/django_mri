@@ -23,6 +23,8 @@ DICOM_FILES_PATH = os.path.join(TEST_FILES_PATH, "DICOM")
 # Simple sample series (Siemens localizer)
 DICOM_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "Localizer")
 
+# LonelyFiles directory path
+LONELY_FILES_PATH = os.path.join(TEST_FILES_PATH, "LonelyFiles")
 
 # DWI
 # ~~~
@@ -31,7 +33,7 @@ DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI")
 # Siemens
 SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_DWI_PATH, "Siemens")
 SIEMENS_DWI_SERIES = {
-    "time": datetime(2018, 5, 1, 12, 37, 55, 433000, pytz.UTC),
+    "time": datetime(2018, 5, 1, 12, 37, 55, 433000, tzinfo=pytz.utc),
     "description": "Ax1D_advdiff_d12D21_TE51_B1000",
     "number": 4,
     "echo_time": 51.0,
@@ -160,4 +162,29 @@ SIEMENS_DWI_SERIES = {
             0.0305069,
         ],
     ],
+}
+
+SIEMENS_DWI_SERIES_FOR_CREATE_SCAN = {
+    "time": datetime(2018, 5, 1, 12, 37, 55, 433000, tzinfo=pytz.utc),
+    "description": "Ax1D_advdiff_d12D21_TE51_B1000",
+    "number": 4,
+    "echo_time": 51.0,
+    "repetition_time": 2500.0,
+    "scanning_sequence": ["GR"],
+    "sequence_variant": ["SP", "OSP"],
+    "pixel_spacing": [0.48828125, 0.48828125],
+    "manufacturer": "SIEMENS",
+    "manufacturer_model_name": "Prisma",
+    "magnetic_field_strength": 3.0,
+    "device_serial_number": "66024",
+    "body_part_examined": "BRAIN",
+    "patient_position": "HFS",
+    "modality": "MR",
+    "institution_name": "Tel-Aviv University",
+    "protocol_name": "localizer_3D_2 (9X5X5)",
+    "flip_angle": 20.0,
+    "mr_acquisition_type": "2D",
+    "slice_thickness": 6.0,
+    "echo_train_length": 1,
+    "operators_name": "Yosef",
 }

@@ -135,8 +135,10 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             )
         try:
             scan = Scan.objects.get(dicom=series)
+            res = ScanSerializer(data=scan, context={"request": request})
+            res.is_valid()
             return Response(
-                ScanSerializer(scan, context={"request": request}).validated_data
+                res.validated_data
             )
         except ObjectDoesNotExist:
             scan = Scan(dicom=series)
