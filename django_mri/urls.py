@@ -10,7 +10,7 @@ router.register(r"sequence_type", views.SequenceTypeViewSet)
 
 
 urlpatterns = [
-    path("mri/", include((router.urls, "mri"))),
+    path("mri/", include(router.urls)),
     path("mri/scan/from_file/", views.ScanViewSet.as_view({"post": "from_file"}), name="from_file"),
     path(
         "mri/scan/from_dicom/<int:series_id>/",
