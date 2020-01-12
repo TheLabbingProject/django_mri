@@ -2,10 +2,9 @@ from rest_framework import status
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from django.urls import reverse
-from .fixtures import SIEMENS_DWI_SERIES_PATH, LONELY_FILES_PATH, SIEMENS_DWI_SERIES_FOR_CREATE_SCAN
+from .fixtures import SIEMENS_DWI_SERIES_PATH, LONELY_FILES_PATH
 from django_mri.data_import import LocalImport
 from django_mri.models import Scan
-from django_dicom.models import Series, Study
 from .models import Subject, Group
 from django.contrib.auth import get_user_model
 import sys
@@ -38,9 +37,15 @@ class LoggedOutScanViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_scan_from_file_unautherized(self):
-        url = reverse("from_file")
+        url = reverse("mri:from_file")
         subject = Subject.objects.last()
-        response = self.client.post(url, data={"file": open(os.path.join(LONELY_FILES_PATH, "001.dcm"), "rb"), "subject_id": subject.id})
+        response = self.client.post(
+            url,
+            data={
+                "file": open(os.path.join(LONELY_FILES_PATH, "001.dcm"), "rb"),
+                "subject_id": subject.id,
+            },
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -59,7 +64,9 @@ class LoggedInScanViewTestCase(APITestCase):
 
     def setUp(self):
         User = get_user_model()
-        self.user = User.objects.create_user(username="test", password="pass", is_staff=True)
+        self.user = User.objects.create_user(
+            username="test", password="pass", is_staff=True
+        )
         self.client.force_authenticate(self.user)
         self.test_scan = Scan.objects.last()
 
@@ -73,26 +80,26 @@ class LoggedInScanViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_scan_from_file_dcm_view(self):
-        url = reverse("from_file")
+        url = reverse("mri:from_file")
         subject = Subject.objects.last()
         f = open(os.path.join(LONELY_FILES_PATH, "001.dcm"), "rb")
         response = self.client.post(url, data={"file": f, "subject_id": subject.id})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_scan_from_file_zip_view(self):
-        url = reverse("from_file")
+        url = reverse("mri:from_file")
         subject = Subject.objects.last()
         f = open(os.path.join(LONELY_FILES_PATH, "001.zip"), "rb")
         response = self.client.post(url, data={"file": f, "subject_id": subject.id})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_scan_from_dicom_bad_request(self):
-        url = reverse("from_dicom", args=(sys.maxsize,))
+        url = reverse("mri:from_dicom", args=(sys.maxsize,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_scan_from_dicom_view(self):
-        url = reverse("from_dicom", args=(self.test_scan.dicom.id,))
+        url = reverse("mri:from_dicom", args=(self.test_scan.dicom.id,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -151,7 +158,9 @@ class LoggedInNIfTIViewTestCase(APITestCase):
 
     def setUp(self):
         User = get_user_model()
-        self.user = User.objects.create_user(username="test", password="pass", is_staff=True)
+        self.user = User.objects.create_user(
+            username="test", password="pass", is_staff=True
+        )
         self.client.force_authenticate(self.user)
         scan = Scan.objects.last()
         self.test_nifti = scan.dicom_to_nifti()
