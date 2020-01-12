@@ -14,8 +14,6 @@ class ScanModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.subject = Subject.objects.create()
-        for sequence in sequences:
-            SequenceType.objects.create(**sequence)
         LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
 
     def setUp(self):
@@ -202,9 +200,9 @@ class ScanModelTestCase(TestCase):
     #     expected = TWO_DIM_TEST_SERIES["spatial_resolution"]
     #     self.assertListEqual(result, expected)
 
-    # def test_infer_sequence_type_from_dicom_returns_none(self):
-    #     result = self.scan.infer_sequence_type_from_dicom()
-    #     self.assertIsNone(result)
+    def test_infer_sequence_type_from_dicom_returns_none(self):
+        result = self.scan.infer_sequence_type_from_dicom()
+        self.assertIsNone(result)
 
     def test_get_default_nifti_dir(self):
         result = self.scan.get_default_nifti_dir()
@@ -241,23 +239,7 @@ class ScanModelTestCase(TestCase):
     # Properties #
     ##############
 
-    # def test_nifti_property_returns_nifti_instance(self):
-    #     result = self.scan._nifti
-    #     self.assertIsInstance(result, NIfTI)
-    #     again = self.scan._nifti
-    #     self.assertEqual(result, again)
-
-    # def test_nifti_property_with_conversion_from_dicom(self):
-    #     self.assertIsNone(self.scan._nifti)
-    #     self.assertIsInstance(self.scan._nifti, NIfTI)
-    #     self.assertIsInstance(self.scan._nifti, NIfTI)
-
-    # def test_nifti_property_with_no_dicom(self):
-    #     self.scan.dicom = None
-    #     self.assertIsNone(self.scan._nifti)
-    #     with self.assertRaises(AttributeError):
-    #         self.scan.nifti
-
-    # sequence_type
     def test_sequence_type(self):
+        for sequence in sequences:
+            SequenceType.objects.create(**sequence)
         self.assertEqual(self.scan.sequence_type, SequenceType.objects.get(title="DWI"))

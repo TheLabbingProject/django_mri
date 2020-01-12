@@ -109,9 +109,9 @@ class NIfTI(TimeStampedModel):
         return self.get_b_vector()
 
     @property
-    def subject_id(self) -> int:
+    def subject(self):
         """
-        If this instance has a single (Scan) origin, returns the related subject's primary key.
+        If this instance has a single (Scan) origin, returns the related subject.
         
         Returns
         -------

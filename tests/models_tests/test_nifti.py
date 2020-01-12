@@ -100,7 +100,8 @@ class NIfTIModelTestCase(TestCase):
 
     def test_subject_id(self):
         self.simple_scan.subject = self.subject
-        self.assertEqual(self.simple_nifti.subject_id, self.subject)
+        self.assertEqual(self.simple_nifti.subject, self.subject)
 
-    # def test_subject_id_with_no_subject(self):
-    #     self.assertIsNone(self.dwi_nifti.subject_id)
+    def test_subject_id_with_no_subject(self):
+        self.simple_scan.subject = None
+        self.assertIsNone(self.simple_nifti.subject)
