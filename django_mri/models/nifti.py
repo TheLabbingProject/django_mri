@@ -4,6 +4,7 @@ import os
 
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from niwidgets import NiftiWidget
 
 
 class NIfTI(TimeStampedModel):
@@ -13,7 +14,7 @@ class NIfTI(TimeStampedModel):
     .. _NIfTI: https://nifti.nimh.nih.gov/nifti-1/
     """
 
-    path = models.FilePathField(max_length=500, unique=True)
+    path = models.FilePathField(max_length=1000, unique=True)
 
     # is_raw is meant to be set according to whether the created instance
     # is the product of a direct conversion from the raw data to NIfTI (True),
@@ -99,6 +100,14 @@ class NIfTI(TimeStampedModel):
                 for vector in content.rstrip().split("\n")
             ]
         return None
+
+    def niwidgets_plot(self, **kwargs):
+        widget = NiftiWidget(self.path)
+        return widget.nifti_plotter(**kwargs)
+
+    def plot(self, provider: str = "niwidgets", **kwargs):
+        if provider == "niwidgets":
+            return self.niwidgets_plot(**kwargs)
 
     @property
     def b_value(self) -> list:

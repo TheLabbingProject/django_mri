@@ -1,7 +1,5 @@
 import os
-import pytz
 
-from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -128,9 +126,7 @@ class Scan(TimeStampedModel):
         if self.dicom:
             self.institution_name = self.dicom.institution_name
             self.number = self.dicom.number
-            self.time = datetime.combine(
-                self.dicom.date, self.dicom.time, tzinfo=pytz.UTC
-            )
+            self.time = self.dicom.datetime
             self.description = self.dicom.description
             self.echo_time = self.dicom.echo_time
             self.inversion_time = self.dicom.inversion_time
