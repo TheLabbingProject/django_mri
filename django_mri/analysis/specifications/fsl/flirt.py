@@ -71,6 +71,7 @@ FLIRT_INPUT_SPECIFICATION = {
             "labeldiff",
             "bbr",
         ],
+        "default": "corratio",
     },
     "uses_qform": {
         "type": BooleanInputDefinition,
@@ -106,6 +107,7 @@ FLIRT_INPUT_SPECIFICATION = {
     "dof": {
         "type": IntegerInputDefinition,
         "description": "Tranform degrees of freedom.",
+        "default": 12,
     },
     "no_resample": {
         "type": BooleanInputDefinition,
