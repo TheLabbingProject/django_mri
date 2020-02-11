@@ -1,5 +1,8 @@
 import nipype
 
+from django_mri.analysis.matlab.spm.cat12.segmentation import (
+    Segmentation as Cat12Segmentation,
+)
 from django_mri.analysis.specifications.fsl.bet import (
     BET_INPUT_SPECIFICATION,
     BET_OUTPUT_SPECIFICATION,
@@ -11,6 +14,10 @@ from django_mri.analysis.specifications.fsl.flirt import (
 from django_mri.analysis.specifications.fsl.fnirt import (
     FNIRT_INPUT_SPECIFICATION,
     FNIRT_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.spm.cat12.segmentation import (
+    CAT12_SEGMENTATION_INPUT_SPECIFICATION,
+    CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.fsl import BET, FLIRT, FNIRT
 
@@ -51,6 +58,19 @@ analysis_definitions = [
                 "input": FNIRT_INPUT_SPECIFICATION,
                 "output": FNIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "CAT12 Segmentation",
+        "description": "SPM's CAT12 toolkit segmentation.",
+        "versions": [
+            {
+                "title": "12.6",
+                "description": "",
+                "fixed_run_method_kwargs": {"verbose_output_dict": True},
+                "input": CAT12_SEGMENTATION_INPUT_SPECIFICATION,
+                "output": CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
             }
         ],
     },
