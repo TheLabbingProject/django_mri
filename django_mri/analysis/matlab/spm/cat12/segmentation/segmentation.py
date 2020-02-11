@@ -5,6 +5,9 @@ from django_mri.analysis.matlab.spm.cat12.segmentation.outputs import (
     SEGMENTATION_OUTPUT,
     AUXILIARY_OUTPUT,
 )
+from django_mri.analysis.matlab.spm.cat12.segmentation.utils import (
+    verbosify_output_dict,
+)
 from django_mri.analysis.matlab.spm.cat12.utils.template_files import (
     RELATIVE_DARTEL_TEMPLATE_LOCATION,
     RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION,
@@ -28,8 +31,8 @@ class Segmentation(SPMProcedure):
     AUXILIARY_OUTPUT = AUXILIARY_OUTPUT
     REDUNDANT_LOG_PATTERN = "catlog_main_*_log*.txt"
 
-    def __init__(self, options: dict = {}):
-        super().__init__(options)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.nifti_validator = NiftiValidator(allow_gz=True)
         self.tissue_probability_map_path = (
             self.spm_directory / RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION
@@ -80,6 +83,7 @@ class Segmentation(SPMProcedure):
         created_uncompressed_version: bool,
         destination: Path,
         remove_redundant_logs: bool,
+        verbose_output_dict: bool = False,
     ) -> dict:
         if remove_redundant_logs:
             self.remove_redundant_logs(path.parent)
@@ -87,18 +91,28 @@ class Segmentation(SPMProcedure):
             path.unlink()
         output_dict = self.create_output_dict(path)
         if destination:
-            return self.move_output(
+            output_dict = self.move_output(
                 output_dict=output_dict, run_dir=path.parent, destination=destination
             )
+        if verbose_output_dict:
+            return verbosify_output_dict(output_dict)
         return output_dict
 
     def run(
-        self, path: Path, destination: Path = None, remove_redundant_logs: bool = True
+        self,
+        path: Path,
+        destination: Path = None,
+        remove_redundant_logs: bool = True,
+        verbose_output_dict: bool = False,
     ) -> dict:
         path, created_uncompressed_version = self.validate_and_fix_input_data(path)
         batch_file = self.create_batch_file(path)
         self.engine.run(str(batch_file), nargout=0)
         return self.organize_output(
-            path, created_uncompressed_version, destination, remove_redundant_logs
+            path,
+            created_uncompressed_version,
+            destination,
+            remove_redundant_logs,
+            verbose_output_dict,
         )
 
