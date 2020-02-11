@@ -18,4 +18,3 @@ SEGMENTATION_TRANSFORMATIONS = {
     "dartel_grey_matter": {"no": 0, "rigid": 1, "affine": 2},
     "dartel_white_matter": {"no": 0, "rigid": 1, "affine": 2},
 }
-

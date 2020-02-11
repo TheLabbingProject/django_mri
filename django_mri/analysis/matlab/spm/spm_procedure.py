@@ -1,4 +1,3 @@
-import matlab.engine
 import shutil
 
 from django_mri.analysis.matlab.spm.utils.batch_templates import TEMPLATES
@@ -12,13 +11,22 @@ class SPMProcedure:
     OUTPUT_DEFINITIONS = {}
     AUXILIARY_OUTPUT = {}
 
-    def __init__(self, options: dict):
-        self.options = {**self.DEFAULTS, **options}
-        self.engine = matlab.engine.start_matlab()
+    def __init__(self, **kwargs):
+        self.options = {**self.DEFAULTS, **kwargs}
+        self.engine = self.start_matlab_engine()
         self.spm_directory = self.get_spm_directory()
 
+    @classmethod
+    def start_matlab_engine(cls):
+        import matlab.engine
+
+        return matlab.engine.start_matlab()
+
     def get_spm_directory(self) -> Path:
-        return Path(self.engine.which("spm")).parent
+        spm_script = self.engine.which("spm")
+        if spm_script:
+            return Path(spm_script).parent
+        raise RuntimeError("Failed to find local SPM installation!")
 
     def get_batch_template_path(self) -> Path:
         try:
@@ -88,9 +96,7 @@ class SPMProcedure:
         }
         generated_output.update(self.AUXILIARY_OUTPUT)
         for key, value in generated_output.items():
-            formatted_value = self.format_output_definition(
-                Path(input_path), key, value
-            )
+            formatted_value = self.format_output_definition(input_path, key, value)
             if formatted_value:
                 result[key] = formatted_value
         return result
