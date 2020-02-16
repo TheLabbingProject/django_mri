@@ -16,8 +16,8 @@ from django_mri.analysis.matlab.spm.cat12.segmentation.transformations import (
     SEGMENTATION_TRANSFORMATIONS,
 )
 from django_mri.analysis.matlab.spm.spm_procedure import SPMProcedure
-from django_mri.analysis.matlab.spm.utils.gunzip import gunzip
 from django_mri.analysis.matlab.spm.utils.nifti_validator import NiftiValidator
+from django_mri.utils.compression import uncompress
 
 from pathlib import Path
 
@@ -70,7 +70,7 @@ class Segmentation(SPMProcedure):
                 return path.with_suffix(""), False
 
             # Otherwise, create an unzipped version and return 'True' for having created it
-            return gunzip(path), True
+            return uncompress(path), True
         return path, False
 
     def remove_redundant_logs(self, run_dir: Path):

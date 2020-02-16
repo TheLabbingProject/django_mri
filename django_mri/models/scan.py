@@ -6,6 +6,8 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from django_analyses.models.pipeline.node import Node
+from django_mri.analysis.utils import get_lastest_analysis_version
 from django_mri.interfaces.dcm2niix import Dcm2niix
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
@@ -272,6 +274,68 @@ class Scan(TimeStampedModel):
                 f"Failed to convert scan #{self.id} from DICOM to NIfTI! No DICOM series is related to this scan."
             )
 
+    def recon_all(self, **configuration):
+        if self.is_mprage or self.is_spgr:
+            recon_all = get_lastest_analysis_version("ReconAll")
+            recon_all_node, _ = Node.objects.get_or_create(
+                analysis_version=recon_all, configuration=configuration
+            )
+            nifti_path = str(self.nifti.uncompressed)
+            results = recon_all_node.run(inputs={"T1_files": [nifti_path]})
+            self.nifti.compress()
+            return results
+        else:
+            raise TypeError(
+                "Only MPRAGE or SPGR scans may be given as input to ReconAll!"
+            )
+
+    def check_protocol(self, string_id: str) -> bool:
+        property_name = f"is_{string_id}".replace("-", "_")
+        try:
+            return getattr(self.dicom, property_name)
+        except AttributeError:
+            return False
+
     @property
     def sequence_type(self) -> SequenceType:
         return self.infer_sequence_type()
+
+    @property
+    def is_mprage(self) -> bool:
+        return self.check_protocol("mprage")
+
+    @property
+    def is_spgr(self) -> bool:
+        return self.check_protocol("spgr")
+
+    @property
+    def is_fspgr(self) -> bool:
+        return self.check_protocol("fspgr")
+
+    @property
+    def is_flair(self) -> bool:
+        return self.check_protocol("flair")
+
+    @property
+    def is_dti(self) -> bool:
+        return self.check_protocol("dti")
+
+    @property
+    def is_fmri(self) -> bool:
+        return self.check_protocol("fmri")
+
+    @property
+    def is_ir_epi(self) -> bool:
+        return self.check_protocol("ir-epi")
+
+    @property
+    def is_localizer(self) -> bool:
+        return self.check_protocol("localizer")
+
+    @property
+    def is_ep2d(self) -> bool:
+        return self.check_protocol("ep2d")
+
+    @property
+    def is_fse(self) -> bool:
+        return self.check_protocol("fse")
