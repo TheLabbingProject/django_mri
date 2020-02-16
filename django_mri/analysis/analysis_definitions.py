@@ -1,7 +1,8 @@
 import nipype
 
-from django_mri.analysis.matlab.spm.cat12.segmentation import (
-    Segmentation as Cat12Segmentation,
+from django_mri.analysis.specifications.freesurfer.recon_all import (
+    RECON_ALL_INPUT_SPECIFICATION,
+    RECON_ALL_OUTPUT_SPECIFICATION,
 )
 from django_mri.analysis.specifications.fsl.bet import (
     BET_INPUT_SPECIFICATION,
@@ -19,6 +20,7 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
+from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import BET, FLIRT, FNIRT
 
 analysis_definitions = [
@@ -71,6 +73,19 @@ analysis_definitions = [
                 "fixed_run_method_kwargs": {"verbose_output_dict": True},
                 "input": CAT12_SEGMENTATION_INPUT_SPECIFICATION,
                 "output": CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "ReconAll",
+        "description": "Performs all, or any part of, the FreeSurfer cortical reconstruction process.",
+        "versions": [
+            {
+                "title": ReconAll().version,
+                "description": f"Default FreeSurfer ReconAll version for nipype {nipype.__version__}.",
+                "input": RECON_ALL_INPUT_SPECIFICATION,
+                "output": RECON_ALL_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
     },

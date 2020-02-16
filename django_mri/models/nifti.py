@@ -4,7 +4,9 @@ import os
 
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from django_mri.utils.compression import compress, uncompress
 from niwidgets import NiftiWidget
+from pathlib import Path
 
 
 class NIfTI(TimeStampedModel):
@@ -109,6 +111,22 @@ class NIfTI(TimeStampedModel):
         if provider == "niwidgets":
             return self.niwidgets_plot(**kwargs)
 
+    def compress(self, keep_source: bool = False) -> Path:
+        if not self.is_compressed:
+            uncompressed_path = Path(self.path)
+            compressed_path = compress(uncompressed_path, keep_source=keep_source)
+            self.path = str(compressed_path)
+            self.save()
+        return Path(self.path)
+
+    def uncompress(self, keep_source: bool = False) -> Path:
+        if self.is_compressed:
+            compressed_path = Path(self.path)
+            uncompressed_path = uncompress(compressed_path, keep_source=keep_source)
+            self.path = str(uncompressed_path)
+            self.save()
+        return Path(self.path)
+
     @property
     def b_value(self) -> list:
         return self.get_b_value()
@@ -116,6 +134,18 @@ class NIfTI(TimeStampedModel):
     @property
     def b_vector(self) -> list:
         return self.get_b_vector()
+
+    @property
+    def is_compressed(self) -> bool:
+        return Path(self.path).name.endswith(".gz")
+
+    @property
+    def compressed(self) -> Path:
+        return self.compress()
+
+    @property
+    def uncompressed(self) -> Path:
+        return self.uncompress()
 
     @property
     def subject(self):
