@@ -1,4 +1,5 @@
 import os
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -9,8 +10,11 @@ from django_extensions.db.models import TimeStampedModel
 from django_analyses.models.pipeline.node import Node
 from django_mri.analysis.utils import get_lastest_analysis_version
 from django_mri.interfaces.dcm2niix import Dcm2niix
+from django_mri.models import messages
+from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
+from pathlib import Path
 
 
 class Scan(TimeStampedModel):
@@ -110,9 +114,18 @@ class Scan(TimeStampedModel):
         on_delete=models.SET_NULL,
     )
 
+    objects = ScanManager()
+
     class Meta:
-        ordering = ("time",)
         verbose_name_plural = "MRI Scans"
+
+    def __str__(self) -> str:
+        return self.description
+
+    def save(self, *args, **kwargs) -> None:
+        if self.dicom and not self.is_updated_from_dicom:
+            self.update_fields_from_dicom()
+        super().save(*args, **kwargs)
 
     def update_fields_from_dicom(self) -> None:
         """
@@ -133,37 +146,10 @@ class Scan(TimeStampedModel):
             self.echo_time = self.dicom.echo_time
             self.inversion_time = self.dicom.inversion_time
             self.repetition_time = self.dicom.repetition_time
-            self.spatial_resolution = self.get_spatial_resolution_from_dicom()
+            self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
             raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")
-
-    def get_spatial_resolution_from_dicom(self) -> list:
-        """
-        Returns the spatial resolution of the MRI scan as infered from a
-        related DICOM series. In DICOM headers, "*x*" and "*y*" resolution
-        (the rows and columns of each instance) are listed as "`Pixel Spacing`_"
-        and the "*z*" plane resolution corresponds to "`Slice Thickness`_".
-        `Pixel Spacing`_ is a `required (type 1)`_ DICOM attribute, and therefore
-        has to be returned, however `Slice Thickness`_ may be empty (`type 2`).
-
-        .. _Pixel Spacing: https://dicom.innolitics.com/ciods/mr-image/image-plane/00280030
-        .. _Slice Thickness: https://dicom.innolitics.com/ciods/mr-image/image-plane/00180050
-        .. _required (type 1): http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.4.html
-        .. _type 2: http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_7.4.html
-
-        Returns
-        -------
-        list
-            "*[x, y, z]*" spatial resolution in millimeters.
-        """
-
-        sample_image = self.dicom.image_set.first()
-        slice_thickness = sample_image.header.get_value("SliceThickness")
-        if slice_thickness:
-            return self.dicom.pixel_spacing + [slice_thickness]
-        else:
-            return self.dicom.pixel_spacing
 
     def infer_sequence_type_from_dicom(self) -> SequenceType:
         """
@@ -189,7 +175,7 @@ class Scan(TimeStampedModel):
         if self.dicom:
             return self.infer_sequence_type_from_dicom()
 
-    def get_default_nifti_dir(self) -> str:
+    def get_default_nifti_dir(self) -> Path:
         """
         Returns the default location for the creation of a NIfTI version of the
         scan. Currently only conversion from DICOM is supported.
@@ -201,7 +187,8 @@ class Scan(TimeStampedModel):
         """
 
         if self.dicom:
-            return self.dicom.get_path().replace("DICOM", "NIfTI")
+            path = str(self.dicom.path).replace("DICOM", "NIfTI")
+            return Path(path)
 
     def get_default_nifti_name(self) -> str:
         """
@@ -215,7 +202,7 @@ class Scan(TimeStampedModel):
 
         return str(self.id)
 
-    def get_default_nifti_destination(self) -> str:
+    def get_default_nifti_destination(self) -> Path:
         """
         Returns the default path for a NIfTI version of this scan.
 
@@ -227,11 +214,11 @@ class Scan(TimeStampedModel):
 
         directory = self.get_default_nifti_dir()
         name = self.get_default_nifti_name()
-        return os.path.join(directory, name)
+        return directory / name
 
     def dicom_to_nifti(
         self,
-        destination: str = None,
+        destination: Path = None,
         compressed: bool = True,
         generate_json: bool = False,
     ) -> NIfTI:
@@ -242,7 +229,7 @@ class Scan(TimeStampedModel):
 
         Parameters
         ----------
-        destination : str, optional
+        destination : Path, optional
             The desired path for conversion output (the default is None, which
             will create the file in some default location).
 
@@ -259,8 +246,11 @@ class Scan(TimeStampedModel):
 
         if self.dicom:
             dcm2niix = Dcm2niix()
-            destination = destination or self.get_default_nifti_destination()
-            os.makedirs(os.path.dirname(destination), exist_ok=True)
+            if destination is None:
+                destination = self.get_default_nifti_destination()
+            elif not isinstance(destination, Path):
+                destination = Path(destination)
+            destination.parent.mkdir(exist_ok=True, parents=True)
             nifti_path = dcm2niix.convert(
                 self.dicom.get_path(),
                 destination,
@@ -289,53 +279,27 @@ class Scan(TimeStampedModel):
                 "Only MPRAGE or SPGR scans may be given as input to ReconAll!"
             )
 
-    def check_protocol(self, string_id: str) -> bool:
-        property_name = f"is_{string_id}".replace("-", "_")
-        try:
-            return getattr(self.dicom, property_name)
-        except AttributeError:
-            return False
+    def warn_subject_mismatch(self, subject):
+        message = messages.SUBJECT_MISMATCH.format(
+            scan_id=self.id,
+            existing_subject_id=self.subject.id,
+            assigned_subject_id=subject.id,
+        )
+        warnings.warn(message)
+
+    def suggest_subject(self, subject) -> None:
+        if subject is not None:
+            # If this scan actually belongs to a different subject (and self.subject
+            # is not None), warn the user and return.
+            mismatch = self.subject != subject
+            if self.subject and mismatch:
+                self.warn_subject_mismatch(subject)
+            # Else, if this scan is not assigned to any subject but a subject was
+            # provided (and not None), associate this scan with it.
+            else:
+                self.subject = subject
+                self.save()
 
     @property
     def sequence_type(self) -> SequenceType:
         return self.infer_sequence_type()
-
-    @property
-    def is_mprage(self) -> bool:
-        return self.check_protocol("mprage")
-
-    @property
-    def is_spgr(self) -> bool:
-        return self.check_protocol("spgr")
-
-    @property
-    def is_fspgr(self) -> bool:
-        return self.check_protocol("fspgr")
-
-    @property
-    def is_flair(self) -> bool:
-        return self.check_protocol("flair")
-
-    @property
-    def is_dti(self) -> bool:
-        return self.check_protocol("dti")
-
-    @property
-    def is_fmri(self) -> bool:
-        return self.check_protocol("fmri")
-
-    @property
-    def is_ir_epi(self) -> bool:
-        return self.check_protocol("ir-epi")
-
-    @property
-    def is_localizer(self) -> bool:
-        return self.check_protocol("localizer")
-
-    @property
-    def is_ep2d(self) -> bool:
-        return self.check_protocol("ep2d")
-
-    @property
-    def is_fse(self) -> bool:
-        return self.check_protocol("fse")

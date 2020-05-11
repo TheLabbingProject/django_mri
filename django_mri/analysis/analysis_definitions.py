@@ -1,5 +1,6 @@
 import nipype
 
+from django_mri.analysis import messages
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -22,6 +23,11 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
 )
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import BET, FLIRT, FNIRT
+from nipype.interfaces.fsl.base import no_fsl
+
+if no_fsl():
+    raise ImportError(messages.NO_FSL)
+
 
 analysis_definitions = [
     {
