@@ -36,10 +36,13 @@ class NIfTI(TimeStampedModel):
         null=True,
     )
 
+    class Meta:
+        verbose_name = "NIfTI"
+
     def get_data(self) -> np.ndarray:
         """
         Uses nibabel_ to return the underlying pixel data as a NumPy_ array.
-        
+
         .. _nibabel: https://nipy.org/nibabel/
         .. _NumPy: http://www.numpy.org/
 
@@ -62,7 +65,7 @@ class NIfTI(TimeStampedModel):
         .. _b-value: https://radiopaedia.org/articles/b-values-1
         .. _dcm2niix: https://github.com/rordenlab/dcm2niix
         .. _DWI: https://en.wikipedia.org/wiki/Diffusion_MRI
-        
+
         Returns
         -------
         list
@@ -87,7 +90,7 @@ class NIfTI(TimeStampedModel):
         .. _b-vectors: https://mrtrix.readthedocs.io/en/latest/concepts/dw_scheme.html
         .. _dcm2niix: https://github.com/rordenlab/dcm2niix
         .. _DWI: https://en.wikipedia.org/wiki/Diffusion_MRI
-        
+
         Returns
         -------
         list
@@ -151,7 +154,7 @@ class NIfTI(TimeStampedModel):
     def subject(self):
         """
         If this instance has a single (Scan) origin, returns the related subject.
-        
+
         Returns
         -------
         int

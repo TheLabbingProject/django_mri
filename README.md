@@ -3,7 +3,6 @@
 
 # _django_mri_
 
-
 A django app to manage MRI data.
 
 Currently only supports data in the [DICOM](https://www.dicomstandard.org/) format, and will soon also support [NIfTI](https://nifti.nimh.nih.gov/).
