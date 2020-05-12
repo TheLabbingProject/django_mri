@@ -1,4 +1,3 @@
-import os
 import warnings
 
 from django.contrib.auth import get_user_model
@@ -90,7 +89,7 @@ class Scan(TimeStampedModel):
     # The reason it is suffixed with an underline is to allow for "nifti"
     # to be used as a property that automatically returns an existing instance
     # or creates one.
-    nifti = models.OneToOneField(
+    _nifti = models.OneToOneField(
         "django_mri.NIfTI", on_delete=models.SET_NULL, blank=True, null=True
     )
 
@@ -260,9 +259,8 @@ class Scan(TimeStampedModel):
             nifti = NIfTI.objects.create(path=nifti_path, parent=self, is_raw=True)
             return nifti
         else:
-            raise AttributeError(
-                f"Failed to convert scan #{self.id} from DICOM to NIfTI! No DICOM series is related to this scan."
-            )
+            message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
+            raise AttributeError(message)
 
     def recon_all(self, **configuration):
         if self.is_mprage or self.is_spgr:
@@ -303,3 +301,10 @@ class Scan(TimeStampedModel):
     @property
     def sequence_type(self) -> SequenceType:
         return self.infer_sequence_type()
+
+    @property
+    def nifti(self) -> NIfTI:
+        if not isinstance(self._nifti, NIfTI):
+            self._nifti = self.dicom_to_nifti()
+            self.save()
+        return self._nifti
