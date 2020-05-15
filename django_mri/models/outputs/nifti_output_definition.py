@@ -1,0 +1,15 @@
+from django_analyses.models.output.definitions.output_definition import OutputDefinition
+from django_mri.models.nifti import NIfTI
+from django_mri.models.outputs.nifti_output import NiftiOutput
+from pathlib import Path
+
+
+class NiftiOutputDefinition(OutputDefinition):
+    output_class = NiftiOutput
+
+    def pre_create(self, kwargs: dict) -> None:
+        value = kwargs.get("value")
+        is_path = isinstance(value, (str, Path))
+        if is_path:
+            kwargs["value"] = NIfTI.objects.create(path=str(value), is_raw=False)
+        super().pre_create(kwargs)
