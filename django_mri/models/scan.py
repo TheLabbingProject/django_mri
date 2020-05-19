@@ -256,7 +256,7 @@ class Scan(TimeStampedModel):
                 compressed=compressed,
                 generate_json=generate_json,
             )
-            nifti = NIfTI.objects.create(path=nifti_path, parent=self, is_raw=True)
+            nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
             return nifti
         else:
             message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
