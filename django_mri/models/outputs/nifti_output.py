@@ -1,7 +1,5 @@
 from django.db import models
 from django_analyses.models.output.output import Output
-from django_mri.models.nifti import NIfTI
-from pathlib import Path
 
 
 class NiftiOutput(Output):

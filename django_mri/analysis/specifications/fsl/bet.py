@@ -8,13 +8,17 @@ from django_analyses.models.input.definitions import (
 )
 
 from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+
 
 BET_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": FileInputDefinition,
+        "type": NiftiInputDefinition,
         "required": True,
         "description": "A NIfTI format file to skullstrip.",
         "is_configuration": False,
+        "value_attribute": "path.__str__",
     },
     "out_file": {
         "type": StringInputDefinition,
@@ -107,15 +111,15 @@ BET_INPUT_SPECIFICATION = {
 
 BET_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the extracted brain file, if generated.",
     },
     "mask_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the binary mask file, if generated.",
     },
     "outline_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the outline file, if generated.",
     },
     "meshfile": {
@@ -123,31 +127,31 @@ BET_OUTPUT_SPECIFICATION = {
         "description": "The path of the VTK mesh file, if generated.",
     },
     "inskull_mask_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the inward skull mask file, if generated.",
     },
     "inskull_mesh_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the inward skull mesh outline file, if generated.",
     },
     "outskull_mask_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the outward skull mask file, if generated.",
     },
     "outskull_mesh_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the outward skull mesh outline file, if generated.",
     },
     "outskin_mask_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the outward skin mask file, if generated.",
     },
     "outskin_mesh_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the outward skin mesh outline file, if generated.",
     },
     "skull_mask_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "The path of the skull mask file, if generated.",
     },
 }
