@@ -23,19 +23,6 @@ class NIfTI(TimeStampedModel):
     # or of a manipulation of the data (False).
     is_raw = models.BooleanField(default=False)
 
-    # As long as this instance is the product of some conversion or manipulation
-    # of a single Scan instance, this field is meant to keep a reference to that
-    # instance. If it is the product of multiple Scan instances, this field may
-    # be set to None, and any associated Scan instances should be reachable
-    # through whichever analysis run instance they are represnted with.
-    parent = models.ForeignKey(
-        "django_mri.Scan",
-        on_delete=models.CASCADE,
-        related_name="derived_niftis",
-        blank=True,
-        null=True,
-    )
-
     class Meta:
         verbose_name = "NIfTI"
 
