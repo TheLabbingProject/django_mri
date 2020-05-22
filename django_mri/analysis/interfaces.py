@@ -1,3 +1,4 @@
+from django_mri.analysis.fsl.fsl_anat import FslAnat
 from django_mri.analysis.matlab.spm.cat12.segmentation import (
     Segmentation as Cat12Segmentation,
 )
@@ -9,5 +10,6 @@ interfaces = {
     "CAT12 Segmentation": {"12.6": Cat12Segmentation},
     "FLIRT": {FLIRT().version: FLIRT},
     "FNIRT": {FNIRT().version: FNIRT},
+    "FSL Anatomical Processing Script": {FslAnat.__version__: FslAnat},
     "ReconAll": {ReconAll().version: ReconAll},
 }
