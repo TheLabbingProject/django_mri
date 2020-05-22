@@ -1,5 +1,6 @@
 include LICENSE
-include README.md
+include requirements.txt
+include requirements-dev.txt
 recursive-include docs *
-recursive-include django_mri/templates *
 recursive-include django_mri/static *
+recursive-include django_mri/analysis *
