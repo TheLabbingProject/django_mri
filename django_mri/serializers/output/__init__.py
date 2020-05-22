@@ -1,0 +1,1 @@
+from django_mri.serializers.output.nifti_output import NiftiOutputSerializer

@@ -3,7 +3,7 @@ import os
 DEBUG = False
 ALLOWED_HOSTS = "*"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = '$up3r-S3cRe7'
+SECRET_KEY = "$up3r-S3cRe7"
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "django_dicom",
+    "django_analyses",
     "django_mri",
     "tests",
 ]
@@ -30,7 +31,7 @@ MIDDLEWARE = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": 'django_mri',
+        "NAME": "django_mri",
     }
 }
 
@@ -80,4 +81,4 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
 }
 
-MIGRATION_MODULES = {'django_mri': "django_mri.migrations.tests"}
+MIGRATION_MODULES = {"django_mri": "django_mri.migrations.tests"}

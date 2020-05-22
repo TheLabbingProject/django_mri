@@ -1,5 +1,7 @@
 import nipype
 
+from django_mri.analysis import messages
+from django_mri.analysis.fsl.fsl_anat import FslAnat
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -16,12 +18,21 @@ from django_mri.analysis.specifications.fsl.fnirt import (
     FNIRT_INPUT_SPECIFICATION,
     FNIRT_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.fsl.fsl_anat import (
+    FSL_ANAT_INPUT_SPECIFICATION,
+    FSL_ANAT_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import BET, FLIRT, FNIRT
+from nipype.interfaces.fsl.base import no_fsl
+
+if no_fsl():
+    raise ImportError(messages.NO_FSL)
+
 
 analysis_definitions = [
     {
@@ -60,6 +71,18 @@ analysis_definitions = [
                 "input": FNIRT_INPUT_SPECIFICATION,
                 "output": FNIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "FSL Anatomical Processing Script",
+        "description": "A general pipeline for processing anatomical images (e.g. T1-weighted scans).",
+        "versions": [
+            {
+                "title": FslAnat.__version__,
+                "description": "FSL 6.0 generic anatomical processing script (beta version).",
+                "input": FSL_ANAT_INPUT_SPECIFICATION,
+                "output": FSL_ANAT_OUTPUT_SPECIFICATION,
             }
         ],
     },
