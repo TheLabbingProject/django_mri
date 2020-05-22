@@ -1,25 +1,26 @@
 import os
 import subprocess
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-DCM2NIIX = os.path.join(BASE_DIR, "utils", "dcm2niix")
+from pathlib import Path
+
+BASE_DIR = Path(__file__).absolute().parent.parent
+DCM2NIIX = BASE_DIR / "utils" / "dcm2niix"
 
 
 class Dcm2niix:
     FLAGS = {"compressed": "-z", "BIDS": "-b", "name": "-f", "directory": "-o"}
     BOOLEAN = {True: "y", False: "n"}
 
-    def __init__(self, path: str = DCM2NIIX):
+    def __init__(self, path: Path = DCM2NIIX):
         self.path = path
 
     def generate_command(
         self,
-        path: str,
-        destination: str,
+        path: Path,
+        destination: Path,
         compressed: bool = True,
         generate_json: bool = True,
     ) -> list:
-        directory, name = os.path.dirname(destination), os.path.basename(destination)
         return [
             self.path,
             self.FLAGS["compressed"],
@@ -27,26 +28,27 @@ class Dcm2niix:
             self.FLAGS["BIDS"],
             self.BOOLEAN[generate_json],
             self.FLAGS["directory"],
-            directory,
+            str(destination.parent),
             self.FLAGS["name"],
-            name,
+            destination.name,
             path,
         ]
 
     def convert(
         self,
-        path: str,
-        destination: str,
+        path: Path,
+        destination: Path,
         compressed: bool = True,
         generate_json: bool = True,
-    ) -> str:
+    ) -> Path:
         command = self.generate_command(
             path, destination, compressed=compressed, generate_json=generate_json
         )
         try:
             subprocess.check_output(command)
-            if os.path.isfile(f"{destination}.nii.gz"):
-                return f"{destination}.nii.gz"
+            expected_file = destination.with_suffix('.nii.gz')
+            if expected_file.is_file():
+                return expected_file
             else:
                 raise RuntimeError(
                     "Failed to create NIfTI file using dcm2niix! Please check application configuration"

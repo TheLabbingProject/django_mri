@@ -23,23 +23,13 @@ class NIfTI(TimeStampedModel):
     # or of a manipulation of the data (False).
     is_raw = models.BooleanField(default=False)
 
-    # As long as this instance is the product of some conversion or manipulation
-    # of a single Scan instance, this field is meant to keep a reference to that
-    # instance. If it is the product of multiple Scan instances, this field may
-    # be set to None, and any associated Scan instances should be reachable
-    # through whichever analysis run instance they are represnted with.
-    parent = models.ForeignKey(
-        "django_mri.Scan",
-        on_delete=models.CASCADE,
-        related_name="derived_niftis",
-        blank=True,
-        null=True,
-    )
+    class Meta:
+        verbose_name = "NIfTI"
 
     def get_data(self) -> np.ndarray:
         """
         Uses nibabel_ to return the underlying pixel data as a NumPy_ array.
-        
+
         .. _nibabel: https://nipy.org/nibabel/
         .. _NumPy: http://www.numpy.org/
 
@@ -62,7 +52,7 @@ class NIfTI(TimeStampedModel):
         .. _b-value: https://radiopaedia.org/articles/b-values-1
         .. _dcm2niix: https://github.com/rordenlab/dcm2niix
         .. _DWI: https://en.wikipedia.org/wiki/Diffusion_MRI
-        
+
         Returns
         -------
         list
@@ -87,7 +77,7 @@ class NIfTI(TimeStampedModel):
         .. _b-vectors: https://mrtrix.readthedocs.io/en/latest/concepts/dw_scheme.html
         .. _dcm2niix: https://github.com/rordenlab/dcm2niix
         .. _DWI: https://en.wikipedia.org/wiki/Diffusion_MRI
-        
+
         Returns
         -------
         list
@@ -151,7 +141,7 @@ class NIfTI(TimeStampedModel):
     def subject(self):
         """
         If this instance has a single (Scan) origin, returns the related subject.
-        
+
         Returns
         -------
         int

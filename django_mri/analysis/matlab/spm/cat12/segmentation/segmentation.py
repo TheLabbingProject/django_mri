@@ -115,4 +115,3 @@ class Segmentation(SPMProcedure):
             remove_redundant_logs,
             verbose_output_dict,
         )
-
