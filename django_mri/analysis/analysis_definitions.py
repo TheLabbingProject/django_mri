@@ -22,12 +22,16 @@ from django_mri.analysis.specifications.fsl.fsl_anat import (
     FSL_ANAT_INPUT_SPECIFICATION,
     FSL_ANAT_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.fsl.susan import (
+    SUSAN_INPUT_SPECIFICATION,
+    SUSAN_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
-from nipype.interfaces.fsl import BET, FLIRT, FNIRT
+from nipype.interfaces.fsl import BET, FLIRT, FNIRT, SUSAN
 from nipype.interfaces.fsl.base import no_fsl
 
 if no_fsl():
@@ -83,6 +87,19 @@ analysis_definitions = [
                 "description": "FSL 6.0 generic anatomical processing script (beta version).",
                 "input": FSL_ANAT_INPUT_SPECIFICATION,
                 "output": FSL_ANAT_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "SUSAN",
+        "description": "Reduces noise in 2/3D images by averaging voxels with similar intensity.",
+        "versions": [
+            {
+                "title": SUSAN().version,
+                "description": "FSL 6.0 version of the SUSAN algorithm.",
+                "input": SUSAN_INPUT_SPECIFICATION,
+                "output": SUSAN_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
     },
