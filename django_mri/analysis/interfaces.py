@@ -3,7 +3,7 @@ from django_mri.analysis.matlab.spm.cat12.segmentation import (
     Segmentation as Cat12Segmentation,
 )
 from nipype.interfaces.freesurfer import ReconAll
-from nipype.interfaces.fsl import BET, FLIRT, FNIRT, Reorient2Std, SUSAN
+from nipype.interfaces.fsl import BET, FLIRT, FNIRT, Reorient2Std, RobustFOV, SUSAN
 
 interfaces = {
     "BET": {BET().version: BET},
@@ -14,4 +14,5 @@ interfaces = {
     "FSL Anatomical Processing Script": {FslAnat.__version__: FslAnat},
     "SUSAN": {SUSAN().version: SUSAN},
     "ReconAll": {ReconAll().version: ReconAll},
+    "robustfov": {RobustFOV().version: RobustFOV},
 }

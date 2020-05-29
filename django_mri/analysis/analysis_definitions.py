@@ -26,6 +26,10 @@ from django_mri.analysis.specifications.fsl.reorient2std import (
     REORIENT2STD_INPUT_SPECIFICATION,
     REORIENT2STD_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.fsl.robustfov import (
+    ROBUSTFOV_INPUT_SPECIFICATION,
+    ROBUSTFOV_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.fsl.susan import (
     SUSAN_INPUT_SPECIFICATION,
     SUSAN_OUTPUT_SPECIFICATION,
@@ -35,7 +39,7 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
-from nipype.interfaces.fsl import BET, FLIRT, FNIRT, SUSAN, Reorient2Std
+from nipype.interfaces.fsl import BET, FLIRT, FNIRT, SUSAN, Reorient2Std, RobustFOV
 from nipype.interfaces.fsl.base import no_fsl
 
 if no_fsl():
@@ -116,6 +120,19 @@ analysis_definitions = [
                 "description": f"Default fslorient2std version for nipype {nipype.__version__}.",  # noqa
                 "input": REORIENT2STD_INPUT_SPECIFICATION,
                 "output": REORIENT2STD_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "robustfov",
+        "description": "Automatically crops an image removing lower head and neck.",
+        "versions": [
+            {
+                "title": RobustFOV().version,
+                "description": f"Default robustfov version for nipype {nipype.__version__}.",
+                "input": ROBUSTFOV_INPUT_SPECIFICATION,
+                "output": ROBUSTFOV_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
