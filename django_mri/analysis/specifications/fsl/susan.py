@@ -12,7 +12,7 @@ SUSAN_INPUT_SPECIFICATION = {
     "brightness_threshold": {
         "type": FloatInputDefinition,
         "required": True,
-        "description": "Should be greater than noise level and less than contrast of edges to be preserved.",
+        "description": "Should be greater than noise level and less than contrast of edges to be preserved.",  # noqa
     },
     "fwhm": {
         "type": FloatInputDefinition,
@@ -23,6 +23,7 @@ SUSAN_INPUT_SPECIFICATION = {
         "type": NiftiInputDefinition,
         "required": True,
         "description": "Filename of input time-series.",
+        "value_attribute": "path.__str__",
     },
     "dimension": {
         "type": IntegerInputDefinition,
@@ -49,7 +50,7 @@ SUSAN_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "required": False,
         "default": True,
-        "description": "Whether to use a local median filter in the cases where single-point noise is detected.",
+        "description": "Whether to use a local median filter in the cases where single-point noise is detected.",  # noqa
     },
     "args": {
         "type": StringInputDefinition,
