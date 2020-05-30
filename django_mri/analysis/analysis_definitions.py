@@ -10,6 +10,10 @@ from django_mri.analysis.specifications.fsl.bet import (
     BET_INPUT_SPECIFICATION,
     BET_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.fsl.fast import (
+    FAST_INPUT_SPECIFICATION,
+    FAST_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.fsl.flirt import (
     FLIRT_INPUT_SPECIFICATION,
     FLIRT_OUTPUT_SPECIFICATION,
@@ -39,7 +43,15 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
-from nipype.interfaces.fsl import BET, FLIRT, FNIRT, SUSAN, Reorient2Std, RobustFOV
+from nipype.interfaces.fsl import (
+    BET,
+    FAST,
+    FLIRT,
+    FNIRT,
+    SUSAN,
+    Reorient2Std,
+    RobustFOV,
+)
 from nipype.interfaces.fsl.base import no_fsl
 
 if no_fsl():
@@ -57,6 +69,18 @@ analysis_definitions = [
                 "input": BET_INPUT_SPECIFICATION,
                 "output": BET_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "FAST",
+        "description": "FAST (FMRIB's Automated Segmentation Tool) segments a 3D image of the brain into different tissue types (Grey Matter, White Matter, CSF, etc.), whilst also correcting for spatial intensity variations (also known as bias field or RF inhomogeneities).",  # noqa
+        "versions": [
+            {
+                "title": FAST().version,
+                "description": f"Default FAST version for nipype {nipype.__version__}.",
+                "input": FAST_INPUT_SPECIFICATION,
+                "output": FAST_OUTPUT_SPECIFICATION,
             }
         ],
     },
@@ -130,7 +154,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": RobustFOV().version,
-                "description": f"Default robustfov version for nipype {nipype.__version__}.",
+                "description": f"Default robustfov version for nipype {nipype.__version__}.",  # noqa
                 "input": ROBUSTFOV_INPUT_SPECIFICATION,
                 "output": ROBUSTFOV_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",

@@ -13,6 +13,7 @@ ROBUSTFOV_INPUT_SPECIFICATION = {
         "description": "Path to NIfTI format image file to crop.",
         "value_attribute": "path.__str__",
         "required": True,
+        "is_configuration": False,
     },
     "args": {
         "type": StringInputDefinition,
@@ -37,7 +38,7 @@ ROBUSTFOV_INPUT_SPECIFICATION = {
         "required": False,
         "description": "Tranformation matrix output file path.",
         "is_output_path": True,
-        "default": "transform",
+        "default": "transform.mat",
     },
     "output_type": {
         "type": StringInputDefinition,
@@ -45,6 +46,7 @@ ROBUSTFOV_INPUT_SPECIFICATION = {
         "description": "Output file format.",
         "choices": ["NIFTI", "NIFTI_PAIR", "NIFTI_GZ", "NIFTI_PAIR_GZ"],
         "default": "NIFTI_GZ",
+        "is_configuration": False,
     },
 }
 
