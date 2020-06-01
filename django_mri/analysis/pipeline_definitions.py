@@ -27,6 +27,18 @@ BASIC_FSL_PREPROCESSING = {
             "source": {"analysis_version": "robustfov", "configuration": {}},
             "source_port": "out_roi",
             "destination": {
+                "analysis_version": "FLIRT",
+                "configuration": {"reference": MNI.id, "interp": "spline"},
+            },
+            "destination_port": "in_file",
+        },
+        {
+            "source": {
+                "analysis_version": "FLIRT",
+                "configuration": {"reference": MNI.id, "interp": "spline"},
+            },
+            "source_port": "out_file",
+            "destination": {
                 "analysis_version": "FNIRT",
                 "configuration": {"ref_file": MNI.id},
             },
