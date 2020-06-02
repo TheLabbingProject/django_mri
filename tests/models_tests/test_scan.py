@@ -2,24 +2,44 @@ import os
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django_mri.data_import import LocalImport
+from django_dicom.models import Image
 from django_mri.models import Scan, NIfTI
 from django_mri.models.common_sequences import sequences
 from django_mri.models.sequence_type import SequenceType
 from ..models import Subject
-from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
+from tests.fixtures import (
+    SIEMENS_DWI_SERIES,
+    SIEMENS_DWI_SERIES_PATH,
+    IMPORTED_DIR,
+)
+from tests.utils import restore_path
+from pathlib import Path
+from django.db.models import signals
+import factory
+
+# from django_mri.data_import import LocalImport
 
 
 class ScanModelTestCase(TestCase):
     @classmethod
+    @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
         cls.subject = Subject.objects.create()
-        LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
+        Image.objects.import_path(Path(SIEMENS_DWI_SERIES_PATH))
+        Scan.objects.create(dicom=Image.objects.first().series)
+        # LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
 
     def setUp(self):
         self.scan = Scan.objects.last()
         if not self.scan:
             self.fail("Test scan not created! Check signals.")
+
+    @classmethod
+    def tearDownClass(cls):
+        scan = Scan.objects.last()
+        curr_path = os.path.join(IMPORTED_DIR, scan.dicom.patient.uid)
+        restore_path(curr_path, SIEMENS_DWI_SERIES_PATH)
+        super().tearDownClass()
 
     ########
     # Meta #
@@ -170,7 +190,7 @@ class ScanModelTestCase(TestCase):
 
     # _nifti
     def test__nifti_blank_and_null(self):
-        field = Scan._meta.get_field("nifti")
+        field = Scan._meta.get_field("_nifti")
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
 

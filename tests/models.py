@@ -1,8 +1,9 @@
 from django_extensions.db.models import TitleDescriptionModel
+from .managers import TestSubjectManager
 
 
 class Subject(TitleDescriptionModel):
-    pass
+    objects = TestSubjectManager()
 
 
 class Group(TitleDescriptionModel):
