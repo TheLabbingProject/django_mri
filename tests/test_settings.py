@@ -81,4 +81,4 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
 }
 
-MIGRATION_MODULES = {"django_mri": "django_mri.migrations.tests"}
+MIGRATION_MODULES = {"django_mri": "tests.migrations"}
