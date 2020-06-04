@@ -1,9 +1,9 @@
 from django_extensions.db.models import TitleDescriptionModel
-from .managers import TestSubjectManager
+from .managers import SubjectQuerySet
 
 
 class Subject(TitleDescriptionModel):
-    objects = TestSubjectManager()
+    objects = SubjectQuerySet.as_manager()
 
 
 class Group(TitleDescriptionModel):
