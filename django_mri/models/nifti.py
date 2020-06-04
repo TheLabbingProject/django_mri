@@ -59,7 +59,8 @@ class NIfTI(TimeStampedModel):
             b-value for each diffusion direction.
         """
 
-        file_name = self.path.replace("nii.gz", "bval")
+        curr_path = str(self.path)
+        file_name = curr_path.replace("nii.gz", "bval")
         if os.path.isfile(file_name):
             with open(file_name, "r") as file_object:
                 content = file_object.read()
@@ -83,7 +84,8 @@ class NIfTI(TimeStampedModel):
         list
             b-value for each diffusion direction
         """
-        file_name = self.path.replace("nii.gz", "bvec")
+        curr_path = str(self.path)
+        file_name = curr_path.replace("nii.gz", "bvec")
         if os.path.isfile(file_name):
             with open(file_name, "r") as file_object:
                 content = file_object.read()

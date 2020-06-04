@@ -82,3 +82,4 @@ REST_FRAMEWORK = {
 }
 
 MIGRATION_MODULES = {"django_mri": "tests.migrations"}
+KEEP_ORIGINAL_DICOM = True
