@@ -6,20 +6,23 @@ from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
 )
-
 from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 FLIRT_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": FileInputDefinition,
+        "type": NiftiInputDefinition,
         "required": True,
         "description": "A NIfTI format file to register to the reference.",
         "is_configuration": False,
+        "value_attribute": "path.__str__",
     },
     "reference": {
-        "type": FileInputDefinition,
+        "type": NiftiInputDefinition,
         "required": True,
         "description": "A NIfTI format file to register the input file with.",
+        "value_attribute": "path.__str__",
     },
     "out_file": {
         "type": StringInputDefinition,
@@ -235,15 +238,17 @@ FLIRT_INPUT_SPECIFICATION = {
 
 FLIRT_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": FileOutputDefinition,
+        "type": NiftiOutputDefinition,
         "description": "Path to registered file (if generated).",
     },
     "out_matrix_file": {
         "type": FileOutputDefinition,
         "description": "Path to the calculated affine transform (if generated).",
+        "validate_existence": False,
     },
     "out_log": {
         "type": FileOutputDefinition,
         "description": "Path to the run log (if generated).",
+        "validate_existence": False,
     },
 }
