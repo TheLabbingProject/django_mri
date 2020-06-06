@@ -136,16 +136,3 @@ class NIfTI(TimeStampedModel):
     @property
     def uncompressed(self) -> Path:
         return self.uncompress()
-
-    @property
-    def subject(self):
-        """
-        If this instance has a single (Scan) origin, returns the related subject.
-
-        Returns
-        -------
-        int
-            The subject ID to which this NIfTI file's origin is related with.
-        """
-
-        return self.parent.subject if self.parent else None
