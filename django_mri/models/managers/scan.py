@@ -7,7 +7,7 @@ from pathlib import Path
 class ScanManager(Manager):
     def import_dicom_data(self, path: Path) -> tuple:
         images = DicomImage.objects.import_path(path)
-        series = set([image[0].series for image in images])
+        series = set([image.series for image in images])
         scans = self.filter(dicom__in=series)
         return scans
 
