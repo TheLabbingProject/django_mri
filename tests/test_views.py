@@ -7,54 +7,55 @@ from .fixtures import (
     LONELY_FILES_PATH,
 )
 from django_mri.models import Scan
-from django_dicom.models import Image, Series
+from django_dicom.models import Image
 from django.db.models import signals
-from .models import Subject
+from django_dicom.models.utils.utils import get_subject_model
 from django.contrib.auth import get_user_model
 import sys
 import os
 import factory
 
+Subject = get_subject_model()
 
-# class LoggedOutScanViewTestCase(TestCase):
-#     @classmethod
-#     @factory.django.mute_signals(signals.post_save)
-#     def setUpTestData(cls):
-#         """
-#         Creates instances to be used in the tests.
-#         For more information see Django's :class:`~django.test.TestCase` documentation_.
 
-#         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
-#         """
-#         cls.subject = Subject.objects.create(title="TestSubject")
-#         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-#         scan, _ = Scan.objects.get_or_create(dicom=Image.objects.first().series)
-#         # scan.suggest_subject(cls.subject)
+class LoggedOutScanViewTestCase(TestCase):
+    @classmethod
+    @factory.django.mute_signals(signals.post_save)
+    def setUpTestData(cls):
+        """
+        Creates instances to be used in the tests.
+        For more information see Django's :class:`~django.test.TestCase` documentation_.
 
-#     def setUp(self):
-#         self.test_instance = Scan.objects.last()
+        .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
+        """
+        subject = Subject.objects.create()
+        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
+        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-#     def test_scan_list_unautherized(self):
-#         url = reverse("mri:scan-list")
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def setUp(self):
+        self.test_instance = Scan.objects.last()
 
-#     def test_scan_detail_unautherized(self):
-#         url = reverse("mri:scan-detail", args=(self.test_instance.dicom.id,))
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_scan_list_unautherized(self):
+        url = reverse("mri:scan-list")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-# def test_scan_from_file_unautherized(self):
-#     url = reverse("mri:from_file")
-#     subject = Subject.objects.last()
-#     response = self.client.post(
-#         url,
-#         data={
-#             "file": open(os.path.join(LONELY_FILES_PATH, "001.dcm"), "rb"),
-#             "subject_id": subject.id,
-#         },
-#     )
-#     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_scan_detail_unautherized(self):
+        url = reverse("mri:scan-detail", args=(self.test_instance.dicom.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # def test_scan_from_file_unautherized(self):
+    #     url = reverse("mri:from_file")
+    #     subject = Subject.objects.last()
+    #     response = self.client.post(
+    #         url,
+    #         data={
+    #             "file": open(os.path.join(LONELY_FILES_PATH, "001.dcm"), "rb"),
+    #             "subject_id": subject.id,
+    #         },
+    #     )
+    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class LoggedInScanViewTestCase(APITestCase):
@@ -67,11 +68,9 @@ class LoggedInScanViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        Subject.objects.create()
+        subject = Subject.objects.create()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        scan, _ = Scan.objects.get_or_create(
-            dicom=Image.objects.first().series, subject=Subject.objects.first()
-        )
+        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
     def setUp(self):
         User = get_user_model()
@@ -82,14 +81,13 @@ class LoggedInScanViewTestCase(APITestCase):
         self.test_scan = Scan.objects.last()
 
     def test_list_view(self):
-        print(Subject.objects.get(mri_scans__in=[self.test_scan]))
         response = self.client.get(reverse("mri:scan-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_detail_view(self):
-    # url = reverse("mri:scan-detail", args=(self.test_scan.id,))
-    # response = self.client.get(url)
-    # self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_detail_view(self):
+        url = reverse("mri:scan-detail", args=(self.test_scan.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # def test_scan_from_file_dcm_view(self):
     #     url = reverse("mri:from_file")
@@ -115,77 +113,76 @@ class LoggedInScanViewTestCase(APITestCase):
     #     response = self.client.get(url)
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_scan_create(self):
-    #     # # TODO figure out how to access the create function in
-    #     # # the Scan_serializer and complete the test
-    #     # url = "/mri/scan/"
-    #     # study = Study.objects.create()
-    #     # SIEMENS_DWI_SERIES_FOR_CREATE_SCAN["study_id"] = study.id
-    #     # Series.objects.create(**SIEMENS_DWI_SERIES_FOR_CREATE_SCAN)
-    #     # dicom = Series.objects.last()
-    #     # response = self.client.post(url, data={"dicom": dicom})
-    #     # self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     pass
+    def test_scan_create(self):
+        # # TODO figure out how to access the create function in
+        # # the Scan_serializer and complete the test
+        # url = "/mri/scan/"
+        # study = Study.objects.create()
+        # SIEMENS_DWI_SERIES_FOR_CREATE_SCAN["study_id"] = study.id
+        # Series.objects.create(**SIEMENS_DWI_SERIES_FOR_CREATE_SCAN)
+        # dicom = Series.objects.last()
+        # response = self.client.post(url, data={"dicom": dicom})
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        pass
 
 
-# class LoggedOutNIfTIViewTestCase(TestCase):
-#     @classmethod
-#     @factory.django.mute_signals(signals.post_save)
-#     def setUpTestData(cls):
-#         """
-#         Creates instances to be used in the tests.
-#         For more information see Django's :class:`~django.test.TestCase` documentation_.
+class LoggedOutNIfTIViewTestCase(TestCase):
+    @classmethod
+    @factory.django.mute_signals(signals.post_save)
+    def setUpTestData(cls):
+        """
+        Creates instances to be used in the tests.
+        For more information see Django's :class:`~django.test.TestCase` documentation_.
 
-#         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
-#         """
-#         cls.subject = Subject.objects.create(title="TestSubject")
-#         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-#         scan, _ = Scan.objects.get_or_create(dicom=Image.objects.first().series)
+        .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
+        """
+        subject = Subject.objects.create()
+        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
+        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-#     def setUp(self):
-#         scan = Scan.objects.last()
-#         self.test_nifti = scan.dicom_to_nifti()
+    def setUp(self):
+        scan = Scan.objects.last()
+        self.test_nifti = scan.dicom_to_nifti()
 
-#     def test_scan_list_unautherized(self):
-#         url = reverse("mri:nifti-list")
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_scan_list_unautherized(self):
+        url = reverse("mri:nifti-list")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-#     def test_scan_detail_unautherized(self):
-#         url = reverse("mri:nifti-detail", args=(self.test_nifti.id,))
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_scan_detail_unautherized(self):
+        url = reverse("mri:nifti-detail", args=(self.test_nifti.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-# class LoggedInNIfTIViewTestCase(APITestCase):
-#     @classmethod
-#     @factory.django.mute_signals(signals.post_save)
-#     def setUpTestData(cls):
-#         """
-#         Creates instances to be used in the tests.
-#         For more information see Django's :class:`~django.test.TestCase` documentation_.
+class LoggedInNIfTIViewTestCase(APITestCase):
+    @classmethod
+    @factory.django.mute_signals(signals.post_save)
+    def setUpTestData(cls):
+        """
+        Creates instances to be used in the tests.
+        For more information see Django's :class:`~django.test.TestCase` documentation_.
 
-#         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
-#         """
-#         # cls.subject = Subject.objects.create(title="TestSubject")
-#         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-#         scan, _ = Scan.objects.get_or_create(dicom=Image.objects.first().series)
-#         # scan.suggest_subject(cls.subject)
+        .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
+        """
+        subject = Subject.objects.create()
+        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
+        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-#     def setUp(self):
-#         User = get_user_model()
-#         self.user = User.objects.create_user(
-#             username="test", password="pass", is_staff=True
-#         )
-#         self.client.force_authenticate(self.user)
-#         scan = Scan.objects.last()
-#         self.test_nifti = scan.dicom_to_nifti()
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="test", password="pass", is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+        scan = Scan.objects.last()
+        self.test_nifti = scan.dicom_to_nifti()
 
-#     def test_list_view(self):
-#         response = self.client.get(reverse("mri:nifti-list"))
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_list_view(self):
+        response = self.client.get(reverse("mri:nifti-list"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-#     def test_detail_view(self):
-#         url = reverse("mri:nifti-detail", args=(self.test_nifti.id,))
-#         response = self.client.get(url)
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_detail_view(self):
+        url = reverse("mri:nifti-detail", args=(self.test_nifti.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
