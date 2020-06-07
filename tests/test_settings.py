@@ -81,5 +81,10 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
 }
 
-MIGRATION_MODULES = {"django_mri": "tests.migrations"}
+# MIGRATION_MODULES = {"django_mri": "django_mri.migrations"}
+# MIGRATION_MODULES = {"django_mri": "tests.migrations"}
+MIGRATION_MODULES = {
+    "tests": "tests.migrations",
+    "django_mri": "django_mri.migrations",
+}
 KEEP_ORIGINAL_DICOM = True

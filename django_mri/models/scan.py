@@ -13,6 +13,7 @@ from django_mri.models import messages
 from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
+from django_mri.utils.utils import get_subject_model, get_group_model
 from pathlib import Path
 
 
@@ -94,7 +95,7 @@ class Scan(TimeStampedModel):
     )
 
     subject = models.ForeignKey(
-        settings.SUBJECT_MODEL,
+        get_subject_model(),
         on_delete=models.PROTECT,
         related_name="mri_scans",
         blank=True,
@@ -102,7 +103,7 @@ class Scan(TimeStampedModel):
     )
 
     study_groups = models.ManyToManyField(
-        settings.STUDY_GROUP_MODEL, related_name="mri_scans", blank=True
+        get_group_model(), related_name="mri_scans", blank=True
     )
 
     added_by = models.ForeignKey(
