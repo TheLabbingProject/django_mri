@@ -7,7 +7,7 @@ from .fixtures import (
     LONELY_FILES_PATH,
 )
 from django_mri.models import Scan
-from django_dicom.models import Image
+from django_dicom.models import Image, Series
 from django.db.models import signals
 from .models import Subject
 from django.contrib.auth import get_user_model
@@ -67,11 +67,11 @@ class LoggedInScanViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        Subject.objects.create(title="TestSubject")
+        Subject.objects.create()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        scan, _ = Scan.objects.get_or_create(dicom=Image.objects.first().series)
-        scan.subject = Subject.objects.last()
-        scan.save()
+        scan, _ = Scan.objects.get_or_create(
+            dicom=Image.objects.first().series, subject=Subject.objects.first()
+        )
 
     def setUp(self):
         User = get_user_model()
@@ -81,15 +81,15 @@ class LoggedInScanViewTestCase(APITestCase):
         self.client.force_authenticate(self.user)
         self.test_scan = Scan.objects.last()
 
-    # def test_list_view(self):
-    #     response = self.client.get(reverse("mri:scan-list"))
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_list_view(self):
+        print(Subject.objects.get(mri_scans__in=[self.test_scan]))
+        response = self.client.get(reverse("mri:scan-list"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_detail_view(self):
-        url = reverse("mri:scan-detail", args=(self.test_scan.id,))
-        print(self.test_scan.subject.id)
-        # response = self.client.get(url)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+    # def test_detail_view(self):
+    # url = reverse("mri:scan-detail", args=(self.test_scan.id,))
+    # response = self.client.get(url)
+    # self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # def test_scan_from_file_dcm_view(self):
     #     url = reverse("mri:from_file")
