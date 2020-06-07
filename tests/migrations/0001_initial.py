@@ -32,10 +32,17 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("title", models.CharField(max_length=255, verbose_name="title")),
                 (
-                    "description",
-                    models.TextField(blank=True, null=True, verbose_name="description"),
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
+                    ),
                 ),
             ],
         ),
@@ -49,6 +56,18 @@ class Migration(migrations.Migration):
                         primary_key=True,
                         serialize=False,
                         verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    django_extensions.db.fields.CreationDateTimeField(
+                        auto_now_add=True, verbose_name="created"
+                    ),
+                ),
+                (
+                    "modified",
+                    django_extensions.db.fields.ModificationDateTimeField(
+                        auto_now=True, verbose_name="modified"
                     ),
                 ),
                 ("title", models.CharField(max_length=255, verbose_name="title")),
@@ -224,7 +243,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="django_mri.NIfTI",
+                        to="NIfTI",
                     ),
                 ),
                 (
@@ -365,7 +384,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="input_set",
-                        to="django_mri.ScanInputDefinition",
+                        to="ScanInputDefinition",
                     ),
                 ),
                 (
@@ -373,7 +392,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="run_input_set",
-                        to="django_mri.Scan",
+                        to="Scan",
                     ),
                 ),
             ],
@@ -398,7 +417,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="output_set",
-                        to="django_mri.NiftiOutputDefinition",
+                        to="NiftiOutputDefinition",
                     ),
                 ),
                 (
@@ -406,7 +425,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="run_output_set",
-                        to="django_mri.NIfTI",
+                        to="NIfTI",
                     ),
                 ),
             ],
@@ -431,7 +450,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="input_set",
-                        to="django_mri.NiftiInputDefinition",
+                        to="NiftiInputDefinition",
                     ),
                 ),
                 (
@@ -439,7 +458,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="run_input_set",
-                        to="django_mri.NIfTI",
+                        to="NIfTI",
                     ),
                 ),
             ],
