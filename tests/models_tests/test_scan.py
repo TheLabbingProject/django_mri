@@ -1,20 +1,27 @@
-import os
-
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django_mri.data_import import LocalImport
+from django_dicom.models import Image
 from django_mri.models import Scan, NIfTI
 from django_mri.models.common_sequences import sequences
 from django_mri.models.sequence_type import SequenceType
 from ..models import Subject
-from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
+from tests.fixtures import (
+    SIEMENS_DWI_SERIES,
+    SIEMENS_DWI_SERIES_PATH,
+)
+
+from pathlib import Path
+from django.db.models import signals
+import factory
 
 
 class ScanModelTestCase(TestCase):
     @classmethod
+    @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
         cls.subject = Subject.objects.create()
-        LocalImport(cls.subject, SIEMENS_DWI_SERIES_PATH).run()
+        Image.objects.import_path(Path(SIEMENS_DWI_SERIES_PATH))
+        Scan.objects.get_or_create(dicom=Image.objects.first().series)
 
     def setUp(self):
         self.scan = Scan.objects.last()
@@ -26,7 +33,7 @@ class ScanModelTestCase(TestCase):
     ########
 
     def test_ordering(self):
-        self.assertTupleEqual(Scan._meta.ordering, ("time",))
+        self.assertListEqual(Scan._meta.ordering, [])
 
     def test_verbose_name_plural(self):
         self.assertTrue(Scan._meta.verbose_name_plural, "MRI Scans")
@@ -170,7 +177,7 @@ class ScanModelTestCase(TestCase):
 
     # _nifti
     def test__nifti_blank_and_null(self):
-        field = Scan._meta.get_field("nifti")
+        field = Scan._meta.get_field("_nifti")
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
 
@@ -183,6 +190,11 @@ class ScanModelTestCase(TestCase):
     ###########
     # Methods #
     ###########
+
+    def test_string(self):
+        expected = SIEMENS_DWI_SERIES["description"]
+        result = str(self.scan)
+        self.assertEqual(result, expected)
 
     def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(self):
         self.scan.dicom = None
@@ -206,7 +218,8 @@ class ScanModelTestCase(TestCase):
 
     def test_get_default_nifti_dir(self):
         result = self.scan.get_default_nifti_dir()
-        expected = self.scan.dicom.get_path().replace("DICOM", "NIfTI")
+        scan_dir = str(self.scan.dicom.path)
+        expected = Path(scan_dir.replace("DICOM", "NIfTI"))
         self.assertEqual(result, expected)
 
     def test_get_default_nifti_dir_without_dicom(self):
@@ -223,7 +236,7 @@ class ScanModelTestCase(TestCase):
         result = self.scan.get_default_nifti_destination()
         directory = self.scan.get_default_nifti_dir()
         name = self.scan.get_default_nifti_name()
-        expected = os.path.join(directory, name)
+        expected = directory / name
         self.assertEqual(result, expected)
 
     def test_dicom_to_nifti_with_no_dicom_raises_attribute_error(self):
@@ -231,9 +244,13 @@ class ScanModelTestCase(TestCase):
         with self.assertRaises(AttributeError):
             self.scan.dicom_to_nifti()
 
-    def test_dicom_to_nifti(self):
-        nifti = self.scan.dicom_to_nifti()
-        self.assertIsInstance(nifti, NIfTI)
+    def test__nifti_before_dicom_to_nifti(self):
+        result = self.scan.nifti
+        self.assertIsInstance(result, NIfTI)
+
+    # def test_dicom_to_nifti(self):
+    #     nifti = self.scan.dicom_to_nifti()
+    #     self.assertIsInstance(nifti, NIfTI)
 
     ##############
     # Properties #
@@ -243,3 +260,7 @@ class ScanModelTestCase(TestCase):
         for sequence in sequences:
             SequenceType.objects.create(**sequence)
         self.assertEqual(self.scan.sequence_type, SequenceType.objects.get(title="DWI"))
+
+    def test_nifti_after_dicom_to_nifti(self):
+        result = self.scan.nifti
+        self.assertIsInstance(result, NIfTI)
