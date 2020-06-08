@@ -34,6 +34,10 @@ db.sqlite3
 # Coverage reports
 htmlcov
 .coverage
+coverage.xml
+
+# tox directory
+.tox
 
 # Other
 *.pem
