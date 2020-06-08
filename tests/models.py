@@ -1,9 +1,10 @@
-from django_extensions.db.models import TitleDescriptionModel
+from django_extensions.db.models import TitleDescriptionModel, TimeStampedModel
+from .managers import SubjectQuerySet
 
 
-class Subject(TitleDescriptionModel):
-    pass
+class Subject(TimeStampedModel):
+    objects = SubjectQuerySet.as_manager()
 
 
-class Group(TitleDescriptionModel):
+class Group(TitleDescriptionModel, TimeStampedModel):
     pass
