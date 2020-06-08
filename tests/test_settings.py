@@ -87,4 +87,6 @@ MIGRATION_MODULES = {
     "tests": "tests.migrations",
     "django_mri": "django_mri.migrations",
 }
+
 KEEP_ORIGINAL_DICOM = True
+DICOM_IMPORT_MODE = "minimal"
