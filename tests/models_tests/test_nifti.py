@@ -10,12 +10,9 @@ from tests.fixtures import (
     DICOM_SERIES_PATH,
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
-    # IMPORTED_DICOM_FILES_PATH,
-    # IMPORTED_DICOM_DWI_PATH,
 )
+from django_mri.utils.compression import compress, uncompress
 from tests.models import Subject
-
-# from tests.utils import restore_path
 from django.db.models import signals
 from pathlib import Path
 
@@ -37,20 +34,6 @@ class NIfTIModelTestCase(TestCase):
             self.fail("Test scan not created! Check signals.")
         self.simple_nifti = self.simple_scan.dicom_to_nifti()
         self.dwi_nifti = self.dwi_scan.dicom_to_nifti()
-
-    # @classmethod
-    # def tearDownClass(cls):
-    #     scan = Scan.objects.last()
-    #     dwi_scan = Scan.objects.first()
-    #     curr_path = os.path.join(
-    #         IMPORTED_DICOM_FILES_PATH, scan.dicom.patient.uid, scan.dicom.uid
-    #     )
-    #     dwi_curr_path = os.path.join(
-    #         IMPORTED_DICOM_DWI_PATH, dwi_scan.dicom.patient.uid, dwi_scan.dicom.uid
-    #     )
-    #     restore_path(curr_path, DICOM_SERIES_PATH)
-    #     restore_path(dwi_curr_path, SIEMENS_DWI_SERIES_PATH)
-    #     super().tearDownClass()
 
     ##########
     # Fields #
@@ -117,3 +100,31 @@ class NIfTIModelTestCase(TestCase):
 
     def test_b_vector_for_non_DWI_returns_none(self):
         self.assertIsNone(self.simple_nifti.b_vector)
+
+    ##############
+    #    Utils   #
+    ##############
+
+    def test_uncompress(self):
+        expected = str(self.simple_nifti.path).replace(".gz", "")
+        expected = Path(expected)
+        result = uncompress(self.simple_nifti.path)
+        self.assertEqual(result, expected)
+
+    def test_compress(self):
+        expected = str(self.simple_nifti.path) + ".gz"
+        expected = Path(expected)
+        result = compress(self.simple_nifti.path)
+        self.assertEqual(result, expected)
+
+    def test_uncompress_keep_source(self):
+        expected = str(self.simple_nifti.path).replace(".gz", "")
+        expected = Path(expected)
+        result = uncompress(self.simple_nifti.path, keep_source=False)
+        self.assertEqual(result, expected)
+
+    def test_compress_keep_source(self):
+        expected = str(self.simple_nifti.path) + ".gz"
+        expected = Path(expected)
+        result = compress(self.simple_nifti.path, keep_source=False)
+        self.assertEqual(result, expected)
