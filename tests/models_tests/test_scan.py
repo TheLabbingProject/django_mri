@@ -248,10 +248,6 @@ class ScanModelTestCase(TestCase):
         result = self.scan.nifti
         self.assertIsInstance(result, NIfTI)
 
-    # def test_dicom_to_nifti(self):
-    #     nifti = self.scan.dicom_to_nifti()
-    #     self.assertIsInstance(nifti, NIfTI)
-
     ##############
     # Properties #
     ##############

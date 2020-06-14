@@ -3,7 +3,7 @@ import os
 
 
 env = environ.Env(
-    DB_NAME=(str, "django_analyses"),
+    DB_NAME=(str, "django_mri"),
     DB_USER=(str, ""),
     DB_PASSWORD=(str, ""),
     DB_HOST=(str, "localhost"),
@@ -104,8 +104,6 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 20,
 }
 
-# MIGRATION_MODULES = {"django_mri": "django_mri.migrations"}
-# MIGRATION_MODULES = {"django_mri": "tests.migrations"}
 MIGRATION_MODULES = {
     "tests": "tests.migrations",
     "django_mri": "django_mri.migrations",
