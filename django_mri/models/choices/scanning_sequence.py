@@ -6,7 +6,7 @@ A ChoiceEnum to represent ScanningSequence_ values.
 """
 
 
-from django_dicom.models.choice_enum import ChoiceEnum
+from dicom_parser.utils.choice_enum import ChoiceEnum
 
 
 class ScanningSequence(ChoiceEnum):
