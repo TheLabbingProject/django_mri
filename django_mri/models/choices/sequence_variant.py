@@ -5,7 +5,7 @@ A ChoiceEnum to represent SequenceVariant_ values.
 
 """
 
-from django_dicom.models.choice_enum import ChoiceEnum
+from dicom_parser.utils.choice_enum import ChoiceEnum
 
 
 class SequenceVariant(ChoiceEnum):
