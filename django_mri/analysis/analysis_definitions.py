@@ -54,7 +54,11 @@ from nipype.interfaces.fsl import (
 )
 from nipype.interfaces.fsl.base import no_fsl
 
-if no_fsl():
+from django.conf import settings
+
+test_mode = getattr(settings, "TESTING_MODE", False)
+
+if no_fsl() and not test_mode:
     raise ImportError(messages.NO_FSL)
 
 
@@ -64,7 +68,7 @@ analysis_definitions = [
         "description": "FSL brain extraction (BET).",
         "versions": [
             {
-                "title": BET().version,
+                "title": BET().version or "1.0",
                 "description": f"Default BET version for nipype {nipype.__version__}.",
                 "input": BET_INPUT_SPECIFICATION,
                 "output": BET_OUTPUT_SPECIFICATION,
@@ -77,7 +81,7 @@ analysis_definitions = [
         "description": "FAST (FMRIB's Automated Segmentation Tool) segments a 3D image of the brain into different tissue types (Grey Matter, White Matter, CSF, etc.), whilst also correcting for spatial intensity variations (also known as bias field or RF inhomogeneities).",  # noqa
         "versions": [
             {
-                "title": FAST().version,
+                "title": FAST().version or "1.0",
                 "description": f"Default FAST version for nipype {nipype.__version__}.",
                 "input": FAST_INPUT_SPECIFICATION,
                 "output": FAST_OUTPUT_SPECIFICATION,
@@ -89,7 +93,7 @@ analysis_definitions = [
         "description": "FLIRT (FMRIB's Linear Image Registration Tool) is a fully automated robust and accurate tool for linear (affine) intra- and inter-modal brain image registration.",  # noqa
         "versions": [
             {
-                "title": FLIRT().version,
+                "title": FLIRT().version or "1.0",
                 "description": f"Default FLIRT version for nipype {nipype.__version__}.",
                 "input": FLIRT_INPUT_SPECIFICATION,
                 "output": FLIRT_OUTPUT_SPECIFICATION,
@@ -102,7 +106,7 @@ analysis_definitions = [
         "description": "FSL FNIRT wrapper for non-linear registration.",
         "versions": [
             {
-                "title": FNIRT().version,
+                "title": FNIRT().version or "1.0",
                 "description": f"Default FNIRT version for nipype {nipype.__version__}.",
                 "input": FNIRT_INPUT_SPECIFICATION,
                 "output": FNIRT_OUTPUT_SPECIFICATION,
@@ -127,7 +131,7 @@ analysis_definitions = [
         "description": "Reduces noise in 2/3D images by averaging voxels with similar intensity.",  # noqa
         "versions": [
             {
-                "title": SUSAN().version,
+                "title": SUSAN().version or "1.0",
                 "description": f"Default SUSAN version for nipype {nipype.__version__}.",
                 "input": SUSAN_INPUT_SPECIFICATION,
                 "output": SUSAN_OUTPUT_SPECIFICATION,
@@ -140,7 +144,7 @@ analysis_definitions = [
         "description": "This is a simple and safe tool designed to reorient an image to match the orientation of the standard template images (MNI152) so that they appear 'the same way around' in FSLView. It requires that the image labels are correct in FSLView before this is run. It is also not a registration tool, so it will not align the image to standard space, it will only apply 90, 180 or 270 degree rotations about the different axes as necessary to get the labels in the same position as the standard template.",  # noqa
         "versions": [
             {
-                "title": Reorient2Std().version,
+                "title": Reorient2Std().version or "1.0",
                 "description": f"Default fslorient2std version for nipype {nipype.__version__}.",  # noqa
                 "input": REORIENT2STD_INPUT_SPECIFICATION,
                 "output": REORIENT2STD_OUTPUT_SPECIFICATION,
@@ -153,7 +157,7 @@ analysis_definitions = [
         "description": "Automatically crops an image removing lower head and neck.",
         "versions": [
             {
-                "title": RobustFOV().version,
+                "title": RobustFOV().version or "1.0",
                 "description": f"Default robustfov version for nipype {nipype.__version__}.",  # noqa
                 "input": ROBUSTFOV_INPUT_SPECIFICATION,
                 "output": ROBUSTFOV_OUTPUT_SPECIFICATION,
@@ -179,7 +183,7 @@ analysis_definitions = [
         "description": "Performs all, or any part of, the FreeSurfer cortical reconstruction process.",  # noqa
         "versions": [
             {
-                "title": ReconAll().version,
+                "title": ReconAll().version or "1.0",
                 "description": f"Default FreeSurfer ReconAll version for nipype {nipype.__version__}.",  # noqa
                 "input": RECON_ALL_INPUT_SPECIFICATION,
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
