@@ -263,20 +263,20 @@ class Scan(TimeStampedModel):
             message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
             raise AttributeError(message)
 
-    def recon_all(self, **configuration):
-        if self.is_mprage or self.is_spgr:
-            recon_all = get_lastest_analysis_version("ReconAll")
-            recon_all_node, _ = Node.objects.get_or_create(
-                analysis_version=recon_all, configuration=configuration
-            )
-            nifti_path = str(self.nifti.uncompressed)
-            results = recon_all_node.run(inputs={"T1_files": [nifti_path]})
-            self.nifti.compress()
-            return results
-        else:
-            raise TypeError(
-                "Only MPRAGE or SPGR scans may be given as input to ReconAll!"
-            )
+    # def recon_all(self, **configuration):
+    #     if self.is_mprage or self.is_spgr:
+    #         recon_all = get_lastest_analysis_version("ReconAll")
+    #         recon_all_node, _ = Node.objects.get_or_create(
+    #             analysis_version=recon_all, configuration=configuration
+    #         )
+    #         nifti_path = str(self.nifti.uncompressed)
+    #         results = recon_all_node.run(inputs={"T1_files": [nifti_path]})
+    #         self.nifti.compress()
+    #         return results
+    #     else:
+    #         raise TypeError(
+    #             "Only MPRAGE or SPGR scans may be given as input to ReconAll!"
+    #         )
 
     def warn_subject_mismatch(self, subject):
         message = messages.SUBJECT_MISMATCH.format(
