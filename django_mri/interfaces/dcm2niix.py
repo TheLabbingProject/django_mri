@@ -1,6 +1,6 @@
 import os
 import subprocess
-
+import glob
 from pathlib import Path
 
 BASE_DIR = Path(__file__).absolute().parent.parent
@@ -46,13 +46,14 @@ class Dcm2niix:
         )
         try:
             subprocess.check_output(command)
-            expected_file = destination.with_suffix('.nii.gz')
+            expected_file = destination.with_suffix(".nii.gz")
             if expected_file.is_file():
                 return expected_file
             else:
                 raise RuntimeError(
                     "Failed to create NIfTI file using dcm2niix! Please check application configuration"
                 )
+
         except FileNotFoundError:
             raise NotImplementedError(
                 "Could not call dcm2niix! Please check settings configuration."

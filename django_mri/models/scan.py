@@ -14,6 +14,7 @@ from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.utils.utils import get_subject_model, get_group_model
+from django_mri.utils.bids import Bids
 from pathlib import Path
 
 
@@ -216,11 +217,19 @@ class Scan(TimeStampedModel):
         name = self.get_default_nifti_name()
         return directory / name
 
+    def get_bids_destination(self):
+        bids_path = Bids(self).compose_bids_path()
+        return bids_path
+
+    def compile_to_bids(self, bids_path: Path):
+        Bids(self).clean_unwanted_files(bids_path)
+        Bids(self).fix_functional_json(bids_path)
+
     def dicom_to_nifti(
         self,
         destination: Path = None,
         compressed: bool = True,
-        generate_json: bool = False,
+        generate_json: bool = True,
     ) -> NIfTI:
         """
         Convert this scan from DICOM to NIfTI using _dcm2niix.
@@ -247,7 +256,8 @@ class Scan(TimeStampedModel):
         if self.dicom:
             dcm2niix = Dcm2niix()
             if destination is None:
-                destination = self.get_default_nifti_destination()
+                # destination = self.get_default_nifti_destination()
+                destination = self.get_bids_destination()
             elif not isinstance(destination, Path):
                 destination = Path(destination)
             destination.parent.mkdir(exist_ok=True, parents=True)
@@ -257,6 +267,7 @@ class Scan(TimeStampedModel):
                 compressed=compressed,
                 generate_json=generate_json,
             )
+            self.compile_to_bids(destination)
             nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
             return nifti
         else:
