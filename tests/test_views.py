@@ -1,22 +1,19 @@
-from rest_framework import status
+import factory
+import sys
+
 from django.test import TestCase
-from rest_framework.test import APITestCase
 from django.urls import reverse
-from .fixtures import (
-    SIEMENS_DWI_SERIES_PATH,
-    LONELY_FILES_PATH,
-)
 from django_mri.models import Scan
 from django_dicom.models import Image, Series
 from django.db.models import signals
-from django_dicom.models.utils.utils import get_subject_model, get_group_model
+from django_dicom.models.utils.utils import get_group_model
 from django.contrib.auth import get_user_model
-import sys
-import os
-import factory
+from rest_framework import status
+from rest_framework.test import APITestCase
+from tests.factories import SubjectFactory
+from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 
 User = get_user_model()
-Subject = get_subject_model()
 Group = get_group_model()
 
 
@@ -26,13 +23,23 @@ class LoggedOutScanViewTestCase(TestCase):
     def setUpTestData(cls):
         """
         Creates instances to be used in the tests.
-        For more information see Django's :class:`~django.test.TestCase` documentation_.
 
-        .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
+
+        References
+        ----------
+        * `Django's TestCase documentation`_
+
+        .. _Django's TestCase documentation:
+           https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
+
+        subject = SubjectFactory()
+        # Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
+        # Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
+        series = Series.objects.first()
+        Scan.objects.create(dicom=series, subject=subject)
+
 
     def setUp(self):
         self.test_instance = Scan.objects.last()
@@ -70,7 +77,8 @@ class LoggedInScanViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
+        # subject = Subject.objects.create()
+        subject = SubjectFactory()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
         Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
@@ -154,7 +162,8 @@ class LoggedOutNIfTIViewTestCase(TestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
+        # subject = Subject.objects.create()
+        subject = SubjectFactory()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
         Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
@@ -183,7 +192,8 @@ class LoggedInNIfTIViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
+        # subject = Subject.objects.create()
+        subject = SubjectFactory()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
         Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 

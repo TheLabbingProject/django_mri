@@ -1,27 +1,28 @@
+import factory
+
 from django.core.exceptions import ValidationError
+from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image
 from django_mri.models import Scan, NIfTI
 from django_mri.models.common_sequences import sequences
 from django_mri.models.sequence_type import SequenceType
-from ..models import Subject
+from tests.factories import SubjectFactory
 from tests.fixtures import (
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
-
 from pathlib import Path
-from django.db.models import signals
-import factory
 
 
 class ScanModelTestCase(TestCase):
     @classmethod
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
-        cls.subject = Subject.objects.create()
+        cls.subject = SubjectFactory()
         Image.objects.import_path(Path(SIEMENS_DWI_SERIES_PATH))
-        Scan.objects.get_or_create(dicom=Image.objects.first().series)
+        series = Image.objects.first().series
+        Scan.objects.get_or_create(dicom=series, subject=cls.subject)
 
     def setUp(self):
         self.scan = Scan.objects.last()
@@ -196,7 +197,9 @@ class ScanModelTestCase(TestCase):
         result = str(self.scan)
         self.assertEqual(result, expected)
 
-    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(self):
+    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(
+        self,
+    ):
         self.scan.dicom = None
         with self.assertRaises(AttributeError):
             self.scan.update_fields_from_dicom()
@@ -245,8 +248,8 @@ class ScanModelTestCase(TestCase):
             self.scan.dicom_to_nifti()
 
     def test__nifti_before_dicom_to_nifti(self):
-        result = self.scan.nifti
-        self.assertIsInstance(result, NIfTI)
+        result = self.scan._nifti
+        self.assertIsNone(result)
 
     ##############
     # Properties #
@@ -255,7 +258,10 @@ class ScanModelTestCase(TestCase):
     def test_sequence_type(self):
         for sequence in sequences:
             SequenceType.objects.create(**sequence)
-        self.assertEqual(self.scan.sequence_type, SequenceType.objects.get(title="DWI"))
+        self.assertEqual(
+            self.scan.sequence_type, SequenceType.objects.get(title="DWI")
+        )
+        SequenceType.objects.all().delete()
 
     def test_nifti_after_dicom_to_nifti(self):
         result = self.scan.nifti

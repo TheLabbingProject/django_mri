@@ -1,26 +1,17 @@
 from django.test import TestCase
 from django_mri.models.choices import ScanningSequence, SequenceVariant
 from django_mri.models.sequence_type import SequenceType
-
-
-TEST_SEQUENCE = {
-    "title": "TEST",
-    "scanning_sequence": [ScanningSequence.GR.name, ScanningSequence.RM.name],
-    "sequence_variant": [
-        SequenceVariant.SK.name,
-        SequenceVariant.SP.name,
-        SequenceVariant.MP.name,
-    ],
-}
+from django_mri.models.common_sequences import sequences
 
 
 class SequenceTypeModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        SequenceType.objects.create(**TEST_SEQUENCE)
+        for sequence in sequences:
+            SequenceType.objects.create(**sequence)
 
     def setUp(self):
-        self.sequence_type = SequenceType.objects.first()
+        self.sequence_type = SequenceType.objects.get(title="DWI")
 
     ########
     # Meta #
@@ -97,15 +88,5 @@ class SequenceTypeModelTestCase(TestCase):
 
     def test_get_string(self):
         result = str(self.sequence_type)
-        expected = TEST_SEQUENCE["title"]
+        expected = "DWI"
         self.assertEqual(result, expected)
-
-    ####################
-    # Common Sequences #
-    ####################
-
-    def test_common_sequences_load(self):
-        from django_mri.models.common_sequences import sequences
-
-        objects = [SequenceType(**sequence) for sequence in sequences]
-        SequenceType.objects.bulk_create(objects)
