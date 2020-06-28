@@ -23,6 +23,9 @@ DICOM_FILES_PATH = os.path.join(TEST_FILES_PATH, "DICOM")
 # Simple sample series (Siemens localizer)
 DICOM_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "Localizer")
 
+# Simple MPRAGE series (Siemens MPRAGE)
+DICOM_MPRAGE_PATH = os.path.join(DICOM_FILES_PATH, "MPRAGE")
+
 # LonelyFiles directory path
 LONELY_FILES_PATH = os.path.join(TEST_FILES_PATH, "LonelyFiles")
 

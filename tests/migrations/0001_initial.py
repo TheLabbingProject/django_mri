@@ -33,6 +33,18 @@ class Migration(migrations.Migration):
                         auto_now=True, verbose_name="modified"
                     ),
                 ),
+                (
+                    "date_of_birth",
+                    models.fields.DateField(blank=True, null=True),
+                ),
+                (
+                    "sex",
+                    models.fields.CharField(max_length=5, blank=True, null=True),
+                ),
+                (
+                    "dominant_hand",
+                    models.fields.CharField(max_length=5, blank=True, null=True),
+                ),
             ],
         ),
         migrations.CreateModel(
