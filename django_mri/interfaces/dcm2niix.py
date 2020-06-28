@@ -22,7 +22,7 @@ class Dcm2niix:
         generate_json: bool = True,
     ) -> list:
         return [
-            self.path,
+            str(self.path),
             self.FLAGS["compressed"],
             self.BOOLEAN[compressed],
             self.FLAGS["BIDS"],
@@ -30,8 +30,8 @@ class Dcm2niix:
             self.FLAGS["directory"],
             str(destination.parent),
             self.FLAGS["name"],
-            destination.name,
-            path,
+            str(destination.name),
+            str(path),
         ]
 
     def convert(
@@ -42,7 +42,10 @@ class Dcm2niix:
         generate_json: bool = True,
     ) -> Path:
         command = self.generate_command(
-            path, destination, compressed=compressed, generate_json=generate_json
+            path,
+            destination,
+            compressed=compressed,
+            generate_json=generate_json,
         )
         try:
             subprocess.check_output(command)

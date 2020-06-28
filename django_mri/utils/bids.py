@@ -1,11 +1,12 @@
-from pathlib import Path
-from enum import Enum
 import glob
-import os
 import json
-import shutil
-from datetime import date
+import os
 import pandas as pd
+import shutil
+
+from datetime import date
+from enum import Enum
+from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"
@@ -36,11 +37,16 @@ class MODALITY_LABELS(Enum):
 class Bids:
     """
     A class to compose BIDS-appropriate paths for usage by dcm2niix
-    For further information regarding BIDS specifications, see https://bids-specification.readthedocs.io/en/stable/
     In short, standard template for BIDS-appropriate path is:
     - sub -<label>/
         -<data_type>/
             -sub-<label>_<modality_label>
+    References
+    ----------
+    * `BIDS specifications`_
+
+    .. _BIDS specification:
+        https://bids-specification.readthedocs.io/en/stable/
     """
 
     def __init__(self, scan):
@@ -52,6 +58,7 @@ class Bids:
         calculate age by date of birth
 
         """
+
         today = date.today()
         try:
             age = (
@@ -71,9 +78,10 @@ class Bids:
         Returns
         -------
         subject_dict[dict]
-            [subject's relevant parameters, sorted by "participant_id",
-            "handedness","age" and "sex" fields]
+            subject's relevant parameters, sorted by "participant_id",
+            "handedness","age" and "sex" fields
         """
+
         subject = self.scan.subject
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
@@ -94,25 +102,33 @@ class Bids:
         Returns
         -------
         parent : Path
-            [parent BIDS directory, underwhich there will be "sub-x"
-            directories]
+            parent BIDS directory, underwhich there will be "sub-x"
+            directories
         data_type : str
-            [sub-directory under "sub-x". either "anat","func","fmap" or "dwi"]
-        modality_label : str]
-            [modality label as described in BIDS specifications. either "dwi",
-            "epi","T1w","FLAIR","bold" or "localizer"]
-        task [str or None]
-            [task name for functional scans. "rest" or None
-            ### needs to improve for robustness]
-        pe_dir [str or None]
-            [PhaseEncodingDirection for DWI-related images or fieldmap-related
-            images. Either "AP","PA" or None]
+            sub-directory under "sub-x". either "anat","func","fmap" or "dwi"
+        modality_label : str
+            modality label as described in BIDS specifications. either "dwi",
+            "epi","T1w","FLAIR","bold" or "localizer"
+        task : Union[str, None]
+            task name for functional scans. "rest" or None
+        pe_dir : Union[str, None]
+            PhaseEncodingDirection for DWI-related images or fieldmap-related
+            images. Either "AP","PA" or None
 
         Todo
         ----
         * Update to handle several tasks.
+        * Update to handle multiple sessions. - Perhaps add "session" property
+          to Scan
         """
-        sequence_type = str(self.scan.sequence_type).lower().replace("-", "_")
+
+        sequence_type = self.scan.sequence_type
+        if sequence_type is None:
+            raise ValueError(
+                """Given scan doesn't have a sequence type definition, which makes
+                it impossible to determine it's BIDS-compatible destination."""
+            )
+        sequence_type = str(sequence_type).lower().replace("-", "_")
         data_type = DATA_TYPES[sequence_type].value
         modality_label = MODALITY_LABELS[sequence_type].value
         dicom_image = self.scan.dicom.image_set.first()
@@ -151,10 +167,11 @@ class Bids:
 
         Returns
         -------
-        [pathlib.Path]
-            [Full path to a BIDS-compatible file, according to scan's
-            parameters.]
+        pathlib.Path
+            Full path to a BIDS-compatible file, according to scan's
+            parameters.
         """
+
         subject_dict = self.get_subject_data()
         subject_id = subject_dict["participant_id"]
         parent, data_type, modality_label, acq, task, pe_dir = self.get_data()
@@ -176,15 +193,18 @@ class Bids:
 
     def clean_unwanted_files(self, bids_path: Path):
         """
+        Clean irrelevant .bvec and .bval files;
         Some versions of dcm2niix produce .bvec and .bval for fieldmap images
         as well as dwi images.
         Since BIDS specifications do now allow such files under "fmap"
         data-type, this method deletes them from the relevant directory.
+
         Parameters
         ----------
         bids_path : Path
-            [Path to the BIDS-compatible directory]
+            Path to the BIDS-compatible directory
         """
+
         if "fmap" in str(bids_path):
             unwanted = glob.glob(f"{str(bids_path.parent)}/*.bv*")
             for fname in unwanted:
@@ -198,7 +218,7 @@ class Bids:
         Parameters
         ----------
         bids_path : Path
-            [description]
+            Path to the BIDS-compatible directory
 
         References
         ----------
@@ -207,6 +227,7 @@ class Bids:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
+
         task = str(bids_path).split("task-")[-1].split("_")[0]
         if task != bids_path:
             json_file = bids_path.parent / Path(bids_path.stem).with_suffix(
@@ -223,17 +244,21 @@ class Bids:
         """
         Generates required "dataset_description.json" file, as stated by BIDS
         structure.
-        For more information, see: https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
 
         Parameters
         ----------
         parent : Path
-            [BIDS-compatible directory, underwhich there are "sub-x" directories]
+            BIDS-compatible directory, underwhich there are "sub-x"
+            directories
 
         References
         ----------
+        * `BIDS complementary files`_
 
+        .. _BIDS complementary files:
+            https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
+
         description_file = parent / "dataset_description.json"
         if not description_file.is_file():
             description_template = TEMPLATES_DIR / description_file.name
@@ -241,8 +266,10 @@ class Bids:
 
     def set_participant_tsv_and_json(self, parent: Path, subject_dict: dict):
         """
-        Generates recommended "participants.tsv" by either copying the template from TEMPLATES_DiR or editing an existing one under {parent} directory.
-        For more information, see: https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
+        Generates recommended "participants.tsv" by either copying the
+        template from TEMPLATES_DiR or editing an existing one under {parent}
+        directory.
+
         Parameters
         ----------
         parent : Path
@@ -250,7 +277,15 @@ class Bids:
         subject_dict : dict
             Subject's parameters dictionary, containing "participant_id",
             "handedness","age","sex" fields
+
+        References
+        ----------
+        * `BIDS complementary files`_
+
+        .. _BIDS complementary files:
+            https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
+
         participants_tsv = parent / "participants.tsv"
         participants_json = participants_tsv.with_suffix(".json")
         for participants_file in [participants_tsv, participants_json]:
@@ -258,7 +293,9 @@ class Bids:
                 participants_template = TEMPLATES_DIR / participants_file.name
                 shutil.copy(str(participants_template), str(participants_file))
         participants_df = pd.read_csv(participants_tsv, "\t")
-        subject_dict["participant_id"] = f"sub-{subject_dict['participant_id']}"
+        subject_dict[
+            "participant_id"
+        ] = f"sub-{subject_dict['participant_id']}"
         if (
             not subject_dict["participant_id"]
             in participants_df["participant_id"].values
@@ -272,14 +309,22 @@ class Bids:
 
     def generate_bidsignore(self, parent: Path):
         """
-        Some acquisitions do not conform to BIDS specification (mainly localizers), so we generate a .bidsignore file, pointing to them.
-        For more information, see: https://neuroimaging-core-docs.readthedocs.io/en/latest/pages/bids-validator.html
+        Some acquisitions do not conform to BIDS specification (mainly
+        localizers), so we generate a .bidsignore file, pointing to them.
 
         Parameters
         ----------
         parent : Path
             BIDS-compatible directory, underwhich there are "sub-x" directories
+
+        References
+        ----------
+        * `BIDS validator specifications`_
+
+        .. _BIDS validator specifications:
+            https://neuroimaging-core-docs.readthedocs.io/en/latest/pages/bids-validator.html
         """
+
         bidsignore = parent / ".bidsignore"
         if not bidsignore.is_file():
             with open(bidsignore, "w+") as in_file:
@@ -296,6 +341,7 @@ class Bids:
         parent : Path
             BIDS-compatible directory, underwhich there are "sub-x" directories
         """
+
         readme = parent / "README"
         if not readme.is_file():
             readme_template = TEMPLATES_DIR / "README"
