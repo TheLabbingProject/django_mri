@@ -24,6 +24,12 @@ sequences = [
         "sequence_variant": ["SK", "SP", "MP", "OSP"],
     },
     {
+        "title": "IR-EPI2",
+        "description": "180° inversion pulse to prepare magnetization and then a RF excitation pulse which results in T1-weighting.",
+        "scanning_sequence": ["EP", "IR"],
+        "sequence_variant": ["SK", "SP", "MP"],
+    },
+    {
         "title": "FLAIR",
         "description": "Fluid-attenuated inversion recovery is an MRI sequence with an inversion recovery set to null fluids. ",
         "scanning_sequence": ["SE", "IR"],
