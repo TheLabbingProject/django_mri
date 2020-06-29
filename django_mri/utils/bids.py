@@ -20,6 +20,7 @@ class DATA_TYPES(Enum):
     flair = "anat"
     fmri = "func"
     ir_epi = "anat"
+    ir_epi2 = "anat"
     localizer = "anat"
 
 
@@ -29,6 +30,7 @@ class MODALITY_LABELS(Enum):
     PA = "epi"
     mprage = "T1w"
     ir_epi = "T1w"
+    ir_epi2 = "T1w"
     flair = "FLAIR"
     fmri = "bold"
     localizer = "localizer"
@@ -86,9 +88,7 @@ class Bids:
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else "n/a",
-            "handedness": subject.dominant_hand
-            if subject.dominant_hand
-            else "n/a",
+            "handedness": subject.dominant_hand if subject.dominant_hand else "n/a",
             "age": age,
             "sex": subject.sex if subject.sex else "n/a",
         }
@@ -144,11 +144,12 @@ class Bids:
             modality_label = MODALITY_LABELS[pe_dir].value
         if "anat" in data_type and "T1w" in modality_label:
             image_type = header["ImageType"]
-            if "NORM" in image_type:
-                acq = "corrected"
-            else:
-                acq = "uncorrected"
-            if "DIS2D" in image_type:
+            if sequence_type == "mprage":
+                if "NORM" in image_type:
+                    acq = "corrected"
+                else:
+                    acq = "uncorrected"
+            elif "ir_epi" in sequence_type:
                 ti = int(header["InversionTime"])
                 acq = f"IREPI{ti}"
         if "localizer" in modality_label:
@@ -175,9 +176,7 @@ class Bids:
         subject_dict = self.get_subject_data()
         subject_id = subject_dict["participant_id"]
         parent, data_type, modality_label, acq, task, pe_dir = self.get_data()
-        bids_path = Path(
-            parent, f"sub-{subject_id}", data_type, f"sub-{subject_id}"
-        )
+        bids_path = Path(parent, f"sub-{subject_id}", data_type, f"sub-{subject_id}")
         if acq:
             bids_path = Path(f"{bids_path}_acq-{acq}")
         if task:
@@ -227,12 +226,9 @@ class Bids:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
-
-        task = str(bids_path).split("task-")[-1].split("_")[0]
-        if task != bids_path:
-            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(
-                ".json"
-            )
+        if "func" in str(bids_path):
+            task = str(bids_path).split("task-")[-1].split("_")[0]
+            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(".json")
             with open(json_file, "r+") as f:
                 data = json.load(f)
                 data["TaskName"] = task
@@ -293,9 +289,7 @@ class Bids:
                 participants_template = TEMPLATES_DIR / participants_file.name
                 shutil.copy(str(participants_template), str(participants_file))
         participants_df = pd.read_csv(participants_tsv, "\t")
-        subject_dict[
-            "participant_id"
-        ] = f"sub-{subject_dict['participant_id']}"
+        subject_dict["participant_id"] = f"sub-{subject_dict['participant_id']}"
         if (
             not subject_dict["participant_id"]
             in participants_df["participant_id"].values
@@ -326,10 +320,9 @@ class Bids:
         """
 
         bidsignore = parent / ".bidsignore"
-        if not bidsignore.is_file():
-            with open(bidsignore, "w+") as in_file:
-                in_file.write("**/*ignore-bids*")
-                in_file.write("**/*IREPI*")
+        with open(bidsignore, "w+") as in_file:
+            in_file.write("**/*ignore-bids*")
+            in_file.write("**/*IREPI*")
 
     def generate_readme(self, parent: Path):
         """
