@@ -26,6 +26,22 @@ DICOM_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "Localizer")
 # Simple MPRAGE series (Siemens MPRAGE)
 DICOM_MPRAGE_PATH = os.path.join(DICOM_FILES_PATH, "MPRAGE")
 
+# FLAIR series (Siemens FLAIR)
+DICOM_FLAIR_PATH = os.path.join(DICOM_FILES_PATH, "FLAIR")
+
+# phase encoding (PA) for DWI
+DICOM_FMAP_PATH = os.path.join(DICOM_FILES_PATH, "fmap")
+
+# BOLD resting-state functional series
+DICOM_FMRI_BOLD_PATH = os.path.join(DICOM_FILES_PATH, "fMRI_bold")
+
+# resting-state sbref series
+DICOM_FMRI_SBREF_PATH = os.path.join(DICOM_FILES_PATH, "fMRI_sbref")
+
+# IR-EPI series
+DICOM_IREPI_PATH = os.path.join(DICOM_FILES_PATH, "IREPI")
+
+#
 # LonelyFiles directory path
 LONELY_FILES_PATH = os.path.join(TEST_FILES_PATH, "LonelyFiles")
 
