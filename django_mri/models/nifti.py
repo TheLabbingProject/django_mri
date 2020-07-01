@@ -25,6 +25,7 @@ class NIfTI(TimeStampedModel):
 
     class Meta:
         verbose_name = "NIfTI"
+        ordering = ("-id",)
 
     def get_data(self) -> np.ndarray:
         """

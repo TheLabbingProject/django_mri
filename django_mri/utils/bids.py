@@ -6,6 +6,7 @@ import shutil
 
 from datetime import date
 from enum import Enum
+from django_mri.utils import messages
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
@@ -43,6 +44,7 @@ class Bids:
     - sub -<label>/
         -<data_type>/
             -sub-<label>_<modality_label>
+
     References
     ----------
     * `BIDS specifications`_
@@ -51,14 +53,25 @@ class Bids:
         https://bids-specification.readthedocs.io/en/stable/
     """
 
+    DATASET_DESCRIPTION_FILE_NAME = "dataset_description.json"
+    PARTICIPANTS_FILE_NAME = "participants.tsv"
+
     def __init__(self, scan):
         self.scan = scan
 
-    def calculate_age(self, born):
+    def calculate_age(self, born: date) -> float:
         """
+        Returns age by date of birth.
 
-        calculate age by date of birth
+        Parameters
+        ----------
+        born : datetime.date
+            Subject's birth date
 
+        Returns
+        -------
+        float
+            Subject's age
         """
 
         today = date.today()
@@ -88,7 +101,9 @@ class Bids:
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else "n/a",
-            "handedness": subject.dominant_hand if subject.dominant_hand else "n/a",
+            "handedness": subject.dominant_hand
+            if subject.dominant_hand
+            else "n/a",
             "age": age,
             "sex": subject.sex if subject.sex else "n/a",
         }
@@ -124,10 +139,7 @@ class Bids:
 
         sequence_type = self.scan.sequence_type
         if sequence_type is None:
-            raise ValueError(
-                """Given scan doesn't have a sequence type definition, which makes
-                it impossible to determine it's BIDS-compatible destination."""
-            )
+            raise ValueError(messages.BIDS_NO_SEQUENCE_TYPE)
         sequence_type = str(sequence_type).lower().replace("-", "_")
         data_type = DATA_TYPES[sequence_type].value
         modality_label = MODALITY_LABELS[sequence_type].value
@@ -176,7 +188,9 @@ class Bids:
         subject_dict = self.get_subject_data()
         subject_id = subject_dict["participant_id"]
         parent, data_type, modality_label, acq, task, pe_dir = self.get_data()
-        bids_path = Path(parent, f"sub-{subject_id}", data_type, f"sub-{subject_id}")
+        bids_path = Path(
+            parent, f"sub-{subject_id}", data_type, f"sub-{subject_id}"
+        )
         if acq:
             bids_path = Path(f"{bids_path}_acq-{acq}")
         if task:
@@ -228,7 +242,9 @@ class Bids:
         """
         if "func" in str(bids_path):
             task = str(bids_path).split("task-")[-1].split("_")[0]
-            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(".json")
+            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(
+                ".json"
+            )
             with open(json_file, "r+") as f:
                 data = json.load(f)
                 data["TaskName"] = task
@@ -255,9 +271,10 @@ class Bids:
             https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
 
-        description_file = parent / "dataset_description.json"
+        description_file = parent / self.DATASET_DESCRIPTION_FILE_NAME
         if not description_file.is_file():
             description_template = TEMPLATES_DIR / description_file.name
+            description_file.parent.mkdir(exist_ok=True)
             shutil.copy(str(description_template), str(description_file))
 
     def set_participant_tsv_and_json(self, parent: Path, subject_dict: dict):
@@ -282,14 +299,16 @@ class Bids:
             https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
 
-        participants_tsv = parent / "participants.tsv"
+        participants_tsv = parent / self.PARTICIPANTS_FILE_NAME
         participants_json = participants_tsv.with_suffix(".json")
         for participants_file in [participants_tsv, participants_json]:
             if not participants_file.is_file():
                 participants_template = TEMPLATES_DIR / participants_file.name
                 shutil.copy(str(participants_template), str(participants_file))
         participants_df = pd.read_csv(participants_tsv, "\t")
-        subject_dict["participant_id"] = f"sub-{subject_dict['participant_id']}"
+        subject_dict[
+            "participant_id"
+        ] = f"sub-{subject_dict['participant_id']}"
         if (
             not subject_dict["participant_id"]
             in participants_df["participant_id"].values

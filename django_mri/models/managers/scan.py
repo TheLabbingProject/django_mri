@@ -5,12 +5,18 @@ from pathlib import Path
 
 
 class ScanManager(Manager):
-    def import_dicom_data(self, path: Path) -> tuple:
-        images = DicomImage.objects.import_path(path)
+    def import_dicom_data(
+        self, path: Path, progressbar: bool = True, report: bool = True
+    ) -> tuple:
+        images = DicomImage.objects.import_path(
+            path, progressbar=progressbar, report=report
+        )
         series = set([image.series for image in images])
         scans = self.filter(dicom__in=series)
         return scans
 
-    def import_path(self, path: Path) -> tuple:
-        dicom_scans = self.import_dicom_data(path)
+    def import_path(
+        self, path: Path, progressbar: bool = True, report: bool = True
+    ) -> tuple:
+        dicom_scans = self.import_dicom_data(path, progressbar, report)
         return {ScanType.DICOM.value: dicom_scans}

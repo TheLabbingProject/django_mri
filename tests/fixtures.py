@@ -63,7 +63,7 @@ SIEMENS_DWI_SERIES = {
     "number": 4,
     "echo_time": 51.0,
     "repetition_time": 2500.0,
-    "spatial_resolution": [1.5, 1.5, 3.0],
+    "spatial_resolution": (1.5, 1.5, 3.0),
     "subject_id": "304848286",
     "b_value": [
         0,
