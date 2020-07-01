@@ -1,19 +1,17 @@
 import warnings
 
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django_analyses.models.pipeline.node import Node
-from django_mri.analysis.utils import get_lastest_analysis_version
 from django_mri.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import messages
 from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.utils.utils import get_subject_model, get_group_model
+from django_mri.utils.bids import Bids
 from pathlib import Path
 
 
@@ -28,7 +26,9 @@ class Scan(TimeStampedModel):
 
     institution_name = models.CharField(max_length=64, blank=True, null=True)
     time = models.DateTimeField(
-        blank=True, null=True, help_text="The time in which the scan was acquired."
+        blank=True,
+        null=True,
+        help_text="The time in which the scan was acquired.",
     )
     description = models.CharField(
         max_length=100,
@@ -63,7 +63,9 @@ class Scan(TimeStampedModel):
         validators=[MinValueValidator(0)],
         help_text="The time between the 180-degree inversion pulse and the following spin-echo (SE) sequence (in milliseconds).",
     )
-    spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
+    spatial_resolution = ArrayField(
+        models.FloatField(), size=3, blank=True, null=True
+    )
 
     comments = models.TextField(
         max_length=1000,
@@ -149,7 +151,9 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
-            raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")
+            raise AttributeError(
+                f"No DICOM data associated with MRI scan {self.id}!"
+            )
 
     def infer_sequence_type_from_dicom(self) -> SequenceType:
         """
@@ -216,11 +220,19 @@ class Scan(TimeStampedModel):
         name = self.get_default_nifti_name()
         return directory / name
 
+    def get_bids_destination(self):
+        bids_path = Bids(self).compose_bids_path()
+        return bids_path
+
+    def compile_to_bids(self, bids_path: Path):
+        Bids(self).clean_unwanted_files(bids_path)
+        Bids(self).fix_functional_json(bids_path)
+
     def dicom_to_nifti(
         self,
         destination: Path = None,
         compressed: bool = True,
-        generate_json: bool = False,
+        generate_json: bool = True,
     ) -> NIfTI:
         """
         Convert this scan from DICOM to NIfTI using _dcm2niix.
@@ -244,10 +256,17 @@ class Scan(TimeStampedModel):
             A :class:`django_mri.NIfTI` instance referencing the conversion output.
         """
 
+        if self.sequence_type and self.sequence_type.title == "Localizer":
+            warnings.warn("Localizer scans may not converted to NIfTI.")
+            return None
         if self.dicom:
             dcm2niix = Dcm2niix()
             if destination is None:
-                destination = self.get_default_nifti_destination()
+                try:
+                    destination = self.get_bids_destination()
+                except ValueError as e:
+                    print(e.args)
+                    destination = self.get_default_nifti_destination()
             elif not isinstance(destination, Path):
                 destination = Path(destination)
             destination.parent.mkdir(exist_ok=True, parents=True)
@@ -257,6 +276,7 @@ class Scan(TimeStampedModel):
                 compressed=compressed,
                 generate_json=generate_json,
             )
+            self.compile_to_bids(destination)
             nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
             return nifti
         else:

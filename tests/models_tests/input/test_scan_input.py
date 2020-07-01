@@ -1,44 +1,43 @@
-from django.test import TestCase
-from django_dicom.models import Image
-from django_analyses.models import AnalysisVersion, Run
-from django_mri.models import Scan
-from django_mri.models.inputs import ScanInput, ScanInputDefinition
-from tests.models import Subject
-from tests.fixtures import (
-    SIEMENS_DWI_SERIES,
-    SIEMENS_DWI_SERIES_PATH,
-)
-
-from pathlib import Path
-from django.db.models import signals
 import factory
+
+from django.db.models import signals
+from django.test import TestCase
+from django_analyses.models import AnalysisVersion, Run
+from django_dicom.models import Image
+from django_mri import serializers
+from django_mri.models import Scan
+from django_mri.models.inputs import ScanInputDefinition, ScanInput
 from django_mri.serializers.input import ScanInputSerializer
 from django_mri.serializers.input.scan_input_definition import (
     ScanInputDefinitionSerializer,
 )
-from django_mri import serializers
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
+from tests.factories import SubjectFactory
+from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 
 
 class ScanInputModelTestCase(TestCase):
     @classmethod
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
-        subject = Subject.objects.create()
-        Image.objects.import_path(Path(SIEMENS_DWI_SERIES_PATH))
-        scan = Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
-        definition = ScanInputDefinition.objects.create(key="test")
+        subject = SubjectFactory()
+        Image.objects.import_path(
+            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+        )
+        cls.scan = Scan.objects.create(
+            dicom=Image.objects.first().series, subject=subject
+        )
+        cls.definition = ScanInputDefinition.objects.create(key="test")
         version = AnalysisVersion.objects.create(
             title="TestVersion", description="desc"
         )
         run = Run.objects.create(analysis_version=version)
-        ScanInput.objects.create(value=scan, definition=definition, run=run)
+        cls.input = ScanInput.objects.create(
+            value=cls.scan, definition=cls.definition, run=run
+        )
 
     def setUp(self):
-        self.scan = Scan.objects.last()
-        self.input = ScanInput.objects.last()
-        self.definition = ScanInputDefinition.objects.last()
         fact = APIRequestFactory()
         request = fact.get("/")
         req = Request(request)

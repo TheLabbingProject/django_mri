@@ -1,22 +1,21 @@
-from rest_framework import status
-from django.test import TestCase
-from rest_framework.test import APITestCase
-from django.urls import reverse
-from .fixtures import (
-    SIEMENS_DWI_SERIES_PATH,
-    LONELY_FILES_PATH,
-)
-from django_mri.models import Scan
-from django_dicom.models import Image, Series
-from django.db.models import signals
-from django_dicom.models.utils.utils import get_subject_model, get_group_model
-from django.contrib.auth import get_user_model
-import sys
-import os
 import factory
+import sys
+
+from django.contrib.auth import get_user_model
+from django.db.models import signals
+from django.test import TestCase
+from django.urls import reverse
+from django_dicom.models import Image, Series
+from django_dicom.models.utils.utils import get_group_model
+from django_mri.models import Scan
+from rest_framework import status
+from rest_framework.test import APITestCase
+from tests.factories import SubjectFactory
+from tests.fixtures import SIEMENS_DWI_SERIES_PATH
+from tests.utils import load_common_sequences
+
 
 User = get_user_model()
-Subject = get_subject_model()
 Group = get_group_model()
 
 
@@ -26,16 +25,23 @@ class LoggedOutScanViewTestCase(TestCase):
     def setUpTestData(cls):
         """
         Creates instances to be used in the tests.
-        For more information see Django's :class:`~django.test.TestCase` documentation_.
 
-        .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
+
+        References
+        ----------
+        * `Django's TestCase documentation`_
+
+        .. _Django's TestCase documentation:
+           https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
-        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-    def setUp(self):
-        self.test_instance = Scan.objects.last()
+        load_common_sequences()
+        subject = SubjectFactory()
+        Image.objects.import_path(
+            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+        )
+        series = Series.objects.first()
+        cls.test_instance = Scan.objects.create(dicom=series, subject=subject)
 
     def test_scan_list_unautherized(self):
         url = reverse("mri:scan-list")
@@ -70,15 +76,17 @@ class LoggedInScanViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
-        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-    def setUp(self):
-        self.user = User.objects.create_user(
+        load_common_sequences()
+        subject = SubjectFactory()
+        Image.objects.import_path(
+            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+        )
+        series = Series.objects.first()
+        cls.test_scan = Scan.objects.create(dicom=series, subject=subject)
+        cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )
-        self.test_scan = Scan.objects.last()
 
     def test_list_view(self):
         self.client.force_authenticate(self.user)
@@ -154,13 +162,15 @@ class LoggedOutNIfTIViewTestCase(TestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
-        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-    def setUp(self):
-        scan = Scan.objects.last()
-        self.test_nifti = scan.dicom_to_nifti()
+        load_common_sequences()
+        subject = SubjectFactory()
+        Image.objects.import_path(
+            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+        )
+        series = Series.objects.first()
+        scan = Scan.objects.create(dicom=series, subject=subject)
+        cls.test_nifti = scan.nifti
 
     def test_scan_list_unautherized(self):
         url = reverse("mri:nifti-list")
@@ -183,16 +193,18 @@ class LoggedInNIfTIViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        subject = Subject.objects.create()
-        Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
 
-    def setUp(self):
-        self.user = User.objects.create_user(
+        load_common_sequences()
+        subject = SubjectFactory()
+        Image.objects.import_path(
+            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+        )
+        series = Series.objects.first()
+        scan = Scan.objects.create(dicom=series, subject=subject)
+        cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )
-        scan = Scan.objects.last()
-        self.test_nifti = scan.dicom_to_nifti()
+        cls.test_nifti = scan.nifti
 
     def test_list_view(self):
         self.client.force_authenticate(self.user)

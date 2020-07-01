@@ -1,7 +1,10 @@
-import os
+import re
 import subprocess
+import warnings
 
+from django_mri.interfaces import messages
 from pathlib import Path
+
 
 BASE_DIR = Path(__file__).absolute().parent.parent
 DCM2NIIX = BASE_DIR / "utils" / "dcm2niix"
@@ -22,7 +25,7 @@ class Dcm2niix:
         generate_json: bool = True,
     ) -> list:
         return [
-            self.path,
+            str(self.path),
             self.FLAGS["compressed"],
             self.BOOLEAN[compressed],
             self.FLAGS["BIDS"],
@@ -30,8 +33,8 @@ class Dcm2niix:
             self.FLAGS["directory"],
             str(destination.parent),
             self.FLAGS["name"],
-            destination.name,
-            path,
+            str(destination.name),
+            str(path),
         ]
 
     def convert(
@@ -42,18 +45,34 @@ class Dcm2niix:
         generate_json: bool = True,
     ) -> Path:
         command = self.generate_command(
-            path, destination, compressed=compressed, generate_json=generate_json
+            path,
+            destination,
+            compressed=compressed,
+            generate_json=generate_json,
         )
         try:
-            subprocess.check_output(command)
-            expected_file = destination.with_suffix('.nii.gz')
-            if expected_file.is_file():
-                return expected_file
-            else:
-                raise RuntimeError(
-                    "Failed to create NIfTI file using dcm2niix! Please check application configuration"
-                )
-        except FileNotFoundError:
-            raise NotImplementedError(
-                "Could not call dcm2niix! Please check settings configuration."
+            process = subprocess.Popen(
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
+            stdout, stderr = process.communicate()
+            returned_path = self.extract_output_path(str(stdout), compressed)
+            expected_path = destination.with_suffix(".nii.gz")
+            if returned_path != expected_path:
+                message = messages.DCM2NIIX_PATH_MISMATCH.format(
+                    returned_path=returned_path, expected_path=expected_path,
+                )
+                warnings.warn(message)
+            if Path(str(returned_path)).is_file():
+                return returned_path
+            else:
+                raise RuntimeError(messages.DCM2NIIX_FAILURE)
+        except FileNotFoundError:
+            raise NotImplementedError(messages.NO_DCM2NIIX)
+
+    def extract_output_path(self, stdout: str, compressed: bool) -> Path:
+        try:
+            path = re.findall(r"as (\/.*?\.[\w]+)", stdout)[0].split(" (")[0]
+        except IndexError:
+            return None
+        ext = ".nii.gz" if compressed else ".nii"
+        return Path(path).with_suffix(ext)

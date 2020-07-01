@@ -23,6 +23,25 @@ DICOM_FILES_PATH = os.path.join(TEST_FILES_PATH, "DICOM")
 # Simple sample series (Siemens localizer)
 DICOM_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "Localizer")
 
+# Simple MPRAGE series (Siemens MPRAGE)
+DICOM_MPRAGE_PATH = os.path.join(DICOM_FILES_PATH, "MPRAGE")
+
+# FLAIR series (Siemens FLAIR)
+DICOM_FLAIR_PATH = os.path.join(DICOM_FILES_PATH, "FLAIR")
+
+# phase encoding (PA) for DWI
+DICOM_FMAP_PATH = os.path.join(DICOM_FILES_PATH, "fmap")
+
+# BOLD resting-state functional series
+DICOM_FMRI_BOLD_PATH = os.path.join(DICOM_FILES_PATH, "fMRI_bold")
+
+# resting-state sbref series
+DICOM_FMRI_SBREF_PATH = os.path.join(DICOM_FILES_PATH, "fMRI_sbref")
+
+# IR-EPI series
+DICOM_IREPI_PATH = os.path.join(DICOM_FILES_PATH, "IREPI")
+
+#
 # LonelyFiles directory path
 LONELY_FILES_PATH = os.path.join(TEST_FILES_PATH, "LonelyFiles")
 
@@ -34,17 +53,17 @@ NIFTI_TEST_FILE_PATH = os.path.join(NIFTI_FILES_PATH, "001.nii.gz")
 
 # DWI
 # ~~~
-DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI")
+DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "DWI")
 
 # Siemens
-SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_DWI_PATH, "Siemens")
+SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "Siemens")
 SIEMENS_DWI_SERIES = {
     "time": datetime(2018, 5, 1, 12, 37, 55, 433000, tzinfo=pytz.utc),
     "description": "Ax1D_advdiff_d12D21_TE51_B1000",
     "number": 4,
     "echo_time": 51.0,
     "repetition_time": 2500.0,
-    "spatial_resolution": [1.5, 1.5, 3.0],
+    "spatial_resolution": (1.5, 1.5, 3.0),
     "subject_id": "304848286",
     "b_value": [
         0,
