@@ -1,14 +1,12 @@
 import factory
 import numpy as np
-import shutil
 
 from django.db.models import signals
 from django.test import TestCase
+from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
-from django_dicom.models import Image
-from django_mri.models.common_sequences import sequences
-from django_mri.models.sequence_type import SequenceType
+from tests.utils import load_common_sequences
 from tests.factories import SubjectFactory
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
@@ -16,47 +14,34 @@ from tests.fixtures import (
     SIEMENS_DWI_SERIES_PATH,
 )
 from pathlib import Path
-from tests.fixtures import IMPORTED_DIR
 
 
 class NIfTIModelTestCase(TestCase):
     @classmethod
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
-        for sequence in sequences:
-            SequenceType.objects.create(**sequence)
+        load_common_sequences()
         cls.subject = SubjectFactory()
-        Image.objects.import_path(Path(DICOM_MPRAGE_PATH))
+
+        # MPRAGE scan
+        Image.objects.import_path(
+            DICOM_MPRAGE_PATH, progressbar=False, report=False
+        )
         series = Image.objects.first().series
-        Scan.objects.get_or_create(dicom=series, subject=cls.subject)
-        Image.objects.import_path(Path(SIEMENS_DWI_SERIES_PATH))
+        cls.simple_scan = Scan.objects.create(
+            dicom=series, subject=cls.subject
+        )
+        cls.simple_nifti = cls.simple_scan.nifti
+
+        # DWI scan
+        Image.objects.import_path(
+            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+        )
         series_dwi = Image.objects.last().series
-        Scan.objects.get_or_create(dicom=series_dwi, subject=cls.subject)
-
-    @classmethod
-    def tearDownClass(cls):
-        for subdir in Path(IMPORTED_DIR).iterdir():
-            if subdir.is_dir():
-                shutil.rmtree(subdir)
-
-    def setUp(self):
-        self.simple_scan = Scan.objects.first()
-        self.dwi_scan = Scan.objects.last()
-        if not self.simple_scan or not self.dwi_scan:
-            self.fail("Test scan not created! Check signals.")
-        try:
-            self.simple_nifti = self.simple_scan.nifti
-        except RuntimeError:
-            destination = self.simple_scan.get_default_nifti_destination()
-            # destination = self.simple_scan.get_bids_destination()
-            expected = destination.with_suffix(
-                ".nii"
-            )  # In case the generated file is not compressed after several compression tests.
-            if expected.is_file():
-                self.simple_nifti = NIfTI.objects.create(path=expected, is_raw=True)
-            else:
-                self.simple_nifti = self.simple_scan.nifti
-        self.dwi_nifti = self.dwi_scan.nifti
+        cls.dwi_scan = Scan.objects.create(
+            dicom=series_dwi, subject=cls.subject
+        )
+        cls.dwi_nifti = cls.dwi_scan.nifti
 
     ##########
     # Fields #
