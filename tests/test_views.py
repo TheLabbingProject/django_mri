@@ -1,5 +1,7 @@
 import factory
 import sys
+import shutil
+from pathlib import Path
 
 from django.test import TestCase
 from django.urls import reverse
@@ -11,7 +13,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 from tests.factories import SubjectFactory
-from tests.fixtures import SIEMENS_DWI_SERIES_PATH
+from tests.fixtures import SIEMENS_DWI_SERIES_PATH, IMPORTED_DIR
+from django_mri.models.sequence_type import SequenceType
+from django_mri.models.common_sequences import sequences
 
 User = get_user_model()
 Group = get_group_model()
@@ -33,13 +37,16 @@ class LoggedOutScanViewTestCase(TestCase):
            https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
 
+        Scan.objects.all().delete()
         subject = SubjectFactory()
-        # Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        # Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
         series = Series.objects.first()
         Scan.objects.create(dicom=series, subject=subject)
 
+    # @classmethod
+    # def tearDownClass(cls):
+    #     for subdir in Path(IMPORTED_DIR).iterdir():
+    #         shutil.rmtree(subdir)
 
     def setUp(self):
         self.test_instance = Scan.objects.last()
@@ -77,15 +84,16 @@ class LoggedInScanViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-        # subject = Subject.objects.create()
+
+        Scan.objects.all().delete()
         subject = SubjectFactory()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
         Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
-
-    def setUp(self):
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )
+
+    def setUp(self):
         self.test_scan = Scan.objects.last()
 
     def test_list_view(self):
@@ -163,13 +171,11 @@ class LoggedOutNIfTIViewTestCase(TestCase):
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
         # subject = Subject.objects.create()
+        Scan.objects.all().delete()
         subject = SubjectFactory()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
-        Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
-
-    def setUp(self):
-        scan = Scan.objects.last()
-        self.test_nifti = scan.dicom_to_nifti()
+        scan = Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
+        cls.test_nifti = scan.nifti
 
     def test_scan_list_unautherized(self):
         url = reverse("mri:nifti-list")
@@ -193,16 +199,15 @@ class LoggedInNIfTIViewTestCase(APITestCase):
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
         # subject = Subject.objects.create()
+        Scan.objects.all().delete()
         subject = SubjectFactory()
         Image.objects.import_path(SIEMENS_DWI_SERIES_PATH)
         Scan.objects.create(dicom=Image.objects.first().series, subject=subject)
-
-    def setUp(self):
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )
         scan = Scan.objects.last()
-        self.test_nifti = scan.dicom_to_nifti()
+        cls.test_nifti = scan.nifti
 
     def test_list_view(self):
         self.client.force_authenticate(self.user)

@@ -53,10 +53,10 @@ NIFTI_TEST_FILE_PATH = os.path.join(NIFTI_FILES_PATH, "001.nii.gz")
 
 # DWI
 # ~~~
-DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI")
+DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "DWI")
 
 # Siemens
-SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_DWI_PATH, "Siemens")
+SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "Siemens")
 SIEMENS_DWI_SERIES = {
     "time": datetime(2018, 5, 1, 12, 37, 55, 433000, tzinfo=pytz.utc),
     "description": "Ax1D_advdiff_d12D21_TE51_B1000",
