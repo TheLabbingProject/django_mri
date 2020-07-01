@@ -25,6 +25,7 @@ class NIfTI(TimeStampedModel):
 
     class Meta:
         verbose_name = "NIfTI"
+        ordering = ("-id",)
 
     def get_data(self) -> np.ndarray:
         """
@@ -64,7 +65,7 @@ class NIfTI(TimeStampedModel):
         if os.path.isfile(file_name):
             with open(file_name, "r") as file_object:
                 content = file_object.read()
-            content = content.splitlines()[0].split("\t")
+            content = content.splitlines()[0].split(" ")
             return [int(value) for value in content]
         return None
 
@@ -90,7 +91,7 @@ class NIfTI(TimeStampedModel):
             with open(file_name, "r") as file_object:
                 content = file_object.read()
             return [
-                [float(value) for value in vector.rstrip().split("\t")]
+                [float(value) for value in vector.rstrip().split(" ")]
                 for vector in content.rstrip().split("\n")
             ]
         return None
@@ -106,7 +107,9 @@ class NIfTI(TimeStampedModel):
     def compress(self, keep_source: bool = False) -> Path:
         if not self.is_compressed:
             uncompressed_path = Path(self.path)
-            compressed_path = compress(uncompressed_path, keep_source=keep_source)
+            compressed_path = compress(
+                uncompressed_path, keep_source=keep_source
+            )
             self.path = str(compressed_path)
             self.save()
         return Path(self.path)
@@ -114,7 +117,9 @@ class NIfTI(TimeStampedModel):
     def uncompress(self, keep_source: bool = False) -> Path:
         if self.is_compressed:
             compressed_path = Path(self.path)
-            uncompressed_path = uncompress(compressed_path, keep_source=keep_source)
+            uncompressed_path = uncompress(
+                compressed_path, keep_source=keep_source
+            )
             self.path = str(uncompressed_path)
             self.save()
         return Path(self.path)
