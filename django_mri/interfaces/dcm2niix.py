@@ -52,10 +52,10 @@ class Dcm2niix:
             )
             stdout, stderr = process.communicate()
             returned_path = self.extract_output_path(str(stdout), compressed)
-            expected_file = destination.with_suffix(".nii.gz")
-            if returned_path != expected_file:
+            expected_path = destination.with_suffix(".nii.gz")
+            if returned_path != expected_path:
                 warnings.warn(
-                    "Returned NIfTI path does not match expected destination.\nThis could indicate a problem with the conversion."
+                    f"Returned NIfTI path does not match expected destination.\nThis could indicate a problem with the conversion.\nExpected:{expected_path}\nReturned:{returned_path}"
                 )
             if Path(str(returned_path)).is_file():
                 return returned_path
