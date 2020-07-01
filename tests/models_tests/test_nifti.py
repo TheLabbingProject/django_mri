@@ -1,11 +1,14 @@
 import factory
 import numpy as np
+import shutil
 
 from django.db.models import signals
 from django.test import TestCase
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_dicom.models import Image
+from django_mri.models.common_sequences import sequences
+from django_mri.models.sequence_type import SequenceType
 from tests.factories import SubjectFactory
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
@@ -13,12 +16,15 @@ from tests.fixtures import (
     SIEMENS_DWI_SERIES_PATH,
 )
 from pathlib import Path
+from tests.fixtures import IMPORTED_DIR
 
 
 class NIfTIModelTestCase(TestCase):
     @classmethod
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
+        for sequence in sequences:
+            SequenceType.objects.create(**sequence)
         cls.subject = SubjectFactory()
         Image.objects.import_path(Path(DICOM_MPRAGE_PATH))
         series = Image.objects.first().series
@@ -26,6 +32,12 @@ class NIfTIModelTestCase(TestCase):
         Image.objects.import_path(Path(SIEMENS_DWI_SERIES_PATH))
         series_dwi = Image.objects.last().series
         Scan.objects.get_or_create(dicom=series_dwi, subject=cls.subject)
+
+    @classmethod
+    def tearDownClass(cls):
+        for subdir in Path(IMPORTED_DIR).iterdir():
+            if subdir.is_dir():
+                shutil.rmtree(subdir)
 
     def setUp(self):
         self.simple_scan = Scan.objects.first()
@@ -41,12 +53,10 @@ class NIfTIModelTestCase(TestCase):
                 ".nii"
             )  # In case the generated file is not compressed after several compression tests.
             if expected.is_file():
-                self.simple_nifti = NIfTI.objects.create(
-                    path=expected, is_raw=True
-                )
+                self.simple_nifti = NIfTI.objects.create(path=expected, is_raw=True)
             else:
                 self.simple_nifti = self.simple_scan.nifti
-        self.dwi_nifti = self.dwi_scan.dicom_to_nifti()
+        self.dwi_nifti = self.dwi_scan.nifti
 
     ##########
     # Fields #
@@ -63,7 +73,7 @@ class NIfTIModelTestCase(TestCase):
         self.assertEqual(field.max_length, 1000)
 
     def test_path_value(self):
-        destination = self.dwi_scan.get_default_nifti_destination()
+        destination = self.dwi_scan.get_bids_destination()
         expected = str(destination) + ".nii.gz"
         result = str(self.dwi_nifti.path)
         self.assertEqual(result, expected)
