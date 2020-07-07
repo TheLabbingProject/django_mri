@@ -50,7 +50,9 @@ class SPMProcedure:
         with open(destination, "w") as batch_file:
             batch_file.write(batch)
 
-    def create_batch_file(self, data_path: Path, file_destination: Path = None) -> str:
+    def create_batch_file(
+        self, data_path: Path, file_destination: Path = None
+    ) -> str:
         batch = self.update_batch_template(data_path)
         destination = file_destination or data_path.with_name(
             self.DEFAULT_BATCH_FILE_NAME
@@ -61,23 +63,34 @@ class SPMProcedure:
     def run(self, *args, **kwargs) -> dict:
         raise NotImplementedError("The `run` method is not implemented!")
 
-    def format_string_output_definition(self, input_path: Path, value: str) -> Path:
+    def format_string_output_definition(
+        self, input_path: Path, value: str
+    ) -> Path:
         file_name = input_path.with_suffix("").name
         return input_path.parent / value.format(file_name=file_name)
 
-    def format_list_output_definition(self, input_path: Path, value: list) -> list:
+    def format_list_output_definition(
+        self, input_path: Path, value: list
+    ) -> list:
         file_name = input_path.with_suffix("").name
         return [
-            input_path.parent / element.format(file_name=file_name) for element in value
+            input_path.parent / element.format(file_name=file_name)
+            for element in value
         ]
 
-    def format_dict_output_definition(self, input_path: Path, key: str, value: dict):
+    def format_dict_output_definition(
+        self, input_path: Path, key: str, value: dict
+    ):
         selected_option = self.options.get(key)
         output_definition = value.get(selected_option)
         if isinstance(output_definition, str):
-            return self.format_string_output_definition(input_path, output_definition)
+            return self.format_string_output_definition(
+                input_path, output_definition
+            )
         elif isinstance(output_definition, list):
-            return self.format_list_output_definition(input_path, output_definition)
+            return self.format_list_output_definition(
+                input_path, output_definition
+            )
 
     def format_output_definition(self, input_path: Path, key: str, value):
         if isinstance(value, str):
@@ -96,7 +109,9 @@ class SPMProcedure:
         }
         generated_output.update(self.AUXILIARY_OUTPUT)
         for key, value in generated_output.items():
-            formatted_value = self.format_output_definition(input_path, key, value)
+            formatted_value = self.format_output_definition(
+                input_path, key, value
+            )
             if formatted_value:
                 result[key] = formatted_value
         return result
@@ -120,7 +135,9 @@ class SPMProcedure:
                 for element in origin
             ]
 
-    def move_output(self, output_dict: dict, run_dir: Path, destination: Path) -> dict:
+    def move_output(
+        self, output_dict: dict, run_dir: Path, destination: Path
+    ) -> dict:
         return {
             key: self.move_output_files(value, run_dir, destination)
             for key, value in output_dict.items()
