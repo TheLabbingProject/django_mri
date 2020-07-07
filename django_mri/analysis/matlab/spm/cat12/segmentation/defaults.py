@@ -2,8 +2,9 @@ SEGMENTATION_DEFAULTS = {
     "n_processes": 4,
     "affine_regularisation": "mni",
     "bias_strength": "medium",
-    "accuracy": "average",
     "affine_preprocessing": "rough",
+    "initial_segmentation": "spm",
+    "shooting_registration": "optimized",
     "local_adaptive_segmentation_strength": "medium",
     "skull_stripping": "aprg",
     "normalized_image_voxel_size": 1.5,
@@ -23,5 +24,6 @@ SEGMENTATION_DEFAULTS = {
     "warped_image": True,
     "jacobian_determinant": False,
     "deformation_fields": "none",
+    "resampling_type": "optimal",
+    "own_atlas": "",
 }
-

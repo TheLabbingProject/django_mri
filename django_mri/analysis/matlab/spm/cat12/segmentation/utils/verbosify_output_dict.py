@@ -9,11 +9,15 @@ def verbose_surface_estimation(output_dict: dict) -> dict:
         return {
             "left_hemisphere_central_surface": surface_estimation[0],
             "left_hemisphere_spherical_surface": surface_estimation[1],
-            "left_hemisphere_spherical_registered_surface": surface_estimation[2],
+            "left_hemisphere_spherical_registered_surface": surface_estimation[
+                2
+            ],
             "left_hemisphere_cortical_thickness": surface_estimation[3],
             "right_hemisphere_central_surface": surface_estimation[4],
             "right_hemisphere_spherical_surface": surface_estimation[5],
-            "right_hemisphere_spherical_registered_surface": surface_estimation[6],
+            "right_hemisphere_spherical_registered_surface": surface_estimation[
+                6
+            ],
             "right_hemisphere_cortical_thickness": surface_estimation[7],
         }
     return {}
@@ -26,7 +30,10 @@ def verbosify_label_files(output_dict: dict) -> dict:
         if output_dict.get(atlas_map)
     ]
     if any(label_files):
-        return {"labels_mat": label_files[0][0], "labels_xml": label_files[0][1]}
+        return {
+            "labels_mat": label_files[0][0],
+            "labels_xml": label_files[0][1],
+        }
     return {}
 
 
@@ -61,6 +68,10 @@ def verbosify_output_dict(output_dict: dict) -> dict:
     result.update(verbosify_deformation_fields(output_dict))
     result.update(verbosify_reports(output_dict["reports"]))
     result.update(
-        {key: value for key, value in output_dict.items() if isinstance(value, Path)}
+        {
+            key: value
+            for key, value in output_dict.items()
+            if isinstance(value, Path)
+        }
     )
     return result

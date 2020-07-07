@@ -1,6 +1,5 @@
 SEGMENTATION_TRANSFORMATIONS = {
     "bias_strength": {"light": 0.25, "medium": 0.5, "strong": 0.75},
-    "accuracy": {"average": 0.5, "high": 0.75, "ultra high": 1},
     "affine_preprocessing": {"none": 0, "light": 1, "full": 2, "rough": 1070},
     "local_adaptive_segmentation_strength": {
         "none": 0,
@@ -17,4 +16,6 @@ SEGMENTATION_TRANSFORMATIONS = {
     },
     "dartel_grey_matter": {"no": 0, "rigid": 1, "affine": 2},
     "dartel_white_matter": {"no": 0, "rigid": 1, "affine": 2},
+    "initial_segmentation": {"spm": 0, "kmeans": 2},
+    "shooting_registration": {"optimized": 0.5, "default": 4},
 }
