@@ -1,3 +1,4 @@
+import os
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from django.db.models.query import QuerySet
@@ -16,7 +17,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.request import Request
 
+APP_MODE = os.environ.get("APP_MODE", "Development")
+
 BOKEH_URL = "http://localhost:5006/series_viewer"
+
+if APP_MODE == "Production":
+    BOKEH_URL = BOKEH_URL.replace("localhost", os.environ.get("APP_IP"))
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
