@@ -1,3 +1,11 @@
+"""
+Analysis definitions compatible with django_analyses_\'s
+:meth:`~django_analyses.models.managers.analysis.AnalysisManager.from_list`
+method.
+
+.. _django_analyses: https://github.com/TheLabbingProject/django_analyses
+"""
+
 import nipype
 
 from django_mri.analysis import messages
@@ -61,6 +69,8 @@ test_mode = getattr(settings, "TESTING_MODE", False)
 if no_fsl() and not test_mode:
     raise ImportError(messages.NO_FSL)
 
+NIPYPE_V = nipype.__version__
+
 
 analysis_definitions = [
     {
@@ -69,7 +79,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": BET().version or "1.0",
-                "description": f"Default BET version for nipype {nipype.__version__}.",
+                "description": f"Default BET version for nipype {NIPYPE_V}.",
                 "input": BET_INPUT_SPECIFICATION,
                 "output": BET_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -82,7 +92,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FAST().version or "1.0",
-                "description": f"Default FAST version for nipype {nipype.__version__}.",
+                "description": f"Default FAST version for nipype {NIPYPE_V}.",
                 "input": FAST_INPUT_SPECIFICATION,
                 "output": FAST_OUTPUT_SPECIFICATION,
             }
@@ -94,7 +104,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FLIRT().version or "1.0",
-                "description": f"Default FLIRT version for nipype {nipype.__version__}.",
+                "description": f"Default FLIRT version for nipype {NIPYPE_V}.",
                 "input": FLIRT_INPUT_SPECIFICATION,
                 "output": FLIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -107,7 +117,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FNIRT().version or "1.0",
-                "description": f"Default FNIRT version for nipype {nipype.__version__}.",
+                "description": f"Default FNIRT version for nipype {NIPYPE_V}.",
                 "input": FNIRT_INPUT_SPECIFICATION,
                 "output": FNIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -132,7 +142,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": SUSAN().version or "1.0",
-                "description": f"Default SUSAN version for nipype {nipype.__version__}.",
+                "description": f"Default SUSAN version for nipype {NIPYPE_V}.",
                 "input": SUSAN_INPUT_SPECIFICATION,
                 "output": SUSAN_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -145,7 +155,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": Reorient2Std().version or "1.0",
-                "description": f"Default fslorient2std version for nipype {nipype.__version__}.",  # noqa
+                "description": f"Default fslorient2std version for nipype {NIPYPE_V}.",  # noqa
                 "input": REORIENT2STD_INPUT_SPECIFICATION,
                 "output": REORIENT2STD_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -154,11 +164,11 @@ analysis_definitions = [
     },
     {
         "title": "robustfov",
-        "description": "Automatically crops an image removing lower head and neck.",
+        "description": "Automatically crops an image removing lower head and neck.",  # noqa
         "versions": [
             {
                 "title": RobustFOV().version or "1.0",
-                "description": f"Default robustfov version for nipype {nipype.__version__}.",  # noqa
+                "description": f"Default robustfov version for nipype {NIPYPE_V}.",  # noqa
                 "input": ROBUSTFOV_INPUT_SPECIFICATION,
                 "output": ROBUSTFOV_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -184,7 +194,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": ReconAll().version or "1.0",
-                "description": f"Default FreeSurfer ReconAll version for nipype {nipype.__version__}.",  # noqa
+                "description": f"Default FreeSurfer ReconAll version for nipype {NIPYPE_V}.",  # noqa
                 "input": RECON_ALL_INPUT_SPECIFICATION,
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
