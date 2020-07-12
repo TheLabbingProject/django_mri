@@ -7,14 +7,18 @@ from django_analyses.models.input.definitions.float_input_definition import (
 from django_analyses.models.input.definitions.string_input_definition import (
     StringInputDefinition,
 )
-from django_analyses.models.input.definitions.directory_input_definition import (
+from django_analyses.models.input.definitions.directory_input_definition import (  # noqa: E501
     DirectoryInputDefinition,
 )
 from django_analyses.models.output.definitions.file_output_definition import (
     FileOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 
 FSL_ANAT_INPUT_SPECIFICATION = {
@@ -51,11 +55,11 @@ FSL_ANAT_INPUT_SPECIFICATION = {
     },
     "no_registration": {
         "type": BooleanInputDefinition,
-        "description": "Turn off registration to standard using FLIRT and FNIRT.",
+        "description": "Turn off registration to standard using FLIRT and FNIRT.",  # noqa: E501
     },
     "no_nonlinear_registration": {
         "type": BooleanInputDefinition,
-        "description": "Turn off non-linear registration to standard using FNIRT.",
+        "description": "Turn off non-linear registration to standard using FNIRT.",  # noqa: E501
     },
     "no_segmentation": {
         "type": BooleanInputDefinition,
@@ -67,15 +71,15 @@ FSL_ANAT_INPUT_SPECIFICATION = {
     },
     "no_search": {
         "type": BooleanInputDefinition,
-        "description": "Specify that linear registration uses the -nosearch option (FLIRT).",
+        "description": "Specify that linear registration uses the -nosearch option (FLIRT).",  # noqa: E501
     },
     "bias_field_smoothing": {
         "type": FloatInputDefinition,
-        "description": "Specify the value for bias field smoothing (the -l option in FAST).",
+        "description": "Specify the value for bias field smoothing (the -l option in FAST).",  # noqa: E501
     },
     "image_type": {
         "type": StringInputDefinition,
-        "description": "Specify the type of image (T1, T2, or PD, default is T1).",
+        "description": "Specify the type of image (T1, T2, or PD, default is T1).",  # noqa: E501
         "choices": ["T1", "T2", "PD"],
         "default": "T1",
     },
@@ -104,7 +108,7 @@ FSL_ANAT_OUTPUT_SPECIFICATION = {
     },
     "volume_scales": {
         "type": FileOutputDefinition,
-        "description": "A file containing a scaling factor and brain volumes, based on skull-contrained registration, suitable for head-size normalisation (as the scaling is based on the skull size, not the brain size).",
+        "description": "A file containing a scaling factor and brain volumes, based on skull-contrained registration, suitable for head-size normalisation (as the scaling is based on the skull size, not the brain size).",  # noqa: E501
     },
     "bias_corrected_brain": {
         "type": NiftiOutputDefinition,
@@ -132,7 +136,7 @@ FSL_ANAT_OUTPUT_SPECIFICATION = {
     },
     "segmentation_summary": {
         "type": NiftiOutputDefinition,
-        "description": "A summary image showing the tissue with the greatest partial volume fraction per voxel.",
+        "description": "A summary image showing the tissue with the greatest partial volume fraction per voxel.",  # noqa: E501
     },
     "subcortical_segmentation_summary": {
         "type": NiftiOutputDefinition,

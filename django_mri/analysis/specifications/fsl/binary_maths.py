@@ -1,15 +1,14 @@
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
-    FileInputDefinition,
     FloatInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
     StringInputDefinition,
 )
-
-from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 BINARY_MATHS_INPUT_SPECIFICATION = {
     "in_file": {
@@ -21,13 +20,13 @@ BINARY_MATHS_INPUT_SPECIFICATION = {
     },
     "operand_file": {
         "type": NiftiInputDefinition,
-        "description": "Path to second image to perform operation with. Mutually exclusive with inputs: operand_value.",
+        "description": "Path to second image to perform operation with. Mutually exclusive with inputs: operand_value.",  # noqa: E501
         "required": True,
     },
     "operand_value": {
         "type": FloatInputDefinition,
         "description": "Value to perform operation with.",
-        "required": True,  ############# Check with Zvi #############
+        "required": True,
     },
     "operation": {
         "type": StringInputDefinition,

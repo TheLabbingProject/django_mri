@@ -1,30 +1,26 @@
 from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
     FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
 )
-
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 APPLY_TOPUP_INPUT_SPECIFICATION = {
     "in_files": {
         "type": ListInputDefinition,
         "required": True,
-        "description": "List of paths to NIfTI files to apply topup's results on.",
+        "description": "List of paths to NIfTI files to apply topup's results on.",  # noqa: E501
         "is_configuration": False,
     },
     "encoding_file": {
         "type": FileInputDefinition,
         "required": True,
-        "description": "Path to a file containing images' phase-encoding directions/readout times. Mutually exclusive with inputs: encoding direction.",  ############# Check with Zvi #############
+        "description": "Path to a file containing images' phase-encoding directions/readout times. Mutually exclusive with inputs: encoding direction.",  # noqa: E501
     },
     "datatype": {
         "type": StringInputDefinition,
@@ -33,15 +29,15 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
     },
     "in_index": {
         "type": ListInputDefinition,
-        "description": "Comma separated list of indices corresponding to –datain.",
+        "description": "Comma separated list of indices corresponding to –datain.",  # noqa: E501
     },
     "in_topup_fieldcoef": {
         "type": NiftiInputDefinition,
-        "description": "Path to topup file containing the field coefficients. Requires inputs: in_topup_movpar",
+        "description": "Path to topup file containing the field coefficients. Requires inputs: in_topup_movpar",  # noqa: E501
     },
     "in_topup_movpar": {
         "type": FileInputDefinition,
-        "description": "Path to topup movpar.txt file. Requires input: in_topup_fieldcoef",
+        "description": "Path to topup movpar.txt file. Requires input: in_topup_fieldcoef",  # noqa: E501
     },
     "interp": {
         "type": StringInputDefinition,
@@ -50,7 +46,7 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
     },
     "method": {
         "type": StringInputDefinition,
-        "description": "Use jacobian modulation (jac) or least-squares resampling (lsr).",
+        "description": "Use jacobian modulation (jac) or least-squares resampling (lsr).",  # noqa: E501
         "choices": ["jac", "lsr"],
     },
     "out_corrected": {
@@ -70,4 +66,3 @@ APPLY_TOPUP_OUTPUT_SPECIFICATION = {
         "description": "Path to 4D image file with unwarped images.",
     },
 }
-

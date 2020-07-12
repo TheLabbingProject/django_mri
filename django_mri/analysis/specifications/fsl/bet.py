@@ -8,8 +8,12 @@ from django_analyses.models.input.definitions import (
 )
 
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 
 BET_INPUT_SPECIFICATION = {
@@ -70,7 +74,7 @@ BET_INPUT_SPECIFICATION = {
     },
     "threshold": {
         "type": BooleanInputDefinition,
-        "description": "Whether to apply thresholding to segmented brain image and mask.",
+        "description": "Whether to apply thresholding to segmented brain image and mask.",  # noqa: E501
     },
     "mesh": {
         "type": BooleanInputDefinition,
@@ -78,21 +82,24 @@ BET_INPUT_SPECIFICATION = {
     },
     "robust": {
         "type": BooleanInputDefinition,
-        "description": "Whether to coduct a robust brain center estimation, iterating BET several times.",
+        "description": "Whether to coduct a robust brain center estimation, iterating BET several times.",  # noqa: E501
     },
     "padding": {
         "type": BooleanInputDefinition,
-        "description": "Whether to improve BET if FOV is very small in Z (by temporarily padding end slices).",
+        "description": "Whether to improve BET if FOV is very small in Z (by temporarily padding end slices).",  # noqa: E501
     },
     "remove_eyes": {
         "type": BooleanInputDefinition,
-        "description": "Whether to remove eyes and optic nerves (can be useful in SIENA).",
+        "description": "Whether to remove eyes and optic nerves (can be useful in SIENA).",  # noqa: E501
     },
     "surfaces": {
         "type": BooleanInputDefinition,
-        "description": "Whether to run bet2 and then betsurf to get additional skull and scalp surfaces (includes registrations).",
+        "description": "Whether to run bet2 and then betsurf to get additional skull and scalp surfaces (includes registrations).",  # noqa: E501
     },
-    "t2_guided": {"type": FileInputDefinition, "description": "Include a raw T2 scan."},
+    "t2_guided": {
+        "type": FileInputDefinition,
+        "description": "Include a raw T2 scan.",
+    },
     "functional": {
         "type": BooleanInputDefinition,
         "description": "Apply brain extraction to 4D fMRI data.",
@@ -132,7 +139,7 @@ BET_OUTPUT_SPECIFICATION = {
     },
     "inskull_mesh_file": {
         "type": NiftiOutputDefinition,
-        "description": "The path of the inward skull mesh outline file, if generated.",
+        "description": "The path of the inward skull mesh outline file, if generated.",  # noqa: E501
     },
     "outskull_mask_file": {
         "type": NiftiOutputDefinition,
@@ -140,7 +147,7 @@ BET_OUTPUT_SPECIFICATION = {
     },
     "outskull_mesh_file": {
         "type": NiftiOutputDefinition,
-        "description": "The path of the outward skull mesh outline file, if generated.",
+        "description": "The path of the outward skull mesh outline file, if generated.",  # noqa: E501
     },
     "outskin_mask_file": {
         "type": NiftiOutputDefinition,
@@ -148,7 +155,7 @@ BET_OUTPUT_SPECIFICATION = {
     },
     "outskin_mesh_file": {
         "type": NiftiOutputDefinition,
-        "description": "The path of the outward skin mesh outline file, if generated.",
+        "description": "The path of the outward skin mesh outline file, if generated.",  # noqa: E501
     },
     "skull_mask_file": {
         "type": NiftiOutputDefinition,

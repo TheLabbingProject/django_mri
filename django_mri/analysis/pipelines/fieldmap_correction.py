@@ -16,7 +16,10 @@ FSLROI_NODE = {
     "analysis_version": "fslroi",
     "configuraion": FSLROI_CONFIGURATION,
 }
-MERGE_NODE = {"analysis_version": "merger", "configuration": MERGE_CONFIGURATION}
+MERGE_NODE = {
+    "analysis_version": "merger",
+    "configuration": MERGE_CONFIGURATION,
+}
 TOPUP_NODE = {"analysis_version": "topup", "coniguration": TOPUP_CONFIGURATION}
 BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
 

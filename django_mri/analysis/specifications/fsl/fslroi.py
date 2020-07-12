@@ -1,12 +1,15 @@
 from django_analyses.models.input.definitions import (
-    FloatInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
     BooleanInputDefinition,
     IntegerInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 FSLROI_INPUT_SPECIFICATION = {
     "in_file": {
@@ -21,7 +24,7 @@ FSLROI_INPUT_SPECIFICATION = {
     },
     "ignore_exception": {
         "type": BooleanInputDefinition,
-        "description": "Print an error message instead of throwing an exception in case the interface fails to run",
+        "description": "Print an error message instead of throwing an exception in case the interface fails to run",  # noqa: E501
     },
     "output_type": {
         "type": StringInputDefinition,
@@ -29,7 +32,10 @@ FSLROI_INPUT_SPECIFICATION = {
         "choices": ["NIFTI", "NIFTI_PAIR", "NIFTI_GZ", "NIFTI_PAIR_GZ"],
         "default": "NIFTI_GZ",
     },
-    "roi_file": {"type": StringInputDefinition, "description": "Path to output file."},
+    "roi_file": {
+        "type": StringInputDefinition,
+        "description": "Path to output file.",
+    },
     "t_min": {"type": IntegerInputDefinition, "description": ""},
     "t_size": {"type": IntegerInputDefinition, "description": ""},
     "x_min": {"type": IntegerInputDefinition, "description": ""},
@@ -40,7 +46,8 @@ FSLROI_INPUT_SPECIFICATION = {
     "z_size": {"type": IntegerInputDefinition, "description": ""},
 }
 FSLROI_OUTPUT_SPECIFICATION = {
-    "roi_file": NiftiOutputDefinition,
-    "description": "Path to output file.",
+    "roi_file": {
+        "type": NiftiOutputDefinition,
+        "description": "Path to output file.",
+    },
 }
-

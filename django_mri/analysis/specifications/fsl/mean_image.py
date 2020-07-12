@@ -1,15 +1,13 @@
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
-    FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
     StringInputDefinition,
 )
-
-from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 MEAN_IMAGE_INPUT_SPECIFICATION = {
     "in_file": {
@@ -22,7 +20,7 @@ MEAN_IMAGE_INPUT_SPECIFICATION = {
     "dimension": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'",
+        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'",  # noqa: E501
         "choices": ["t", "x", "y", "z", "a"],
     },
     "internal_datatype": {

@@ -1,5 +1,4 @@
 from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
     FileInputDefinition,
     FloatInputDefinition,
     IntegerInputDefinition,
@@ -11,8 +10,12 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 from pathlib import Path
 import os
 
@@ -22,29 +25,29 @@ TOPUP_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
         "required": True,
-        "description": "A 4D NIfTI file containing images of dual-phase encoded images.",
+        "description": "A 4D NIfTI file containing images of dual-phase encoded images.",  # noqa: E501
         "is_configuration": False,
         "value_attribute": "path.__str__",
     },
     "encoding_direction": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "Encoding direction for automatic generation of encoding file. Mutually exclusive with inputs: encoding_file. Requires inputs: readout_times.",
+        "description": "Encoding direction for automatic generation of encoding file. Mutually exclusive with inputs: encoding_file. Requires inputs: readout_times.",  # noqa: E501
         "choices": ["x", "y", "z", "-x", "-y", "-z"],
     },
     "encoding_file": {
         "type": FileInputDefinition,
         "required": True,
-        "description": "Path to a file containing images' phase-encoding directions/readout times. Mutually exclusive with inputs: encoding direction.",
+        "description": "Path to a file containing images' phase-encoding directions/readout times. Mutually exclusive with inputs: encoding direction.",  # noqa: E501
     },
     "readout_times": {
         "type": ListInputDefinition,
         "required": True,
-        "description": "A list of readout times (floats). Requires inputs: encoding_direction.",
+        "description": "A list of readout times (floats). Requires inputs: encoding_direction.",  # noqa: E501
     },
     "config": {
         "type": FileInputDefinition,
-        "description": "Path to configuration files specifying command line arguments.",
+        "description": "Path to configuration files specifying command line arguments.",  # noqa: E501
         "default": Path(Path(FSL_DIR) / "etc" / "flirtsch" / "b02b0.cnf"),
     },
     "estmov": {
@@ -68,7 +71,7 @@ TOPUP_INPUT_SPECIFICATION = {
     },
     "minmet": {
         "type": IntegerInputDefinition,
-        "description": "Minimisation method 0=Levenberg-Marquardt, 1=Scaled Conjugate Gradient.",
+        "description": "Minimisation method 0=Levenberg-Marquardt, 1=Scaled Conjugate Gradient.",  # noqa: E501
         "min_value": 0,
         "max_value": 1,
     },
@@ -77,15 +80,18 @@ TOPUP_INPUT_SPECIFICATION = {
         "description": "Precision for representing Hessian, double or float.",
     },
     "out_base": {
-        "type": StringInputDefinition,  ############# Check with Zvi #############
-        "description": "Base-name of output files (spline coefficients (Hz) and movement parameters).",
+        "type": StringInputDefinition,
+        "is_output_path": True,
+        "description": "Base-name of output files (spline coefficients (Hz) and movement parameters).",  # noqa: E501
     },
     "out_corrected": {
         "type": StringInputDefinition,
+        "is_output_path": True,
         "description": "Path to 4D image file with unwarped images.",
     },
     "out_field": {
         "type": StringInputDefinition,
+        "is_output_path": True,
         "description": "Path to image file with field (Hz).",
     },
     "out_jac_prefix": {
@@ -111,22 +117,22 @@ TOPUP_INPUT_SPECIFICATION = {
     },
     "reg_lambda": {
         "type": FloatInputDefinition,
-        "description": "Weight of regularisation, default depending on –ssqlambda and –regmod switches.",
+        "description": "Weight of regularisation, default depending on –ssqlambda and –regmod switches.",  # noqa: E501
     },
     "regmod": {
         "type": StringInputDefinition,
-        "description": "Regularisation term implementation. Defaults to bending_energy. Note that the two functions have vastly different scales. The membrane energy is based on the first derivatives and the bending energy on the second derivatives. The second derivatives will typically be much smaller than the first derivatives, so input lambda will have to be larger for bending_energy to yield approximately the same level of regularisation.",
+        "description": "Regularisation term implementation. Defaults to bending_energy. Note that the two functions have vastly different scales. The membrane energy is based on the first derivatives and the bending energy on the second derivatives. The second derivatives will typically be much smaller than the first derivatives, so input lambda will have to be larger for bending_energy to yield approximately the same level of regularisation.",  # noqa: E501
         "choices": ["bending_energy", "membrane_energy"],
     },
     "regrid": {
         "type": IntegerInputDefinition,
-        "description": "If set (=1), the calculations are done in a different grid.",
+        "description": "If set (=1), the calculations are done in a different grid.",  # noqa: E501
         "min_value": 0,
         "max_value": 1,
     },
     "scale": {
         "type": IntegerInputDefinition,
-        "description": "If set (=1), the images are individually scaled to a common mean.",
+        "description": "If set (=1), the images are individually scaled to a common mean.",  # noqa: E501
         "min_value": 0,
         "max_value": 1,
     },
@@ -136,14 +142,17 @@ TOPUP_INPUT_SPECIFICATION = {
     },
     "ssqlambda": {
         "type": IntegerInputDefinition,
-        "description": "Weight lambda by the current value of the ssd. If used (=1), the effective weight of regularisation term becomes higher for the initial iterations, therefore initial steps are a little smoother than they would without weighting. This reduces the risk of finding a local minimum.",
+        "description": "Weight lambda by the current value of the ssd. If used (=1), the effective weight of regularisation term becomes higher for the initial iterations, therefore initial steps are a little smoother than they would without weighting. This reduces the risk of finding a local minimum.",  # noqa: E501
         "min_value": 0,
         "max_value": 1,
     },
-    "subsamp": {"type": IntegerInputDefinition, "description": "Sub-sampling scheme."},
+    "subsamp": {
+        "type": IntegerInputDefinition,
+        "description": "Sub-sampling scheme.",
+    },
     "warp_res": {
         "type": FloatInputDefinition,
-        "description": "(approximate) resolution (in mm) of warp basis for the different sub-sampling levels.",
+        "description": "(approximate) resolution (in mm) of warp basis for the different sub-sampling levels.",  # noqa: E501
     },
 }
 TOPUP_OUTPUT_SPECIFICATION = {
@@ -184,4 +193,3 @@ TOPUP_OUTPUT_SPECIFICATION = {
         "description": "List of paths to warpfield images.",
     },
 }
-

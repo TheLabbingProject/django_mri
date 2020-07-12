@@ -3,8 +3,12 @@ from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 FSLMERGE_INPUT_SPECIFICATION = {
     "in_files": {
@@ -17,7 +21,7 @@ FSLMERGE_INPUT_SPECIFICATION = {
     "dimension": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'",
+        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'",  # noqa: E501
         "choices": ["t", "x", "y", "z", "a"],
     },
     "merged_file": {
@@ -39,5 +43,8 @@ FSLMERGE_INPUT_SPECIFICATION = {
     },
 }
 FSLMERGE_OUTPUT_SPECIFICATION = {
-    "merged_file": {"type": NiftiOutputDefinition, "description": "Path of merged file"}
+    "merged_file": {
+        "type": NiftiOutputDefinition,
+        "description": "Path of merged file",
+    }
 }
