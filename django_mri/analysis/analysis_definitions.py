@@ -1,11 +1,3 @@
-"""
-Analysis definitions compatible with django_analyses_\'s
-:meth:`~django_analyses.models.managers.analysis.AnalysisManager.from_list`
-method.
-
-.. _django_analyses: https://github.com/TheLabbingProject/django_analyses
-"""
-
 import nipype
 
 from django_mri.analysis import messages
@@ -46,6 +38,30 @@ from django_mri.analysis.specifications.fsl.susan import (
     SUSAN_INPUT_SPECIFICATION,
     SUSAN_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.fsl.fslmerge import (
+    FSLMERGE_INPUT_SPECIFICATION,
+    FSLMERGE_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.fsl.fslroi import (
+    FSLROI_INPUT_SPECIFICATION,
+    FSLROI_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.fsl.topup import (
+    TOPUP_INPUT_SPECIFICATION,
+    TOPUP_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.fsl.apply_topup import (
+    APPLY_TOPUP_INPUT_SPECIFICATION,
+    APPLY_TOPUP_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.fsl.binary_maths import (
+    BINARY_MATHS_INPUT_SPECIFICATION,
+    BINARY_MATHS_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.fsl.mean_image import (
+    MEAN_IMAGE_INPUT_SPECIFICATION,
+    MEAN_IMAGE_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
@@ -59,6 +75,12 @@ from nipype.interfaces.fsl import (
     SUSAN,
     Reorient2Std,
     RobustFOV,
+    Merge,
+    TOPUP,
+    ApplyTOPUP,
+    BinaryMaths,
+    MeanImage,
+    ExtractROI,
 )
 from nipype.interfaces.fsl.base import no_fsl
 
@@ -69,8 +91,6 @@ test_mode = getattr(settings, "TESTING_MODE", False)
 if no_fsl() and not test_mode:
     raise ImportError(messages.NO_FSL)
 
-NIPYPE_V = nipype.__version__
-
 
 analysis_definitions = [
     {
@@ -79,7 +99,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": BET().version or "1.0",
-                "description": f"Default BET version for nipype {NIPYPE_V}.",
+                "description": f"Default BET version for nipype {nipype.__version__}.",
                 "input": BET_INPUT_SPECIFICATION,
                 "output": BET_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -92,7 +112,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FAST().version or "1.0",
-                "description": f"Default FAST version for nipype {NIPYPE_V}.",
+                "description": f"Default FAST version for nipype {nipype.__version__}.",
                 "input": FAST_INPUT_SPECIFICATION,
                 "output": FAST_OUTPUT_SPECIFICATION,
             }
@@ -104,7 +124,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FLIRT().version or "1.0",
-                "description": f"Default FLIRT version for nipype {NIPYPE_V}.",
+                "description": f"Default FLIRT version for nipype {nipype.__version__}.",
                 "input": FLIRT_INPUT_SPECIFICATION,
                 "output": FLIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -117,7 +137,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FNIRT().version or "1.0",
-                "description": f"Default FNIRT version for nipype {NIPYPE_V}.",
+                "description": f"Default FNIRT version for nipype {nipype.__version__}.",
                 "input": FNIRT_INPUT_SPECIFICATION,
                 "output": FNIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -142,9 +162,87 @@ analysis_definitions = [
         "versions": [
             {
                 "title": SUSAN().version or "1.0",
-                "description": f"Default SUSAN version for nipype {NIPYPE_V}.",
+                "description": f"Default SUSAN version for nipype {nipype.__version__}.",
                 "input": SUSAN_INPUT_SPECIFICATION,
                 "output": SUSAN_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "fslmerge",
+        "description": "Concatenates images along specified dimension.",
+        "versions": [
+            {
+                "title": Merge().version or "1.0",
+                "description": f"Default fslmerge version for nipype {nipype.__version__}.",
+                "input": FSLMERGE_INPUT_SPECIFICATION,
+                "output": FSLMERGE_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "fslroi",
+        "description": "Extracts specific ROI from image.",
+        "versions": [
+            {
+                "title": ExtractROI().version or "1.0",
+                "description": f"Default fslroi version for nipype {nipype.__version__}.",
+                "input": FSLROI_INPUT_SPECIFICATION,
+                "output": FSLROI_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "topup",
+        "description": "Estimates and corrects susceptibillity induced distortions.",
+        "versions": [
+            {
+                "title": TOPUP().version or "1.0",
+                "description": f"Default topup version for nipype {nipype.__version__}.",
+                "input": TOPUP_INPUT_SPECIFICATION,
+                "output": TOPUP_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "apply_topup",
+        "description": "Estimates and corrects susceptibillity induced distortions, following FSL's TopUp fieldmap estimations.",
+        "versions": [
+            {
+                "title": ApplyTOPUP().version or "1.0",
+                "description": f"Default apply_topup version for nipype {nipype.__version__}.",
+                "input": APPLY_TOPUP_INPUT_SPECIFICATION,
+                "output": APPLY_TOPUP_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "binary_maths",
+        "description": "Perform mathematical operations using a second image or a numeric value.",
+        "versions": [
+            {
+                "title": BinaryMaths().version or "1.0",
+                "description": f"Default BinaryMaths version for nipype {nipype.__version__}.",
+                "input": BINARY_MATHS_INPUT_SPECIFICATION,
+                "output": BINARY_MATHS_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "mean_image",
+        "description": "Generate a mean image across a given dimension.",
+        "versions": [
+            {
+                "title": MeanImage().version or "1.0",
+                "description": f"Default MeanImage version for nipype {nipype.__version__}.",
+                "input": MEAN_IMAGE_INPUT_SPECIFICATION,
+                "output": MEAN_IMAGE_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
@@ -155,7 +253,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": Reorient2Std().version or "1.0",
-                "description": f"Default fslorient2std version for nipype {NIPYPE_V}.",  # noqa
+                "description": f"Default fslorient2std version for nipype {nipype.__version__}.",  # noqa
                 "input": REORIENT2STD_INPUT_SPECIFICATION,
                 "output": REORIENT2STD_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -164,11 +262,11 @@ analysis_definitions = [
     },
     {
         "title": "robustfov",
-        "description": "Automatically crops an image removing lower head and neck.",  # noqa
+        "description": "Automatically crops an image removing lower head and neck.",
         "versions": [
             {
                 "title": RobustFOV().version or "1.0",
-                "description": f"Default robustfov version for nipype {NIPYPE_V}.",  # noqa
+                "description": f"Default robustfov version for nipype {nipype.__version__}.",  # noqa
                 "input": ROBUSTFOV_INPUT_SPECIFICATION,
                 "output": ROBUSTFOV_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -194,7 +292,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": ReconAll().version or "1.0",
-                "description": f"Default FreeSurfer ReconAll version for nipype {NIPYPE_V}.",  # noqa
+                "description": f"Default FreeSurfer ReconAll version for nipype {nipype.__version__}.",  # noqa
                 "input": RECON_ALL_INPUT_SPECIFICATION,
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",

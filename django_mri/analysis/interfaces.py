@@ -11,6 +11,12 @@ from nipype.interfaces.fsl import (
     Reorient2Std,
     RobustFOV,
     SUSAN,
+    Merge,
+    TOPUP,
+    ApplyTOPUP,
+    MeanImage,
+    BinaryMaths,
+    ExtractROI,
 )
 
 
@@ -31,6 +37,12 @@ interfaces = {
     "FAST": {FAST().version: FastWrapper},
     "FLIRT": {FLIRT().version: FLIRT},
     "FNIRT": {FNIRT().version: FNIRT},
+    "fslmerge": {Merge().version: Merge},
+    "fslroi": {ExtractROI().version: ExtractROI},
+    "topup": {TOPUP().version: TOPUP},
+    "apply_topup": {ApplyTOPUP().version: ApplyTOPUP},
+    "binary_maths": {BinaryMaths().version: BinaryMaths},
+    "mean_image": {MeanImage().version: MeanImage},
     "FSL Anatomical Processing Script": {FslAnat.__version__: FslAnat},
     "SUSAN": {SUSAN().version: SUSAN},
     "ReconAll": {ReconAll().version: ReconAll},

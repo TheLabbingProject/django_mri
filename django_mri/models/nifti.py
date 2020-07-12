@@ -1,6 +1,8 @@
 import nibabel as nib
 import numpy as np
 import os
+import json
+import warnings
 
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
@@ -22,6 +24,8 @@ class NIfTI(TimeStampedModel):
     # is the product of a direct conversion from the raw data to NIfTI (True),
     # or of a manipulation of the data (False).
     is_raw = models.BooleanField(default=False)
+
+    _json_data = None
 
     class Meta:
         verbose_name = "NIfTI"
@@ -96,6 +100,22 @@ class NIfTI(TimeStampedModel):
             ]
         return None
 
+    def read_json(self) -> dict:
+        base_name = Path(self.path).name.split(".")[0]
+        json_file = (Path(self.path).parent / base_name).with_suffix(".json")
+        if json_file.is_file():
+            with open(json_file, "r") as f:
+                return json.load(f)
+
+    def get_total_readout_time(self) -> float:
+        return self.json_data.get("TotalReadoutTime")
+
+    def get_effective_spacing(self) -> float:
+        return self.json_data.get("EffectiveEchoSpacing")
+
+    def get_phase_encoding_direction(self) -> float:
+        return self.json_data.get("PhaseEncodingDirection")
+
     def niwidgets_plot(self, **kwargs):
         widget = NiftiWidget(self.path)
         return widget.nifti_plotter(**kwargs)
@@ -107,9 +127,7 @@ class NIfTI(TimeStampedModel):
     def compress(self, keep_source: bool = False) -> Path:
         if not self.is_compressed:
             uncompressed_path = Path(self.path)
-            compressed_path = compress(
-                uncompressed_path, keep_source=keep_source
-            )
+            compressed_path = compress(uncompressed_path, keep_source=keep_source)
             self.path = str(compressed_path)
             self.save()
         return Path(self.path)
@@ -117,12 +135,16 @@ class NIfTI(TimeStampedModel):
     def uncompress(self, keep_source: bool = False) -> Path:
         if self.is_compressed:
             compressed_path = Path(self.path)
-            uncompressed_path = uncompress(
-                compressed_path, keep_source=keep_source
-            )
+            uncompressed_path = uncompress(compressed_path, keep_source=keep_source)
             self.path = str(uncompressed_path)
             self.save()
         return Path(self.path)
+
+    @property
+    def json_data(self) -> dict:
+        if self._json_data is None:
+            self._json_data = self.read_json()
+        return self._json_data
 
     @property
     def b_value(self) -> list:
