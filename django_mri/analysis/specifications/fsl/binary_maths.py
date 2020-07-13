@@ -47,6 +47,7 @@ BINARY_MATHS_INPUT_SPECIFICATION = {
     "out_file": {
         "type": StringInputDefinition,
         "description": "Path to image to write results to.",
+        "default": "math_out.nii.gz",
     },
     "output_datatype": {
         "type": StringInputDefinition,

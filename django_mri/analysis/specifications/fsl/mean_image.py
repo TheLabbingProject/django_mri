@@ -35,6 +35,7 @@ MEAN_IMAGE_INPUT_SPECIFICATION = {
     },
     "out_file": {
         "type": StringInputDefinition,
+        "default": "mean.nii.gz",
         "description": "Path to image to write results to.",
     },
     "output_datatype": {

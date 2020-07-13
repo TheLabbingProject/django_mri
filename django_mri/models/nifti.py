@@ -127,7 +127,9 @@ class NIfTI(TimeStampedModel):
     def compress(self, keep_source: bool = False) -> Path:
         if not self.is_compressed:
             uncompressed_path = Path(self.path)
-            compressed_path = compress(uncompressed_path, keep_source=keep_source)
+            compressed_path = compress(
+                uncompressed_path, keep_source=keep_source
+            )
             self.path = str(compressed_path)
             self.save()
         return Path(self.path)
@@ -135,7 +137,9 @@ class NIfTI(TimeStampedModel):
     def uncompress(self, keep_source: bool = False) -> Path:
         if self.is_compressed:
             compressed_path = Path(self.path)
-            uncompressed_path = uncompress(compressed_path, keep_source=keep_source)
+            uncompressed_path = uncompress(
+                compressed_path, keep_source=keep_source
+            )
             self.path = str(uncompressed_path)
             self.save()
         return Path(self.path)

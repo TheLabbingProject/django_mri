@@ -3,9 +3,6 @@ from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
 from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
@@ -17,6 +14,7 @@ FSLMERGE_INPUT_SPECIFICATION = {
         "description": "A list of (at least 2) NIfTI format files to merge.",
         "is_configuration": False,
         "element_type": "FIL",
+        "db_value_preprocessing": "path.__str__",
     },
     "dimension": {
         "type": StringInputDefinition,

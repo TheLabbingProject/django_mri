@@ -22,6 +22,18 @@ import os
 FSL_DIR = os.environ["FSL_DIR"]
 
 TOPUP_INPUT_SPECIFICATION = {
+    "dwi_file": {
+        "type": NiftiInputDefinition,
+        "required": True,
+        "description": "Raw DWI image with corresponding json file.",
+        "is_configuration": False,
+    },
+    "phasediff_file": {
+        "type": NiftiInputDefinition,
+        "required": True,
+        "description": "Raw opposite-encoded (phasediff) image with corresponding json file.",  # noqa: E501
+        "is_configuration": False,
+    },
     "in_file": {
         "type": NiftiInputDefinition,
         "required": True,
@@ -30,19 +42,17 @@ TOPUP_INPUT_SPECIFICATION = {
         "value_attribute": "path.__str__",
     },
     "encoding_direction": {
-        "type": StringInputDefinition,
-        "required": True,
+        "type": ListInputDefinition,
+        "element_type": "STR",
         "description": "Encoding direction for automatic generation of encoding file. Mutually exclusive with inputs: encoding_file. Requires inputs: readout_times.",  # noqa: E501
-        "choices": ["x", "y", "z", "-x", "-y", "-z"],
     },
     "encoding_file": {
         "type": FileInputDefinition,
-        "required": True,
         "description": "Path to a file containing images' phase-encoding directions/readout times. Mutually exclusive with inputs: encoding direction.",  # noqa: E501
     },
     "readout_times": {
         "type": ListInputDefinition,
-        "required": True,
+        "element_type": "FLT",
         "description": "A list of readout times (floats). Requires inputs: encoding_direction.",  # noqa: E501
     },
     "config": {
@@ -81,18 +91,20 @@ TOPUP_INPUT_SPECIFICATION = {
     },
     "out_base": {
         "type": StringInputDefinition,
-        "is_output_path": True,
         "description": "Base-name of output files (spline coefficients (Hz) and movement parameters).",  # noqa: E501
+        "default": "topup",
     },
     "out_corrected": {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "Path to 4D image file with unwarped images.",
+        "default": "out_corrected.nii.gz",
     },
     "out_field": {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "Path to image file with field (Hz).",
+        "default": "out_field.nii.gz",
     },
     "out_jac_prefix": {
         "type": StringInputDefinition,
@@ -174,6 +186,7 @@ TOPUP_OUTPUT_SPECIFICATION = {
     },
     "out_jacs": {
         "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "List of paths to jacobian images.",
     },
     "out_logfile": {
@@ -182,6 +195,7 @@ TOPUP_OUTPUT_SPECIFICATION = {
     },
     "out_mats": {
         "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "List of paths to realignment matrices.",
     },
     "out_movpar": {
@@ -190,6 +204,7 @@ TOPUP_OUTPUT_SPECIFICATION = {
     },
     "out_warps": {
         "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "List of paths to warpfield images.",
     },
 }

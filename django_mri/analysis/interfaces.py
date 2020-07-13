@@ -30,21 +30,42 @@ class FastWrapper(FAST):
         return d
 
 
+class TopupWrapper(TOPUP):
+    PHASE_ENCODING_DICT = {"i": "x", "j": "y", "k": "z"}
+
+    def __init__(self, *args, **kwargs):
+        dwi, phasediff = kwargs.pop("dwi_file"), kwargs.pop("phasediff_file")
+        kwargs["encoding_direction"] = [
+            self.fix_phase_encoding(dwi.get_phase_encoding_direction()),
+            self.fix_phase_encoding(phasediff.get_phase_encoding_direction()),
+        ]
+        kwargs["readout_times"] = [
+            dwi.get_total_readout_time(),
+            phasediff.get_total_readout_time(),
+        ]
+        super().__init__(*args, **kwargs)
+
+    def fix_phase_encoding(self, phase_encoding: str) -> str:
+        for key, value in self.PHASE_ENCODING_DICT.items():
+            phase_encoding = phase_encoding.replace(key, value)
+        return phase_encoding
+
+
 interfaces = {
+    "apply_topup": {ApplyTOPUP().version: ApplyTOPUP},
+    "binary_maths": {BinaryMaths().version: BinaryMaths},
     "BET": {BET().version: BET},
     "CAT12 Segmentation": {"12.6": Cat12Segmentation},
+    "fslmerge": {Merge().version: Merge},
     "fslreorient2std": {Reorient2Std().version: Reorient2Std},
+    "fslroi": {ExtractROI().version: ExtractROI},
     "FAST": {FAST().version: FastWrapper},
     "FLIRT": {FLIRT().version: FLIRT},
     "FNIRT": {FNIRT().version: FNIRT},
-    "fslmerge": {Merge().version: Merge},
-    "fslroi": {ExtractROI().version: ExtractROI},
-    "topup": {TOPUP().version: TOPUP},
-    "apply_topup": {ApplyTOPUP().version: ApplyTOPUP},
-    "binary_maths": {BinaryMaths().version: BinaryMaths},
-    "mean_image": {MeanImage().version: MeanImage},
     "FSL Anatomical Processing Script": {FslAnat.__version__: FslAnat},
-    "SUSAN": {SUSAN().version: SUSAN},
-    "ReconAll": {ReconAll().version: ReconAll},
+    "mean_image": {MeanImage().version: MeanImage},
     "robustfov": {RobustFOV().version: RobustFOV},
+    "ReconAll": {ReconAll().version: ReconAll},
+    "SUSAN": {SUSAN().version: SUSAN},
+    "topup": {TOPUP().version: TopupWrapper},
 }

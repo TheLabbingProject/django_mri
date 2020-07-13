@@ -17,9 +17,11 @@ FSLROI_INPUT_SPECIFICATION = {
         "required": True,
         "description": "A NIfTI to extract an ROI from.",
         "is_configuration": False,
+        "value_attribute": "path.__str__",
     },
     "crop_list": {
         "type": ListInputDefinition,
+        "element_type": "TUP",
         "description": "list of two tuples specifying crop options.",
     },
     "ignore_exception": {
@@ -35,6 +37,8 @@ FSLROI_INPUT_SPECIFICATION = {
     "roi_file": {
         "type": StringInputDefinition,
         "description": "Path to output file.",
+        "default": "roi.nii.gz",
+        "is_output_path": True,
     },
     "t_min": {"type": IntegerInputDefinition, "description": ""},
     "t_size": {"type": IntegerInputDefinition, "description": ""},

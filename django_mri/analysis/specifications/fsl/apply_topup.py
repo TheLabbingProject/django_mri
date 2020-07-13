@@ -16,6 +16,7 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
         "required": True,
         "description": "List of paths to NIfTI files to apply topup's results on.",  # noqa: E501
         "is_configuration": False,
+        "element_type": "FIL",
     },
     "encoding_file": {
         "type": FileInputDefinition,
@@ -29,6 +30,7 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
     },
     "in_index": {
         "type": ListInputDefinition,
+        "element_type": "INT",
         "description": "Comma separated list of indices corresponding to –datain.",  # noqa: E501
     },
     "in_topup_fieldcoef": {
