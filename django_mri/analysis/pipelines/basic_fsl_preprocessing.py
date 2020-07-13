@@ -1,21 +1,33 @@
+"""
+Simplified FSL preprocessing pipeline for anatomical images.
+
+Raises
+------
+NIfTI.DoesNotExist
+    MNI152_T1_2mm_brain template could not be found
+"""
+
 from django_mri.models.nifti import NIfTI
 
 
 try:
     MNI = NIfTI.objects.get(path__contains="MNI152_T1_2mm_brain")
 except NIfTI.DoesNotExist:
-    raise NIfTI.DoesNotExist("Could not find MNI152_T1_2mm_brain in the database.")
+    raise NIfTI.DoesNotExist(
+        "Could not find MNI152_T1_2mm_brain in the database."
+    )
 
 
-###########################
-# Basic FSL Preprocessing #
-###########################
+# Node configurations
 
 BET_CONFIGURATION = {"robust": True}
 REORIENT_CONFIGURATION = {}
 ROBUSTFOV_CONFIGURATION = {}
 FLIRT_CONFIGURATION = {"reference": MNI.id, "interp": "spline"}
 FNIRT_CONFIGURATION = {"ref_file": MNI.id}
+
+
+# Node creation
 
 BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
 REORIENT_NODE = {
@@ -31,7 +43,9 @@ FLIRT_NODE = {
     "configuration": {"reference": MNI.id, "interp": "spline"},
 }
 
-# Pipe configurations
+
+# Pipe creation
+
 BET_TO_REORIENT = {
     "source": BET_NODE,
     "source_port": "out_file",
@@ -61,6 +75,9 @@ FLIRT_TO_FNIRT = {
     "destination": FNIRT_NODE,
     "destination_port": "in_file",
 }
+
+
+# Pipeline correction
 
 BASIC_FSL_PREPROCESSING = {
     "title": "Basic FSL Preprocessing",

@@ -1,3 +1,8 @@
+"""
+Field-map correction for EPI scans using FSL.
+"""
+
+
 # Node configurations
 
 FSLROI_CONFIGURATION = {
@@ -12,8 +17,8 @@ FSLROI_CONFIGURATION = {
 }
 MERGE_CONFIGURATION = {"dimension": "t"}
 TOPUP_CONFIGURATION = {}
+MEAN_CONFIGURATION = {"dimension": "T"}
 MATHS_CONFIGURATION = {"operand_value": 6.28, "operation": "mul"}
-MEAN_CONFIGURATION = {"dimension": "t"}
 BET_CONFIGURATION = {}
 
 
@@ -31,15 +36,15 @@ TOPUP_NODE = {
     "analysis_version": "topup",
     "configuration": TOPUP_CONFIGURATION,
 }
-BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
-MATHS_NODE = {
-    "analysis_version": "binary_maths",
-    "configuration": MATHS_CONFIGURATION,
-}
 MEAN_NODE = {
     "analysis_version": "mean_image",
     "configuration": MEAN_CONFIGURATION,
 }
+MATHS_NODE = {
+    "analysis_version": "binary_maths",
+    "configuration": MATHS_CONFIGURATION,
+}
+BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
 
 # Pipe creation
 

@@ -19,7 +19,7 @@ FSLMERGE_INPUT_SPECIFICATION = {
     "dimension": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'",  # noqa: E501
+        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'.",  # noqa: E501
         "choices": ["t", "x", "y", "z", "a"],
     },
     "merged_file": {

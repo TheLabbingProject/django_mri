@@ -21,12 +21,10 @@ BINARY_MATHS_INPUT_SPECIFICATION = {
     "operand_file": {
         "type": NiftiInputDefinition,
         "description": "Path to second image to perform operation with. Mutually exclusive with inputs: operand_value.",  # noqa: E501
-        "required": True,
     },
     "operand_value": {
         "type": FloatInputDefinition,
         "description": "Value to perform operation with.",
-        "required": True,
     },
     "operation": {
         "type": StringInputDefinition,
@@ -48,6 +46,7 @@ BINARY_MATHS_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Path to image to write results to.",
         "default": "math_out.nii.gz",
+        "is_output_path": True,
     },
     "output_datatype": {
         "type": StringInputDefinition,

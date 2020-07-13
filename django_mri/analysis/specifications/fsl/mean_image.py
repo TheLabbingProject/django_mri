@@ -20,8 +20,8 @@ MEAN_IMAGE_INPUT_SPECIFICATION = {
     "dimension": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "Dimension along which to merge, optionally set tr inputs when dimension is 't'",  # noqa: E501
-        "choices": ["t", "x", "y", "z", "a"],
+        "description": "Dimension along which to merge, optionally set TR inputs when dimension is 'T'",  # noqa: E501
+        "choices": ["T", "X", "Y", "Z"],
     },
     "internal_datatype": {
         "type": StringInputDefinition,

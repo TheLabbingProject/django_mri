@@ -86,6 +86,7 @@ class ScanInputDefinitionModelTestCase(TestCase):
             "is_configuration": self.definition.is_configuration,
             "value_attribute": self.definition.value_attribute,
             "run_method_input": self.definition.run_method_input,
+            "db_value_preprocessing": self.definition.db_value_preprocessing,
         }
         result = self.definition_serializer.data
         self.assertDictEqual(result, expected)
