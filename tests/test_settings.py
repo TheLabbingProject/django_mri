@@ -8,6 +8,7 @@ env = environ.Env(
     DB_PASSWORD=(str, ""),
     DB_HOST=(str, "localhost"),
     DB_PORT=(int, 5432),
+    APP_IP=(str, "127.0.0.1"),
 )
 environ.Env.read_env()
 
@@ -112,3 +113,4 @@ MIGRATION_MODULES = {
 KEEP_ORIGINAL_DICOM = True
 DICOM_IMPORT_MODE = "minimal"
 TESTING_MODE = True
+APP_IP=env("APP_IP")
