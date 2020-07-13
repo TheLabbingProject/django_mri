@@ -1,4 +1,3 @@
-import os
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from django.db.models.query import QuerySet
@@ -16,13 +15,9 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.request import Request
+from django.conf import settings
 
-APP_MODE = os.environ.get("APP_MODE", "Development")
-
-BOKEH_URL = "http://localhost:5006/series_viewer"
-
-if APP_MODE == "Production":
-    BOKEH_URL = BOKEH_URL.replace("localhost", os.environ.get("APP_IP"))
+BOKEH_URL = f"http://{settings.APP_IP}:5006/series_viewer"
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -138,8 +133,7 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             series = Series.objects.get(id=series_id)
         except ObjectDoesNotExist:
             return Response(
-                "Invalid DICOM primary key!",
-                status=status.HTTP_400_BAD_REQUEST,
+                "Invalid DICOM primary key!", status=status.HTTP_400_BAD_REQUEST,
             )
         try:
             scan = Scan.objects.get(dicom=series)
