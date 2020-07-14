@@ -16,3 +16,16 @@ class SequenceType(TitleDescriptionModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return self.title
+
+    @property
+    def scanning_sequence(self) -> list:
+        return [
+            scan_seq.scanning_sequence
+            for scan_seq in self.sequence_definition_set.all()
+        ]
+
+    @property
+    def sequence_variant(self) -> list:
+        return [
+            scan_seq.sequence_variant for scan_seq in self.sequence_definition_set.all()
+        ]

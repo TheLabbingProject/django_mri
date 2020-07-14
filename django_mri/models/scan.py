@@ -10,6 +10,7 @@ from django_mri.models import messages
 from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
+from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.utils import get_subject_model, get_group_model
 from django_mri.utils.bids import Bids
 from pathlib import Path
@@ -26,9 +27,7 @@ class Scan(TimeStampedModel):
 
     institution_name = models.CharField(max_length=64, blank=True, null=True)
     time = models.DateTimeField(
-        blank=True,
-        null=True,
-        help_text="The time in which the scan was acquired.",
+        blank=True, null=True, help_text="The time in which the scan was acquired.",
     )
     description = models.CharField(
         max_length=100,
@@ -63,9 +62,7 @@ class Scan(TimeStampedModel):
         validators=[MinValueValidator(0)],
         help_text="The time between the 180-degree inversion pulse and the following spin-echo (SE) sequence (in milliseconds).",
     )
-    spatial_resolution = ArrayField(
-        models.FloatField(), size=3, blank=True, null=True
-    )
+    spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
 
     comments = models.TextField(
         max_length=1000,
@@ -151,9 +148,7 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
-            raise AttributeError(
-                f"No DICOM data associated with MRI scan {self.id}!"
-            )
+            raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")
 
     def infer_sequence_type_from_dicom(self) -> SequenceType:
         """
@@ -168,10 +163,11 @@ class Scan(TimeStampedModel):
         """
 
         try:
-            return SequenceType.objects.get(
+            sequence_definition = SequenceTypeDefinition.objects.get(
                 scanning_sequence=self.dicom.scanning_sequence,
                 sequence_variant=self.dicom.sequence_variant,
             )
+            return sequence_definition.sequence_type
         except models.ObjectDoesNotExist:
             return None
 
