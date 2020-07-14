@@ -17,7 +17,9 @@ from nipype.interfaces.fsl import (
     MeanImage,
     BinaryMaths,
     ExtractROI,
+    Eddy,
 )
+from nipype.interfaces.mrtrix3 import DWIDenoise, MRDeGibbs, DWIBiasCorrect
 
 
 class FastWrapper(FAST):
@@ -68,4 +70,8 @@ interfaces = {
     "ReconAll": {ReconAll().version: ReconAll},
     "SUSAN": {SUSAN().version: SUSAN},
     "topup": {TOPUP().version: TopupWrapper},
+    "eddy": {Eddy().version: Eddy},
+    "denoise": {DWIDenoise().version: DWIDenoise},
+    "degibbs": {MRDeGibbs().version: MRDeGibbs},
+    "bias_correct": {DWIBiasCorrect().version: DWIBiasCorrect},
 }

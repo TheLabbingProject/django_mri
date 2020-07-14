@@ -62,9 +62,25 @@ from django_mri.analysis.specifications.fsl.mean_image import (
     MEAN_IMAGE_INPUT_SPECIFICATION,
     MEAN_IMAGE_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.fsl.eddy import (
+    EDDY_INPUT_SPECIFICATION,
+    EDDY_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix.denoise import (
+    DENOISE_INPUT_SPECIFICATION,
+    DENOISE_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix.degibbs import (
+    DEGIBBS_INPUT_SPECIFICATION,
+    DEGIBBS_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix.bias_correct import (
+    BIAS_CORRECT_INPUT_SPECIFICATION,
+    BIAS_CORRECT_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
@@ -81,7 +97,9 @@ from nipype.interfaces.fsl import (
     BinaryMaths,
     MeanImage,
     ExtractROI,
+    Eddy,
 )
+from nipype.interfaces.mrtrix3 import DWIDenoise, DWIBiasCorrect, MRDeGibbs
 from nipype.interfaces.fsl.base import no_fsl
 
 from django.conf import settings
@@ -222,6 +240,19 @@ analysis_definitions = [
         ],
     },
     {
+        "title": "eddy",
+        "description": "estimates and corrects eddy currents induced distortions.",
+        "versions": [
+            {
+                "title": Eddy().version or "1.0",
+                "description": f"Default eddy version for nipype {nipype.__version__}.",
+                "input": EDDY_INPUT_SPECIFICATION,
+                "output": EDDY_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
         "title": "binary_maths",
         "description": "Perform mathematical operations using a second image or a numeric value.",
         "versions": [
@@ -295,6 +326,45 @@ analysis_definitions = [
                 "description": f"Default FreeSurfer ReconAll version for nipype {nipype.__version__}.",  # noqa
                 "input": RECON_ALL_INPUT_SPECIFICATION,
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "denoise",
+        "description": "Denoise DWI data and estimate the noise level based on the optimal threshold for PCA.",
+        "versions": [
+            {
+                "title": DWIDenoise().version or "1.0",
+                "description": f"Default dwidenoise version for nipype {nipype.__version__}.",
+                "input": DENOISE_INPUT_SPECIFICATION,
+                "output": DENOISE_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "degibbs",
+        "description": "Remove Gibbs ringing artifacts.",
+        "versions": [
+            {
+                "title": MRDeGibbs.version or "1.0",
+                "description": f"Default mrdegibbs version for nipype {nipype.__version__}.",
+                "input": DEGIBBS_INPUT_SPECIFICATION,
+                "output": DEGIBBS_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "bias_correct",
+        "description": "Perform B1 field inhomogeneity correction for a DWI volume series.",
+        "versions": [
+            {
+                "title": DWIBiasCorrect.version or "1.0",
+                "description": f"Default dwibiascorrect version for nipype {nipype.__version__}.",
+                "input": BIAS_CORRECT_INPUT_SPECIFICATION,
+                "output": BIAS_CORRECT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
