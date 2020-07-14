@@ -23,7 +23,7 @@ BET_CONFIGURATION = {"mask": True}
 EDDY_CONFIGURATION = {}
 DENOISE_CONFIGURATION = {}
 DEGIBBS_CONFIGURATION = {}
-BIAS_CORRECT_CONFIGURATION = {"use_fsl": True}
+BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
 # Node creation
 
 FSLROI_NODE = {
@@ -87,8 +87,15 @@ BRAIN_EXTRACT = {
     "destination": BET_NODE,
     "destination_port": "in_file",
 }
+DENOISE_EPI = {  ############## multiple inputs from nodes \ user - ask Zvi #############
+    "source": BET_NODE,
+    "source_port": "mask_file",
+    "destination": DENOISE_NODE,
+    "destination_port": "mask",
+}
 ############## Generate index.txt ##############
 ############## User should insert .bvec and .bval as inputs - we shpuld consider automating this ##############
+
 EDDY_CORRECT = {
     "source": TOPUP_NODE,
     "source_port": "out_fieldcoef",
@@ -115,12 +122,7 @@ EDDY_CORRECT = {
     "destination_port": "in_mask",
 }
 
-DENOISE_EPI = {  ############## multiple inputs from nodes \ user - ask Zvi #############
-    "source": EDDY_NODE,
-    "source_port": "out_corrected",
-    "destination": DENOISE_NODE,
-    "destination_port": "in_file",
-}
+
 CORRET_GIBBS = {
     "source": DENOISE_NODE,
     "source_port": "out_file",
@@ -133,7 +135,12 @@ BIAS_CORRECT = {
     "destination": BIAS_CORRECT_NODE,
     "destination_port": "in_file",
 }
-
+BIAS_CORRECT = {
+    "source": BET_NODE,
+    "source_port": "mask_file",
+    "destination": BIAS_CORRECT_NODE,
+    "destination_port": "in_mask",
+}
 # Pipeline creation
 
 FIELDMAP_CORRECTION = {
