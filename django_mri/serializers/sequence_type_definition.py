@@ -21,3 +21,7 @@ class SequenceTypeDefinitionSerializer(serializers.HyperlinkedModelSerializer):
             "sequence_type",
             "url",
         )
+
+    # def create(self, validated_data):
+    #     pass
+
