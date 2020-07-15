@@ -2,6 +2,7 @@ import nipype
 
 from django_mri.analysis import messages
 from django_mri.analysis.fsl.fsl_anat import FslAnat
+from django_mri.analysis.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -70,6 +71,10 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.mrtrix.mrconvert import (
+    MRCONVERT_INPUT_SPECIFICATION,
+    MRCONVERT_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.mrtrix.denoise import (
     DENOISE_INPUT_SPECIFICATION,
     DENOISE_OUTPUT_SPECIFICATION,
@@ -81,6 +86,10 @@ from django_mri.analysis.specifications.mrtrix.degibbs import (
 from django_mri.analysis.specifications.mrtrix.bias_correct import (
     BIAS_CORRECT_INPUT_SPECIFICATION,
     BIAS_CORRECT_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix.dwifslpreproc import (
+    DWIFSLPREPROC_INPUT_SPECIFICATION,
+    DWIFSLPREPROC_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
@@ -99,7 +108,12 @@ from nipype.interfaces.fsl import (
     ExtractROI,
     Eddy,
 )
-from nipype.interfaces.mrtrix3 import DWIDenoise, DWIBiasCorrect, MRDeGibbs
+from nipype.interfaces.mrtrix3 import (
+    DWIDenoise,
+    DWIBiasCorrect,
+    MRDeGibbs,
+    MRConvert,
+)
 from nipype.interfaces.fsl.base import no_fsl
 
 from django.conf import settings
@@ -331,6 +345,19 @@ analysis_definitions = [
         ],
     },
     {
+        "title": "mrconvert",
+        "description": "Performs conversion between different file types and optionally extract a subset of the input image",
+        "versions": [
+            {
+                "title": MRConvert().version or "1.0",
+                "description": f"Default mrconvert version for nipype {nipype.__version__}.",
+                "input": MRCONVERT_INPUT_SPECIFICATION,
+                "output": MRCONVERT_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
         "title": "denoise",
         "description": "Denoise DWI data and estimate the noise level based on the optimal threshold for PCA.",
         "versions": [
@@ -365,6 +392,19 @@ analysis_definitions = [
                 "description": f"Default dwibiascorrect version for nipype {nipype.__version__}.",
                 "input": BIAS_CORRECT_INPUT_SPECIFICATION,
                 "output": BIAS_CORRECT_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "dwifslpreproc",
+        "description": "Perform diffusion image pre-processing using FSL’s eddy tool; including inhomogeneity distortion correction using FSL’s topup tool if possible",
+        "versions": [
+            {
+                "title": DwiFslPreproc.__version__ or "1.0",
+                "description": f"Default dwifslpreproc version for nipype {nipype.__version__}.",
+                "input": DWIFSLPREPROC_INPUT_SPECIFICATION,
+                "output": DWIFSLPREPROC_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
