@@ -1,53 +1,50 @@
 from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    FloatInputDefinition,
     IntegerInputDefinition,
-    ListInputDefinition,
     StringInputDefinition,
     BooleanInputDefinition,
 )
-
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
+from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
+
 
 BIAS_CORRECT_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": ScanInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
+        "value_attribute": "mif.__str__",
     },
     "use_ants": {
         "type": BooleanInputDefinition,
-        "description": "Use ANTS N4 to estimate the inhomogeneity field. Mutually exclusive with inputs: use_fsl.",
+        "description": "Use ANTS N4 to estimate the inhomogeneity field. Mutually exclusive with inputs: use_fsl.",  # noqa: E501
     },
     "use_fsl": {
         "type": BooleanInputDefinition,
-        "description": "Use FSL FAST to estimate the inhomogeneity field. Mutually exclusive with inputs: use_ants.",
+        "description": "Use FSL FAST to estimate the inhomogeneity field. Mutually exclusive with inputs: use_ants.",  # noqa: E501
     },
     "bias": {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output noise map.",
-        "default": "bias.nii.gz",
+        "default": "bias.mif",
     },
     "bval_scale": {
         "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",
+        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
         "choices": ["yes", "no"],
         "default": "yes",
     },
     "grad_file": {
         "type": StringInputDefinition,
-        "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",
+        "description": "DWI gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",  # noqa: E501
     },
     "grad_fsl": {
         "type": StringInputDefinition,
-        "description": "dw gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",
+        "description": "DWI gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",  # noqa: E501
     },
     "in_bval": {
         "type": StringInputDefinition,
@@ -57,13 +54,10 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Bvecs file in FSL format.",
     },
-    "in_mask": {
-        "type": NiftiInputDefinition,  ########## Check with Zvi - Nifti or String #########
-        "description": "Mask image.",
-    },
+    "in_mask": {"type": NiftiInputDefinition, "description": "Mask image."},
     "nthreads": {
         "type": IntegerInputDefinition,
-        "description": "Number of threads. if zero, the number of available cpus will be used.",
+        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
     },
     "out_file": {
         "type": StringInputDefinition,
@@ -74,10 +68,12 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
 }
 
 BIAS_CORRECT_OUTPUT_SPECIFICATION = {
-    "bias": {"type": NiftiOutputDefinition, "description": "The output bias field."},
+    "bias": {
+        "type": FileOutputDefinition,
+        "description": "The output bias field.",
+    },
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",
     },
 }
-

@@ -7,28 +7,24 @@ from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     DirectoryInputDefinition,
 )
-
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
-)
+from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.nifti_input_definition import (
     NiftiInputDefinition,
 )
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
+
 
 DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "scan": {
-        "type": NiftiInputDefinition,
+        "type": ScanInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
         "run_method_input": True,
+        "value_attribute": "mif.__str__",
     },
     "destination": {
-        "type": DirectoryInputDefinition,
+        "type": StringInputDefinition,
         "description": "Run output destination.",
         "required": False,
         "is_configuration": False,
@@ -37,7 +33,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     },
     "pe_dir": {
         "type": StringInputDefinition,
-        "description": "Manually specify the phase encoding direction of the input series",
+        "description": "Manually specify the phase encoding direction of the input series",  # noqa: E501
         "choices": [
             "rl",
             "lr",
@@ -61,61 +57,61 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     },
     "readout_time": {
         "type": FloatInputDefinition,
-        "description": "Manually specify the total readout time of the input series (in seconds)",
+        "description": "Manually specify the total readout time of the input series (in seconds)",  # noqa: E501
     },
     "se_epi": {
         "type": NiftiInputDefinition,
-        "description": "Provide an additional image series consisting of spin-echo EPI images, which is to be used exclusively by topup for estimating the inhomogeneity field (i.e. it will not form part of the output image series)",
+        "description": "Provide an additional image series consisting of spin-echo EPI images, which is to be used exclusively by topup for estimating the inhomogeneity field (i.e. it will not form part of the output image series)",  # noqa: E501
     },
     "align_seepi": {
         "type": BooleanInputDefinition,
-        "description": "Achieve alignment between the SE-EPI images used for inhomogeneity field estimation, and the DWIs (more information in Description section)",
+        "description": "Achieve alignment between the SE-EPI images used for inhomogeneity field estimation, and the DWIs (more information in Description section)",  # noqa: E501
     },
     "json_import": {
         "type": FileInputDefinition,
-        "description": "Import image header information from an associated JSON file (may be necessary to determine phase encoding information)",
+        "description": "Import image header information from an associated JSON file (may be necessary to determine phase encoding information)",  # noqa: E501
     },
     "topup_options": {
         "type": StringInputDefinition,
-        "description": "Manually provide additional command-line options to the topup command (provide a string within quotation marks that contains at least one space, even if only passing a single command-line option to topup)",
+        "description": "Manually provide additional command-line options to the topup command (provide a string within quotation marks that contains at least one space, even if only passing a single command-line option to topup)",  # noqa: E501
     },
     "eddy_options": {
         "type": StringInputDefinition,
-        "description": "Manually provide additional command-line options to the eddy command (provide a string within quotation marks that contains at least one space, even if only passing a single command-line option to eddy)",
+        "description": "Manually provide additional command-line options to the eddy command (provide a string within quotation marks that contains at least one space, even if only passing a single command-line option to eddy)",  # noqa: E501
     },
     "eddy_mask": {
         "type": NiftiInputDefinition,
-        "description": "Provide a processing mask to use for eddy, instead of having dwifslpreproc generate one internally using dwi2mask",
+        "description": "Provide a processing mask to use for eddy, instead of having dwifslpreproc generate one internally using dwi2mask",  # noqa: E501
     },
     "eddy_slspec": {
         "type": FileInputDefinition,
-        "description": "Provide a file containing slice groupings for eddy’s slice-to-volume registration",
+        "description": "Provide a file containing slice groupings for eddy’s slice-to-volume registration",  # noqa: E501
     },
     "eddyqc_text": {
         "type": DirectoryInputDefinition,
-        "description": "Copy the various text-based statistical outputs generated by eddy, and the output of eddy_qc (if installed), into an output directory",
+        "description": "Copy the various text-based statistical outputs generated by eddy, and the output of eddy_qc (if installed), into an output directory",  # noqa: E501
         "is_output_path": True,
     },
     "eddyqc_all": {
         "type": DirectoryInputDefinition,
-        "description": "Copy ALL outputs generated by eddy (including images), and the output of eddy_qc (if installed), into an output directory",
+        "description": "Copy ALL outputs generated by eddy (including images), and the output of eddy_qc (if installed), into an output directory",  # noqa: E501
         "is_output_path": True,
     },
     "rpe_none": {
         "type": BooleanInputDefinition,
-        "description": "Specify that no reversed phase-encoding image data is being provided; eddy will perform eddy current and motion correction only",
+        "description": "Specify that no reversed phase-encoding image data is being provided; eddy will perform eddy current and motion correction only",  # noqa: E501
     },
     "rpe_pair": {
         "type": BooleanInputDefinition,
-        "description": "Specify that a set of images (typically b=0 volumes) will be provided for use in inhomogeneity field estimation only (using the -se_epi option)",
+        "description": "Specify that a set of images (typically b=0 volumes) will be provided for use in inhomogeneity field estimation only (using the -se_epi option)",  # noqa: E501
     },
     "rpe_all": {
         "type": BooleanInputDefinition,
-        "description": "Specify that ALL DWIs have been acquired with opposing phase-encoding",
+        "description": "Specify that ALL DWIs have been acquired with opposing phase-encoding",  # noqa: E501
     },
     "rpe_header": {
         "type": BooleanInputDefinition,
-        "description": "Specify that the phase-encoding information can be found in the image header(s), and that this is the information that the script should use",
+        "description": "Specify that the phase-encoding information can be found in the image header(s), and that this is the information that the script should use",  # noqa: E501
     },
     "grad": {
         "type": StringInputDefinition,
@@ -134,32 +130,31 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "export_grad_fsl": {
         "type": ListInputDefinition,
         "element_type": "STR",
-        "description": "Export the final gradient table in FSL bvecs/bvals format",
+        "description": "Export the final gradient table in FSL bvecs/bvals format",  # noqa: E501
         "is_output_path": True,
     },
     "nocleanup": {
         "type": BooleanInputDefinition,
-        "description": "do not delete intermediate files during script execution, and do not delete scratch directory at script completion.",
+        "description": "do not delete intermediate files during script execution, and do not delete scratch directory at script completion.",  # noqa: E501
     },
     "scratch": {
         "type": StringInputDefinition,
-        "description": "manually specify the path in which to generate the scratch directory.",
+        "description": "manually specify the path in which to generate the scratch directory.",  # noqa: E501
         "is_output_path": True,
     },
     "nthreads": {
         "type": IntegerInputDefinition,
-        "description": "Number of threads. if zero, the number of available cpus will be used.",
+        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
     },
 }
 
 DWIFSLPREPROC_OUTPUT_SPECIFICATION = {
     "preprocessed_dwi": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output preprocessed DWI image.",
     },
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",
     },
 }
-
