@@ -48,7 +48,7 @@ class NIfTI(TimeStampedModel):
             Pixel data.
         """
 
-        return nib.load(self.path).get_data()
+        return nib.load(str(self.path)).get_data()
 
     def get_b_value(self) -> List[int]:
         """

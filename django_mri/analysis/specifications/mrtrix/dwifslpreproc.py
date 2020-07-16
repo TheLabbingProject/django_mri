@@ -1,5 +1,6 @@
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
+    DirectoryInputDefinition,
     FileInputDefinition,
     FloatInputDefinition,
     IntegerInputDefinition,
@@ -23,7 +24,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "value_attribute": "mif.__str__",
     },
     "destination": {
-        "type": StringInputDefinition,
+        "type": DirectoryInputDefinition,
         "description": "Run output destination.",
         "required": False,
         "is_configuration": False,

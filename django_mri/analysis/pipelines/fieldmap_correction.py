@@ -24,6 +24,8 @@ EDDY_CONFIGURATION = {}
 DENOISE_CONFIGURATION = {}
 DEGIBBS_CONFIGURATION = {}
 BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
+
+
 # Node creation
 
 FSLROI_NODE = {
@@ -48,12 +50,19 @@ MATHS_NODE = {
 }
 BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
 EDDY_NODE = {"analysis_version": "eddy", "configuration": EDDY_CONFIGURATION}
-DENOISE_NODE = {"analysis_version": "denoise", "configuration": DENOISE_CONFIGURATION}
-DEGIBBS_NODE = {"analysis_version": "degibbs", "configuration": DEGIBBS_CONFIGURATION}
+DENOISE_NODE = {
+    "analysis_version": "denoise",
+    "configuration": DENOISE_CONFIGURATION,
+}
+DEGIBBS_NODE = {
+    "analysis_version": "degibbs",
+    "configuration": DEGIBBS_CONFIGURATION,
+}
 BIAS_CORRECT_NODE = {
     "analysis_version": "bias_correct",
     "configuration": BIAS_CORRECT_CONFIGURATION,
 }
+
 
 # Pipe creation
 
@@ -87,15 +96,18 @@ BRAIN_EXTRACT = {
     "destination": BET_NODE,
     "destination_port": "in_file",
 }
-DENOISE_EPI = {  ############## multiple inputs from nodes \ user - ask Zvi #############
+
+# multiple inputs from nodes \ user - ask Zvi
+DENOISE_EPI = {
     "source": BET_NODE,
     "source_port": "mask_file",
     "destination": DENOISE_NODE,
     "destination_port": "mask",
 }
-############## Generate index.txt ##############
-############## User should insert .bvec and .bval as inputs - we shpuld consider automating this ##############
 
+
+# User should insert .bvec and .bval as inputs we shpuld consider automating
+# this
 EDDY_CORRECT = {
     "source": TOPUP_NODE,
     "source_port": "out_fieldcoef",
@@ -121,8 +133,6 @@ EDDY_CORRECT = {
     "destination": EDDY_NODE,
     "destination_port": "in_mask",
 }
-
-
 CORRET_GIBBS = {
     "source": DENOISE_NODE,
     "source_port": "out_file",
@@ -141,6 +151,8 @@ BIAS_CORRECT = {
     "destination": BIAS_CORRECT_NODE,
     "destination_port": "in_mask",
 }
+
+
 # Pipeline creation
 
 FIELDMAP_CORRECTION = {
