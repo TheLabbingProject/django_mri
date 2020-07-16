@@ -1,3 +1,9 @@
+"""
+This module exposes a list of preconfigured analyses that may easily be
+imported to the database using
+:meth:`~django_analyses.models.managers.analysis.AnalysisManager.from_list`.
+"""
+
 import nipype
 
 from django.conf import settings

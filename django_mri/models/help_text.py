@@ -1,3 +1,10 @@
+"""
+A module storing strings used to populate the fields' help_text_ attributes.
+
+.. _help_text:
+   https://docs.djangoproject.com/en/3.0/ref/forms/fields/#help-text
+"""
+
 SCAN_COMMENTS = (
     "If anything noteworthy happened during acquisition, it may be noted here."
 )

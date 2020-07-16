@@ -1,3 +1,7 @@
+"""
+Definition of the :class:`~django_mri.serializers.scan.ScanSerializer` class.
+"""
+
 from django_dicom.models import Series
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
@@ -7,6 +11,14 @@ from rest_framework import serializers
 
 
 class ScanSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Serializer class for the :class:`~accounts.models.user.User` model.
+
+    References
+    ----------
+    * https://www.django-rest-framework.org/api-guide/serializers/
+    """
+
     url = serializers.HyperlinkedIdentityField(view_name="mri:scan-detail")
     dicom = serializers.HyperlinkedRelatedField(
         view_name="dicom:series-detail", queryset=Series.objects.all()
@@ -54,9 +66,24 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
             "sequence_type",
         )
 
-    def create(self, validated_data):
-        scan, created = Scan.objects.get_or_create(**validated_data)
-        if created and scan.dicom and len(validated_data) == 1:
+    def create(self, data: dict):
+        """
+        Gets or creates an instance of the
+        :class:`~django_mri.models.scan.Scan` model based on the provided data.
+
+        Parameters
+        ----------
+        data : dict
+            Instance data
+
+        Returns
+        -------
+        ~django_mri.models.scan.Scan
+            Matching scan
+        """
+
+        scan, created = Scan.objects.get_or_create(**data)
+        if created and scan.dicom and len(data) == 1:
             scan.update_fields_from_dicom()
             scan.save()
         return scan

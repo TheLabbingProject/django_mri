@@ -387,6 +387,18 @@ class Scan(TimeStampedModel):
                 self.save()
 
     def convert_to_mif(self) -> Path:
+        """
+        Creates a *.mif* version of this scan using mrconvert_.
+
+        .. _mrconvert:
+           https://mrtrix.readthedocs.io/en/latest/reference/commands/mrconvert.html
+
+        Returns
+        -------
+        Path
+            Created file path
+        """
+
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
         if not out_file.parent.exists():
@@ -396,10 +408,33 @@ class Scan(TimeStampedModel):
         )
 
     def get_default_mif_path(self) -> Path:
+        """
+        Returns the default *.mif* path for this scan.
+
+        Returns
+        -------
+        Path
+            Default *.mif* path
+        """
+
         return get_mri_root() / "mif" / f"{self.id}.mif"
 
     @property
     def mif(self) -> Path:
+        """
+        Returns the *.mif* version of this scan, creating it if it doesn't
+        exist.
+
+        Returns
+        -------
+        Path
+            *.mif* file path
+
+        See Also
+        --------
+        * :meth:`convert_to_mif`
+        """
+
         destination = self.get_default_mif_path()
         if not destination.exists():
             self.convert_to_mif()

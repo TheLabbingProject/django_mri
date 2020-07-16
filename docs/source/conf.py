@@ -46,8 +46,13 @@ EXLUDED_MEMBERS = (
     # Default Django fields, methods, and exceptions that are created in
     # models but do not require documentation.
     # Fields
+    "id",
     # Methods
     # Exceptions
+    "DoesNotExist",
+    "MultipleObjectsReturned",
+    # Other
+    "Meta",
 )
 
 autodoc_default_options = {

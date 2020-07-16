@@ -64,8 +64,8 @@ class NIfTI(TimeStampedModel):
 
         Hint
         ----
-        For more information, see dcm2niix's `Diffusion Tensor Imaing`_ section
-        of the user guide.
+        For more information, see dcm2niix's `Diffusion Tensor Imaging`_
+        section of the user guide.
 
         .. _Diffusion Tensor Imaging:
            https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#Diffusion_Tensor_Imaging
@@ -103,8 +103,8 @@ class NIfTI(TimeStampedModel):
 
         Hint
         ----
-        For more information, see dcm2niix's `Diffusion Tensor Imaing`_ section
-        of the user guide.
+        For more information, see dcm2niix's `Diffusion Tensor Imaging`_
+        section of the user guide.
 
         .. _Diffusion Tensor Imaging:
            https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#Diffusion_Tensor_Imaging
