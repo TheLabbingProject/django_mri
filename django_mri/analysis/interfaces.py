@@ -75,5 +75,5 @@ interfaces = {
     "denoise": {DWIDenoise().version: DWIDenoise},
     "degibbs": {MRDeGibbs().version: MRDeGibbs},
     "bias_correct": {DWIBiasCorrect().version: DWIBiasCorrect},
-    "dwipreproc": {DwiFslPreproc().__version__: DwiFslPreproc},
+    "dwipreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
 }
