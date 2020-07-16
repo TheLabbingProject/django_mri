@@ -17,7 +17,18 @@ class DwiFslPreproc:
     )
     SUPPLEMENTARY_OUTPUTS = ("eddyqc_text", "eddyqc_all")
     DEFAULT_OUTPUT_NAME = "preprocessed_dwi.mif"
-
+    EDDY_OUTPUTS = {
+        "out_movement_rms": "eddy_movement_rms",
+        "eddy_mask": "eddy_mask.nii",
+        "out_outlier_map": "eddy_outlier_map",
+        "out_outlier_n_sqr_stdev_map": "eddy_outlier_n_sqr_stdev_map",
+        "out_outlier_n_stdev_map": "eddy_outlier_n_stdev_map",
+        "out_outlier_report": "eddy_outlier_report",
+        "out_parameter": "eddy_parameters",
+        "out_restricted_movement_rms": "eddy_restricted_movement_rms",
+        "out_shell_alignment_parameters": "eddy_post_eddy_shell_alignment_parameters",
+        "out_shell_pe_translation_parameters": "eddy_post_eddy_shell_PE_translation_parameters",
+    }
     __version__ = "BETA"
 
     def __init__(self, configuration: dict):
@@ -30,9 +41,9 @@ class DwiFslPreproc:
                 config[key] = destination
         return config
 
-    def generate_command(self, scan, destination: Path):
+    def generate_command(self, scan, destination: Path, config: str):
         output_path = destination / self.DEFAULT_OUTPUT_NAME
-        command = f"dwifslpreproc {scan.path} {output_path} "
+        command = f"dwifslpreproc {scan.path} {output_path} {config}"
         return command + "".join(
             [
                 f" -{key}"
@@ -45,13 +56,15 @@ class DwiFslPreproc:
     def generate_output_dict(self, destination: Path):
         output_dict = {
             "corrected_image": destination / self.DEFAULT_OUTPUT_NAME,
-            "eddyqc_text": destination / "replace_with_true_name.txt",
         }
+        for key, value in self.EDDY_OUTPUTS.items():
+            output_dict[key] = destination / value
+        return output_dict
 
     def run(self, scan, destination: Path = None) -> dict:
         destination = Path(destination) if destination else scan.path.parent
         config = self.add_supplementary_outputs(destination)
-        command = self.generate_command(scan, destination).split()
+        command = self.generate_command(scan, destination, config).split()
         process = subprocess.run(command, capture_output=True)
         if process.returncode:
             raise RuntimeError("Failed to run dwifslpreproc!")

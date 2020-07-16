@@ -4,9 +4,6 @@ from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
@@ -54,7 +51,11 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Bvecs file in FSL format.",
     },
-    "in_mask": {"type": NiftiInputDefinition, "description": "Mask image."},
+    "in_mask": {
+        "type": ScanInputDefinition,
+        "description": "Mask image.",
+        "value_attribute": "mif.__str__",
+    },
     "nthreads": {
         "type": IntegerInputDefinition,
         "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501

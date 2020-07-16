@@ -12,7 +12,6 @@ DEGIBBS_INPUT_SPECIFICATION = {
         "type": ScanInputDefinition,
         "required": True,
         "is_configuration": False,
-        "description": "Input DWI image.",
         "value_attribute": "mif.__str__",
     },
     "axes": {

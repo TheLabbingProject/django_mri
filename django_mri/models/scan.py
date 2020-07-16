@@ -15,6 +15,8 @@ from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.utils.utils import get_subject_model, get_group_model
+from django_mri.utils.utils import get_mri_root
+from django_mri.analysis.utils.get_mrconvert_node import get_mrconvert_node
 from django_mri.utils.bids import Bids
 from pathlib import Path
 
@@ -383,6 +385,25 @@ class Scan(TimeStampedModel):
             else:
                 self.subject = subject
                 self.save()
+
+    def convert_to_mif(self) -> Path:
+        node, created = get_mrconvert_node()
+        out_file = self.get_default_mif_path()
+        if not out_file.parent.exists():
+            out_file.parent.mkdir()
+        return node.run(
+            inputs={"in_file": self.nifti.path, "out_file": out_file}
+        )
+
+    def get_default_mif_path(self) -> Path:
+        return get_mri_root() / "mif" / f"{self.id}.mif"
+
+    @property
+    def mif(self) -> Path:
+        destination = self.get_default_mif_path()
+        if not destination.exists():
+            self.convert_to_mif()
+        return destination
 
     @property
     def sequence_type(self) -> SequenceType:

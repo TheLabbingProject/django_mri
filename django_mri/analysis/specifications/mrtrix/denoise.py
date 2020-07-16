@@ -1,12 +1,10 @@
 from django_analyses.models.input.definitions import (
+    FileInputDefinition,
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
@@ -15,7 +13,6 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": ScanInputDefinition,
         "required": True,
         "is_configuration": False,
-        "description": "Input DWI image.",
         "value_attribute": "mif.__str__",
     },
     "bval_scale": {
@@ -27,7 +24,7 @@ DENOISE_INPUT_SPECIFICATION = {
     "extent": {
         "type": ListInputDefinition,
         "element_type": "FLT",
-        "description": "Set the window size of the denoising filter.",  # noqa: E501
+        "description": "Set the window size of the denoising filter.",
         "default": [5.0, 5.0, 5.0],
     },
     "grad_file": {
@@ -46,20 +43,16 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Bvecs file in FSL format.",
     },
-    "mask": {
-        "type": NiftiInputDefinition,
-        "description": "Mask image.",
-        "value_attribute": "path.__str__",
-    },
-    "nthreads": {
-        "type": IntegerInputDefinition,
-        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
-    },
+    "mask": {"type": FileInputDefinition, "description": "Mask image."},
     "noise": {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output noise map.",
         "default": "noise.mif",
+    },
+    "nthreads": {
+        "type": IntegerInputDefinition,
+        "description": "Number of threads. if zero, the number of available cpus will be used.",
     },
     "out_file": {
         "type": StringInputDefinition,
