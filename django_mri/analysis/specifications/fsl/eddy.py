@@ -11,8 +11,12 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 EDDY_INPUT_SPECIFICATION = {
     "in_file": {
@@ -80,8 +84,7 @@ EDDY_INPUT_SPECIFICATION = {
         "description": "Matrix specifying the relative positions of the fieldmap, –field, and the first volume of the input file, –imain.",
     },
     "flm": {
-        "type": ListInputDefinition,
-        "element_type": "STR",
+        "type": StringInputDefinition,
         "choices": ["quadratic", "linear", "cubic"],
         "description": "First level EC model.",
         "default": "quadratic",
@@ -108,8 +111,7 @@ EDDY_INPUT_SPECIFICATION = {
         "description": "Resets rand for when selecting voxels.",
     },
     "interp": {
-        "type": ListInputDefinition,
-        "element_type": "STR",
+        "type": StringInputDefinition,
         "choices": ["spline", "trilinear"],
         "description": " Interpolation model for estimation step.",
         "default": "spline",
@@ -150,7 +152,8 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "multiband_offset": {
         "type": IntegerInputDefinition,
-        "choices": [-1, 0, -1],
+        "min_value": -1,
+        "max_value": 1,
         "description": "Multi-band offset (-1 if bottom slice removed, 1 if top slice removed. Requires inputs: multiband_factor.",
     },
     "niter": {
@@ -199,7 +202,10 @@ EDDY_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "description": "Detect and replace outlier slices.",
     },
-    "residuals": {"type": BooleanInputDefinition, "description": "Output Residuals."},
+    "residuals": {
+        "type": BooleanInputDefinition,
+        "description": "Output Residuals.",
+    },
     "session": {
         "type": StringInputDefinition,
         "description": "File containing session indices for all volumes in –imain.",

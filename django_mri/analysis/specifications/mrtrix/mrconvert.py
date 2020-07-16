@@ -51,8 +51,9 @@ MRCONVERT_INPUT_SPECIFICATION = {
         "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",
     },
     "grad_fsl": {
-        "type": StringInputDefinition,
-        "description": "dw gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "(bvec, bval) DW gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",
     },
     "in_bval": {
         "type": StringInputDefinition,

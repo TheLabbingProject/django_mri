@@ -10,15 +10,21 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 DENOISE_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": ScanInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
+        "value_attribute": "mif.__str__",
     },
     "bval_scale": {
         "type": StringInputDefinition,
@@ -30,7 +36,7 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": ListInputDefinition,
         "element_type": "FLT",
         "description": "Set the window size of the denoising filter.",
-        "default": [5, 5, 5],
+        "default": [5.0, 5.0, 5.0],
     },
     "grad_file": {
         "type": StringInputDefinition,
@@ -48,15 +54,12 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Bvecs file in FSL format.",
     },
-    "mask": {
-        "type": NiftiInputDefinition,  ########## Check with Zvi - Nifti or String #########
-        "description": "Mask image.",
-    },
+    "mask": {"type": FileInputDefinition, "description": "Mask image."},
     "noise": {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output noise map.",
-        "default": "noise.nii.gz",
+        "default": "noise.mif",
     },
     "nthreads": {
         "type": IntegerInputDefinition,
@@ -66,14 +69,17 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output denoised DWI image.",
-        "default": "denoised.nii.gz",
+        "default": "denoised.mif",
     },
 }
 
 DENOISE_OUTPUT_SPECIFICATION = {
-    "noise": {"type": NiftiOutputDefinition, "description": "The output noise map."},
+    "noise": {
+        "type": FileOutputDefinition,
+        "description": "The output noise map.",
+    },
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",
     },
 }

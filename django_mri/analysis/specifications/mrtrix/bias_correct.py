@@ -11,15 +11,21 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 BIAS_CORRECT_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": ScanInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
+        "value_attribute": "mif.__str__",
     },
     "use_ants": {
         "type": BooleanInputDefinition,
@@ -58,8 +64,9 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "description": "Bvecs file in FSL format.",
     },
     "in_mask": {
-        "type": NiftiInputDefinition,  ########## Check with Zvi - Nifti or String #########
+        "type": ScanInputDefinition,
         "description": "Mask image.",
+        "value_attribute": "mif.__str__",
     },
     "nthreads": {
         "type": IntegerInputDefinition,
@@ -74,9 +81,12 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
 }
 
 BIAS_CORRECT_OUTPUT_SPECIFICATION = {
-    "bias": {"type": NiftiOutputDefinition, "description": "The output bias field."},
+    "bias": {
+        "type": FileOutputDefinition,
+        "description": "The output bias field.",
+    },
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",
     },
 }

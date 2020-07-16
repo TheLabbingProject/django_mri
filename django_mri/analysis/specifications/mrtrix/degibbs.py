@@ -10,15 +10,21 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 DEGIBBS_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": ScanInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
+        "value_attribute": "mif.__str__",
     },
     "axes": {
         "type": ListInputDefinition,
@@ -77,7 +83,7 @@ DEGIBBS_INPUT_SPECIFICATION = {
 
 DEGIBBS_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",
     },
 }
