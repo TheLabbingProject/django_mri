@@ -19,9 +19,11 @@ MERGE_CONFIGURATION = {"dimension": "t"}
 TOPUP_CONFIGURATION = {}
 MEAN_CONFIGURATION = {"dimension": "T"}
 MATHS_CONFIGURATION = {"operand_value": 6.28, "operation": "mul"}
-BET_CONFIGURATION = {}
-
-
+BET_CONFIGURATION = {"mask": True}
+EDDY_CONFIGURATION = {}
+DENOISE_CONFIGURATION = {}
+DEGIBBS_CONFIGURATION = {}
+BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
 # Node creation
 
 FSLROI_NODE = {
@@ -45,6 +47,13 @@ MATHS_NODE = {
     "configuration": MATHS_CONFIGURATION,
 }
 BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
+EDDY_NODE = {"analysis_version": "eddy", "configuration": EDDY_CONFIGURATION}
+DENOISE_NODE = {"analysis_version": "denoise", "configuration": DENOISE_CONFIGURATION}
+DEGIBBS_NODE = {"analysis_version": "degibbs", "configuration": DEGIBBS_CONFIGURATION}
+BIAS_CORRECT_NODE = {
+    "analysis_version": "bias_correct",
+    "configuration": BIAS_CORRECT_CONFIGURATION,
+}
 
 # Pipe creation
 
@@ -60,7 +69,7 @@ MERGE_PHASEDIFF = {
     "destination": TOPUP_NODE,
     "destination_port": "in_file",
 }
-CORRECT_FIELD = {
+PERFORM_TOPUP = {
     "source": TOPUP_NODE,
     "source_port": "out_corrected",
     "destination": MEAN_NODE,
@@ -78,8 +87,60 @@ BRAIN_EXTRACT = {
     "destination": BET_NODE,
     "destination_port": "in_file",
 }
+DENOISE_EPI = {  ############## multiple inputs from nodes \ user - ask Zvi #############
+    "source": BET_NODE,
+    "source_port": "mask_file",
+    "destination": DENOISE_NODE,
+    "destination_port": "mask",
+}
+############## Generate index.txt ##############
+############## User should insert .bvec and .bval as inputs - we shpuld consider automating this ##############
+
+EDDY_CORRECT = {
+    "source": TOPUP_NODE,
+    "source_port": "out_fieldcoef",
+    "destination": EDDY_NODE,
+    "destination_port": "in_topup_fieldcoef",
+}
+EDDY_CORRECT = {
+    "source": TOPUP_NODE,
+    "source_port": "out_movpar",
+    "destination": EDDY_NODE,
+    "destination_port": "in_topup_movpar",
+}
+
+EDDY_CORRECT = {
+    "source": TOPUP_NODE,
+    "source_port": "out_enc_file",
+    "destination": EDDY_NODE,
+    "destination_port": "in_acqp",
+}
+EDDY_CORRECT = {
+    "source": BRAIN_EXTRACT,
+    "source_port": "mask_file",
+    "destination": EDDY_NODE,
+    "destination_port": "in_mask",
+}
 
 
+CORRET_GIBBS = {
+    "source": DENOISE_NODE,
+    "source_port": "out_file",
+    "destination": DEGIBBS_NODE,
+    "destination_port": "in_file",
+}
+BIAS_CORRECT = {
+    "source": DEGIBBS_NODE,
+    "source_port": "out_file",
+    "destination": BIAS_CORRECT_NODE,
+    "destination_port": "in_file",
+}
+BIAS_CORRECT = {
+    "source": BET_NODE,
+    "source_port": "mask_file",
+    "destination": BIAS_CORRECT_NODE,
+    "destination_port": "in_mask",
+}
 # Pipeline creation
 
 FIELDMAP_CORRECTION = {
@@ -88,8 +149,12 @@ FIELDMAP_CORRECTION = {
     "pipes": [
         EXTRACT_VOLUME,
         MERGE_PHASEDIFF,
-        CORRECT_FIELD,
+        PERFORM_TOPUP,
         RADIANS_PIPE,
         BRAIN_EXTRACT,
+        EDDY_CORRECT,
+        DENOISE_CONFIGURATION,
+        CORRET_GIBBS,
+        BIAS_CORRECT,
     ],
 }
