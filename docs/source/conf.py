@@ -47,8 +47,25 @@ EXLUDED_MEMBERS = (
     # Default Django fields, methods, and exceptions that are created in
     # models but do not require documentation.
     # Fields
+    "added_by_id",
+    "dicom_id",
+    "definition_id",
     "id",
+    "input_ptr",
+    "input_ptr_id",
+    "inputdefinition_ptr",
+    "inputdefinition_ptr_id",
+    "outputdefinition_ptr",
+    "outputdefinition_ptr_id",
+    "output_ptr",
+    "output_ptr_id",
+    "subject_id",
+    "value_id",
     # Methods
+    "get_next_by_created",
+    "get_next_by_modified",
+    "get_previous_by_created",
+    "get_previous_by_modified",
     # Exceptions
     "DoesNotExist",
     "MultipleObjectsReturned",
@@ -73,6 +90,10 @@ intersphinx_mapping = {
     "django": ("http://django.readthedocs.org/en/latest/", None),
     "django_filters": (
         "https://django-filter.readthedocs.io/en/master/",
+        None,
+    ),
+    "django_analyses": (
+        "http://django_analyses.readthedocs.org/en/latest/",
         None,
     ),
 }

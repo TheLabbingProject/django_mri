@@ -1,14 +1,6 @@
 Reference
 =========
 
-Module contents
----------------
-
-.. automodule:: django_mri
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Subpackages
 -----------
 

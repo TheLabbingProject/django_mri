@@ -1,5 +1,5 @@
-django\_mri.views package
-=========================
+Views
+=====
 
 Module contents
 ---------------

@@ -1,5 +1,5 @@
-django\_mri.filters package
-===========================
+Filters
+=======
 
 Module contents
 ---------------

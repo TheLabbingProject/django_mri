@@ -1,5 +1,5 @@
-django\_mri.models.inputs package
-=================================
+Inputs
+======
 
 Module contents
 ---------------

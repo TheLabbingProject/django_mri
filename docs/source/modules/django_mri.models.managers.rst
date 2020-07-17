@@ -1,5 +1,5 @@
-django\_mri.models.managers package
-===================================
+Managers
+========
 
 Module contents
 ---------------

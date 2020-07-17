@@ -1,5 +1,5 @@
-django\_mri.models.outputs package
-==================================
+Outputs
+=======
 
 Module contents
 ---------------

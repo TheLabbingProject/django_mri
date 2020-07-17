@@ -1,5 +1,5 @@
-django\_mri.models.choices package
-==================================
+Choices
+=======
 
 Module contents
 ---------------

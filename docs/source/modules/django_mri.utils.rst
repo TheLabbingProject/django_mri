@@ -1,5 +1,5 @@
-django\_mri.utils package
-=========================
+Utils
+=====
 
 Module contents
 ---------------

@@ -1,5 +1,5 @@
-django\_mri.models package
-==========================
+Models
+======
 
 Module contents
 ---------------

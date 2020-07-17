@@ -1,5 +1,5 @@
-django\_mri.serializers package
-===============================
+Serializers
+===========
 
 Module contents
 ---------------

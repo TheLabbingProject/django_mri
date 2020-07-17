@@ -1,5 +1,5 @@
-django\_mri.interfaces package
-==============================
+Interfaces
+==========
 
 Module contents
 ---------------
