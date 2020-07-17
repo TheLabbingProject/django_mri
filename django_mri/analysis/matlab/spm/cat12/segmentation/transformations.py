@@ -1,3 +1,9 @@
+"""
+Definition of the :obj:`SEGMENTATION_TRANSFORMATIONS` dictionary.
+"""
+
+
+#: Transformation to apply to option values before editing the batch template.
 SEGMENTATION_TRANSFORMATIONS = {
     "bias_strength": {"light": 0.25, "medium": 0.5, "strong": 0.75},
     "accuracy": {"average": 0.5, "high": 0.75, "ultra high": 1},

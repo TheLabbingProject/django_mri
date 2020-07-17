@@ -1,3 +1,7 @@
+"""
+Default values for the various keys required in the batch template.
+"""
+
 SEGMENTATION_DEFAULTS = {
     "n_processes": 4,
     "affine_regularisation": "mni",
@@ -24,4 +28,3 @@ SEGMENTATION_DEFAULTS = {
     "jacobian_determinant": False,
     "deformation_fields": "none",
 }
-

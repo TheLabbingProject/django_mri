@@ -1,19 +1,11 @@
-Analysis
-========
-
-Module contents
----------------
-
-.. automodule:: django_mri.analysis
-   :members:
-   :undoc-members:
-   :show-inheritance:
+django\_mri.analysis package
+============================
 
 Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
    django_mri.analysis.fsl
    django_mri.analysis.matlab
@@ -60,6 +52,15 @@ django\_mri.analysis.visualizers module
 ---------------------------------------
 
 .. automodule:: django_mri.analysis.visualizers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: django_mri.analysis
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,3 +1,8 @@
+"""
+Dictionaries containing CAT12 segmentation output file names by key.
+"""
+
+#: Output file names by key.
 SEGMENTATION_OUTPUT = {
     "surface_estimation": [
         "surf/lh.central.{file_name}.gii",
@@ -15,7 +20,10 @@ SEGMENTATION_OUTPUT = {
     ],
     "lpba40": ["label/catROI_{file_name}.mat", "label/catROI_{file_name}.xml"],
     "cobra": ["label/catROI_{file_name}.mat", "label/catROI_{file_name}.xml"],
-    "hammers": ["label/catROI_{file_name}.mat", "label/catROI_{file_name}.xml"],
+    "hammers": [
+        "label/catROI_{file_name}.mat",
+        "label/catROI_{file_name}.xml",
+    ],
     "native_grey_matter": "mri/p1{file_name}.nii",
     "modulated_grey_matter": "mri/mwp1{file_name}.nii",
     "dartel_grey_matter": {
@@ -39,6 +47,7 @@ SEGMENTATION_OUTPUT = {
     },
 }
 
+#: Artifacts created during execution.
 AUXILIARY_OUTPUT = {
     "batch_file": "segmentation.m",
     "reports": [
