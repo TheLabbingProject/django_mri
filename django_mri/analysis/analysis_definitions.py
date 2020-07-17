@@ -2,6 +2,17 @@
 This module exposes a list of preconfigured analyses that may easily be
 imported to the database using
 :meth:`~django_analyses.models.managers.analysis.AnalysisManager.from_list`.
+
+Example
+-------
+
+.. code-block:: py
+
+    from django_analyses.models.analysis import Analysis
+    from django_mri.analysis.analysis_definitions import analysis_definitions
+
+    Analysis.objects.from_list(analysis_definitions)
+
 """
 
 import nipype

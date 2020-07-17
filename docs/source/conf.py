@@ -96,6 +96,7 @@ intersphinx_mapping = {
         "https://django-filter.readthedocs.io/en/master/",
         None,
     ),
+    "nipype": ("http://nipype.readthedocs.org/en/latest/", None),
     "python": ("https://docs.python.org/3", None),
 }
 

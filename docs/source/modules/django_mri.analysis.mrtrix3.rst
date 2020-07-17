@@ -1,5 +1,5 @@
-django\_mri.analysis.mrtrix3 package
-====================================
+MRtrix3
+=======
 
 Module contents
 ---------------

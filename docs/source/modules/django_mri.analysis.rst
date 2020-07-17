@@ -13,7 +13,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    django_mri.analysis.fsl
    django_mri.analysis.mrtrix3

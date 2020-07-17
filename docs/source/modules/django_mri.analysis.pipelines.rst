@@ -1,5 +1,5 @@
-django\_mri.analysis.pipelines package
-======================================
+Pipelines
+=========
 
 Module contents
 ---------------

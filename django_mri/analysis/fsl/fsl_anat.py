@@ -1,9 +1,22 @@
+"""
+Definition of the :class:`~django_mri.analysis.fsl.fsl_anat.FslAnat` class.
+"""
+
 import subprocess
 
 from pathlib import Path
 
 
 class FslAnat:
+    """
+    Custom interface class for the fsl_anat_ anatomical preprocessing script.
+
+    .. _fsl_anat:
+       https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
+    """
+
+    #: "Flags" indicate parameters that are specified without any arguments,
+    #: i.e. they are a switch for some binary configuration.
     FLAG_ATTRIBUTES = (
         "weak_bias",
         "no_reorient",
@@ -16,13 +29,21 @@ class FslAnat:
         "no_search",
         "no_cleanup",
     )
+
+    #: Conversion dictionary between the verbose names given to the class
+    #: initialization keyword arguments and the script's parameters.
     FLAGS = {
         "no_registration": "noreg",
         "no_nonlinear_registration": "nononlinreg",
         "no_segmentation": "noseg",
         "no_subcortical_segmentation": "nosubcortseg",
     }
+
+    #: A suffix given by *fsl_anat* and removed by the interface.
     FORCED_SUFFIX = ".anat"
+
+    #: A dictionary of the file names expected to be created by running the
+    #: script.
     OUTPUT_FILES = {
         "linear_registration": "T1_to_MNI_lin.nii.gz",
         "nonlinear_registration": "T1_to_MNI_nonlin.nii.gz",
@@ -70,6 +91,16 @@ class FslAnat:
         self.no_cleanup = no_cleanup
 
     def generate_flags(self) -> str:
+        """
+        Returns a string containing the various flags configured for this
+        instance.
+
+        Returns
+        -------
+        str
+            Execution command flag parameters
+        """
+
         for att_name in self.FLAG_ATTRIBUTES:
             flags = ""
             if getattr(self, att_name):
@@ -78,15 +109,56 @@ class FslAnat:
                 flags += f" --{flag}"
             return flags
 
-    def generate_command(self, image, destination: Path = None) -> str:
+    def generate_command(self, scan, destination: Path = None) -> str:
+        """
+        Returns the command to be executed in order to run the analysis.
+
+        Parameters
+        ----------
+        scan : ~django_mri.models.nifti.NIfTI
+            The scan to run the analysis on
+        destination : Path, optional
+            The directory in which output files should be created, by default
+            None
+
+        Returns
+        -------
+        str
+            Command string
+        """
+
         flags = self.generate_flags()
         destination_arg = f" -o {str(destination)}" if destination else ""
-        return f"fsl_anat {flags} -i {str(image.path)}{destination_arg}"
+        return f"fsl_anat {flags} -i {str(scan.path)}{destination_arg}"
 
     def fix_output_path(self, destination: Path) -> None:
+        """
+        Removed the forced *.anat* suffix appended to the destination
+        directory.
+
+        Parameters
+        ----------
+        destination : Path
+            Destination directory
+        """
+
         destination.with_suffix(self.FORCED_SUFFIX).rename(destination)
 
     def generate_output_dict(self, destination: Path = None) -> dict:
+        """
+        Returns a dictionary of the run's output files.
+
+        Parameters
+        ----------
+        destination : Path, optional
+            Destination directory, by default None
+
+        Returns
+        -------
+        dict
+            Output files by key
+        """
+
         self.fix_output_path(destination)
         return {
             key: destination / value
@@ -94,9 +166,33 @@ class FslAnat:
             if (destination / value).is_file()
         }
 
-    def run(self, image, destination: Path = None) -> dict:
-        destination = Path(destination) if destination else Path(image.path).parent
-        command = self.generate_command(image, destination).split()
+    def run(self, scan, destination: Path = None) -> dict:
+        """
+        Runs *fsl_anat* with the provided *scan* as input and *destination* as
+        the destination directory.
+
+        Parameters
+        ----------
+        scan : ~django_mri.models.nifti.NIfTI
+            Input scan
+        destination : Path, optional
+            Destination directory, by default None
+
+        Returns
+        -------
+        dict
+            Output files by key
+
+        Raises
+        ------
+        RuntimeError
+            Run failure
+        """
+
+        destination = (
+            Path(destination) if destination else Path(scan.path).parent
+        )
+        command = self.generate_command(scan, destination).split()
         process = subprocess.run(command, capture_output=True)
         if process.returncode:
             raise RuntimeError("Failed to run fsl_anat!")
