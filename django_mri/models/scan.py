@@ -185,7 +185,6 @@ class Scan(TimeStampedModel):
     def update_fields_from_dicom(self) -> None:
         """
         Sets instance fields from related DICOM series.
-        TODO: Needs refactoring.
 
         Raises
         ------

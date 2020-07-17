@@ -6,6 +6,7 @@ Welcome to django_mri's documentation!
    :caption: Contents:
 
    overview
+   installation
    modules/modules
 
 

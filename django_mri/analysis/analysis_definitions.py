@@ -263,11 +263,11 @@ analysis_definitions = [
     },
     {
         "title": "eddy",
-        "description": "estimates and corrects eddy currents induced distortions.",
+        "description": "estimates and corrects eddy currents induced distortions.",  # noqa: E501
         "versions": [
             {
                 "title": Eddy().version or "1.0",
-                "description": f"Default eddy version for nipype {nipype.__version__}.",
+                "description": f"Default eddy version for nipype {NIPYPE_VERSION}.",  # noqa: E501
                 "input": EDDY_INPUT_SPECIFICATION,
                 "output": EDDY_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -354,11 +354,11 @@ analysis_definitions = [
     },
     {
         "title": "mrconvert",
-        "description": "Performs conversion between different file types and optionally extract a subset of the input image",
+        "description": "Performs conversion between different file types and optionally extract a subset of the input image",  # noqa: E501
         "versions": [
             {
                 "title": MRConvert().version or "1.0",
-                "description": f"Default mrconvert version for nipype {nipype.__version__}.",
+                "description": f"Default mrconvert version for nipype {NIPYPE_VERSION}.",  # noqa: E501
                 "input": MRCONVERT_INPUT_SPECIFICATION,
                 "output": MRCONVERT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -367,11 +367,11 @@ analysis_definitions = [
     },
     {
         "title": "denoise",
-        "description": "Denoise DWI data and estimate the noise level based on the optimal threshold for PCA.",
+        "description": "Denoise DWI data and estimate the noise level based on the optimal threshold for PCA.",  # noqa: E501
         "versions": [
             {
                 "title": DWIDenoise().version or "1.0",
-                "description": f"Default dwidenoise version for nipype {nipype.__version__}.",
+                "description": f"Default dwidenoise version for nipype {NIPYPE_VERSION}.",  # noqa: E501
                 "input": DENOISE_INPUT_SPECIFICATION,
                 "output": DENOISE_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -384,7 +384,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": MRDeGibbs.version or "1.0",
-                "description": f"Default mrdegibbs version for nipype {nipype.__version__}.",
+                "description": f"Default mrdegibbs version for nipype {NIPYPE_VERSION}.",  # noqa: E501
                 "input": DEGIBBS_INPUT_SPECIFICATION,
                 "output": DEGIBBS_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -393,11 +393,11 @@ analysis_definitions = [
     },
     {
         "title": "bias_correct",
-        "description": "Perform B1 field inhomogeneity correction for a DWI volume series.",
+        "description": "Perform B1 field inhomogeneity correction for a DWI volume series.",  # noqa: E501
         "versions": [
             {
                 "title": DWIBiasCorrect.version or "1.0",
-                "description": f"Default dwibiascorrect version for nipype {nipype.__version__}.",
+                "description": f"Default dwibiascorrect version for nipype {NIPYPE_VERSION}.",  # noqa: E501
                 "input": BIAS_CORRECT_INPUT_SPECIFICATION,
                 "output": BIAS_CORRECT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -406,11 +406,11 @@ analysis_definitions = [
     },
     {
         "title": "dwifslpreproc",
-        "description": "Perform diffusion image pre-processing using FSL’s eddy tool; including inhomogeneity distortion correction using FSL’s topup tool if possible",
+        "description": "Perform diffusion image pre-processing using FSL’s eddy tool; including inhomogeneity distortion correction using FSL’s topup tool if possible",  # noqa: E501
         "versions": [
             {
                 "title": DwiFslPreproc.__version__ or "1.0",
-                "description": f"Default dwifslpreproc version for nipype {nipype.__version__}.",
+                "description": f"Default dwifslpreproc version for nipype {NIPYPE_VERSION}.",  # noqa: E501
                 "input": DWIFSLPREPROC_INPUT_SPECIFICATION,
                 "output": DWIFSLPREPROC_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",

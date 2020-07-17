@@ -109,13 +109,13 @@ class Bids:
 
     def get_data(self):
         """
-        Use Scan's dicom header to extract relevant parameters for
-        BIDS-appropriate naming.
+        Extracts relevant parameters for BIDS-compatible naming.
 
-        TODO:
+        Todo
+        ----
         * Update to handle several tasks.
         * Update to handle multiple sessions. - Perhaps add "session" property
-        to Scan.
+            to Scan.
 
         Returns
         -------
@@ -165,7 +165,7 @@ class Bids:
             acq = "ignore-bids"
         if "func" in data_type:
             image_type = header["ImageType"]
-            task = "rest"  # TODO:
+            task = "rest"
             if "MB" not in image_type:
                 modality_label = "sbref"
         return parent, data_type, modality_label, acq, task, pe_dir
@@ -355,4 +355,3 @@ class Bids:
         if not readme.is_file():
             readme_template = TEMPLATES_DIR / "README"
             shutil.copy(str(readme_template), str(readme))
-

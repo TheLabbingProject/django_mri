@@ -36,10 +36,11 @@ release = "0.1.0"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.autosectionlabel",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
 ]
 
 EXLUDED_MEMBERS = (

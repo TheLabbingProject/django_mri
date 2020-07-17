@@ -13,7 +13,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    django_mri.models.choices
    django_mri.models.inputs

@@ -28,7 +28,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "required": False,
         "default": 4,
-        "description": "Whether to implement multi-threading and with how many processes.",
+        "description": "Whether to implement multi-threading and with how many processes.",  # noqa: E501
         "is_configuration": False,
     },
     "tpm_path": {
@@ -288,7 +288,7 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
     },
     "batch_file": {
         "type": FileOutputDefinition,
-        "description": "The MATLAB .m file used to run the CAT12 segmentation.",
+        "description": "The MATLAB .m file used to run the CAT12 segmentation.",  # noqa: E501
     },
     "report_mat": {
         "type": FileOutputDefinition,
