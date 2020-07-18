@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's FNIRT_ script.
+
+.. _FNIRT:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
@@ -15,6 +22,8 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
+
+#: *FNIRT* input specification dictionary.
 FNIRT_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
@@ -76,7 +85,7 @@ FNIRT_INPUT_SPECIFICATION = {
     # made for this conditions.
     # "out_intensitymap_file": {
     #     "type": StringInputDefinition,
-    #     "description": "Path to the output file for writing information pertaining to intensity mapping.",
+    #     "description": "Path to the output file for writing information pertaining to intensity mapping.", # noqa: E501
     #     "is_output_path": True,
     #     "default": "out_intensitymap",
     # },
@@ -284,6 +293,7 @@ FNIRT_INPUT_SPECIFICATION = {
     },
 }
 
+#: *FNIRT* output specification dictionary.
 FNIRT_OUTPUT_SPECIFICATION = {
     "fieldcoeff_file": {
         "type": FileOutputDefinition,

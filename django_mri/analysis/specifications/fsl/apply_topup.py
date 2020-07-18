@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's applytopup_ script.
+
+.. _applytopup:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
+"""
+
 from django_analyses.models.input.definitions import (
     FileInputDefinition,
     ListInputDefinition,
@@ -10,6 +17,7 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
+#: *applytopup* input specification.
 APPLY_TOPUP_INPUT_SPECIFICATION = {
     "in_files": {
         "type": ListInputDefinition,
@@ -62,6 +70,8 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
         "default": "NIFTI_GZ",
     },
 }
+
+#: *applytopup* output specification.
 APPLY_TOPUP_OUTPUT_SPECIFICATION = {
     "out_corrected": {
         "type": NiftiOutputDefinition,

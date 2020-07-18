@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's FLIRT_ script.
+
+.. _FLIRT:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
@@ -14,6 +21,8 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
+
+#: *FLIRT* input specification dictionary.
 FLIRT_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
@@ -225,7 +234,7 @@ FLIRT_INPUT_SPECIFICATION = {
     },
     "pedir": {
         "type": IntegerInputDefinition,
-        "description": "Phase encode direction of EPI - 1/2/3=x/y/z & -1/-2/-3=-x/-y/-z.",
+        "description": "Phase encode direction of EPI - 1/2/3=x/y/z & -1/-2/-3=-x/-y/-z.",  # noqa: E501
     },
     "echospacing": {
         "type": FloatInputDefinition,
@@ -242,7 +251,7 @@ FLIRT_INPUT_SPECIFICATION = {
     },
 }
 
-
+#: *FLIRT* output specification dictionary.
 FLIRT_OUTPUT_SPECIFICATION = {
     "out_file": {
         "type": NiftiOutputDefinition,
@@ -250,7 +259,7 @@ FLIRT_OUTPUT_SPECIFICATION = {
     },
     "out_matrix_file": {
         "type": FileOutputDefinition,
-        "description": "Path to the calculated affine transform (if generated).",
+        "description": "Path to the calculated affine transform (if generated).",  # noqa: E501
         "validate_existence": False,
     },
     "out_log": {

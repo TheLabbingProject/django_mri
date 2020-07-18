@@ -170,4 +170,3 @@ class SPMProcedure:
             key: self.move_output_files(value, run_dir, destination)
             for key, value in output_dict.items()
         }
-

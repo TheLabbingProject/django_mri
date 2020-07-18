@@ -1,3 +1,20 @@
+"""
+Input and output specification dictionaries for MRtrix's *dwifslpreproc*
+script.
+
+See Also
+--------
+* :class:`DwiFslPreproc interface
+  <django_mri.analysis.mrtrix3.dwifslpreproc.DwiFslPreproc>`
+
+References
+----------
+* dwifslpreproc_
+
+.. _dwifslpreproc:
+   https://mrtrix.readthedocs.io/en/latest/reference/commands/dwifslpreproc.html
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     DirectoryInputDefinition,
@@ -14,6 +31,7 @@ from django_mri.models.outputs.nifti_output_definition import (
 )
 
 
+#: *DwiFslPreproc* input specification dictionary.
 DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "scan": {
         "type": ScanInputDefinition,
@@ -147,6 +165,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     },
 }
 
+#: *DwiFslPreproc* output specification dictionary.
 DWIFSLPREPROC_OUTPUT_SPECIFICATION = {
     "preprocessed_dwi": {
         "type": FileOutputDefinition,

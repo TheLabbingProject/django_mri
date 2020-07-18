@@ -1,23 +1,25 @@
 """
 Full DWI preprocessing pipeline.
+
+Steps:
+
+    - Extract b0 from AP
+    - Merge AP_b0 and PA
+    - Create brain mask
+    - Convert to mif (merged, AP)
+    - Denoise initial AP
+    - *dwifslpreproc* AP merged
+    - Gibbs correction
+    - Bias correction
+
+User inputs:
+
+    - *fslroi* node: in_file [AP]
+    - *fslmerge* node: in_files [PA]
+    - mrconvert_1 --> AP: in_bvec [bvec]
+    - mrconvert_1 --> AP: in_bval [bval]
+
 """
-
-# Steps:
-# - extract b0 from AP
-# - merge AP_b0 and PA
-# - create brain mask
-# - convert to mif (merged, AP)
-# - denoise initial AP
-# - dwifslpreproc AP merged
-# - gibbs correction
-# - bias correction
-
-# User inputs:
-# - fslroi node: in_file [AP]
-# - fslmerge node: in_files [PA]
-# - mrconvert_1 --> AP: in_bvec [bvec]
-# - mrconvert_1 --> AP: in_bval [bval]
-
 
 # Configrations
 

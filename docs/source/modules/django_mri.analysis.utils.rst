@@ -19,3 +19,19 @@ django\_mri.analysis.utils.get\_latest\_analysis\_version module
    :members:
    :undoc-members:
    :show-inheritance:
+
+django\_mri.analysis.utils.get\_mrconvert\_node
+-----------------------------------------------
+
+.. automodule:: django_mri.analysis.utils.get_mrconvert_node
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+django\_mri.analysis.utils.load\_mri\_analyses
+-----------------------------------------------
+
+.. automodule:: django_mri.analysis.utils.load_mri_analyses
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,3 +1,18 @@
+"""
+Input and output specification dictionaries for MRtrix's *dwibiascorrect*
+script.
+
+References
+----------
+* dwibiascorrect_
+* nipype's `DWIBiasCorrect interface`_
+
+.. _dwibiascorrect:
+   https://mrtrix.readthedocs.io/en/latest/reference/commands/dwibiascorrect.html
+.. _DWIBiasCorrect interface:
+   https://nipype.readthedocs.io/en/1.4.1/api/generated/nipype.interfaces.mrtrix3.preprocess.html#dwibiascorrect
+"""
+
 from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     StringInputDefinition,
@@ -7,6 +22,7 @@ from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
+#: *DWIBiasCorrect* input specification dictionary.
 BIAS_CORRECT_INPUT_SPECIFICATION = {
     "in_file": {
         "type": ScanInputDefinition,
@@ -68,6 +84,7 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
     },
 }
 
+#: *DWIBiasCorrect* output specification dictionary.
 BIAS_CORRECT_OUTPUT_SPECIFICATION = {
     "bias": {
         "type": FileOutputDefinition,

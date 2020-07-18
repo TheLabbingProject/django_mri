@@ -1,3 +1,13 @@
+"""
+Input and output specification dictionaries for CAT12 segmentation interface.
+
+See Also
+--------
+* :class:`CAT12 segmentation interface
+  <django_mri.analysis.matlab.spm.cat12.segmentation.segmentation.Segmentation>`
+
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     DirectoryInputDefinition,
@@ -9,6 +19,8 @@ from django_analyses.models.input.definitions import (
 
 from django_analyses.models.output.definitions import FileOutputDefinition
 
+
+#: CAT12 segmentation interface input specification dictionary.
 CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
     "path": {
         "type": FileInputDefinition,
@@ -222,6 +234,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
     },
 }
 
+#: CAT12 segmentation interface output specification dictionary.
 CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
     "left_hemisphere_central_surface": {
         "type": FileOutputDefinition,

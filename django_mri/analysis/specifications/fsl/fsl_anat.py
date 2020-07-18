@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's fsl_anat_ script.
+
+.. _fsl_anat:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
+"""
+
 from django_analyses.models.input.definitions.boolean_input_definition import (
     BooleanInputDefinition,
 )
@@ -20,7 +27,7 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
-
+#: *fsl_anat* input specification dictionary.
 FSL_ANAT_INPUT_SPECIFICATION = {
     "image": {
         "type": NiftiInputDefinition,
@@ -39,7 +46,7 @@ FSL_ANAT_INPUT_SPECIFICATION = {
     },
     "weak_bias": {
         "type": BooleanInputDefinition,
-        "description": "Used for images with little and/or smooth bias fields.",
+        "description": "Used for images with little and/or smooth bias fields.",  # noqa: E501
     },
     "no_reorient": {
         "type": BooleanInputDefinition,
@@ -89,6 +96,7 @@ FSL_ANAT_INPUT_SPECIFICATION = {
     },
 }
 
+#: *fsl_anat* output specification dictionary.
 FSL_ANAT_OUTPUT_SPECIFICATION = {
     "linear_registration": {
         "type": NiftiOutputDefinition,

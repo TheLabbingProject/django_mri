@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's FAST_ script.
+
+.. _FAST:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FAST
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
@@ -13,6 +20,7 @@ from django_mri.models.outputs.nifti_output_definition import (
 )
 
 
+#: *FAST* input specification dictionary.
 FAST_INPUT_SPECIFICATION = {
     "in_files": {
         "type": NiftiInputDefinition,
@@ -149,6 +157,7 @@ FAST_INPUT_SPECIFICATION = {
     },
 }
 
+#: *FAST* output specification dictionary.
 FAST_OUTPUT_SPECIFICATION = {
     "tissue_class_map": {
         "type": NiftiOutputDefinition,

@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's fslmerge_ script.
+
+.. _fslmerge:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fslmerge
+"""
+
 from django_analyses.models.input.definitions import (
     FloatInputDefinition,
     ListInputDefinition,
@@ -7,6 +14,8 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
+
+#: *fslmerge* input specification dictionary.
 FSLMERGE_INPUT_SPECIFICATION = {
     "in_files": {
         "type": ListInputDefinition,
@@ -40,6 +49,8 @@ FSLMERGE_INPUT_SPECIFICATION = {
         "default": 1.0,
     },
 }
+
+#: *fslmerge* output specification dictionary.
 FSLMERGE_OUTPUT_SPECIFICATION = {
     "merged_file": {
         "type": NiftiOutputDefinition,

@@ -1,3 +1,11 @@
+"""
+Input and output specification dictionaries for FSL's SUSAN_ script.
+
+.. _SUSAN:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/SUSAN
+"""
+
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FloatInputDefinition,
@@ -12,6 +20,7 @@ from django_mri.models.outputs.nifti_output_definition import (
 )
 
 
+#: *SUSAN* input specification dictionary.
 SUSAN_INPUT_SPECIFICATION = {
     "brightness_threshold": {
         "type": FloatInputDefinition,
@@ -64,6 +73,7 @@ SUSAN_INPUT_SPECIFICATION = {
 }
 
 
+#: *SUSAN* output specification dictionary.
 SUSAN_OUTPUT_SPECIFICATION = {
     "smoothed_file": {
         "type": NiftiOutputDefinition,

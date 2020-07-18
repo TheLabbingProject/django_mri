@@ -1,16 +1,18 @@
+"""
+Input and output specification dictionaries for FSL's eddy_ script.
+
+.. _eddy:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
+"""
+
 from django_analyses.models.input.definitions import (
-    FileInputDefinition,
     FloatInputDefinition,
     IntegerInputDefinition,
-    ListInputDefinition,
     StringInputDefinition,
     BooleanInputDefinition,
 )
 
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
-)
+from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.nifti_input_definition import (
     NiftiInputDefinition,
 )
@@ -18,11 +20,13 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
+
+#: *eddy* input specification dictionary.
 EDDY_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
         "required": True,
-        "description": "File containing all the images to estimate distortions for.",
+        "description": "File containing all the images to estimate distortions for.",  # noqa: E501
         "is_configuration": False,
     },
     "in_acqp": {
@@ -33,17 +37,17 @@ EDDY_INPUT_SPECIFICATION = {
     "in_bval": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "File containing the b-values for all volumes in –imain.",
+        "description": "File containing the b-values for all volumes in –imain.",  # noqa: E501
     },
     "in_bvec": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "File containing the b-vectors for all volumes in –imain.",
+        "description": "File containing the b-vectors for all volumes in –imain.",  # noqa: E501
     },
     "in_index": {
         "type": StringInputDefinition,
         "required": True,
-        "description": "File containing indices for all volumes in –imain into –acqp and –topup.",
+        "description": "File containing indices for all volumes in –imain into –acqp and –topup.",  # noqa: E501
     },
     "in_mask": {
         "type": NiftiInputDefinition,
@@ -67,7 +71,7 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "estimate_move_by_susceptibility": {
         "type": BooleanInputDefinition,
-        "description": "Estimate how susceptibility field changes with subject movement.",
+        "description": "Estimate how susceptibility field changes with subject movement.",  # noqa: E501
         "default": False,
     },
     "fep": {
@@ -81,7 +85,7 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "field_mat": {
         "type": StringInputDefinition,
-        "description": "Matrix specifying the relative positions of the fieldmap, –field, and the first volume of the input file, –imain.",
+        "description": "Matrix specifying the relative positions of the fieldmap, –field, and the first volume of the input file, –imain.",  # noqa: E501
     },
     "flm": {
         "type": StringInputDefinition,
@@ -96,7 +100,7 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "fwhm": {
         "type": FloatInputDefinition,
-        "description": "FWHM for conditioning filter when estimating the parameters.",
+        "description": "FWHM for conditioning filter when estimating the parameters.",  # noqa: E501
     },
     "in_topup_fieldcoef": {
         "type": NiftiInputDefinition,
@@ -104,7 +108,7 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "in_topup_movpar": {
         "type": StringInputDefinition,
-        "description": "Topup results file containing the movement parameters (movpar.txt). Requires inputs: in_topup_fieldcoef",
+        "description": "Topup results file containing the movement parameters (movpar.txt). Requires inputs: in_topup_fieldcoef",  # noqa: E501
     },
     "initrand": {
         "type": BooleanInputDefinition,
@@ -118,23 +122,23 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "is_shelled": {
         "type": BooleanInputDefinition,
-        "description": "Override internal check to ensure that date are acquired on a set of b-value shells.",
+        "description": "Override internal check to ensure that date are acquired on a set of b-value shells.",  # noqa: E501
     },
     "json": {
         "type": StringInputDefinition,
-        "description": "Name of .json text file with information about slice timing. Mutually exclusive with inputs: slice_order. Requires inputs: mporder.",
+        "description": "Name of .json text file with information about slice timing. Mutually exclusive with inputs: slice_order. Requires inputs: mporder.",  # noqa: E501
     },
     "mbs_ksp": {
         "type": IntegerInputDefinition,
-        "description": "Knot-spacing for MBS field estimation. Requires inputs: estimate_move_by_susceptibility.",
+        "description": "Knot-spacing for MBS field estimation. Requires inputs: estimate_move_by_susceptibility.",  # noqa: E501
     },
     "mbs_lambda": {
         "type": IntegerInputDefinition,
-        "description": "Weighting of regularisation for MBS estimation. Requires inputs: estimate_move_by_susceptibility.",
+        "description": "Weighting of regularisation for MBS estimation. Requires inputs: estimate_move_by_susceptibility.",  # noqa: E501
     },
     "mbs_niter": {
         "type": IntegerInputDefinition,
-        "description": "Number of iterations for MBS estimation. Requires inputs: estimate_move_by_susceptibility.",
+        "description": "Number of iterations for MBS estimation. Requires inputs: estimate_move_by_susceptibility.",  # noqa: E501
     },
     "method": {
         "type": StringInputDefinition,
@@ -144,7 +148,7 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "mporder": {
         "type": IntegerInputDefinition,
-        "description": "Order of slice-to-vol movement model.Requires inputs: use_cuda.",
+        "description": "Order of slice-to-vol movement model.Requires inputs: use_cuda.",  # noqa: E501
     },
     "multiband_factor": {
         "type": IntegerInputDefinition,
@@ -154,7 +158,7 @@ EDDY_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "min_value": -1,
         "max_value": 1,
-        "description": "Multi-band offset (-1 if bottom slice removed, 1 if top slice removed. Requires inputs: multiband_factor.",
+        "description": "Multi-band offset (-1 if bottom slice removed, 1 if top slice removed. Requires inputs: multiband_factor.",  # noqa: E501
     },
     "niter": {
         "type": IntegerInputDefinition,
@@ -177,20 +181,20 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "outlier_nstd": {
         "type": IntegerInputDefinition,
-        "description": "Number of std off to qualify as outlier.Requires inputs: repol.",
+        "description": "Number of std off to qualify as outlier.Requires inputs: repol.",  # noqa: E501
     },
     "outlier_pos": {
         "type": BooleanInputDefinition,
-        "description": "Consider both positive and negative outliers if set. Requires inputs: repol.",
+        "description": "Consider both positive and negative outliers if set. Requires inputs: repol.",  # noqa: E501
     },
     "outlier_sqr": {
         "type": BooleanInputDefinition,
-        "description": "Consider outliers among sums-of-squared differences if set. Requires inputs: repol.",
+        "description": "Consider outliers among sums-of-squared differences if set. Requires inputs: repol.",  # noqa: E501
     },
     "outlier_type": {
         "type": StringInputDefinition,
         "choices": ["sw", "gw", "both"],
-        "description": "Type of outliers, slicewise (sw), groupwise (gw) or both (both). Requires inputs: repol.",
+        "description": "Type of outliers, slicewise (sw), groupwise (gw) or both (both). Requires inputs: repol.",  # noqa: E501
     },
     "output_type": {
         "type": StringInputDefinition,
@@ -208,24 +212,24 @@ EDDY_INPUT_SPECIFICATION = {
     },
     "session": {
         "type": StringInputDefinition,
-        "description": "File containing session indices for all volumes in –imain.",
+        "description": "File containing session indices for all volumes in –imain.",  # noqa: E501
     },
     "slice2vol_interp": {
         "type": StringInputDefinition,
         "choices": ["trilinear", "spline"],
-        "description": " Slice-to-vol interpolation model for estimation step. Requires inputs: mporder.",
+        "description": " Slice-to-vol interpolation model for estimation step. Requires inputs: mporder.",  # noqa: E501
     },
     "slice2vol_lambda": {
         "type": IntegerInputDefinition,
-        "description": "Regularisation weight for slice-to-vol movement (reasonable range 1-10). Requires inputs: mporder.",
+        "description": "Regularisation weight for slice-to-vol movement (reasonable range 1-10). Requires inputs: mporder.",  # noqa: E501
     },
     "slice2vol_niter": {
         "type": IntegerInputDefinition,
-        "description": "umber of iterations for slice-to-vol. Requires inputs: mporder.",
+        "description": "umber of iterations for slice-to-vol. Requires inputs: mporder.",  # noqa: E501
     },
     "slice_order": {
         "type": StringInputDefinition,
-        "description": "Name of text file completely specifying slice/group acquisition. Mutually exclusive with inputs: json. Requires inputs: mporder.",
+        "description": "Name of text file completely specifying slice/group acquisition. Mutually exclusive with inputs: json. Requires inputs: mporder.",  # noqa: E501
     },
     "slm": {
         "type": StringInputDefinition,
@@ -239,6 +243,7 @@ EDDY_INPUT_SPECIFICATION = {
     },
 }
 
+#: *eddy* input specification dictionary.
 EDDY_OUTPUT_SPECIFICATION = {
     "out_cnr_maps": {
         "type": NiftiOutputDefinition,
@@ -250,7 +255,7 @@ EDDY_OUTPUT_SPECIFICATION = {
     },
     "out_movement_over_time": {
         "type": FileOutputDefinition,
-        "description": "Text file containing translations (mm) and rotations (radians) for each excitation.",
+        "description": "Text file containing translations (mm) and rotations (radians) for each excitation.",  # noqa: E501
     },
     "out_movement_rms": {
         "type": NiftiOutputDefinition,
@@ -258,27 +263,27 @@ EDDY_OUTPUT_SPECIFICATION = {
     },
     "out_outlier_free": {
         "type": NiftiOutputDefinition,
-        "description": "4D image file not corrected for susceptibility or eddy-current distortions or subject movement but with outlier slices replaced.",
+        "description": "4D image file not corrected for susceptibility or eddy-current distortions or subject movement but with outlier slices replaced.",  # noqa: E501
     },
     "out_outlier_map": {
         "type": FileOutputDefinition,
-        "description": "Matrix where rows represent volumes and columns represent slices. “0” indicates that scan-slice is not an outlier and “1” indicates that it is.",
+        "description": "Matrix where rows represent volumes and columns represent slices. “0” indicates that scan-slice is not an outlier and “1” indicates that it is.",  # noqa: E501
     },
     "out_outlier_n_sqr_stdev_map": {
         "type": FileOutputDefinition,
-        "description": "Matrix where rows represent volumes and columns represent slices. Values indicate number of standard deivations off the square root of the mean squared difference between observation and prediction is.",
+        "description": "Matrix where rows represent volumes and columns represent slices. Values indicate number of standard deivations off the square root of the mean squared difference between observation and prediction is.",  # noqa: E501
     },
     "out_outlier_n_stdev_map": {
         "type": FileOutputDefinition,
-        "description": "Matrix where rows represent volumes and columns represent slices. Values indicate number of standard deviations off the mean difference between observation and prediction is.",
+        "description": "Matrix where rows represent volumes and columns represent slices. Values indicate number of standard deviations off the mean difference between observation and prediction is.",  # noqa: E501
     },
     "out_outlier_report": {
         "type": FileOutputDefinition,
-        "description": "Text file with a plain language report on what outlier slices eddy has found.",
+        "description": "Text file with a plain language report on what outlier slices eddy has found.",  # noqa: E501
     },
     "out_parameter": {
         "type": FileOutputDefinition,
-        "description": "Text file with parameters defining the field and movement for each scan.",
+        "description": "Text file with parameters defining the field and movement for each scan.",  # noqa: E501
     },
     "out_residuals": {
         "type": NiftiOutputDefinition,
@@ -286,7 +291,7 @@ EDDY_OUTPUT_SPECIFICATION = {
     },
     "out_restricted_movement_rms": {
         "type": NiftiOutputDefinition,
-        "description": "Summary of the ‘total movement’ in each volume disregarding translation in the PE direction.",
+        "description": "Summary of the ‘total movement’ in each volume disregarding translation in the PE direction.",  # noqa: E501
     },
     "out_rotated_bvecs": {
         "type": FileOutputDefinition,
@@ -294,11 +299,10 @@ EDDY_OUTPUT_SPECIFICATION = {
     },
     "out_shell_alignment_parameters": {
         "type": FileOutputDefinition,
-        "description": " Text file containing rigid body movement parameters between the different shells as estimated by a post-hoc mutual information based registration.",
+        "description": " Text file containing rigid body movement parameters between the different shells as estimated by a post-hoc mutual information based registration.",  # noqa: E501
     },
     "out_shell_pe_translation_parameters": {
         "type": FileOutputDefinition,
-        "description": "Text file containing translation along the PE-direction between the different shells as estimated by a post-hoc mutual information based registration.",
+        "description": "Text file containing translation along the PE-direction between the different shells as estimated by a post-hoc mutual information based registration.",  # noqa: E501
     },
 }
-

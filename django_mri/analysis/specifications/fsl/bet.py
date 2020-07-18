@@ -1,3 +1,11 @@
+"""
+Input and output specification dictionaries for FSL's BET_ script.
+
+.. _BET:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET
+"""
+
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
@@ -15,7 +23,7 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
-
+#: *BET* input specification dictionary.
 BET_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
@@ -116,6 +124,7 @@ BET_INPUT_SPECIFICATION = {
     },
 }
 
+#: *BET* output specification dictionary.
 BET_OUTPUT_SPECIFICATION = {
     "out_file": {
         "type": NiftiOutputDefinition,
@@ -143,7 +152,7 @@ BET_OUTPUT_SPECIFICATION = {
     },
     "outskull_mask_file": {
         "type": NiftiOutputDefinition,
-        "description": "The path of the outward skull mask file, if generated.",
+        "description": "The path of the outward skull mask file, if generated.",  # noqa: E501
     },
     "outskull_mesh_file": {
         "type": NiftiOutputDefinition,

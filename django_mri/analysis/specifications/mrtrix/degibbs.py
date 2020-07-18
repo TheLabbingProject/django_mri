@@ -1,3 +1,17 @@
+"""
+Input and output specification dictionaries for MRtrix's *mrdegibbs* script.
+
+References
+----------
+* mrdegibbs_
+* nipype's `MRDeGibbs interface`_
+
+.. _mrdegibbs:
+   https://mrtrix.readthedocs.io/en/latest/reference/commands/mrdegibbs.html
+.. _MRDeGibbs interface:
+   https://nipype.readthedocs.io/en/1.4.1/api/generated/nipype.interfaces.mrtrix3.preprocess.html#mrdegibbs
+"""
+
 from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
@@ -7,6 +21,7 @@ from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
+#: *MRDeGibbs* input specification.
 DEGIBBS_INPUT_SPECIFICATION = {
     "in_file": {
         "type": ScanInputDefinition,
@@ -69,6 +84,7 @@ DEGIBBS_INPUT_SPECIFICATION = {
     },
 }
 
+#: *MRDeGibbs* output specification.
 DEGIBBS_OUTPUT_SPECIFICATION = {
     "out_file": {
         "type": FileOutputDefinition,

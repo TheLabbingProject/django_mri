@@ -1,6 +1,7 @@
 """
 Definition of the
-:func:`~django_mri.analysis.utils.load_mri_analyses.load_mri_analyses`.
+:func:`~django_mri.analysis.utils.load_mri_analyses.load_mri_analyses`
+function.
 """
 
 from django_analyses.models.analysis import Analysis

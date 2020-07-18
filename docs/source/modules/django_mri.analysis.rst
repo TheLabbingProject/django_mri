@@ -19,6 +19,7 @@ Subpackages
    django_mri.analysis.matlab
    django_mri.analysis.mrtrix3
    django_mri.analysis.pipelines
+   django_mri.analysis.specifications
    django_mri.analysis.utils
 
 Submodules

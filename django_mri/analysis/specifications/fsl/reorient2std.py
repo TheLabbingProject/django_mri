@@ -1,3 +1,13 @@
+"""
+Input and output specification dictionaries for nipype's Reorient2Std_
+interface, wrapping FSL's fslreorient2std_.
+
+.. _fslreorient2std:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Fslutils?highlight=%28fslreorient2std%29
+.. _Reorient2Std:
+   https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.utils.html#reorient2std
+"""
+
 from django_analyses.models.input.definitions import StringInputDefinition
 from django_mri.models.inputs.nifti_input_definition import (
     NiftiInputDefinition,
@@ -7,6 +17,7 @@ from django_mri.models.outputs.nifti_output_definition import (
 )
 
 
+#: *Reorient2Std* input specification dictionary.
 REORIENT2STD_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
@@ -37,6 +48,7 @@ REORIENT2STD_INPUT_SPECIFICATION = {
     },
 }
 
+#: *Reorient2Std* output specification dictionary.
 REORIENT2STD_OUTPUT_SPECIFICATION = {
     "out_file": {
         "type": NiftiOutputDefinition,

@@ -1,3 +1,17 @@
+"""
+Input and output specification dictionaries for MRtrix's *dwidenoise* script.
+
+References
+----------
+* dwidenoise_
+* nipype's `DWIDenoise interface`_
+
+.. _dwidenoise:
+   https://mrtrix.readthedocs.io/en/latest/reference/commands/dwidenoise.html
+.. _DWIDenoise interface:
+   https://nipype.readthedocs.io/en/1.4.1/api/generated/nipype.interfaces.mrtrix3.preprocess.html#dwidenoise
+"""
+
 from django_analyses.models.input.definitions import (
     FileInputDefinition,
     IntegerInputDefinition,
@@ -52,7 +66,7 @@ DENOISE_INPUT_SPECIFICATION = {
     },
     "nthreads": {
         "type": IntegerInputDefinition,
-        "description": "Number of threads. if zero, the number of available cpus will be used.",
+        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
     },
     "out_file": {
         "type": StringInputDefinition,

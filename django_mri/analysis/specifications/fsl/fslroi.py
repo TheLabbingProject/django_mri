@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's fslroi_ script.
+
+.. _fslroi:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fslroi
+"""
+
 from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
@@ -11,6 +18,7 @@ from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
 
+#: *fslroi* input specification dictionary.
 FSLROI_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
@@ -49,6 +57,8 @@ FSLROI_INPUT_SPECIFICATION = {
     "z_min": {"type": IntegerInputDefinition, "description": ""},
     "z_size": {"type": IntegerInputDefinition, "description": ""},
 }
+
+#: *fslroi* output specification dictionary.
 FSLROI_OUTPUT_SPECIFICATION = {
     "roi_file": {
         "type": NiftiOutputDefinition,
