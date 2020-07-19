@@ -16,7 +16,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_dicom.models.series import Series
 from django_mri.models.scan import Scan
-from django_mri.utils.get_subject_model import get_subject_model
+from django_mri.utils import get_subject_model
 
 _SCAN_FROM_SERIES_FAILURE = (
     "Failed to create Scan instance for DICOM series {series_id}!\n{exception}"

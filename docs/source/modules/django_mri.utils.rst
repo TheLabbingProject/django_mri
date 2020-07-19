@@ -28,14 +28,6 @@ django\_mri.utils.compression module
    :undoc-members:
    :show-inheritance:
 
-django\_mri.utils.get\_subject\_model module
---------------------------------------------
-
-.. automodule:: django_mri.utils.get_subject_model
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 django\_mri.utils.messages module
 ---------------------------------
 

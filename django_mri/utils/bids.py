@@ -1,3 +1,7 @@
+"""
+Definition of the :class:`~django_mri.utils.bids.Bids` class.
+"""
+
 import glob
 import json
 import os

@@ -1,5 +1,5 @@
-django\_mri.serializers.output package
-======================================
+Output
+======
 
 Module contents
 ---------------

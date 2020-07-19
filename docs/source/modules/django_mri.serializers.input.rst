@@ -1,5 +1,5 @@
-django\_mri.serializers.input package
-=====================================
+Input
+=====
 
 Module contents
 ---------------
