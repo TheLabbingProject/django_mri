@@ -19,8 +19,8 @@ import nipype
 
 from django.conf import settings
 from django_mri.analysis import messages
-from django_mri.analysis.fsl.fsl_anat import FslAnat
-from django_mri.analysis.mrtrix3.dwifslpreproc import DwiFslPreproc
+from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
+from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -89,23 +89,23 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
 )
-from django_mri.analysis.specifications.mrtrix.mrconvert import (
+from django_mri.analysis.specifications.mrtrix3.mrconvert import (
     MRCONVERT_INPUT_SPECIFICATION,
     MRCONVERT_OUTPUT_SPECIFICATION,
 )
-from django_mri.analysis.specifications.mrtrix.denoise import (
+from django_mri.analysis.specifications.mrtrix3.denoise import (
     DENOISE_INPUT_SPECIFICATION,
     DENOISE_OUTPUT_SPECIFICATION,
 )
-from django_mri.analysis.specifications.mrtrix.degibbs import (
+from django_mri.analysis.specifications.mrtrix3.degibbs import (
     DEGIBBS_INPUT_SPECIFICATION,
     DEGIBBS_OUTPUT_SPECIFICATION,
 )
-from django_mri.analysis.specifications.mrtrix.bias_correct import (
+from django_mri.analysis.specifications.mrtrix3.bias_correct import (
     BIAS_CORRECT_INPUT_SPECIFICATION,
     BIAS_CORRECT_OUTPUT_SPECIFICATION,
 )
-from django_mri.analysis.specifications.mrtrix.dwifslpreproc import (
+from django_mri.analysis.specifications.mrtrix3.dwifslpreproc import (
     DWIFSLPREPROC_INPUT_SPECIFICATION,
     DWIFSLPREPROC_OUTPUT_SPECIFICATION,
 )
@@ -135,14 +135,15 @@ from nipype.interfaces.mrtrix3 import (
 from nipype.interfaces.fsl.base import no_fsl
 
 
+#: Raise ImportError if FSL is not accessible.
 test_mode = getattr(settings, "TESTING_MODE", False)
-
 if no_fsl() and not test_mode:
     raise ImportError(messages.NO_FSL)
 
 
-NIPYPE_VERSION = nipype.__version__
+_NIPYPE_VERSION = nipype.__version__
 
+#: Preconfigured analysis definitions.
 analysis_definitions = [
     {
         "title": "BET",
@@ -150,7 +151,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": BET().version or "1.0",
-                "description": f"Default BET version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default BET version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": BET_INPUT_SPECIFICATION,
                 "output": BET_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -163,7 +164,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FAST().version or "1.0",
-                "description": f"Default FAST version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default FAST version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": FAST_INPUT_SPECIFICATION,
                 "output": FAST_OUTPUT_SPECIFICATION,
             }
@@ -175,7 +176,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FLIRT().version or "1.0",
-                "description": f"Default FLIRT version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default FLIRT version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": FLIRT_INPUT_SPECIFICATION,
                 "output": FLIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -188,7 +189,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FNIRT().version or "1.0",
-                "description": f"Default FNIRT version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default FNIRT version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": FNIRT_INPUT_SPECIFICATION,
                 "output": FNIRT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -213,7 +214,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": SUSAN().version or "1.0",
-                "description": f"Default SUSAN version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default SUSAN version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": SUSAN_INPUT_SPECIFICATION,
                 "output": SUSAN_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -226,7 +227,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": Merge().version or "1.0",
-                "description": f"Default fslmerge version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default fslmerge version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": FSLMERGE_INPUT_SPECIFICATION,
                 "output": FSLMERGE_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -239,7 +240,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": ExtractROI().version or "1.0",
-                "description": f"Default fslroi version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default fslroi version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": FSLROI_INPUT_SPECIFICATION,
                 "output": FSLROI_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -252,7 +253,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": TOPUP().version or "1.0",
-                "description": f"Default topup version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default topup version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": TOPUP_INPUT_SPECIFICATION,
                 "output": TOPUP_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -265,7 +266,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": ApplyTOPUP().version or "1.0",
-                "description": f"Default apply_topup version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default apply_topup version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": APPLY_TOPUP_INPUT_SPECIFICATION,
                 "output": APPLY_TOPUP_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -278,7 +279,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": Eddy().version or "1.0",
-                "description": f"Default eddy version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default eddy version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": EDDY_INPUT_SPECIFICATION,
                 "output": EDDY_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -291,7 +292,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": BinaryMaths().version or "1.0",
-                "description": f"Default BinaryMaths version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default BinaryMaths version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": BINARY_MATHS_INPUT_SPECIFICATION,
                 "output": BINARY_MATHS_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -304,7 +305,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": MeanImage().version or "1.0",
-                "description": f"Default MeanImage version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default MeanImage version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": MEAN_IMAGE_INPUT_SPECIFICATION,
                 "output": MEAN_IMAGE_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -317,7 +318,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": Reorient2Std().version or "1.0",
-                "description": f"Default fslorient2std version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default fslorient2std version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": REORIENT2STD_INPUT_SPECIFICATION,
                 "output": REORIENT2STD_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -330,7 +331,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": RobustFOV().version or "1.0",
-                "description": f"Default robustfov version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default robustfov version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": ROBUSTFOV_INPUT_SPECIFICATION,
                 "output": ROBUSTFOV_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -356,7 +357,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": ReconAll().version or "1.0",
-                "description": f"Default FreeSurfer ReconAll version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default FreeSurfer ReconAll version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": RECON_ALL_INPUT_SPECIFICATION,
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -369,7 +370,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": MRConvert().version or "1.0",
-                "description": f"Default mrconvert version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default mrconvert version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": MRCONVERT_INPUT_SPECIFICATION,
                 "output": MRCONVERT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -382,7 +383,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": DWIDenoise().version or "1.0",
-                "description": f"Default dwidenoise version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default dwidenoise version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DENOISE_INPUT_SPECIFICATION,
                 "output": DENOISE_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -395,7 +396,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": MRDeGibbs.version or "1.0",
-                "description": f"Default mrdegibbs version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default mrdegibbs version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DEGIBBS_INPUT_SPECIFICATION,
                 "output": DEGIBBS_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -408,7 +409,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": DWIBiasCorrect.version or "1.0",
-                "description": f"Default dwibiascorrect version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default dwibiascorrect version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": BIAS_CORRECT_INPUT_SPECIFICATION,
                 "output": BIAS_CORRECT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
@@ -421,7 +422,7 @@ analysis_definitions = [
         "versions": [
             {
                 "title": DwiFslPreproc.__version__ or "1.0",
-                "description": f"Default dwifslpreproc version for nipype {NIPYPE_VERSION}.",  # noqa: E501
+                "description": f"Default dwifslpreproc version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DWIFSLPREPROC_INPUT_SPECIFICATION,
                 "output": DWIFSLPREPROC_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",

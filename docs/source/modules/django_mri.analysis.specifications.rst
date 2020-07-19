@@ -17,5 +17,5 @@ Subpackages
 
    django_mri.analysis.specifications.freesurfer
    django_mri.analysis.specifications.fsl
-   django_mri.analysis.specifications.mrtrix
+   django_mri.analysis.specifications.mrtrix3
    django_mri.analysis.specifications.spm

@@ -1,5 +1,5 @@
-Utils
-=====
+Utilities
+=========
 
 Module contents
 ---------------

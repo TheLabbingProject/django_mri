@@ -15,9 +15,7 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 
-   django_mri.analysis.fsl
-   django_mri.analysis.matlab
-   django_mri.analysis.mrtrix3
+   django_mri.analysis.interfaces
    django_mri.analysis.pipelines
    django_mri.analysis.specifications
    django_mri.analysis.utils
@@ -33,10 +31,10 @@ django\_mri.analysis.analysis\_definitions module
    :undoc-members:
    :show-inheritance:
 
-django\_mri.analysis.interfaces module
---------------------------------------
+django\_mri.analysis.mri\_interfaces module
+-------------------------------------------
 
-.. automodule:: django_mri.analysis.interfaces
+.. automodule:: django_mri.analysis.mri_interfaces
    :members:
    :undoc-members:
    :show-inheritance:

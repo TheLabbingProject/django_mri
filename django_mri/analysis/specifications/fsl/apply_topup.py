@@ -1,8 +1,19 @@
 """
-Input and output specification dictionaries for FSL's applytopup_ script.
+Input and output specification dictionaries for FSL's *applytopup* script.
 
-.. _applytopup:
-   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
+See Also
+--------
+* `nipype.interfaces.fsl.epi.ApplyTOPUP`_
+
+Notes
+-----
+For more information about *applytopup*, see FSL's `TOPUP/ApplyTOPUP User
+Guide`_
+
+.. _TOPUP/ApplyTOPUP User Guide:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/ApplyTopupUsersGuide
+.. _nipype.interfaces.fsl.epi.ApplyTOPUP:
+   https://nipype.readthedocs.io/en/1.1.7/interfaces/generated/interfaces.fsl/epi.html#applytopup
 """
 
 from django_analyses.models.input.definitions import (

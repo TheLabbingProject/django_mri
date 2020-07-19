@@ -4,7 +4,7 @@ Input and output specification dictionaries for CAT12 segmentation interface.
 See Also
 --------
 * :class:`CAT12 segmentation interface
-  <django_mri.analysis.matlab.spm.cat12.segmentation.segmentation.Segmentation>`
+  <django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.segmentation.Segmentation>`
 
 """
 

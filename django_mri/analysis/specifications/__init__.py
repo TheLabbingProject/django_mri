@@ -17,5 +17,4 @@ See Also
   <django_analysis.models.managers.input_specification.InputSpecificationManager.from_dict>`
 * :meth:`OutputSpecification.objects.from_dict()
   <django_analysis.models.managers.output_specification.OutputSpecificationManager.from_dict>`
-
 """

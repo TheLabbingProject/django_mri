@@ -1,8 +1,18 @@
 """
 Input and output specification dictionaries for FSL's BET_ script.
 
-.. _BET:
+See Also
+--------
+* `nipype.interfaces.fsl.preprocess.BET`_
+
+Notes
+-----
+For more information about BET, see FSL's `BET documentation`_.
+
+.. _BET documentation:
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/BET
+.. _nipype.interfaces.fsl.preprocess.BET:
+   https://nipype.readthedocs.io/en/1.1.7/interfaces/generated/interfaces.fsl/preprocess.html#bet
 """
 
 

@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django_mri.interfaces.dcm2niix import Dcm2niix
+from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
 from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI

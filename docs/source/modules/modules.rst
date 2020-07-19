@@ -9,7 +9,6 @@ Subpackages
 
    django_mri.analysis
    django_mri.filters
-   django_mri.interfaces
    django_mri.models
    django_mri.serializers
    django_mri.utils
