@@ -2,11 +2,12 @@ Welcome to django_mri's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    overview
    installation
+   user_guide/importing_data
    modules/modules
 
 
