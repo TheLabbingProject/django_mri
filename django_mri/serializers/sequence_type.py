@@ -1,4 +1,4 @@
-from django_mri.models.sequence_type import SequenceType
+from django_mri.models import SequenceType, SequenceTypeDefinition
 from rest_framework import serializers
 
 
