@@ -3,9 +3,6 @@ from rest_framework import serializers
 
 
 class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
-    sequence_definition_set = serializers.HyperlinkedIdentityField(
-        view_name="mri:sequencetypedefinition-detail"
-    )
     url = serializers.HyperlinkedIdentityField(view_name="mri:sequencetype-detail")
 
     class Meta:
@@ -14,8 +11,17 @@ class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "title",
             "description",
-            "sequence_definition_set",
-            "scanning_sequence",
-            "sequence_variant",
+            "sequence_definitions",
             "url",
         )
+
+    def create(self, validated_data):
+        sequence_variants = validated_data.pop("sequence_variant")
+        scanning_sequences = validated_data.pop("scanning_sequence")
+        sequence_type = SequenceType.objects.create(**validated_data)
+        return SequenceTypeDefinition.objects.create(
+            sequence_variant=sequence_variants,
+            scanning_sequence=scanning_sequences,
+            sequence_type=sequence_type,
+        )
+

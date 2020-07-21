@@ -18,14 +18,10 @@ class SequenceType(TitleDescriptionModel, TimeStampedModel):
         return self.title
 
     @property
-    def scanning_sequence(self) -> list:
-        return [
-            scan_seq.scanning_sequence
-            for scan_seq in self.sequence_definition_set.all()
-        ]
+    def sequence_definitions(self) -> list:
+        return list(
+            self.sequence_definition_set.values(
+                "id", "scanning_sequence", "sequence_variant"
+            )
+        )
 
-    @property
-    def sequence_variant(self) -> list:
-        return [
-            scan_seq.sequence_variant for scan_seq in self.sequence_definition_set.all()
-        ]
