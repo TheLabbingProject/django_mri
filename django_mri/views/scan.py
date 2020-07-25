@@ -17,7 +17,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from django.conf import settings
 
-BOKEH_URL = f"http://{settings.APP_IP}:5006/series_viewer"
+
+HOST_NAME = getattr(settings, "APP_IP", "localhost")
+BOKEH_URL = f"http://{HOST_NAME}:5006/series_viewer"
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
