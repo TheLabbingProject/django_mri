@@ -15,8 +15,9 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.request import Request
+from django.conf import settings
 
-BOKEH_URL = "http://localhost:5006/series_viewer"
+BOKEH_URL = f"http://{settings.APP_IP}:5006/series_viewer"
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -76,7 +77,8 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     # @action(detail=False, methods=["POST"])
     # def from_file(self, request):
     #     """
-    #     Creates a new scan instance from a file (currently only DICOM format files are accepted).
+    #     Creates a new scan instance from a file (currently only DICOM format
+    #     files are accepted).
 
     #     Parameters
     #     ----------
@@ -89,7 +91,9 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     #         A response containing the serialized data or a message.
     #     """
     #     file_obj = request.data["file"]
-    #     subject = get_subject_model().objects.get(id=request.data["subject_id"])
+    #     subject = get_subject_model().objects.get(
+    #                   id=request.data["subject_id"]
+    #               )
     #     user = get_user_model().objects.get(username=self.request.user)
 
     #     if file_obj.name.endswith(".dcm"):
@@ -102,7 +106,9 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     #     elif file_obj.name.endswith(".zip"):
     #         content = ContentFile(file_obj.read())
     #         temp_file_name = default_storage.save("tmp.zip", content)
-    #         temp_file_path = os.path.join(settings.MEDIA_ROOT, temp_file_name)
+    #         temp_file_path = os.path.join(
+    #                              settings.MEDIA_ROOT, temp_file_name
+    #                              )
     #         LocalImport(subject, temp_file_path, user=user).run()
     #         os.remove(temp_file_path)
     #         return Response(
@@ -113,15 +119,17 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=["GET"])
     def from_dicom(self, request: Request, series_id: int = None) -> Response:
         """
-        Returns scan information from a :class:`~django_dicom.models.series.Series` instance
-        without serializing.
+        Returns scan information from a
+        :class:`~django_dicom.models.series.Series` instance without
+        serializing.
 
         Parameters
         ----------
         request :
             A request from the client.
         series_id : int, optional
-            :class:`~django_dicom.models.series.Series` primary key, by default None
+            :class:`~django_dicom.models.series.Series` primary key, by
+            default None
 
         Returns
         -------
