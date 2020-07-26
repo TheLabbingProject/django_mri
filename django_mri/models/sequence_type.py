@@ -1,4 +1,5 @@
 from django_extensions.db.models import TitleDescriptionModel, TimeStampedModel
+from django_mri.models.managers.sequence_type import SequenceTypeManager
 
 
 class SequenceType(TitleDescriptionModel, TimeStampedModel):
@@ -10,6 +11,8 @@ class SequenceType(TitleDescriptionModel, TimeStampedModel):
     This model is a wrapper for the known combinations.
 
     """
+
+    objects = SequenceTypeManager()
 
     class Meta:
         ordering = ("title",)

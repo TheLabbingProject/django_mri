@@ -12,4 +12,4 @@ class SequenceTypeDefinitionFilter(filters.FilterSet):
 
     class Meta:
         model = SequenceTypeDefinition
-        fields = ("title", "scanning_sequence", "sequence_variant")
+        fields = ("scanning_sequence", "sequence_variant")

@@ -17,8 +17,6 @@ class SequenceTypeDefinitionSerializer(serializers.HyperlinkedModelSerializer):
         model = SequenceTypeDefinition
         fields = (
             "id",
-            "title",
-            "description",
             "scanning_sequence",
             "sequence_variant",
             "sequence_type",
@@ -28,6 +26,8 @@ class SequenceTypeDefinitionSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         sequence_type = validated_data.pop("sequence_id")
+        validated_data["scanning_sequence"].sort(reverse=True)
+        validated_data["sequence_variant"].sort(reverse=True)
         return SequenceTypeDefinition.objects.create(
             sequence_type=sequence_type, **validated_data
         )

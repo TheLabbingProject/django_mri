@@ -1,4 +1,7 @@
 from django_mri.models import SequenceType, SequenceTypeDefinition
+from django_mri.serializers.sequence_type_definition import (
+    SequenceTypeDefinitionSerializer,
+)
 from rest_framework import serializers
 
 
@@ -13,15 +16,5 @@ class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
             "description",
             "sequence_definitions",
             "url",
-        )
-
-    def create(self, validated_data):
-        sequence_variants = validated_data.pop("sequence_variant")
-        scanning_sequences = validated_data.pop("scanning_sequence")
-        sequence_type = SequenceType.objects.create(**validated_data)
-        return SequenceTypeDefinition.objects.create(
-            sequence_variant=sequence_variants,
-            scanning_sequence=scanning_sequences,
-            sequence_type=sequence_type,
         )
 

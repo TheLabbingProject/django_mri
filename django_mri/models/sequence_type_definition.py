@@ -4,7 +4,7 @@ from django_mri.models.choices import ScanningSequence, SequenceVariant
 from django_mri.models.fields import ChoiceArrayField
 
 
-class SequenceTypeDefinition(TitleDescriptionModel, TimeStampedModel):
+class SequenceTypeDefinition(TimeStampedModel):
     """
     A model to represent familiar MRI sequences. The purpose of this model is to
     provide a title and description for commonly used sequences, as well as to
@@ -36,7 +36,10 @@ class SequenceTypeDefinition(TitleDescriptionModel, TimeStampedModel):
 
     class Meta:
         unique_together = ("scanning_sequence", "sequence_variant")
-        ordering = ("title",)
+        ordering = ("id",)
 
     def __str__(self) -> str:
-        return self.title
+        return (
+            f"Scanning Sequence: {str(self.scanning_sequence)}\n"
+            + f"Sequence Variant: {str(self.sequence_variant)}"
+        )
