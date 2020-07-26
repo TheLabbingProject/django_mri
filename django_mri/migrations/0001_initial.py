@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ("path", models.FilePathField(max_length=1000, unique=True)),
                 ("is_raw", models.BooleanField(default=False)),
             ],
-            options={"verbose_name": "NIfTI",},
+            options={'ordering': ('-id',), "verbose_name": "NIfTI"},
         ),
         migrations.CreateModel(
             name="NiftiInputDefinition",
