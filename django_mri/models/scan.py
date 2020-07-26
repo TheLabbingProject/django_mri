@@ -16,7 +16,6 @@ from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.utils.utils import get_subject_model, get_group_model
 from django_mri.utils.utils import get_mri_root
-from django_mri.analysis.utils.get_mrconvert_node import get_mrconvert_node
 from django_mri.utils.bids import Bids
 from pathlib import Path
 
@@ -397,7 +396,8 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-
+        from django_mri.analysis.utils.get_mrconvert_node import get_mrconvert_node
+        
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
         if not out_file.parent.exists():
