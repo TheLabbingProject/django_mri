@@ -15,15 +15,10 @@ def restore_image_path(id: str, old_path: Path) -> None:
 
 def restore_path(curr_path: str, old_path: str) -> None:
     for image in Path(curr_path).rglob("*.dcm"):
-        str_path = str(
-            image.absolute()
-        )  # Stringify the absolute path of the image
+        str_path = str(image.absolute())  # Stringify the absolute path of the image
         id = pydicom.dcmread(str_path).get("SOPInstanceUID")
         restore_image_path(id, Path(old_path))
 
 
 def load_common_sequences() -> list:
-    return [
-        SequenceType.objects.get_or_create(**sequence)[0]
-        for sequence in sequences
-    ]
+    return SequenceType.objects.from_list(sequences)

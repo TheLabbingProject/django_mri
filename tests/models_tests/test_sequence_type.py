@@ -1,14 +1,13 @@
 from django.test import TestCase
 from django_mri.models.choices import ScanningSequence, SequenceVariant
 from django_mri.models.sequence_type import SequenceType
-from django_mri.models.common_sequences import sequences
+from tests.utils import load_common_sequences
 
 
 class SequenceTypeModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        for sequence in sequences:
-            SequenceType.objects.create(**sequence)
+        load_common_sequences()
 
     def setUp(self):
         self.sequence_type = SequenceType.objects.get(title="DWI")
@@ -17,9 +16,9 @@ class SequenceTypeModelTestCase(TestCase):
     # Meta #
     ########
 
-    def test_unique_together(self):
-        result = SequenceType._meta.unique_together
-        expected = (("scanning_sequence", "sequence_variant"),)
+    def test_ordering(self):
+        result = SequenceType._meta.ordering
+        expected = ("title",)
         self.assertTupleEqual(result, expected)
 
     ##########
@@ -46,41 +45,17 @@ class SequenceTypeModelTestCase(TestCase):
         field = SequenceType._meta.get_field("description")
         self.assertFalse(field.unique)
 
-    # scanning_sequence
-    def test_scanning_sequence_blank_and_null(self):
-        field = SequenceType._meta.get_field("scanning_sequence")
-        self.assertTrue(field.blank)
-        self.assertTrue(field.null)
+    ##############
+    # Properties #
+    ##############
 
-    def test_scanning_sequence_size(self):
-        field = SequenceType._meta.get_field("scanning_sequence")
-        self.assertEqual(field.size, 5)
-
-    def test_scanning_sequence_base_max_length(self):
-        field = SequenceType._meta.get_field("scanning_sequence")
-        self.assertEqual(field.base_field.max_length, 2)
-
-    def test_scanning_sequence_choices(self):
-        field = SequenceType._meta.get_field("scanning_sequence")
-        result = field.base_field.choices
-        expected = ScanningSequence.choices()
-        self.assertTupleEqual(result, expected)
-
-    # sequence_variant
-    def test_sequence_variant_blank_and_null(self):
-        field = SequenceType._meta.get_field("sequence_variant")
-        self.assertTrue(field.blank)
-        self.assertTrue(field.null)
-
-    def test_sequence_variant_base_max_length(self):
-        field = SequenceType._meta.get_field("sequence_variant")
-        self.assertEqual(field.base_field.max_length, 4)
-
-    def test_sequence_variant_choices(self):
-        field = SequenceType._meta.get_field("sequence_variant")
-        result = field.base_field.choices
-        expected = SequenceVariant.choices()
-        self.assertTupleEqual(result, expected)
+    def test_sequence_definitions(self):
+        expected = [
+            {"id": 41, "scanning_sequence": ["EP"], "sequence_variant": ["SK", "SP"],}
+        ]
+        result = self.sequence_type.sequence_definitions
+        self.assertIsInstance(result, list)
+        self.assertEqual(result, expected)
 
     ###########
     # Methods #

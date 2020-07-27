@@ -85,6 +85,7 @@ class ScanInputDefinitionModelTestCase(TestCase):
             "description": self.definition.description,
             "is_configuration": self.definition.is_configuration,
             "value_attribute": self.definition.value_attribute,
+            "db_value_preprocessing": self.definition.db_value_preprocessing,
             "run_method_input": self.definition.run_method_input,
             "db_value_preprocessing": self.definition.db_value_preprocessing,
         }
