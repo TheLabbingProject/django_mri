@@ -2,7 +2,6 @@ from django_mri.models.sequence_type import SequenceType
 from django_mri.serializers import SequenceTypeSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
-from django_mri.filters import SequenceTypeFilter
 from rest_framework import viewsets
 
 
