@@ -1,6 +1,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/django-mri.svg)](https://pypi.python.org/pypi/django-mri/)
 [![PyPI status](https://img.shields.io/pypi/status/django-mri.svg)](https://pypi.python.org/pypi/django-mri/)
 [![CircleCI](https://circleci.com/gh/TheLabbingProject/django_mri.svg?style=shield)](https://app.circleci.com/pipelines/github/TheLabbingProject/django-mri)
+[![Documentation Status](https://readthedocs.org/projects/django-mri/badge/?version=latest)](http://django-mri.readthedocs.io/?badge=latest)
 [![codecov.io](https://codecov.io/gh/TheLabbingProject/django_mri/coverage.svg?branch=master)](https://codecov.io/github/TheLabbingProject/mri?branch=master)
 
 # _django_mri_
