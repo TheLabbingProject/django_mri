@@ -81,13 +81,15 @@ class BidsTestCase(TestCase):
         # TODO: Add tests for fmap and sbref
         # Image.objects.import_path(Path(DICOM_FMRI_SBREF_PATH))
         # series_fmri_sbref = Image.objects.last().series
-        # Scan.objects.get_or_create(dicom=series_fmri_sbref, subject=cls.subject)
+        # Scan.objects.get_or_create(
+        # dicom=series_fmri_sbref, subject=cls.subject)
         # Image.objects.import_path(Path(DICOM_FMAP_PATH))
         # series_fmap = Image.objects.last().series
         # Scan.objects.get_or_create(dicom=series_fmap, subject=cls.subject)
         # self.fmap_nifti = self.fmap_scan.nifti
         # self.fmri_sbref_nifti = self.fmri_sbref_scan.nifti
-        # self.fmap_scan = Scan.objects.filter(description__icontains="PA").first()
+        # self.fmap_scan = Scan.objects.filter(
+        # description__icontains="PA").first()
         # self.fmri_sbref_scan = Scan.objects.filter(
         #     description__icontains="sbref"
         # ).first()

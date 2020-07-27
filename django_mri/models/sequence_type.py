@@ -18,6 +18,15 @@ class SequenceType(TitleDescriptionModel, TimeStampedModel):
         ordering = ("title",)
 
     def __str__(self) -> str:
+        """
+        Returns the string representation of this instance.
+
+        Returns
+        -------
+        str
+            String representation of this instance
+        """
+
         return self.title
 
     @property

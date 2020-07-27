@@ -1,18 +1,31 @@
+"""
+Input and output specification dictionaries for FSL's SUSAN_ script.
+
+.. _SUSAN:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/SUSAN
+"""
+
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FloatInputDefinition,
     IntegerInputDefinition,
     StringInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 
+#: *SUSAN* input specification dictionary.
 SUSAN_INPUT_SPECIFICATION = {
     "brightness_threshold": {
         "type": FloatInputDefinition,
         "required": True,
-        "description": "Should be greater than noise level and less than contrast of edges to be preserved.",  # noqa
+        "description": "Should be greater than noise level and less than contrast of edges to be preserved.",  # noqa: E501
     },
     "fwhm": {
         "type": FloatInputDefinition,
@@ -50,7 +63,7 @@ SUSAN_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "required": False,
         "default": True,
-        "description": "Whether to use a local median filter in the cases where single-point noise is detected.",  # noqa
+        "description": "Whether to use a local median filter in the cases where single-point noise is detected.",  # noqa: E501
     },
     "args": {
         "type": StringInputDefinition,
@@ -60,6 +73,7 @@ SUSAN_INPUT_SPECIFICATION = {
 }
 
 
+#: *SUSAN* output specification dictionary.
 SUSAN_OUTPUT_SPECIFICATION = {
     "smoothed_file": {
         "type": NiftiOutputDefinition,
