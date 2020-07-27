@@ -1,67 +1,24 @@
-from django_mri.models.nifti import NIfTI
+"""
+Aggregates pipeline definitions from :mod:`django_mri.analysis.pipelines`.
+The created list (*pipeline_definitions*) may easily be imported to the
+database using the
+:meth:`~django_analysis.models.managers.pipline.PipelineManager.from_list`
+method.
 
+Example
+-------
 
-try:
-    MNI = NIfTI.objects.get(path__contains="MNI152_T1_2mm_brain")
-except NIfTI.DoesNotExist:
-    raise NIfTI.DoesNotExist("Could not find MNI152_T1_2mm_brain in the database.")
+.. code-block:: py
 
+    from django_analyses.models.pipeline import Pipleine
+    from django_mri.analysis.pipeline_definitions import pipeline_definitions
 
-BET_CONFIGURATION = {"robust": True}
-REORIENT_CONFIGURATION = {}
-ROBUSTFOV_CONFIGURATION = {}
-FLIRT_CONFIGURATION = {"reference": MNI.id, "interp": "spline"}
-FNIRT_CONFIGURATION = {"ref_file": MNI.id}
+    Pipeline.objects.from_list(pipeline_definitions)
 
-BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
-REORIENT_NODE = {
-    "analysis_version": "fslreorient2std",
-    "configuration": REORIENT_CONFIGURATION,
-}
-ROBUST_FOV_NODE = {
-    "analysis_version": "robustfov",
-    "configuration": ROBUSTFOV_CONFIGURATION,
-}
-FLIRT_NODE = {
-    "analysis_version": "FLIRT",
-    "configuration": {"reference": MNI.id, "interp": "spline"},
-}
+"""
 
-# Pipe configurations
-BET_TO_REORIENT = {
-    "source": BET_NODE,
-    "source_port": "out_file",
-    "destination": REORIENT_NODE,
-    "destination_port": "in_file",
-}
-FNIRT_NODE = {
-    "analysis_version": "FNIRT",
-    "configuration": {"ref_file": MNI.id},
-}
-
-REORIENT_TO_FOV = {
-    "source": REORIENT_NODE,
-    "source_port": "out_file",
-    "destination": ROBUST_FOV_NODE,
-    "destination_port": "in_file",
-}
-FOV_TO_FLIRT = {
-    "source": ROBUST_FOV_NODE,
-    "source_port": "out_roi",
-    "destination": FLIRT_NODE,
-    "destination_port": "in_file",
-}
-FLIRT_TO_FNIRT = {
-    "source": FLIRT_NODE,
-    "source_port": "out_file",
-    "destination": FNIRT_NODE,
-    "destination_port": "in_file",
-}
-
-BASIC_FSL_PREPROCESSING = {
-    "title": "Basic FSL Preprocessing",
-    "description": "Basic MRI preprocessing pipeline using FSL.",
-    "pipes": [BET_TO_REORIENT, REORIENT_TO_FOV, FOV_TO_FLIRT, FLIRT_TO_FNIRT],
-}
+from django_mri.analysis.pipelines.basic_fsl_preprocessing import (
+    BASIC_FSL_PREPROCESSING,
+)
 
 pipeline_definitions = [BASIC_FSL_PREPROCESSING]

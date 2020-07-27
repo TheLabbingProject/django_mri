@@ -1,3 +1,7 @@
+"""
+Definition of the :class:`~django_mri.utils.bids.Bids` class.
+"""
+
 import glob
 import json
 import os
@@ -5,8 +9,8 @@ import pandas as pd
 import shutil
 
 from datetime import date
-from enum import Enum
 from django_mri.utils import messages
+from enum import Enum
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
@@ -41,16 +45,14 @@ class Bids:
     """
     A class to compose BIDS-appropriate paths for usage by dcm2niix
     In short, standard template for BIDS-appropriate path is:
-    - sub -<label>/
-        -<data_type>/
-            -sub-<label>_<modality_label>
+    *sub-<label>/<data_type>/sub-<label>_<modality_label>*
 
     References
     ----------
-    * `BIDS specifications`_
+    * `The BIDS Specification`_.
 
-    .. _BIDS specification:
-        https://bids-specification.readthedocs.io/en/stable/
+    .. _The BIDS Specification:
+       https://bids-specification.readthedocs.io/en/stable/
     """
 
     DATASET_DESCRIPTION_FILE_NAME = "dataset_description.json"
@@ -111,13 +113,18 @@ class Bids:
 
     def get_data(self):
         """
-        Use Scan's dicom header to extract relevant parameters for
-        BIDS-appropriate naming.
+        Extracts relevant parameters for BIDS-compatible naming.
+
+        Todo
+        ----
+        * Update to handle several tasks.
+        * Update to handle multiple sessions. - Perhaps add "session" property
+            to Scan.
 
         Returns
         -------
         parent : Path
-            parent BIDS directory, underwhich there will be "sub-x"
+            Parent BIDS directory, under which there will be "sub-x"
             directories
         data_type : str
             sub-directory under "sub-x". either "anat","func","fmap" or "dwi"
@@ -129,12 +136,6 @@ class Bids:
         pe_dir : Union[str, None]
             PhaseEncodingDirection for DWI-related images or fieldmap-related
             images. Either "AP","PA" or None
-
-        Todo
-        ----
-        * Update to handle several tasks.
-        * Update to handle multiple sessions. - Perhaps add "session" property
-          to Scan
         """
 
         sequence_type = self.scan.sequence_type
@@ -168,7 +169,7 @@ class Bids:
             acq = "ignore-bids"
         if "func" in data_type:
             image_type = header["ImageType"]
-            task = "rest"  # TODO:
+            task = "rest"
             if "MB" not in image_type:
                 modality_label = "sbref"
         return parent, data_type, modality_label, acq, task, pe_dir
@@ -358,4 +359,3 @@ class Bids:
         if not readme.is_file():
             readme_template = TEMPLATES_DIR / "README"
             shutil.copy(str(readme_template), str(readme))
-

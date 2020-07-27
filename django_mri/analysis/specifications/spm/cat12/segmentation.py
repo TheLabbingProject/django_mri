@@ -1,7 +1,17 @@
+"""
+Input and output specification dictionaries for CAT12 segmentation interface.
+
+See Also
+--------
+* :class:`CAT12 segmentation interface
+  <django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.segmentation.Segmentation>`
+
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
-    FileInputDefinition,
     DirectoryInputDefinition,
+    FileInputDefinition,
     FloatInputDefinition,
     IntegerInputDefinition,
     StringInputDefinition,
@@ -9,6 +19,8 @@ from django_analyses.models.input.definitions import (
 
 from django_analyses.models.output.definitions import FileOutputDefinition
 
+
+#: CAT12 segmentation interface input specification dictionary.
 CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
     "path": {
         "type": FileInputDefinition,
@@ -28,7 +40,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "required": False,
         "default": 4,
-        "description": "Whether to implement multi-threading and with how many processes.",
+        "description": "Whether to implement multi-threading and with how many processes.",  # noqa: E501
         "is_configuration": False,
     },
     "tpm_path": {
@@ -222,6 +234,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
     },
 }
 
+#: CAT12 segmentation interface output specification dictionary.
 CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
     "left_hemisphere_central_surface": {
         "type": FileOutputDefinition,
@@ -261,7 +274,10 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
     "modulated_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "dartel_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "native_white_matter": {"type": FileOutputDefinition, "description": ""},
-    "modulated_white_matter": {"type": FileOutputDefinition, "description": ""},
+    "modulated_white_matter": {
+        "type": FileOutputDefinition,
+        "description": "",
+    },
     "dartel_white_matter": {"type": FileOutputDefinition, "description": ""},
     "native_pve": {
         "type": FileOutputDefinition,
@@ -285,17 +301,26 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
     },
     "batch_file": {
         "type": FileOutputDefinition,
-        "description": "The MATLAB .m file used to run the CAT12 segmentation.",
+        "description": "The MATLAB .m file used to run the CAT12 segmentation.",  # noqa: E501
     },
     "report_mat": {
         "type": FileOutputDefinition,
         "description": "MATLAB format .mat file containing the run's log.",
     },
-    "report_xml": {"type": FileOutputDefinition, "description": "XML log of the run.",},
+    "report_xml": {
+        "type": FileOutputDefinition,
+        "description": "XML log of the run.",
+    },
     "report_txt": {
         "type": FileOutputDefinition,
         "description": "Text format log file.",
     },
-    "report_pdf": {"type": FileOutputDefinition, "description": "PDF log of the run."},
-    "report_jpg": {"type": FileOutputDefinition, "description": "JPG log of the run."},
+    "report_pdf": {
+        "type": FileOutputDefinition,
+        "description": "PDF log of the run.",
+    },
+    "report_jpg": {
+        "type": FileOutputDefinition,
+        "description": "JPG log of the run.",
+    },
 }

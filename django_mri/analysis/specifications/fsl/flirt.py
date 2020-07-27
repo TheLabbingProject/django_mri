@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's FLIRT_ script.
+
+.. _FLIRT:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
@@ -7,9 +14,15 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
+
+#: *FLIRT* input specification dictionary.
 FLIRT_INPUT_SPECIFICATION = {
     "in_file": {
         "type": NiftiInputDefinition,
@@ -33,7 +46,7 @@ FLIRT_INPUT_SPECIFICATION = {
     "out_matrix_file": {
         "type": StringInputDefinition,
         "required": False,
-        "description": "The calculated affine transformation that registers the input to the reference which is saved as a 4x4 affine matrix.",
+        "description": "The calculated affine transformation that registers the input to the reference which is saved as a 4x4 affine matrix.",  # noqa: E501
         "is_output_path": True,
         "default": "affine_matrix.txt",
     },
@@ -55,7 +68,7 @@ FLIRT_INPUT_SPECIFICATION = {
     },
     "apply_isoxfm": {
         "type": FloatInputDefinition,
-        "description": "Whether to apply an affine transformation with isotropic resampling.",
+        "description": "Whether to apply an affine transformation with isotropic resampling.",  # noqa: E501
     },
     "datatype": {
         "type": StringInputDefinition,
@@ -196,16 +209,16 @@ FLIRT_INPUT_SPECIFICATION = {
     },
     "bgvalue": {
         "type": FloatInputDefinition,
-        "description": "Use a specified background value for points outside FOV.",
+        "description": "Use a specified background value for points outside FOV.",  # noqa: E501
     },
     # BBR Options
     "wm_seg": {
         "type": FileInputDefinition,
-        "description": "White matter segmentation volume needed by BBR cost function.",
+        "description": "White matter segmentation volume needed by BBR cost function.",  # noqa: E501
     },
     "wmcoords": {
         "type": FileInputDefinition,
-        "description": "White matter boundary coordinates for BBR cost function.",
+        "description": "White matter boundary coordinates for BBR cost function.",  # noqa: E501
     },
     "wmnorms": {
         "type": FileInputDefinition,
@@ -213,7 +226,7 @@ FLIRT_INPUT_SPECIFICATION = {
     },
     "fieldmap": {
         "type": FileInputDefinition,
-        "description": "Fieldmap image in radians per second. Must be already registered to the reference image.",
+        "description": "Fieldmap image in radians per second. Must be already registered to the reference image.",  # noqa: E501
     },
     "fieldmapmask": {
         "type": FileInputDefinition,
@@ -221,7 +234,7 @@ FLIRT_INPUT_SPECIFICATION = {
     },
     "pedir": {
         "type": IntegerInputDefinition,
-        "description": "Phase encode direction of EPI - 1/2/3=x/y/z & -1/-2/-3=-x/-y/-z.",
+        "description": "Phase encode direction of EPI - 1/2/3=x/y/z & -1/-2/-3=-x/-y/-z.",  # noqa: E501
     },
     "echospacing": {
         "type": FloatInputDefinition,
@@ -232,10 +245,13 @@ FLIRT_INPUT_SPECIFICATION = {
         "description": "Type of BBR cost function.",
         "choices": ["signed", "global_abs", "local_abs"],
     },
-    "bbr_slope": {"type": FloatInputDefinition, "description": "Value of BBR slope."},
+    "bbr_slope": {
+        "type": FloatInputDefinition,
+        "description": "Value of BBR slope.",
+    },
 }
 
-
+#: *FLIRT* output specification dictionary.
 FLIRT_OUTPUT_SPECIFICATION = {
     "out_file": {
         "type": NiftiOutputDefinition,
@@ -243,7 +259,7 @@ FLIRT_OUTPUT_SPECIFICATION = {
     },
     "out_matrix_file": {
         "type": FileOutputDefinition,
-        "description": "Path to the calculated affine transform (if generated).",
+        "description": "Path to the calculated affine transform (if generated).",  # noqa: E501
         "validate_existence": False,
     },
     "out_log": {

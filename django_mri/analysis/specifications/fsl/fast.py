@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FSL's FAST_ script.
+
+.. _FAST:
+   https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FAST
+"""
+
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     FileInputDefinition,
@@ -5,10 +12,15 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     StringInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 
+#: *FAST* input specification dictionary.
 FAST_INPUT_SPECIFICATION = {
     "in_files": {
         "type": NiftiInputDefinition,
@@ -24,7 +36,7 @@ FAST_INPUT_SPECIFICATION = {
     "bias_iters": {
         "type": IntegerInputDefinition,
         "required": False,
-        "description": "Number of main-loop iterations during bias-field removal.",
+        "description": "Number of main-loop iterations during bias-field removal.",  # noqa: E501
         "min_value": 1,
         "max_value": 10,
     },
@@ -52,7 +64,7 @@ FAST_INPUT_SPECIFICATION = {
     "init_seg_smooth": {
         "type": FloatInputDefinition,
         "required": False,
-        "description": "Initial segmentation spatial smoothness (during bias field estimation).",  # noqa
+        "description": "Initial segmentation spatial smoothness (during bias field estimation).",  # noqa: E501
         "min_value": 0.0001,
         "max_value": 0.1,
     },
@@ -64,7 +76,7 @@ FAST_INPUT_SPECIFICATION = {
     "iters_afterbias": {
         "type": IntegerInputDefinition,
         "required": False,
-        "description": "Number of main-loop iterations after bias-field removal.",
+        "description": "Number of main-loop iterations after bias-field removal.",  # noqa: E501
         "min_value": 1,
         "max_value": 20,
     },
@@ -145,10 +157,11 @@ FAST_INPUT_SPECIFICATION = {
     },
 }
 
+#: *FAST* output specification dictionary.
 FAST_OUTPUT_SPECIFICATION = {
     "tissue_class_map": {
         "type": NiftiOutputDefinition,
-        "description": "An image of all tissue classes represented as 1, 2, and 3.",
+        "description": "An image of all tissue classes represented as 1, 2, and 3.",  # noqa: E501
     },
     "mixeltype": {
         "type": NiftiOutputDefinition,

@@ -1,3 +1,10 @@
+"""
+Input and output specification dictionaries for FreeSurfer's recon_all_ script.
+
+.. _recon_all:
+   https://surfer.nmr.mgh.harvard.edu/fswiki/recon-all
+"""
+
 from django.conf import settings
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
@@ -10,12 +17,14 @@ from django_analyses.models.input.definitions import (
 
 from django_analyses.models.output.definitions import FileOutputDefinition
 
+
+#: *recon_all* input specification.
 RECON_ALL_INPUT_SPECIFICATION = {
     "subject_id": {
         "type": StringInputDefinition,
         "dynamic_default": "{run_id}",
         "required": True,
-        "description": "Subject ID to be searched for in the SUBJECTS_DIR path.",
+        "description": "Subject ID to be searched for in the SUBJECTS_DIR path.",  # noqa: E501
         "is_configuration": False,
     },
     "directive": {
@@ -41,7 +50,7 @@ RECON_ALL_INPUT_SPECIFICATION = {
             "qcache",
         ],
         "default": "all",
-        "description": "Directives control the execution of the various processing procedures carried out.",
+        "description": "Directives control the execution of the various processing procedures carried out.",  # noqa: E501
     },
     "hemi": {
         "type": StringInputDefinition,
@@ -53,27 +62,27 @@ RECON_ALL_INPUT_SPECIFICATION = {
         "type": ListInputDefinition,
         "element_type": "FIL",
         "required": False,
-        "description": "A list of T1 files to be processed, in either DICOM or NIfTI format.",
+        "description": "A list of T1 files to be processed, in either DICOM or NIfTI format.",  # noqa: E501
     },
     "T2_file": {
         "type": FileInputDefinition,
         "required": False,
-        "description": "Path to T2 image to be used for improved pial surface estimation (can be either a DICOM, MGH or NIFTI file)",
+        "description": "Path to T2 image to be used for improved pial surface estimation (can be either a DICOM, MGH or NIFTI file)",  # noqa: E501
     },
     "use_T2": {
         "type": BooleanInputDefinition,
         "required": False,
-        "description": "Whether to use the provided T2 image to generate an improved pial surface estimation.",
+        "description": "Whether to use the provided T2 image to generate an improved pial surface estimation.",  # noqa: E501
     },
     "FLAIR_file": {
         "type": FileInputDefinition,
         "required": False,
-        "description": "Path to FLAIR image to be used for improved pial surface estimation (can be either a DICOM, MGH or NIFTI file)",
+        "description": "Path to FLAIR image to be used for improved pial surface estimation (can be either a DICOM, MGH or NIFTI file)",  # noqa: E501
     },
     "use_FLAIR": {
         "type": BooleanInputDefinition,
         "required": False,
-        "description": "Whether to use the provided FLAIR image to generate an improved pial surface estimation.",
+        "description": "Whether to use the provided FLAIR image to generate an improved pial surface estimation.",  # noqa: E501
     },
     "parallel": {
         "type": BooleanInputDefinition,
@@ -83,17 +92,17 @@ RECON_ALL_INPUT_SPECIFICATION = {
     "openmp": {
         "type": IntegerInputDefinition,
         "required": False,
-        "description": "Number of processes to run if parallel execution is enabled.",
+        "description": "Number of processes to run if parallel execution is enabled.",  # noqa: E501
     },
     "hires": {
         "type": BooleanInputDefinition,
         "required": False,
-        "description": "Conform to minimum voxel size (for voxels lesser than 1mm).",
+        "description": "Conform to minimum voxel size (for voxels lesser than 1mm).",  # noqa: E501
     },
     "mprage": {
         "type": BooleanInputDefinition,
         "required": False,
-        "description": "Assume scan parameters are MGH MPRAGE protocol, which produces darker grey matter.",
+        "description": "Assume scan parameters are MGH MPRAGE protocol, which produces darker grey matter.",  # noqa: E501
     },
     "big_ventricles": {
         "type": BooleanInputDefinition,
@@ -292,6 +301,7 @@ RECON_ALL_INPUT_SPECIFICATION = {
     },
 }
 
+#: *recon_all* output specification.
 RECON_ALL_OUTPUT_SPECIFICATION = {
     # mri/T1.mgz
     "T1": {"type": FileOutputDefinition, "description": ""},
@@ -303,7 +313,7 @@ RECON_ALL_OUTPUT_SPECIFICATION = {
     # mri/orig.mgz
     "orig": {
         "type": FileOutputDefinition,
-        "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",
+        "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",  # noqa: E501
     },
     # mri/nu.mgz
     "nu": {
