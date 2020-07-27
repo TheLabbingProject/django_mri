@@ -27,7 +27,7 @@ from pathlib import Path
 import os
 
 
-FSL_DIR = os.environ["FSL_DIR"]
+FSLDIR = os.environ["FSLDIR"]
 
 #: *topup* input specification.
 TOPUP_INPUT_SPECIFICATION = {
@@ -67,7 +67,7 @@ TOPUP_INPUT_SPECIFICATION = {
     "config": {
         "type": FileInputDefinition,
         "description": "Path to configuration files specifying command line arguments.",  # noqa: E501
-        "default": Path(Path(FSL_DIR) / "etc" / "flirtsch" / "b02b0.cnf"),
+        "default": Path(Path(FSLDIR) / "etc" / "flirtsch" / "b02b0.cnf"),
     },
     "estmov": {
         "type": IntegerInputDefinition,
