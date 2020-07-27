@@ -8,14 +8,19 @@ NIfTI.DoesNotExist
 """
 
 from django_mri.models.nifti import NIfTI
+from pathlib import Path
 
 
 try:
     MNI = NIfTI.objects.get(path__contains="MNI152_T1_2mm_brain")
 except NIfTI.DoesNotExist:
-    raise NIfTI.DoesNotExist(
-        "Could not find MNI152_T1_2mm_brain in the database."
+    mni_path = (
+        Path(__file__).parent.parent.parent
+        / "utils"
+        / "atlases"
+        / "MNI152_T1_2mm_brain.nii.gz"
     )
+    MNI = NIfTI.objects.create(path=mni_path)
 
 
 # Node configurations
