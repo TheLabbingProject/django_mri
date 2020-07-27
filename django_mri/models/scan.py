@@ -34,20 +34,11 @@ class Scan(TimeStampedModel):
     institution_name = models.CharField(max_length=64, blank=True, null=True)
 
     #: Acquisition datetime.
-    time = models.DateTimeField(
-<<<<<<< HEAD
-        blank=True, null=True, help_text="The time in which the scan was acquired.",
-=======
-        blank=True, null=True, help_text=help_text.SCAN_TIME,
->>>>>>> master
-    )
+    time = models.DateTimeField(blank=True, null=True, help_text=help_text.SCAN_TIME)
 
     #: Short description of the scan's acquisition parameters.
     description = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text=help_text.SCAN_DESCRIPTION,
+        max_length=100, blank=True, null=True, help_text=help_text.SCAN_DESCRIPTION
     )
 
     #: The relative number of this scan in the session in which it was
@@ -84,22 +75,13 @@ class Scan(TimeStampedModel):
         validators=[MinValueValidator(0)],
         help_text=help_text.SCAN_INVERSION_TIME,
     )
-<<<<<<< HEAD
-    spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
-=======
 
     #: The spatial resolution of the image in millimeters.
-    spatial_resolution = ArrayField(
-        models.FloatField(), size=3, blank=True, null=True
-    )
->>>>>>> master
+    spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
 
     #: Any other comments about this scan.
     comments = models.TextField(
-        max_length=1000,
-        blank=True,
-        null=True,
-        help_text=help_text.SCAN_COMMENTS,
+        max_length=1000, blank=True, null=True, help_text=help_text.SCAN_COMMENTS,
     )
 
     #: If this instance's origin is a DICOM file, or it was saved as one, this
@@ -405,14 +387,12 @@ class Scan(TimeStampedModel):
             Created file path
         """
         from django_mri.analysis.utils.get_mrconvert_node import get_mrconvert_node
-        
+
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
         if not out_file.parent.exists():
             out_file.parent.mkdir()
-        return node.run(
-            inputs={"in_file": self.nifti.path, "out_file": out_file}
-        )
+        return node.run(inputs={"in_file": self.nifti.path, "out_file": out_file})
 
     def get_default_mif_path(self) -> Path:
         """
