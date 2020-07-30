@@ -395,7 +395,7 @@ analysis_definitions = [
         "description": "Remove Gibbs ringing artifacts.",
         "versions": [
             {
-                "title": MRDeGibbs.version or "1.0",
+                "title": MRDeGibbs().version or "1.0",
                 "description": f"Default mrdegibbs version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DEGIBBS_INPUT_SPECIFICATION,
                 "output": DEGIBBS_OUTPUT_SPECIFICATION,
@@ -408,7 +408,7 @@ analysis_definitions = [
         "description": "Perform B1 field inhomogeneity correction for a DWI volume series.",  # noqa: E501
         "versions": [
             {
-                "title": DWIBiasCorrect.version or "1.0",
+                "title": DWIBiasCorrect().version or "1.0",
                 "description": f"Default dwibiascorrect version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": BIAS_CORRECT_INPUT_SPECIFICATION,
                 "output": BIAS_CORRECT_OUTPUT_SPECIFICATION,
