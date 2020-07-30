@@ -96,39 +96,34 @@ BRAIN_EXTRACT = {
     "destination": BET_NODE,
     "destination_port": "in_file",
 }
-
-# multiple inputs from nodes \ user - ask Zvi
 DENOISE_EPI = {
     "source": BET_NODE,
     "source_port": "mask_file",
     "destination": DENOISE_NODE,
     "destination_port": "mask",
 }
-
-
 # User should insert .bvec and .bval as inputs we shpuld consider automating
 # this
-EDDY_CORRECT = {
+EDDY_CORRECT_1 = {
     "source": TOPUP_NODE,
     "source_port": "out_fieldcoef",
     "destination": EDDY_NODE,
     "destination_port": "in_topup_fieldcoef",
 }
-EDDY_CORRECT = {
+EDDY_CORRECT_2 = {
     "source": TOPUP_NODE,
     "source_port": "out_movpar",
     "destination": EDDY_NODE,
     "destination_port": "in_topup_movpar",
 }
-
-EDDY_CORRECT = {
+EDDY_CORRECT_3 = {
     "source": TOPUP_NODE,
     "source_port": "out_enc_file",
     "destination": EDDY_NODE,
     "destination_port": "in_acqp",
 }
-EDDY_CORRECT = {
-    "source": BRAIN_EXTRACT,
+EDDY_CORRECT_4 = {
+    "source": BET_NODE,
     "source_port": "mask_file",
     "destination": EDDY_NODE,
     "destination_port": "in_mask",
@@ -139,13 +134,13 @@ CORRET_GIBBS = {
     "destination": DEGIBBS_NODE,
     "destination_port": "in_file",
 }
-BIAS_CORRECT = {
+BIAS_CORRECT_1 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
     "destination": BIAS_CORRECT_NODE,
     "destination_port": "in_file",
 }
-BIAS_CORRECT = {
+BIAS_CORRECT_2 = {
     "source": BET_NODE,
     "source_port": "mask_file",
     "destination": BIAS_CORRECT_NODE,
@@ -164,9 +159,14 @@ FIELDMAP_CORRECTION = {
         PERFORM_TOPUP,
         RADIANS_PIPE,
         BRAIN_EXTRACT,
-        EDDY_CORRECT,
-        DENOISE_CONFIGURATION,
+        DENOISE_EPI,
+        EDDY_CORRECT_1,
+        EDDY_CORRECT_2,
+        EDDY_CORRECT_3,
+        EDDY_CORRECT_4,
+        DENOISE_EPI,
         CORRET_GIBBS,
-        BIAS_CORRECT,
+        BIAS_CORRECT_1,
+        BIAS_CORRECT_2,
     ],
 }
