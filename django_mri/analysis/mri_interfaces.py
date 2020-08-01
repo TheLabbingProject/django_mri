@@ -37,7 +37,12 @@ from nipype.interfaces.fsl import (
     ExtractROI,
     Eddy,
 )
-from nipype.interfaces.mrtrix3 import DWIDenoise, MRDeGibbs, DWIBiasCorrect
+from nipype.interfaces.mrtrix3 import (
+    DWIDenoise,
+    MRDeGibbs,
+    DWIBiasCorrect,
+    MRConvert,
+)
 
 
 #: A dictionary that should be imported in the project's settings and included
@@ -64,4 +69,5 @@ interfaces = {
     "degibbs": {MRDeGibbs().version: MRDeGibbs},
     "bias_correct": {DWIBiasCorrect().version: DWIBiasCorrect},
     "dwipreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
+    "mrconvert": {MRConvert().version: MRConvert},
 }
