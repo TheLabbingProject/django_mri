@@ -80,9 +80,8 @@ class NIfTI(TimeStampedModel):
             b-value for each diffusion direction.
         """
 
-        curr_path = str(self.path)
-        file_name = curr_path.replace("nii.gz", "bval")
-        if os.path.isfile(file_name):
+        file_name = self.b_value_file
+        if file_name:
             with open(file_name, "r") as file_object:
                 content = file_object.read()
             content = content.splitlines()[0].split(" ")
@@ -119,9 +118,8 @@ class NIfTI(TimeStampedModel):
             b-value for each diffusion direction
         """
 
-        curr_path = str(self.path)
-        file_name = curr_path.replace("nii.gz", "bvec")
-        if os.path.isfile(file_name):
+        file_name = self.b_vector_file
+        if file_name:
             with open(file_name, "r") as file_object:
                 content = file_object.read()
             return [
@@ -281,6 +279,38 @@ class NIfTI(TimeStampedModel):
         if self._json_data is None:
             self._json_data = self.read_json()
         return self._json_data
+
+    @property
+    def b_value_file(self) -> Path:
+        """
+        Return FSL format b-value file path
+
+        Returns
+        -------
+        Path
+            FSL format b-value file path
+        """
+
+        p = Path(self.path)
+        bval_file = p.parent / Path(p.stem).with_suffix(".bval")
+        if bval_file.is_file():
+            return bval_file
+
+    @property
+    def b_vector_file(self) -> Path:
+        """
+        Return FSL format b-vector file path.
+
+        Returns
+        -------
+        Path
+            FSL format b-vector file path
+        """
+
+        p = Path(self.path)
+        bvec_file = p.parent / Path(p.stem).with_suffix(".bvec")
+        if bvec_file.is_file():
+            return bvec_file
 
     @property
     def b_value(self) -> List[int]:

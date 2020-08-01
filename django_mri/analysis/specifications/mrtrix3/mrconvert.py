@@ -19,6 +19,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
+    FileInputDefinition,
 )
 from django_mri.models.inputs.nifti_input_definition import (
     NiftiInputDefinition,
@@ -34,6 +35,7 @@ MRCONVERT_INPUT_SPECIFICATION = {
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
+        "value_attribute": "path.__str__",
     },
     "out_file": {
         "type": StringInputDefinition,
@@ -50,7 +52,6 @@ MRCONVERT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
         "choices": ["yes", "no"],
-        "default": "yes",
     },
     "coord": {
         "type": ListInputDefinition,
@@ -58,7 +59,7 @@ MRCONVERT_INPUT_SPECIFICATION = {
         "description": "extract data at the specified coordinates",
     },
     "grad_file": {
-        "type": StringInputDefinition,
+        "type": FileInputDefinition,
         "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",  # noqa: E501
     },
     "grad_fsl": {
@@ -67,11 +68,11 @@ MRCONVERT_INPUT_SPECIFICATION = {
         "description": "(bvec, bval) DW gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",  # noqa: E501
     },
     "in_bval": {
-        "type": StringInputDefinition,
+        "type": FileInputDefinition,
         "description": "Bvals file in FSL format.",
     },
     "in_bvec": {
-        "type": StringInputDefinition,
+        "type": FileInputDefinition,
         "description": "Bvecs file in FSL format.",
     },
     "nthreads": {
