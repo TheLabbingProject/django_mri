@@ -15,7 +15,7 @@ from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.utils import (
     verbosify_output_dict,
 )
 from django_mri.analysis.interfaces.matlab.spm.cat12.utils.template_files import (  # noqa: E501
-    RELATIVE_DARTEL_TEMPLATE_LOCATION,
+    RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION,
     RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION,
 )
 from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.transformations import (  # noqa: E501
@@ -51,9 +51,14 @@ class Segmentation(SPMProcedure):
         self.tissue_probability_map_path = (
             self.spm_directory / RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION
         )
-        self.dartel_template_path = (
-            self.spm_directory / RELATIVE_DARTEL_TEMPLATE_LOCATION
+        self.shooting_tpm_path = (
+            self.spm_directory
+            / RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION
         )
+        # Removed in version 12.7
+        # self.dartel_template_path = (
+        #     self.spm_directory / RELATIVE_DARTEL_TEMPLATE_LOCATION
+        # )
 
     def transform_options(self) -> dict:
         """
@@ -99,8 +104,12 @@ class Segmentation(SPMProcedure):
             "$TPM_PATH", str(self.tissue_probability_map_path)
         )
         batch = batch.replace(
-            "$DARTEL_TEMPLATE_PATH", str(self.dartel_template_path)
+            "$SHOOTING_TPM_PATH", str(self.shooting_tpm_path)
         )
+        # Removed in version 12.7
+        # batch = batch.replace(
+        #     "$DARTEL_TEMPLATE_PATH", str(self.dartel_template_path)
+        # )
         for key, value in options.items():
             batch = batch.replace(f"${key.upper()}", str(value))
         return batch

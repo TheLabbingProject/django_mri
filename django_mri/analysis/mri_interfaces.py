@@ -51,7 +51,7 @@ interfaces = {
     "apply_topup": {ApplyTOPUP().version: ApplyTOPUP},
     "binary_maths": {BinaryMaths().version: BinaryMaths},
     "BET": {BET().version: BET},
-    "CAT12 Segmentation": {"12.6": Cat12Segmentation},
+    "CAT12 Segmentation": {"12.7": Cat12Segmentation},
     "fslmerge": {Merge().version: Merge},
     "fslreorient2std": {Reorient2Std().version: Reorient2Std},
     "fslroi": {ExtractROI().version: ExtractROI},
