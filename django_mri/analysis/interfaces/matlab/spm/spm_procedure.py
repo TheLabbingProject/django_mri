@@ -149,12 +149,16 @@ class SPMProcedure:
     def move_output_file(
         self, path: Path, run_dir: Path, destination_dir: Path
     ) -> dict:
-        destination = Path(destination_dir) / Path(path).relative_to(run_dir)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(path), str(destination))
-        if not len(list(path.parent.iterdir())):
-            path.parent.rmdir()
-        return destination
+        if path.is_file():
+            destination = Path(destination_dir) / Path(path).relative_to(
+                run_dir
+            )
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(path), str(destination))
+            # Delete the parent directory if it's empty.
+            if not len(list(path.parent.iterdir())):
+                path.parent.rmdir()
+            return destination
 
     def move_output_files(self, origin, run_dir: Path, destination: Path):
         if isinstance(origin, Path):
