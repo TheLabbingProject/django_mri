@@ -9,7 +9,7 @@ from pathlib import Path
 CAT12_MODULE_PATH = Path(__file__).parent.parent
 
 CAT12_SEGMENTATION_TEMPLATE = (
-    CAT12_MODULE_PATH / "segmentation" / "batch_template.m"
+    CAT12_MODULE_PATH / "segmentation" / "batch_template_12_7.m"
 )
 
 #: Batch template file path by interface (string) key.

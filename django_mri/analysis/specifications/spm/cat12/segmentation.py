@@ -16,9 +16,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     StringInputDefinition,
 )
-
 from django_analyses.models.output.definitions import FileOutputDefinition
-
 
 #: CAT12 segmentation interface input specification dictionary.
 CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
@@ -65,14 +63,15 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "default": "medium",
         "is_configuration": True,
     },
-    "accuracy": {
-        "type": StringInputDefinition,
-        "required": False,
-        "description": "",
-        "choices": ["average", "high", "ultra high"],
-        "default": "average",
-        "is_configuration": True,
-    },
+    # Removed in version 12.7
+    # "accuracy": {
+    #     "type": StringInputDefinition,
+    #     "required": False,
+    #     "description": "",
+    #     "choices": ["average", "high", "ultra high"],
+    #     "default": "average",
+    #     "is_configuration": True,
+    # },
     "affine_preprocessing": {
         "type": StringInputDefinition,
         "required": False,
@@ -231,6 +230,22 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "default": "none",
         "is_configuration": False,
         "is_output_switch": True,
+    },
+    # Added in version 12.7
+    "initial_segmentation": {
+        "type": StringInputDefinition,
+        "required": False,
+        "description": "",
+        "choices": ["spm", "kamap"],
+        "default": "spm",
+    },
+    # Added in version 12.7
+    "shooting_strength": {
+        "type": StringInputDefinition,
+        "required": False,
+        "description": "",
+        "choices": ["optimized", "default"],
+        "default": "optimized",
     },
 }
 

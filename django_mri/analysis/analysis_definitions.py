@@ -343,7 +343,7 @@ analysis_definitions = [
         "description": "SPM's CAT12 toolkit segmentation.",
         "versions": [
             {
-                "title": "12.6",
+                "title": "12.7",
                 "description": "",
                 "fixed_run_method_kwargs": {"verbose_output_dict": True},
                 "input": CAT12_SEGMENTATION_INPUT_SPECIFICATION,
