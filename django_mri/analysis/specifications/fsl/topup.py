@@ -27,7 +27,10 @@ from pathlib import Path
 import os
 
 
-FSLDIR = os.environ["FSLDIR"]
+try:
+    FSLDIR = os.environ["FSLDIR"]
+except KeyError:
+    FSLDIR = "/usr/local/fsl/"
 
 #: *topup* input specification.
 TOPUP_INPUT_SPECIFICATION = {

@@ -30,9 +30,9 @@ def _verbose_surface_estimation(output_dict: dict) -> dict:
 
 def _verbosify_label_files(output_dict: dict) -> dict:
     label_files = [
-        output_dict.get(atlas_map)
+        output_dict[atlas_map]
         for atlas_map in ROI_ATLAS_MAPS
-        if output_dict.get(atlas_map)
+        if atlas_map in output_dict
     ]
     if any(label_files):
         return {
