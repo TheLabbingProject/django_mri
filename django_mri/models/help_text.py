@@ -14,10 +14,10 @@ SCAN_INVERSION_TIME = "The time between the 180-degree inversion pulse and the f
 SCAN_NUMBER = (
     "The number of this scan relative to the session in which it was acquired."
 )
-SCAN_REPETITION_TIME = (
-    "The time between two successive RF pulses (in milliseconds)."
-)
+SCAN_REPETITION_TIME = "The time between two successive RF pulses (in milliseconds)."
 SCAN_TIME = "The time in which the scan was acquired."
+
+SESSION_COMMENTS = "Comments for all scans in session."
 
 
 # flake8: noqa: E501

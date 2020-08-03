@@ -1,6 +1,6 @@
 from django_extensions.db.models import TimeStampedModel
+from django_mri.models import help_text
 from django.db import models
-from django_mri.models import Scan
 
 
 class Session(TimeStampedModel):
@@ -17,6 +17,5 @@ class Session(TimeStampedModel):
     )
 
     comments = models.TextField(
-        max_length=1000, blank=True, null=True, help_text=help_text.SCAN_COMMENTS,
+        max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
     )
-
