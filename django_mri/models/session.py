@@ -19,3 +19,7 @@ class Session(TimeStampedModel):
     comments = models.TextField(
         max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
     )
+
+    def get_scans_avg_acquisition_time(self):
+        scans = self.mri_scans.all()
+        return scans.aggregate(models.Avg("aquisition_time"))

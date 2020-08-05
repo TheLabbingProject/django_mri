@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Manager
 from django_dicom.models.image import Image as DicomImage
 from django_mri.utils.scan_type import ScanType
@@ -20,3 +21,10 @@ class ScanManager(Manager):
     ) -> tuple:
         dicom_scans = self.import_dicom_data(path, progressbar, report)
         return {ScanType.DICOM.value: dicom_scans}
+
+    def create(self, **obj_data):
+        try:
+            scan = self.get(dicom=obj_data["dicom"])
+            return scan
+        except ObjectDoesNotExist:
+            return super().create(**obj_data)
