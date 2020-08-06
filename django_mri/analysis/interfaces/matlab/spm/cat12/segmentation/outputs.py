@@ -13,6 +13,10 @@ SEGMENTATION_OUTPUT = {
         "surf/rh.sphere.{file_name}.gii",
         "surf/rh.sphere.reg.{file_name}.gii",
         "surf/rh.thickness.{file_name}",
+        "surf/lh.pbt.{file_name}",
+        "surf/rh.pbt.{file_name}",
+        "label/catROIs_{file_name}.mat",
+        "label/catROIs_{file_name}.xml",
     ],
     "neuromorphometrics": [
         "label/catROI_{file_name}.mat",

@@ -24,6 +24,10 @@ def _verbose_surface_estimation(output_dict: dict) -> dict:
                 6
             ],
             "right_hemisphere_cortical_thickness": surface_estimation[7],
+            "left_hemisphere_pbt": surface_estimation[8],
+            "right_hemisphere_pbt": surface_estimation[9],
+            "surface_labels_mat": surface_estimation[10],
+            "surface_labels_xml": surface_estimation[11],
         }
     return {}
 
