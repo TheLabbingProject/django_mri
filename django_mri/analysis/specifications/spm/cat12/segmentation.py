@@ -115,7 +115,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "neuromorphometrics": {
@@ -267,6 +267,7 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "",
     },
+    "left_hemisphere_pbt": {"type": FileOutputDefinition, "description": "",},
     "right_hemisphere_central_surface": {
         "type": FileOutputDefinition,
         "description": "",
@@ -283,8 +284,11 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "",
     },
+    "right_hemisphere_pbt": {"type": FileOutputDefinition, "description": "",},
     "labels_mat": {"type": FileOutputDefinition, "description": ""},
     "labels_xml": {"type": FileOutputDefinition, "description": ""},
+    "surface_labels_mat": {"type": FileOutputDefinition, "description": ""},
+    "surface_labels_xml": {"type": FileOutputDefinition, "description": ""},
     "native_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "modulated_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "dartel_grey_matter": {"type": FileOutputDefinition, "description": ""},
