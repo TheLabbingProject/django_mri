@@ -38,7 +38,6 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "description": "Input DWI image.",
         "is_configuration": False,
         "run_method_input": True,
-        "value_attribute": "mif.__str__",
     },
     "destination": {
         "type": DirectoryInputDefinition,
@@ -137,7 +136,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "grad_fsl": {
         "type": ListInputDefinition,
         "element_type": "STR",
-        "description": "Provide the diffusion gradient table in MRtrix format",
+        "description": "Provide the diffusion gradient table in FSL bvecs/bvals format",
     },
     "export_grad_mrtrix": {
         "type": StringInputDefinition,

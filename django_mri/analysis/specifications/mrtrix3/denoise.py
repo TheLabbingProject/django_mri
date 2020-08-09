@@ -22,6 +22,9 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
@@ -30,7 +33,6 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": ScanInputDefinition,
         "required": True,
         "is_configuration": False,
-        "value_attribute": "mif.__str__",
     },
     "bval_scale": {
         "type": StringInputDefinition,

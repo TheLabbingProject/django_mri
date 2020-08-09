@@ -34,7 +34,7 @@ FSLROI_CONFIGURATION = {
     "z_size": -1,
 }
 MERGE_CONFIGURATION = {"dimension": "t"}
-BET_CONFIGURATION = {"mask": True}
+BET_CONFIGURATION = {"mask": True, "frac": 0.15}
 MRCONVERT_CONFIGURATION = {}
 DENOISE_CONFIGURATION = {}
 DWIFSLPREPROC_CONFIGURATION = {
@@ -98,4 +98,23 @@ PASS_MERGED_MIF_TO_DWIFSLPREPROC = {
     "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "se_epi",
+}
+PASS_MASK_TO_DENOISE = {
+    "source": BET_NODE,
+    "source_port": "mask_file",
+    "destination": DENOISE_NODE,
+    "destination_port": "mask",
+}
+DEGIBBSED_PIPE_MAIN = {
+    "source": DWIFSLPREPROC_NODE,
+    "source_port": "preprocessed_dwi",
+    "destination": DEGIBBS_NODE,
+    "destination_port": "in_file",
+}
+
+DEGIBBSED_PIPE_MASK = {
+    "source": DWIFSLPREPROC_NODE,
+    "source_port": "eddy_mask",
+    "destination": BIAS_CORRECT_NODE,
+    "destination_port": "in_mask",
 }
