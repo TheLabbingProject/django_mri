@@ -27,4 +27,6 @@ SEGMENTATION_DEFAULTS = {
     "warped_image": True,
     "jacobian_determinant": False,
     "deformation_fields": "none",
+    "initial_segmentation": "spm",
+    "shooting_strength": "optimized",
 }

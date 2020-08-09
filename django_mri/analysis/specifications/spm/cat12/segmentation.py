@@ -16,9 +16,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     StringInputDefinition,
 )
-
 from django_analyses.models.output.definitions import FileOutputDefinition
-
 
 #: CAT12 segmentation interface input specification dictionary.
 CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
@@ -65,14 +63,15 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "default": "medium",
         "is_configuration": True,
     },
-    "accuracy": {
-        "type": StringInputDefinition,
-        "required": False,
-        "description": "",
-        "choices": ["average", "high", "ultra high"],
-        "default": "average",
-        "is_configuration": True,
-    },
+    # Removed in version 12.7
+    # "accuracy": {
+    #     "type": StringInputDefinition,
+    #     "required": False,
+    #     "description": "",
+    #     "choices": ["average", "high", "ultra high"],
+    #     "default": "average",
+    #     "is_configuration": True,
+    # },
     "affine_preprocessing": {
         "type": StringInputDefinition,
         "required": False,
@@ -116,7 +115,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "neuromorphometrics": {
@@ -232,6 +231,22 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "is_configuration": False,
         "is_output_switch": True,
     },
+    # Added in version 12.7
+    "initial_segmentation": {
+        "type": StringInputDefinition,
+        "required": False,
+        "description": "",
+        "choices": ["spm", "kamap"],
+        "default": "spm",
+    },
+    # Added in version 12.7
+    "shooting_strength": {
+        "type": StringInputDefinition,
+        "required": False,
+        "description": "",
+        "choices": ["optimized", "default"],
+        "default": "optimized",
+    },
 }
 
 #: CAT12 segmentation interface output specification dictionary.
@@ -252,6 +267,7 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "",
     },
+    "left_hemisphere_pbt": {"type": FileOutputDefinition, "description": "",},
     "right_hemisphere_central_surface": {
         "type": FileOutputDefinition,
         "description": "",
@@ -268,8 +284,11 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "",
     },
+    "right_hemisphere_pbt": {"type": FileOutputDefinition, "description": "",},
     "labels_mat": {"type": FileOutputDefinition, "description": ""},
     "labels_xml": {"type": FileOutputDefinition, "description": ""},
+    "surface_labels_mat": {"type": FileOutputDefinition, "description": ""},
+    "surface_labels_xml": {"type": FileOutputDefinition, "description": ""},
     "native_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "modulated_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "dartel_grey_matter": {"type": FileOutputDefinition, "description": ""},

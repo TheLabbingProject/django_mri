@@ -47,6 +47,10 @@ FLIRT_NODE = {
     "analysis_version": "FLIRT",
     "configuration": {"reference": MNI.id, "interp": "spline"},
 }
+FNIRT_NODE = {
+    "analysis_version": "FNIRT",
+    "configuration": {"ref_file": MNI.id},
+}
 
 
 # Pipe creation
@@ -57,11 +61,6 @@ BET_TO_REORIENT = {
     "destination": REORIENT_NODE,
     "destination_port": "in_file",
 }
-FNIRT_NODE = {
-    "analysis_version": "FNIRT",
-    "configuration": {"ref_file": MNI.id},
-}
-
 REORIENT_TO_FOV = {
     "source": REORIENT_NODE,
     "source_port": "out_file",

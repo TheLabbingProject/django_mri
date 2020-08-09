@@ -23,4 +23,6 @@ SEGMENTATION_TRANSFORMATIONS = {
     },
     "dartel_grey_matter": {"no": 0, "rigid": 1, "affine": 2},
     "dartel_white_matter": {"no": 0, "rigid": 1, "affine": 2},
+    "initial_segmentation": {"spm": 0, "kamap": 2},
+    "shooting_strength": {"optimized": 0.5, "default": 4},
 }

@@ -24,15 +24,19 @@ def _verbose_surface_estimation(output_dict: dict) -> dict:
                 6
             ],
             "right_hemisphere_cortical_thickness": surface_estimation[7],
+            "left_hemisphere_pbt": surface_estimation[8],
+            "right_hemisphere_pbt": surface_estimation[9],
+            "surface_labels_mat": surface_estimation[10],
+            "surface_labels_xml": surface_estimation[11],
         }
     return {}
 
 
 def _verbosify_label_files(output_dict: dict) -> dict:
     label_files = [
-        output_dict.get(atlas_map)
+        output_dict[atlas_map]
         for atlas_map in ROI_ATLAS_MAPS
-        if output_dict.get(atlas_map)
+        if atlas_map in output_dict
     ]
     if any(label_files):
         return {
