@@ -43,7 +43,8 @@ DWIFSLPREPROC_CONFIGURATION = {
     "eddy_oprions": " --slm=linear ",
 }
 DEGIBBS_CONFIGURATION = {}
-BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
+# BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
+BIAS_CORRECT_CONFIGURATION = {"use_fsl": True}
 
 # Nodes
 FSLROI_NODE = {
@@ -86,16 +87,10 @@ FIRST_AP_VOLUME_TO_MERGE = {
     "destination": MERGE_NODE,
     "destination_port": "in_files",
 }
-# Generate dual-phase encoded image
-CONVERT_MERGED_TO_MIF = {
+
+PASS_MERGED_TO_DWIFSLPREPROC = {
     "source": MERGE_NODE,
     "source_port": "merged_file",
-    "destination": MRCONVERT_NODE,
-    "destination_port": "in_file",
-}
-PASS_MERGED_MIF_TO_DWIFSLPREPROC = {
-    "source": MRCONVERT_NODE,
-    "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "se_epi",
 }

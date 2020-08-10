@@ -35,8 +35,8 @@ class DwiFslPreproc:
     )
 
     #: Non-default output configurations.
-    SUPPLEMENTARY_OUTPUTS = "eddyqc_text", "eddyqc_all"
-
+    SUPPLEMENTARY_OUTPUTS = ["eddyqc_text", "eddyqc_all"]
+    DEFAULT_INPUTS = ["json_import", "grad_fsl"]
     #: Default name for primary output file.
     DEFAULT_OUTPUT_NAME = "preprocessed_dwi.mif"
 
@@ -64,7 +64,7 @@ class DwiFslPreproc:
     __version__ = "BETA"
 
     def __init__(self, configuration: dict):
-        self.configuration = configuration
+        self.configuration = self.set_default_configurations(configuration)
 
     def add_supplementary_outputs(self, destination: Path) -> dict:
         """
@@ -94,6 +94,31 @@ class DwiFslPreproc:
             if key not in config.keys():
                 config[key] = destination
         return config
+
+    def set_default_configurations(self, scan, configurations: dict) -> dict:
+        """
+        Sets default values for convenience of use.
+        Parameters
+        ----------
+        scan : ~django_mri.models.scan.Scan
+            Input scan
+        configurations : dict
+            Dictionary of configuration arguments for the command by keys and values
+
+        Returns
+        -------
+        dict
+            Default input files by key if not stated by user
+        """
+        for key, value in configurations.items():
+            if key in self.DEFAULT_INPUTS and not value:
+                if "json" in key:
+                    configurations[key] = scan.nifti.json_file
+                elif "grad" in key:
+                    configurations[
+                        key
+                    ] = f"{scan.nifti.b_vector_file} {scan.nifti.b_value_file}"
+        return configurations
 
     def generate_command(self, scan, destination: Path, config: str) -> str:
         """
