@@ -7,7 +7,7 @@ import warnings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import models, IntegrityError
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
@@ -15,7 +15,11 @@ from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.utils.utils import get_subject_model, get_group_model
+from django_mri.utils.utils import (
+    get_subject_model,
+    get_group_model,
+    get_min_distance_session,
+)
 from django_mri.utils.utils import get_mri_root
 from django_mri.utils.bids import Bids
 from pathlib import Path
@@ -137,10 +141,15 @@ class Scan(TimeStampedModel):
         on_delete=models.SET_NULL,
     )
 
+    session = models.ForeignKey(
+        "django_mri.Session", blank=True, null=True, on_delete=models.CASCADE,
+    )
+
     objects = ScanManager()
 
     class Meta:
         verbose_name_plural = "MRI Scans"
+        unique_together = ("number", "session")
 
     def __str__(self) -> str:
         """
@@ -168,9 +177,25 @@ class Scan(TimeStampedModel):
            https://docs.djangoproject.com/en/3.0/topics/db/models/#overriding-model-methods
         """
 
+        Subject = get_subject_model()
+
+        def create_session(subject=None):
+            session = Session.objects.create(subject=subject)
+            kwargs["session"] = session
+
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
-        super().save(*args, **kwargs)
+        try:
+            subject = Subject.objects.get(id_number=self.dicom.patient.uid)
+            sessions = Session.objects.filter(subject=subject)
+            kwargs["session"] = get_min_distance_session(self, sessions)
+        except models.ObjectDoesNotExist:
+            create_session()
+        try:
+            super().save(*args, **kwargs)
+        except IntegrityError:
+            create_session(subject)
+            super().save(*args, **kwargs)
 
     def update_fields_from_dicom(self) -> None:
         """
@@ -374,6 +399,14 @@ class Scan(TimeStampedModel):
                 self.subject = subject
                 self.save()
 
+    def infer_session(self):
+        Subject = get_subject_model()
+        
+        try:
+            subject = Subject.objects.get(id_number=self.dicom.patient.uid)
+        except models.ObjectDoesNotExist:
+            pass
+
     def convert_to_mif(self) -> Path:
         """
         Creates a *.mif* version of this scan using mrconvert_.
@@ -469,10 +502,3 @@ class Scan(TimeStampedModel):
             self.save()
         return self._nifti
 
-    @property
-    def acquisition_time(self):
-        return self.dicom.acquisition_time
-
-    @property
-    def acquisition_date(self):
-        return self.dicom.acquisition_date

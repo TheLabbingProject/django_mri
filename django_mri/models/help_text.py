@@ -17,7 +17,7 @@ SCAN_NUMBER = (
 SCAN_REPETITION_TIME = "The time between two successive RF pulses (in milliseconds)."
 SCAN_TIME = "The time in which the scan was acquired."
 
-SESSION_COMMENTS = "Comments for all scans in session."
+SESSION_COMMENTS = "General comments about MRI scanning session."
 
 
 # flake8: noqa: E501

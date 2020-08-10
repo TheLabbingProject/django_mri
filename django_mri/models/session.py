@@ -1,4 +1,6 @@
 from django_extensions.db.models import TimeStampedModel
+
+from django_mri.utils import get_subject_model
 from django_mri.models import help_text
 from django.db import models
 
@@ -9,9 +11,9 @@ class Session(TimeStampedModel):
     """
 
     subject = models.ForeignKey(
-        "django_mri.Scan",
+        get_subject_model(),
         on_delete=models.CASCADE,
-        related_name="scanning_sessions",
+        related_name="mri_session_set",
         blank=True,
         null=True,
     )
@@ -20,6 +22,9 @@ class Session(TimeStampedModel):
         max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
     )
 
-    def get_scans_avg_acquisition_time(self):
-        scans = self.mri_scans.all()
-        return scans.aggregate(models.Avg("aquisition_time"))
+    time = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.scan_set.all():
+            self.time = min(self.scan_set.values_list("time", flat=True))
+        super().save(*args, **kwargs)

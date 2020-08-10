@@ -67,3 +67,11 @@ def get_dicom_root() -> Path:
     """
 
     return get_mri_root() / DEFAULT_DICOM_DIR_NAME
+
+
+def get_min_distance_session(scan, sessions):
+    """
+    Returns the session with the minimal timedelta in relation to the given scan.
+    """
+
+    return min(sessions, key=lambda session: abs(session.time - scan.time))
