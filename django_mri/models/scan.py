@@ -189,12 +189,15 @@ class Scan(TimeStampedModel):
             subject = Subject.objects.get(id_number=self.dicom.patient.uid)
             sessions = Session.objects.filter(subject=subject)
             kwargs["session"] = get_min_distance_session(self, sessions)
-        except models.ObjectDoesNotExist:
+        except models.ObjectDoesNotExist:  # The subject does not exist.
             create_session()
         try:
             super().save(*args, **kwargs)
-        except IntegrityError:
+        except IntegrityError:  # There is already a scan with this number associated with this session.
             create_session(subject)
+            other_sessions = subject.mri_session_set.exclude(id=kwargs["session"].id)
+            for session in other_sessions:
+                session.infer_session()
             super().save(*args, **kwargs)
 
     def update_fields_from_dicom(self) -> None:
@@ -401,11 +404,9 @@ class Scan(TimeStampedModel):
 
     def infer_session(self):
         Subject = get_subject_model()
-        
-        try:
-            subject = Subject.objects.get(id_number=self.dicom.patient.uid)
-        except models.ObjectDoesNotExist:
-            pass
+        subject = Subject.objects.get(id_number=self.dicom.patient.uid)
+        sessions = Session.objects.filter(subject=subject)
+        self.session = get_min_distance_session(self, sessions)
 
     def convert_to_mif(self) -> Path:
         """
