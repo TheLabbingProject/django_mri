@@ -42,6 +42,7 @@ from nipype.interfaces.mrtrix3 import (
     MRDeGibbs,
     DWIBiasCorrect,
     MRConvert,
+    ConstrainedSphericalDeconvolution,
 )
 
 
@@ -68,6 +69,9 @@ interfaces = {
     "denoise": {DWIDenoise().version: DWIDenoise},
     "degibbs": {MRDeGibbs().version: MRDeGibbs},
     "bias_correct": {DWIBiasCorrect().version: DWIBiasCorrect},
-    "dwipreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
+    "dwifslpreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
     "mrconvert": {MRConvert().version: MRConvert},
+    "dwi2fod": {
+        ConstrainedSphericalDeconvolution().version: ConstrainedSphericalDeconvolution
+    },
 }

@@ -1,6 +1,6 @@
 """
 Definition of the
-:class:`~django_mri.analysis.interfaces.mrtrix3.dwifslpreproc` interface.
+:class:`~django_mri.analysis.interfaces.fsl.generate_datain` interface.
 """
 
 import subprocess
@@ -8,63 +8,28 @@ import subprocess
 from pathlib import Path
 
 
-class DwiFslPreproc:
+class GenerateDatain:
     """
-    An interface for the MRtrix3 *dwifslpreproc* script.
+    An interface for automatically create a datain.txt file for field map correction by FSL's tools.
 
     References
     ----------
-    * dwifslpreproc_
+    * Field map correction with FSL_
 
-    .. _dwifslpreproc:
-       https://mrtrix.readthedocs.io/en/latest/reference/commands/dwifslpreproc.html
+    .. _Field map correction with FSL:
+       https://lcni.uoregon.edu/kb-articles/kb-0003
     """
 
     #: "Flags" indicate parameters that are specified without any arguments,
     #: i.e. they are a switch for some binary configuration.
-    FLAGS = (
-        "align_seepi",
-        "rpe_none",
-        "rpe_pair",
-        "rpe_all",
-        "rpe_header",
-        "force",
-        "quiet",
-        "info",
-        "nocleanup",
-    )
 
-    #: Non-default output configuration.
-    SUPPLEMENTARY_OUTPUTS = ["eddyqc_all"]
-    DEFAULT_INPUTS = ["json_import", "fslgrad"]
+    #: Non-default output configurations.
     #: Default name for primary output file.
-    DEFAULT_OUTPUT_NAME = "preprocessed_dwi.mif"
-
-    #: *eddy* output files by key.
-    #:
-    #: References
-    #: ----------
-    #: * eddy_
-    #:
-    #: .. _eddy:
-    #:    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
-    EDDY_OUTPUTS = {
-        "out_movement_rms": "eddy_movement_rms",
-        "eddy_mask": "eddy_mask.nii",
-        "out_outlier_map": "eddy_outlier_map",
-        "out_outlier_n_sqr_stdev_map": "eddy_outlier_n_sqr_stdev_map",
-        "out_outlier_n_stdev_map": "eddy_outlier_n_stdev_map",
-        "out_outlier_report": "eddy_outlier_report",
-        "out_parameter": "eddy_parameters",
-        "out_restricted_movement_rms": "eddy_restricted_movement_rms",
-        "out_shell_alignment_parameters": "eddy_post_eddy_shell_alignment_parameters",  # noqa: E501
-        "out_shell_pe_translation_parameters": "eddy_post_eddy_shell_PE_translation_parameters",  # noqa: E501
-    }
 
     __version__ = "BETA"
 
-    def __init__(self, **kwargs):
-        self.configuration = self.set_default_configuration(kwargs)
+    def __init__(self, configuration: dict):
+        self.configuration = configuration
 
     def add_supplementary_outputs(self, destination: Path) -> dict:
         """
@@ -95,14 +60,14 @@ class DwiFslPreproc:
                 config[key] = destination
         return config
 
-    def set_default_configuration(self, configuration: dict) -> dict:
+    def set_default_configurations(self, scan, configurations: dict) -> dict:
         """
         Sets default values for convenience of use.
         Parameters
         ----------
         scan : ~django_mri.models.scan.Scan
             Input scan
-        configuration : dict
+        configurations : dict
             Dictionary of configuration arguments for the command by keys and values
 
         Returns
@@ -110,29 +75,27 @@ class DwiFslPreproc:
         dict
             Default input files by key if not stated by user
         """
-        scan = configuration.get("scan")
-        for key in self.DEFAULT_INPUTS:
-            if not configuration.get(key):
+        for key, value in configurations.items():
+            if key in self.DEFAULT_INPUTS and not value:
                 if "json" in key:
-                    json_file = scan.nifti.json_file
-                    if json_file.is_file():
-                        configuration[key] = str(json_file)
+                    configurations[key] = scan.nifti.json_file
                 elif "grad" in key:
-                    bvec_file = scan.nifti.b_vector_file
-                    bval_file = scan.nifti.b_value_file
-                    if bvec_file.is_file() and bval_file.is_file():
-                        configuration[key] = f"{bvec_file} {bval_file}"
-        return configuration
+                    configurations[
+                        key
+                    ] = f"{scan.nifti.b_vector_file} {scan.nifti.b_value_file}"
+        return configurations
 
-    def generate_command(self, destination: Path, config: dict) -> str:
+    def generate_command(self, scan, destination: Path, config: str) -> str:
         """
         Returns the command to be executed in order to run the analysis.
 
         Parameters
         ----------
+        scan : ~django_mri.models.scan.Scan
+            Input scan
         destination : Path
             Output files destination direcotry
-        config : dict
+        config : str
             Configuration arguments for the command
 
         Returns
@@ -142,15 +105,13 @@ class DwiFslPreproc:
         """
 
         output_path = destination / self.DEFAULT_OUTPUT_NAME
-        scan = config.pop("scan")
-        pe_direction = scan.nifti.get_phase_encoding_direction()
-        command = f"dwifslpreproc {scan.nifti.path} {output_path} -pe_dir {pe_direction}"
+        command = f"dwifslpreproc {scan.path} {output_path} {config}"
         return command + "".join(
             [
                 f" -{key}"
                 if key in self.FLAGS and value
                 else f" -{key} {value}"
-                for key, value in config.items()
+                for key, value in self.configuration.items()
             ]
         )
 
@@ -176,7 +137,7 @@ class DwiFslPreproc:
             output_dict[key] = destination / value
         return output_dict
 
-    def run(self, destination: Path = None) -> dict:
+    def run(self, scan, destination: Path = None) -> dict:
         """
         Runs *dwifslpreproc* with the provided *scan* as input.
         If *destination* is not specified, output files will be created within
@@ -202,7 +163,7 @@ class DwiFslPreproc:
 
         destination = Path(destination) if destination else scan.path.parent
         config = self.add_supplementary_outputs(destination)
-        command = self.generate_command(destination, config).split()
+        command = self.generate_command(scan, destination, config).split()
         process = subprocess.run(command, capture_output=True)
         if process.returncode:
             raise RuntimeError("Failed to run dwifslpreproc!")

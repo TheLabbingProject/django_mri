@@ -20,10 +20,6 @@ TOPUP_CONFIGURATION = {}
 MEAN_CONFIGURATION = {"dimension": "T"}
 MATHS_CONFIGURATION = {"operand_value": 6.28, "operation": "mul"}
 BET_CONFIGURATION = {"mask": True}
-EDDY_CONFIGURATION = {}
-DENOISE_CONFIGURATION = {}
-DEGIBBS_CONFIGURATION = {}
-BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
 
 
 # Node creation
@@ -49,19 +45,6 @@ MATHS_NODE = {
     "configuration": MATHS_CONFIGURATION,
 }
 BET_NODE = {"analysis_version": "BET", "configuration": BET_CONFIGURATION}
-EDDY_NODE = {"analysis_version": "eddy", "configuration": EDDY_CONFIGURATION}
-DENOISE_NODE = {
-    "analysis_version": "denoise",
-    "configuration": DENOISE_CONFIGURATION,
-}
-DEGIBBS_NODE = {
-    "analysis_version": "degibbs",
-    "configuration": DEGIBBS_CONFIGURATION,
-}
-BIAS_CORRECT_NODE = {
-    "analysis_version": "bias_correct",
-    "configuration": BIAS_CORRECT_CONFIGURATION,
-}
 
 
 # Pipe creation

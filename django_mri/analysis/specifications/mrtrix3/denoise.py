@@ -20,6 +20,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
+    TupleInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.nifti_input_definition import (
@@ -33,6 +34,7 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": ScanInputDefinition,
         "required": True,
         "is_configuration": False,
+        "value_attribute": "nifti.path",
     },
     "bval_scale": {
         "type": StringInputDefinition,
@@ -41,10 +43,10 @@ DENOISE_INPUT_SPECIFICATION = {
         "default": "yes",
     },
     "extent": {
-        "type": ListInputDefinition,
+        "type": TupleInputDefinition,  ### FIX - NEEDS TO BE TUPLE ###
         "element_type": "FLT",
         "description": "Set the window size of the denoising filter.",
-        "default": [5.0, 5.0, 5.0],
+        "default": (5.0, 5.0, 5.0),
     },
     "grad_file": {
         "type": StringInputDefinition,

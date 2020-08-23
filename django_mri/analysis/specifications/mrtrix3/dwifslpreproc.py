@@ -24,6 +24,9 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
@@ -37,7 +40,6 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
-        "run_method_input": True,
     },
     "destination": {
         "type": DirectoryInputDefinition,
@@ -76,7 +78,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "description": "Manually specify the total readout time of the input series (in seconds)",  # noqa: E501
     },
     "se_epi": {
-        "type": FileInputDefinition,
+        "type": NiftiInputDefinition,
         "description": "Provide an additional image series consisting of spin-echo EPI images, which is to be used exclusively by topup for estimating the inhomogeneity field (i.e. it will not form part of the output image series)",  # noqa: E501
     },
     "align_seepi": {
@@ -133,7 +135,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Provide the diffusion gradient table in MRtrix format",
     },
-    "grad_fsl": {
+    "fslgrad": {
         "type": ListInputDefinition,
         "element_type": "STR",
         "description": "Provide the diffusion gradient table in FSL bvecs/bvals format",

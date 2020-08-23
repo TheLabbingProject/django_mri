@@ -109,6 +109,10 @@ from django_mri.analysis.specifications.mrtrix3.dwifslpreproc import (
     DWIFSLPREPROC_INPUT_SPECIFICATION,
     DWIFSLPREPROC_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.mrtrix3.estimate_fod import (
+    DWI2FOD_INPUT_SPECIFICATION,
+    DWI2FOD_OUTPUT_SPECIFICATION,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -131,6 +135,7 @@ from nipype.interfaces.mrtrix3 import (
     DWIBiasCorrect,
     MRDeGibbs,
     MRConvert,
+    ConstrainedSphericalDeconvolution,
 )
 from nipype.interfaces.fsl.base import no_fsl
 
@@ -412,6 +417,19 @@ analysis_definitions = [
                 "description": f"Default dwibiascorrect version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": BIAS_CORRECT_INPUT_SPECIFICATION,
                 "output": BIAS_CORRECT_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "dwi2fod",
+        "description": "Estimate fibre orientation distributions from diffusion data using spherical deconvolution.",  # noqa: E501
+        "versions": [
+            {
+                "title": ConstrainedSphericalDeconvolution().version or "1.0",
+                "description": f"Default ConstrainedSphericalDeconvolution version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWI2FOD_INPUT_SPECIFICATION,
+                "output": DWI2FOD_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],

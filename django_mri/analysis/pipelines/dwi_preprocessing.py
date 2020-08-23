@@ -40,7 +40,7 @@ DENOISE_CONFIGURATION = {}
 DWIFSLPREPROC_CONFIGURATION = {
     "align_seepi": True,
     "rpe_pair": True,
-    "eddy_oprions": " --slm=linear ",
+    "eddy_options": '" --slm=linear"',
 }
 DEGIBBS_CONFIGURATION = {}
 # BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
