@@ -7,7 +7,9 @@ import warnings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
-from django.db import models, IntegrityError
+from django.db import models
+from django.db.utils import IntegrityError
+from psycopg2.errors import UniqueViolation
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
@@ -15,6 +17,7 @@ from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
+from django_mri.models.session import Session
 from django_mri.utils.utils import (
     get_subject_model,
     get_group_model,
@@ -112,17 +115,6 @@ class Scan(TimeStampedModel):
         "django_mri.NIfTI", on_delete=models.SET_NULL, blank=True, null=True
     )
 
-    #: Associates this scan with some subject. Subjects are expected to be
-    #: represented by a model specified as `SUBJECT_MODEL` in the project's
-    #: settings.
-    subject = models.ForeignKey(
-        get_subject_model(),
-        on_delete=models.PROTECT,
-        related_name="mri_scans",
-        blank=True,
-        null=True,
-    )
-
     #: Individual scans may be associated with multiple `Group` instances.
     #: This is meant to provide flexibility in managing access to data between
     #: researchers working on different studies.
@@ -141,9 +133,18 @@ class Scan(TimeStampedModel):
         on_delete=models.SET_NULL,
     )
 
+    # #: Associates this scan with some session of a subject.
     session = models.ForeignKey(
         "django_mri.Session", blank=True, null=True, on_delete=models.CASCADE,
     )
+
+    # subject = models.ForeignKey(
+    #     get_subject_model(),
+    #     on_delete=models.PROTECT,
+    #     related_name="mri_scans",
+    #     blank=True,
+    #     null=True,
+    # )
 
     objects = ScanManager()
 
@@ -179,26 +180,32 @@ class Scan(TimeStampedModel):
 
         Subject = get_subject_model()
 
-        def create_session(subject=None):
-            session = Session.objects.create(subject=subject)
-            kwargs["session"] = session
-
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
         try:
             subject = Subject.objects.get(id_number=self.dicom.patient.uid)
-            sessions = Session.objects.filter(subject=subject)
-            kwargs["session"] = get_min_distance_session(self, sessions)
+            sessions = subject.mri_session_set.all()
+            if len(sessions) == 0:
+                Session.objects.create(time=self.dicom.datetime, subject=subject)
+                sessions = subject.mri_session_set.all()
+            self.session = get_min_distance_session(self, sessions)
         except models.ObjectDoesNotExist:  # The subject does not exist.
-            create_session()
+            self.session = Session.objects.create(
+                subject=subject, time=self.dicom.datetime
+            )
         try:
-            super().save(*args, **kwargs)
+            super(Scan, self).save(*args, **kwargs)
+            self.session.save()
         except IntegrityError:  # There is already a scan with this number associated with this session.
-            create_session(subject)
-            other_sessions = subject.mri_session_set.exclude(id=kwargs["session"].id)
+            self.session = Session.objects.create(
+                subject=subject, time=self.dicom.datetime
+            )
+            other_sessions = subject.mri_session_set.all()
             for session in other_sessions:
-                session.infer_session()
-            super().save(*args, **kwargs)
+                for scan in session.scan_set.all():
+                    scan.infer_session()
+            super(Scan, self).save(*args, **kwargs)
+            self.session.save()
 
     def update_fields_from_dicom(self) -> None:
         """
@@ -393,19 +400,21 @@ class Scan(TimeStampedModel):
         if subject is not None:
             # If this scan actually belongs to a different subject (and
             # self.subject is not None), warn the user and return.
-            mismatch = self.subject != subject
-            if self.subject and mismatch:
+            session = self.session
+            curr_subject = session.subject
+            mismatch = curr_subject != subject
+            if curr_subject and mismatch:
                 self.warn_subject_mismatch(subject)
             # Else, if this scan is not assigned to any subject but a subject
             # was provided (and not None), associate this scan with it.
             else:
-                self.subject = subject
-                self.save()
+                session.subject = subject
+                session.save()
 
-    def infer_session(self):
+    def infer_session(self) -> None:
         Subject = get_subject_model()
         subject = Subject.objects.get(id_number=self.dicom.patient.uid)
-        sessions = Session.objects.filter(subject=subject)
+        sessions = subject.mri_session_set.exclude(id=self.session_id)
         self.session = get_min_distance_session(self, sessions)
 
     def convert_to_mif(self) -> Path:

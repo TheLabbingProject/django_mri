@@ -5,6 +5,7 @@ General app utilites.
 from django.apps import apps
 from django.conf import settings
 from pathlib import Path
+from datetime import timedelta
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.
@@ -74,4 +75,15 @@ def get_min_distance_session(scan, sessions):
     Returns the session with the minimal timedelta in relation to the given scan.
     """
 
-    return min(sessions, key=lambda session: abs(session.time - scan.time))
+    return (
+        min(
+            sessions,
+            key=lambda session: abs(scan.time - session.time)
+            if scan.session_id != session.id
+            and scan.number
+            not in list(session.scan_set.values_list("number", flat=True))
+            else timedelta.max,
+        )
+        if len(sessions) > 0
+        else scan.session
+    )
