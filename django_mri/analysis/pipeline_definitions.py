@@ -23,5 +23,12 @@ from django_mri.analysis.pipelines.basic_fsl_preprocessing import (
 from django_mri.analysis.pipelines.fieldmap_correction import (
     FIELDMAP_CORRECTION,
 )
+from django_mri.analysis.pipelines.dwi_preprocessing import (
+    DWI_PREPROCESSING_PIPELINE,
+)
 
-pipeline_definitions = [BASIC_FSL_PREPROCESSING, FIELDMAP_CORRECTION]
+pipeline_definitions = [
+    BASIC_FSL_PREPROCESSING,
+    FIELDMAP_CORRECTION,
+    DWI_PREPROCESSING_PIPELINE,
+]

@@ -44,7 +44,7 @@ DWIFSLPREPROC_CONFIGURATION = {
 }
 DEGIBBS_CONFIGURATION = {}
 # BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
-BIAS_CORRECT_CONFIGURATION = {"use_fsl": True}
+BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
 
 # Nodes
 FSLROI_NODE = {
@@ -87,18 +87,29 @@ FIRST_AP_VOLUME_TO_MERGE = {
     "destination": MERGE_NODE,
     "destination_port": "in_files",
 }
-
-PASS_MERGED_TO_DWIFSLPREPROC = {
-    "source": MERGE_NODE,
-    "source_port": "merged_file",
-    "destination": DWIFSLPREPROC_NODE,
-    "destination_port": "se_epi",
+FIRST_AP_TO_BET = {
+    "source": FSLROI_NODE,
+    "source_port": "roi_file",
+    "destination": BET_NODE,
+    "destination_port": "in_file",
 }
 PASS_MASK_TO_DENOISE = {
     "source": BET_NODE,
     "source_port": "mask_file",
     "destination": DENOISE_NODE,
     "destination_port": "mask",
+}
+PASS_MERGED_TO_DWIFSLPREPROC = {
+    "source": MERGE_NODE,
+    "source_port": "merged_file",
+    "destination": DWIFSLPREPROC_NODE,
+    "destination_port": "se_epi",
+}
+DENOISED_TO_DWIFSLPREPROC = {
+    "source": DENOISE_NODE,
+    "source_port": "out_file",
+    "destination": DWIFSLPREPROC_NODE,
+    "destination_port": "scan",
 }
 DEGIBBSED_PIPE_MAIN = {
     "source": DWIFSLPREPROC_NODE,
@@ -112,4 +123,18 @@ DEGIBBSED_PIPE_MASK = {
     "source_port": "eddy_mask",
     "destination": BIAS_CORRECT_NODE,
     "destination_port": "in_mask",
+}
+
+DWI_PREPROCESSING_PIPELINE = {
+    "title": "Basic DWI Preprocessing",
+    "description": "Basic DWI preprocessing pipeline using FSL and Mrtrix3.",
+    "pipes": [
+        FIRST_AP_VOLUME_TO_MERGE,
+        FIRST_AP_TO_BET,
+        DENOISED_TO_DWIFSLPREPROC,
+        PASS_MERGED_TO_DWIFSLPREPROC,
+        PASS_MASK_TO_DENOISE,
+        DEGIBBSED_PIPE_MAIN,
+        DEGIBBSED_PIPE_MASK,
+    ],
 }

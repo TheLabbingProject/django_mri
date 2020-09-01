@@ -43,6 +43,8 @@ from nipype.interfaces.mrtrix3 import (
     DWIBiasCorrect,
     MRConvert,
     ConstrainedSphericalDeconvolution,
+    ResponseSD,
+    Generate5tt,
 )
 
 
@@ -74,4 +76,6 @@ interfaces = {
     "dwi2fod": {
         ConstrainedSphericalDeconvolution().version: ConstrainedSphericalDeconvolution
     },
+    "dwi2response": {ResponseSD().version: ResponseSD},
+    "5ttgen": {Generate5tt().version: Generate5tt},
 }

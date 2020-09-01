@@ -113,6 +113,14 @@ from django_mri.analysis.specifications.mrtrix3.estimate_fod import (
     DWI2FOD_INPUT_SPECIFICATION,
     DWI2FOD_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.mrtrix3.estimate_response import (
+    DWI2RESPONSE_INPUT_SPECIFICATION,
+    DWI2RESPONSE_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.generate_5tt import (
+    GENERATE_5TT_INPUT_SPECIFICATION,
+    GENERATE_5TT_OUTPUT_SPECIFICATION,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -136,6 +144,8 @@ from nipype.interfaces.mrtrix3 import (
     MRDeGibbs,
     MRConvert,
     ConstrainedSphericalDeconvolution,
+    ResponseSD,
+    Generate5tt,
 )
 from nipype.interfaces.fsl.base import no_fsl
 
@@ -430,6 +440,32 @@ analysis_definitions = [
                 "description": f"Default ConstrainedSphericalDeconvolution version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DWI2FOD_INPUT_SPECIFICATION,
                 "output": DWI2FOD_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "dwi2response",
+        "description": "Estimate response function(s) for spherical deconvolution using the specified algorithm.",  # noqa: E501
+        "versions": [
+            {
+                "title": ResponseSD().version or "1.0",
+                "description": f"Default ResponseSD version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWI2RESPONSE_INPUT_SPECIFICATION,
+                "output": DWI2RESPONSE_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "5ttgen",
+        "description": "Generate a 5TT image suitable for ACT using the selected algorithm.",  # noqa: E501
+        "versions": [
+            {
+                "title": Generate5tt().version or "1.0",
+                "description": f"Default Generate5tt version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": GENERATE_5TT_INPUT_SPECIFICATION,
+                "output": GENERATE_5TT_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],

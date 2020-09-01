@@ -3,8 +3,7 @@ Definition of the
 :class:`~django_mri.analysis.interfaces.mrtrix3.dwifslpreproc` interface.
 """
 
-import subprocess
-
+import os
 from pathlib import Path
 
 
@@ -64,7 +63,7 @@ class DwiFslPreproc:
     __version__ = "BETA"
 
     def __init__(self, **kwargs):
-        self.configuration = self.set_default_configuration(kwargs)
+        self.configuration = kwargs
 
     def add_supplementary_outputs(self, destination: Path) -> dict:
         """
@@ -90,39 +89,26 @@ class DwiFslPreproc:
         """
 
         config = self.configuration.copy()
+        print(config)
         for key in self.SUPPLEMENTARY_OUTPUTS:
+            print(key)
             if key not in config.keys():
                 config[key] = destination
         return config
 
-    def set_default_configuration(self, configuration: dict) -> dict:
-        """
-        Sets default values for convenience of use.
-        Parameters
-        ----------
-        scan : ~django_mri.models.scan.Scan
-            Input scan
-        configuration : dict
-            Dictionary of configuration arguments for the command by keys and values
-
-        Returns
-        -------
-        dict
-            Default input files by key if not stated by user
-        """
-        scan = configuration.get("scan")
-        for key in self.DEFAULT_INPUTS:
-            if not configuration.get(key):
-                if "json" in key:
-                    json_file = scan.nifti.json_file
-                    if json_file.is_file():
-                        configuration[key] = str(json_file)
-                elif "grad" in key:
-                    bvec_file = scan.nifti.b_vector_file
-                    bval_file = scan.nifti.b_value_file
-                    if bvec_file.is_file() and bval_file.is_file():
-                        configuration[key] = f"{bvec_file} {bval_file}"
-        return configuration
+    def set_configuration_by_keys(self, config: dict):
+        key_command = ""
+        for key, value in config.items():
+            key_addition = f" -{key}"
+            if isinstance(value, list):
+                for val in value:
+                    key_addition += f" {val}"
+            elif key in self.FLAGS and value:
+                pass
+            else:
+                key_addition += f" {value}"
+            key_command += key_addition
+        return key_command
 
     def generate_command(self, destination: Path, config: dict) -> str:
         """
@@ -143,16 +129,17 @@ class DwiFslPreproc:
 
         output_path = destination / self.DEFAULT_OUTPUT_NAME
         scan = config.pop("scan")
-        pe_direction = scan.nifti.get_phase_encoding_direction()
-        command = f"dwifslpreproc {scan.nifti.path} {output_path} -pe_dir {pe_direction}"
-        return command + "".join(
-            [
-                f" -{key}"
-                if key in self.FLAGS and value
-                else f" -{key} {value}"
-                for key, value in config.items()
-            ]
-        )
+        # pe_direction = scan.nifti.get_phase_encoding_direction()
+        command = f"dwifslpreproc {scan} {output_path}"
+        return command + self.set_configuration_by_keys(config)
+        # "".join(
+        #     [
+        #         f" -{key}"
+        #         if key in self.FLAGS and value
+        #         else f" -{key} {value}"
+        #         for key, value in config.items()
+        #     ]
+        # )
 
     def generate_output_dict(self, destination: Path) -> dict:
         """
@@ -202,8 +189,10 @@ class DwiFslPreproc:
 
         destination = Path(destination) if destination else scan.path.parent
         config = self.add_supplementary_outputs(destination)
-        command = self.generate_command(destination, config).split()
-        process = subprocess.run(command, capture_output=True)
-        if process.returncode:
-            raise RuntimeError("Failed to run dwifslpreproc!")
+        command = self.generate_command(destination, config)
+        raise_exception = os.system(command)
+        if raise_exception:
+            raise RuntimeError(
+                f"Failed to run dwifslpreproc!\nExecuted command: {' '.join(command)}"
+            )
         return self.generate_output_dict(destination)

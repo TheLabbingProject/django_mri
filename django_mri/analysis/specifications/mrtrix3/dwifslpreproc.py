@@ -36,7 +36,7 @@ from django_mri.models.outputs.nifti_output_definition import (
 #: *DwiFslPreproc* input specification dictionary.
 DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "scan": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
@@ -80,6 +80,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "se_epi": {
         "type": NiftiInputDefinition,
         "description": "Provide an additional image series consisting of spin-echo EPI images, which is to be used exclusively by topup for estimating the inhomogeneity field (i.e. it will not form part of the output image series)",  # noqa: E501
+        "value_attribute": "path.__str__",
     },
     "align_seepi": {
         "type": BooleanInputDefinition,
