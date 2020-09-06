@@ -19,6 +19,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
+    FileInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
@@ -27,10 +28,10 @@ from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 #: *MRDeGibbs* input specification.
 DEGIBBS_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "is_configuration": False,
-        "value_attribute": "mif.__str__",
+        "db_value_preprocessing": "path",
     },
     "axes": {
         "type": ListInputDefinition,

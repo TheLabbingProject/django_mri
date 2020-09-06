@@ -193,6 +193,6 @@ class DwiFslPreproc:
         raise_exception = os.system(command)
         if raise_exception:
             raise RuntimeError(
-                f"Failed to run dwifslpreproc!\nExecuted command: {' '.join(command)}"
+                f"Failed to run dwifslpreproc!\nExecuted command: {command}"
             )
         return self.generate_output_dict(destination)

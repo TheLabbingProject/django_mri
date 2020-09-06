@@ -34,7 +34,7 @@ DENOISE_INPUT_SPECIFICATION = {
         "type": ScanInputDefinition,
         "required": True,
         "is_configuration": False,
-        "value_attribute": "nifti.path",
+        "value_attribute": "nifti.path.__str__",
     },
     "extent": {
         "type": ListInputDefinition,
@@ -43,7 +43,11 @@ DENOISE_INPUT_SPECIFICATION = {
         "default": [5, 5, 5],
         "as_tuple": True,
     },
-    "mask": {"type": FileInputDefinition, "description": "Mask image."},
+    "mask": {
+        "type": FileInputDefinition,
+        "description": "Mask image.",
+        "db_value_preprocessing": "path",
+    },
     "noise": {
         "type": StringInputDefinition,
         "is_output_path": True,

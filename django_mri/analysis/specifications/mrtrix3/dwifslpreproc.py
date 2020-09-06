@@ -101,6 +101,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "eddy_mask": {
         "type": FileInputDefinition,
         "description": "Provide a processing mask to use for eddy, instead of having dwifslpreproc generate one internally using dwi2mask",  # noqa: E501
+        "db_value_preprocessing": "path",
     },
     "eddy_slspec": {
         "type": FileInputDefinition,
