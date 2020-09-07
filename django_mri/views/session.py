@@ -6,8 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
-from django_mri.models import Scan
-from django_mri.serializers import ScanSerializer
+from django_mri.models.session import Session
+from django_mri.serializers import SessionSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import fix_bokeh_script
@@ -18,60 +18,30 @@ from rest_framework.request import Request
 from django.conf import settings
 
 
-HOST_NAME = getattr(settings, "APP_IP", "localhost")
-BOKEH_URL = f"http://{HOST_NAME}:5006/series_viewer"
-
-
-class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
+class SessionViewSet(DefaultsMixin, viewsets.ModelViewSet):
     """
     API endpoint that allows scans to be viewed or edited.
     """
 
     pagination_class = StandardResultsSetPagination
-    queryset = Scan.objects.order_by("-time__date", "time__time")
-    serializer_class = ScanSerializer
-    filter_class = ScanFilter
-    search_fields = (
-        "id",
-        "description",
-        "number",
-        "created",
-        "scan_time",
-        "echo_time",
-        "inversion_time",
-        "repetition_time",
-        "sequence_type",
-        "spatial_resolution",
-        "institution_name",
-        "is_updated_from_dicom",
-    )
-    ordering_fields = (
-        "id",
-        "description",
-        "number",
-        "created",
-        "echo_time",
-        "inversion_time",
-        "repetition_time",
-        "sequence_type",
-        "spatial_resolution",
-        "institution_name",
-    )
+    queryset = Session.objects.order_by("-time__date", "time__time")
+    serializer_class = SessionSerializer
+    ordering_fields = ("url", "subject", "comments", "time", "scan_set")
 
-    def get_queryset(self) -> QuerySet:
-        """
-        Filter the returned scans according to the studies the requesting
-        user is a collaborator in, unless the user is staff, in which case
-        return all scans.
+    # def get_queryset(self) -> QuerySet:
+    #     """
+    #     Filter the returned scans according to the studies the requesting
+    #     user is a collaborator in, unless the user is staff, in which case
+    #     return all scans.
 
-        Returns
-        -------
-        QuerySet
-            Scan instances.
-        """
+    #     Returns
+    #     -------
+    #     QuerySet
+    #         Scan instances.
+    #     """
 
-        user = get_user_model().objects.get(username=self.request.user)
-        queryset = super().get_queryset()
-        if user.is_staff:
-            return queryset
-        return queryset.filter(study_groups__study__collaborators=user)
+    #     user = get_user_model().objects.get(username=self.request.user)
+    #     queryset = super().get_queryset()
+    #     if user.is_staff:
+    #         return queryset
+    #     return queryset.filter(study_groups__study__collaborators=user)

@@ -5,7 +5,7 @@ from django.test import TestCase
 from django_analyses.models import AnalysisVersion, Run
 from django_dicom.models import Image, Series
 from django_mri import serializers
-from django_mri.models import Scan
+from django_mri.models import Scan, Session
 from django_mri.models.inputs import NiftiInput, NiftiInputDefinition
 from django_mri.serializers.input import NiftiInputSerializer
 from django_mri.serializers.input.nifti_input_definition import (
@@ -16,6 +16,7 @@ from rest_framework.test import APIRequestFactory
 from tests.factories import SubjectFactory
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 from tests.utils import load_common_sequences
+from tests.models import Subject
 
 
 class NiftiInputModelTestCase(TestCase):
@@ -23,12 +24,13 @@ class NiftiInputModelTestCase(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
         load_common_sequences()
-        subject = SubjectFactory()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         series = Series.objects.first()
-        scan = Scan.objects.create(dicom=series, subject=subject)
+        subject, _ = Subject.objects.from_dicom_patient(series.patient)
+        session = Session.objects.create(subject=subject, time=series.datetime)
+        scan = Scan.objects.create(dicom=series, session=session)
         cls.nifti = scan.nifti
         cls.definition = NiftiInputDefinition.objects.create(key="test")
         version = AnalysisVersion.objects.create(

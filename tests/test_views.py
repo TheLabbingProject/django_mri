@@ -7,12 +7,13 @@ from django.test import TestCase
 from django.urls import reverse
 from django_dicom.models import Image, Series
 from django_dicom.models.utils.utils import get_group_model
-from django_mri.models import Scan
+from django_mri.models import Scan, Session
 from rest_framework import status
 from rest_framework.test import APITestCase
 from tests.factories import SubjectFactory
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 from tests.utils import load_common_sequences
+from tests.models import Subject
 
 
 User = get_user_model()
@@ -36,12 +37,13 @@ class LoggedOutScanViewTestCase(TestCase):
         """
 
         load_common_sequences()
-        subject = SubjectFactory()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         series = Series.objects.first()
-        cls.test_instance = Scan.objects.create(dicom=series, subject=subject)
+        cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
+        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
+        cls.test_instance = Scan.objects.create(dicom=series, session=cls.session)
 
     def test_scan_list_unautherized(self):
         url = reverse("mri:scan-list")
@@ -78,12 +80,13 @@ class LoggedInScanViewTestCase(APITestCase):
         """
 
         load_common_sequences()
-        subject = SubjectFactory()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         series = Series.objects.first()
-        cls.test_scan = Scan.objects.create(dicom=series, subject=subject)
+        cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
+        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
+        cls.test_scan = Scan.objects.create(dicom=series, session=cls.session)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )
@@ -164,12 +167,13 @@ class LoggedOutNIfTIViewTestCase(TestCase):
         """
 
         load_common_sequences()
-        subject = SubjectFactory()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         series = Series.objects.first()
-        scan = Scan.objects.create(dicom=series, subject=subject)
+        cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
+        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
+        scan = Scan.objects.create(dicom=series, session=cls.session)
         cls.test_nifti = scan.nifti
 
     def test_scan_list_unautherized(self):
@@ -195,12 +199,13 @@ class LoggedInNIfTIViewTestCase(APITestCase):
         """
 
         load_common_sequences()
-        subject = SubjectFactory()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         series = Series.objects.first()
-        scan = Scan.objects.create(dicom=series, subject=subject)
+        cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
+        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
+        scan = Scan.objects.create(dicom=series, session=cls.session)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )

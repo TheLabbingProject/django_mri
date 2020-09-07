@@ -99,7 +99,7 @@ class Bids:
             "handedness","age" and "sex" fields
         """
 
-        subject = self.scan.subject
+        subject = self.scan.session.subject
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else "n/a",

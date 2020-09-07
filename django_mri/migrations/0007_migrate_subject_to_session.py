@@ -4,7 +4,9 @@ from django.db import migrations, models, transaction
 import django.db.models.deletion
 import django_extensions.db.fields
 from django.conf import settings
-from django_mri.utils.utils import get_subject_model, get_min_distance_session
+from django_mri.utils.utils import get_subject_model
+from dicom_parser.header import Header as DicomHeader
+from datetime import datetime
 
 
 class Migration(migrations.Migration):
@@ -15,42 +17,22 @@ class Migration(migrations.Migration):
 
         for scan in Scan.objects.all():
             subjects = Subject.objects.filter(id_number=scan.dicom.patient.uid)
+            header = DicomHeader(scan.dicom.image_set.first().dcm.path)
+            session_time = datetime.combine(
+                header.get("StudyDate"), header.get("StudyTime")
+            )
             subject = None
             if len(subjects) == 0:
-                scan.session_id = Session.objects.create(time=scan.time).id
+                scan.session_id = Session.objects.create(time=session_time).id
                 scan.save()
             else:
                 subject = subjects.first()
-                sessions = subject.mri_session_set.all()
-                if scan.session:
-                    sessions = sessions.exclude(id=scan.session_id)
+                sessions = subject.mri_session_set.filter(time=session_time)
                 if len(sessions) == 0:
-                    Session.objects.create(subject_id=subject.id, time=scan.time)
+                    Session.objects.create(subject_id=subject.id, time=session_time)
                     sessions = subject.mri_session_set.all()
-                min_session = get_min_distance_session(scan, sessions)
-                if (
-                    scan.number
-                    in list(min_session.scan_set.values_list("number", flat=True))
-                    and scan.session_id != min_session.id
-                ):
-                    new_session = Session.objects.create(
-                        subject_id=subject.id, time=scan.time
-                    )
-                    scan.session_id = new_session.id
-                    scan.save()
-                    scan.session.save()
-                elif scan.session_id != min_session.id:
-                    scan.session_id = min_session.id
-                    scan.save()
-                    scan.session.save()
-                other_sessions = subject.mri_session_set.exclude(id=scan.session_id)
-                for session in other_sessions:
-                    for other_scan in session.scan_set.all():
-                        other_scan.infer_session()
-
-        for subject in Subject.objects.all():
-            for session in subject.mri_session_set.all():
-                session.save()
+                scan.session_id = sessions.first().id
+                scan.save()
 
     def session_to_scan_subject(apps, schema_editor):
         Scan = apps.get_model("django_mri", "Scan")

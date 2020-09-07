@@ -23,9 +23,3 @@ class Session(TimeStampedModel):
     )
 
     time = models.DateTimeField()
-
-    def save(self, *args, **kwargs):
-        scans = self.scan_set
-        if len(scans.all()) > 0:
-            self.time = min(scans.values_list("time", flat=True))
-        super().save(*args, **kwargs)

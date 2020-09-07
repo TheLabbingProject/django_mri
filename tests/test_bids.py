@@ -2,11 +2,10 @@ import factory
 
 from django.db.models import signals
 from django.test import TestCase
-from django_mri.models import Scan
+from django_mri.models import Scan, Session
 from django_dicom.models import Image, Series
 from django_mri.models.sequence_type import SequenceType
 from tests.utils import load_common_sequences
-from tests.factories import SubjectFactory
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
     DICOM_DWI_PATH,
@@ -14,6 +13,7 @@ from tests.fixtures import (
     DICOM_FMRI_BOLD_PATH,
     DICOM_IREPI_PATH,
 )
+from tests.models import Subject
 
 
 class BidsTestCase(TestCase):
@@ -21,32 +21,48 @@ class BidsTestCase(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
         load_common_sequences()
-        cls.subject = SubjectFactory()
-        Image.objects.import_path(
-            DICOM_MPRAGE_PATH, progressbar=False, report=False
-        )
+
+        Image.objects.import_path(DICOM_MPRAGE_PATH, progressbar=False, report=False)
         series_mprage = Series.objects.get(description__icontains="MPRAGE")
-        Scan.objects.get_or_create(dicom=series_mprage, subject=cls.subject)
-        Image.objects.import_path(
-            DICOM_DWI_PATH, progressbar=False, report=False
+        subject_mprage, _ = Subject.objects.from_dicom_patient(series_mprage.patient)
+        session_mprage = Session.objects.create(
+            subject=subject_mprage, time=series_mprage.datetime
         )
+        Scan.objects.get_or_create(dicom=series_mprage, session=session_mprage)
+
+        Image.objects.import_path(DICOM_DWI_PATH, progressbar=False, report=False)
         series_dwi = Series.objects.get(description__icontains="ep2d")
-        Scan.objects.get_or_create(dicom=series_dwi, subject=cls.subject)
-        Image.objects.import_path(
-            DICOM_FLAIR_PATH, progressbar=False, report=False
+        subject_dwi, _ = Subject.objects.from_dicom_patient(series_dwi.patient)
+        session_dwi = Session.objects.create(
+            subject=subject_dwi, time=series_dwi.datetime
         )
+        Scan.objects.get_or_create(dicom=series_dwi, session=session_dwi)
+
+        Image.objects.import_path(DICOM_FLAIR_PATH, progressbar=False, report=False)
         series_flair = Series.objects.get(description__icontains="FLAIR")
-        Scan.objects.get_or_create(dicom=series_flair, subject=cls.subject)
-        Image.objects.import_path(
-            DICOM_FMRI_BOLD_PATH, progressbar=False, report=False
+        subject_flair, _ = Subject.objects.from_dicom_patient(series_flair.patient)
+        session_flair = Session.objects.create(
+            subject=subject_flair, time=series_flair.datetime
         )
+        Scan.objects.get_or_create(dicom=series_flair, session=session_flair)
+
+        Image.objects.import_path(DICOM_FMRI_BOLD_PATH, progressbar=False, report=False)
         series_fmri_bold = Series.objects.get(description__icontains="FMRI")
-        Scan.objects.get_or_create(dicom=series_fmri_bold, subject=cls.subject)
-        Image.objects.import_path(
-            DICOM_IREPI_PATH, progressbar=False, report=False
+        subject_fmri_bold, _ = Subject.objects.from_dicom_patient(
+            series_fmri_bold.patient
         )
+        session_fmri_bold = Session.objects.create(
+            subject=subject_fmri_bold, time=series_fmri_bold.datetime
+        )
+        Scan.objects.get_or_create(dicom=series_fmri_bold, session=session_fmri_bold)
+
+        Image.objects.import_path(DICOM_IREPI_PATH, progressbar=False, report=False)
         series_irepi = Series.objects.get(description__icontains="IR-EPI")
-        Scan.objects.get_or_create(dicom=series_irepi, subject=cls.subject)
+        subject_irepi, _ = Subject.objects.from_dicom_patient(series_irepi.patient)
+        session_irepi = Session.objects.create(
+            subject=subject_irepi, time=series_irepi.datetime
+        )
+        Scan.objects.get_or_create(dicom=series_irepi, session=session_irepi)
 
         dwi = SequenceType.objects.get(title="DWI")
         mprage = SequenceType.objects.get(title="MPRAGE")
@@ -67,9 +83,7 @@ class BidsTestCase(TestCase):
             scan for scan in Scan.objects.all() if scan.sequence_type == irepi
         ][0]
         cls.fmri_bold_scan = [
-            scan
-            for scan in Scan.objects.all()
-            if scan.sequence_type == fmri_bold
+            scan for scan in Scan.objects.all() if scan.sequence_type == fmri_bold
         ][0]
 
         cls.mprage_nifti = cls.mprage_scan.nifti

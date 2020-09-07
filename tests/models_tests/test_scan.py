@@ -4,15 +4,18 @@ from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
-from django_mri.models import Scan, NIfTI
+from django_mri.models import Scan, NIfTI, Session
 from django_mri.models.sequence_type import SequenceType
 from pathlib import Path
+from datetime import datetime
 from tests.factories import SubjectFactory
+from tests.models import Subject
 from tests.fixtures import (
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
 from tests.utils import load_common_sequences
+from tests.models import Subject
 
 
 class ScanModelTestCase(TestCase):
@@ -23,12 +26,13 @@ class ScanModelTestCase(TestCase):
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         cls.series = Series.objects.first()
-        cls.subject = SubjectFactory()
+        cls.subject, _ = Subject.objects.from_dicom_patient(cls.series.patient)
+        cls.session = Session.objects.create(
+            subject=cls.subject, time=cls.series.datetime
+        )
 
     def setUp(self):
-        self.scan = Scan.objects.create(
-            dicom=self.series, subject=self.subject
-        )
+        self.scan = Scan.objects.create(dicom=self.series, session=self.session)
 
     ########
     # Meta #
@@ -185,9 +189,9 @@ class ScanModelTestCase(TestCase):
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
 
-    # subject_id
-    def test_subject_id_blank_and_null(self):
-        field = Scan._meta.get_field("subject_id")
+    # session_id
+    def test_session_id_blank_and_null(self):
+        field = Scan._meta.get_field("session_id")
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
 
@@ -200,9 +204,7 @@ class ScanModelTestCase(TestCase):
         result = str(self.scan)
         self.assertEqual(result, expected)
 
-    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(
-        self,
-    ):
+    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(self,):
         self.scan.dicom = None
         with self.assertRaises(AttributeError):
             self.scan.update_fields_from_dicom()
@@ -256,6 +258,20 @@ class ScanModelTestCase(TestCase):
     def test__nifti_before_dicom_to_nifti(self):
         result = self.scan._nifti
         self.assertIsNone(result)
+
+    def test_suggest_subject(self):
+        self.scan.suggest_subject(self.subject)
+        self.assertEqual(self.scan.session.subject, self.subject)
+
+    def test_suggest_subject_mismatch(self):
+        subject = Subject.objects.create()
+        self.scan.suggest_subject(subject)
+        self.assertEqual(self.scan.session.subject, self.subject)
+
+    def test_suggest_subject_none(self):
+        subject = None
+        self.scan.suggest_subject(subject)
+        self.assertEqual(self.scan.session.subject, self.subject)
 
     ##############
     # Properties #

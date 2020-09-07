@@ -21,11 +21,12 @@ from django_mri.models.session import Session
 from django_mri.utils.utils import (
     get_subject_model,
     get_group_model,
-    get_min_distance_session,
+    get_mri_root,
 )
-from django_mri.utils.utils import get_mri_root
 from django_mri.utils.bids import Bids
 from pathlib import Path
+from datetime import datetime
+import pytz
 
 
 class Scan(TimeStampedModel):
@@ -138,14 +139,6 @@ class Scan(TimeStampedModel):
         "django_mri.Session", blank=True, null=True, on_delete=models.CASCADE,
     )
 
-    # subject = models.ForeignKey(
-    #     get_subject_model(),
-    #     on_delete=models.PROTECT,
-    #     related_name="mri_scans",
-    #     blank=True,
-    #     null=True,
-    # )
-
     objects = ScanManager()
 
     class Meta:
@@ -184,28 +177,19 @@ class Scan(TimeStampedModel):
             self.update_fields_from_dicom()
         try:
             subject = Subject.objects.get(id_number=self.dicom.patient.uid)
-            sessions = subject.mri_session_set.all()
+            header = self.dicom.image_set.first().header.instance
+            session_time = datetime.combine(
+                header.get("StudyDate"), header.get("StudyTime")
+            ).replace(tzinfo=pytz.UTC)
+            sessions = subject.mri_session_set.filter(time=session_time)
             if len(sessions) == 0:
-                Session.objects.create(time=self.dicom.datetime, subject=subject)
+                Session.objects.create(time=session_time, subject=subject)
                 sessions = subject.mri_session_set.all()
-            self.session = get_min_distance_session(self, sessions)
+            self.session = sessions.first()
         except models.ObjectDoesNotExist:  # The subject does not exist.
-            self.session = Session.objects.create(
-                subject=subject, time=self.dicom.datetime
-            )
-        try:
-            super(Scan, self).save(*args, **kwargs)
-            self.session.save()
-        except IntegrityError:  # There is already a scan with this number associated with this session.
-            self.session = Session.objects.create(
-                subject=subject, time=self.dicom.datetime
-            )
-            other_sessions = subject.mri_session_set.all()
-            for session in other_sessions:
-                for scan in session.scan_set.all():
-                    scan.infer_session()
-            super(Scan, self).save(*args, **kwargs)
-            self.session.save()
+            self.session = Session.objects.create(time=session_time)
+        super(Scan, self).save(*args, **kwargs)
+        self.session.save()
 
     def update_fields_from_dicom(self) -> None:
         """
@@ -391,7 +375,7 @@ class Scan(TimeStampedModel):
 
         message = messages.SUBJECT_MISMATCH.format(
             scan_id=self.id,
-            existing_subject_id=self.subject.id,
+            existing_subject_id=self.session.subject.id,
             assigned_subject_id=subject.id,
         )
         warnings.warn(message)
@@ -410,12 +394,6 @@ class Scan(TimeStampedModel):
             else:
                 session.subject = subject
                 session.save()
-
-    def infer_session(self) -> None:
-        Subject = get_subject_model()
-        subject = Subject.objects.get(id_number=self.dicom.patient.uid)
-        sessions = subject.mri_session_set.exclude(id=self.session_id)
-        self.session = get_min_distance_session(self, sessions)
 
     def convert_to_mif(self) -> Path:
         """
