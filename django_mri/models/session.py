@@ -1,4 +1,5 @@
 from django_extensions.db.models import TimeStampedModel
+from django.db.models import QuerySet
 from django_mri.utils import get_subject_model
 from django_mri.models import help_text
 from django.db import models
@@ -23,3 +24,7 @@ class Session(TimeStampedModel):
     )
 
     time = models.DateTimeField()
+
+    @property
+    def study_groups(self) -> QuerySet:
+        return self.scan_set.values_list("study_groups", flat=True)

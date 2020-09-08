@@ -7,10 +7,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django_dicom.models import Image, Series
 from django_dicom.models.utils.utils import get_group_model
-from django_mri.models import Scan, Session
+from django_mri.models import Scan
 from rest_framework import status
 from rest_framework.test import APITestCase
-from tests.factories import SubjectFactory
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 from tests.utils import load_common_sequences
 from tests.models import Subject
@@ -42,8 +41,7 @@ class LoggedOutScanViewTestCase(TestCase):
         )
         series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
-        cls.test_instance = Scan.objects.create(dicom=series, session=cls.session)
+        cls.test_instance = Scan.objects.create(dicom=series)
 
     def test_scan_list_unautherized(self):
         url = reverse("mri:scan-list")
@@ -85,8 +83,7 @@ class LoggedInScanViewTestCase(APITestCase):
         )
         series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
-        cls.test_scan = Scan.objects.create(dicom=series, session=cls.session)
+        cls.test_scan = Scan.objects.create(dicom=series)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )
@@ -172,8 +169,7 @@ class LoggedOutNIfTIViewTestCase(TestCase):
         )
         series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
-        scan = Scan.objects.create(dicom=series, session=cls.session)
+        scan = Scan.objects.create(dicom=series)
         cls.test_nifti = scan.nifti
 
     def test_scan_list_unautherized(self):
@@ -204,8 +200,7 @@ class LoggedInNIfTIViewTestCase(APITestCase):
         )
         series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        cls.session = Session.objects.create(subject=cls.subject, time=series.datetime)
-        scan = Scan.objects.create(dicom=series, session=cls.session)
+        scan = Scan.objects.create(dicom=series)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
         )

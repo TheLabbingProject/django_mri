@@ -4,12 +4,9 @@ from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
-from django_mri.models import Scan, NIfTI, Session
+from django_mri.models import Scan, NIfTI
 from django_mri.models.sequence_type import SequenceType
 from pathlib import Path
-from datetime import datetime
-from tests.factories import SubjectFactory
-from tests.models import Subject
 from tests.fixtures import (
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
@@ -27,12 +24,10 @@ class ScanModelTestCase(TestCase):
         )
         cls.series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(cls.series.patient)
-        cls.session = Session.objects.create(
-            subject=cls.subject, time=cls.series.datetime
-        )
 
     def setUp(self):
-        self.scan = Scan.objects.create(dicom=self.series, session=self.session)
+        self.scan = Scan.objects.create(dicom=self.series)
+        self.session = self.scan.session
 
     ########
     # Meta #

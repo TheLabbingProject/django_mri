@@ -1,21 +1,14 @@
 import factory
-
-from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
-from django_mri.models import Scan, NIfTI, Session
-from django_mri.models.sequence_type import SequenceType
-from pathlib import Path
-from datetime import datetime
-from tests.factories import SubjectFactory
+from django_mri.models import Scan, Session
 from tests.models import Subject
 from tests.fixtures import (
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
-from tests.utils import load_common_sequences
-from tests.models import Subject
+from tests.models import Subject, Group
 
 
 class SessionModelTestCase(TestCase):
@@ -27,10 +20,10 @@ class SessionModelTestCase(TestCase):
         )
         cls.series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(cls.series.patient)
-        cls.session = Session.objects.create(
-            subject=cls.subject, time=cls.series.datetime
-        )
-        cls.scan = Scan.objects.create(dicom=cls.series, session=cls.session)
+        cls.scan = Scan.objects.create(dicom=cls.series)
+
+    def setUp(self):
+        self.session = self.scan.session
 
     ##########
     # Fields #
@@ -39,7 +32,7 @@ class SessionModelTestCase(TestCase):
     # time
     def test_time_value(self):
         result = self.session.time
-        expected = SIEMENS_DWI_SERIES["time"]
+        expected = SIEMENS_DWI_SERIES["study_time"]
         self.assertEqual(result, expected)
 
     # comments
@@ -62,3 +55,12 @@ class SessionModelTestCase(TestCase):
         field = Session._meta.get_field("subject_id")
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
+
+    ##############
+    # Properties #
+    ##############
+
+    def test_study_groups(self):
+        result = self.session.study_groups
+        self.assertEqual(len(result), 1)
+        self.assertIsNone(result.first())

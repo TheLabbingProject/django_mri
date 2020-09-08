@@ -6,9 +6,7 @@ from django.test import TestCase
 from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
-from django_mri.models.session import Session
 from tests.utils import load_common_sequences
-from tests.factories import SubjectFactory
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
     SIEMENS_DWI_SERIES,
@@ -28,8 +26,7 @@ class NIfTIModelTestCase(TestCase):
         Image.objects.import_path(DICOM_MPRAGE_PATH, progressbar=False, report=False)
         series = Image.objects.first().series
         subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        session = Session.objects.create(subject=subject, time=series.datetime)
-        cls.simple_scan = Scan.objects.create(dicom=series, session=session)
+        cls.simple_scan = Scan.objects.create(dicom=series)
         cls.simple_nifti = cls.simple_scan.nifti
 
         # DWI scan
@@ -38,10 +35,7 @@ class NIfTIModelTestCase(TestCase):
         )
         series_dwi = Image.objects.last().series
         subject_dwi, _ = Subject.objects.from_dicom_patient(series_dwi.patient)
-        dwi_session = Session.objects.create(
-            subject=subject_dwi, time=series_dwi.datetime
-        )
-        cls.dwi_scan = Scan.objects.create(dicom=series_dwi, session=dwi_session)
+        cls.dwi_scan = Scan.objects.create(dicom=series_dwi)
         cls.dwi_nifti = cls.dwi_scan.nifti
 
     ##########
