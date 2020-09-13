@@ -90,6 +90,20 @@ class ScanInline(admin.TabularInline):
             return ""
 
     def number_(self, scan: Scan) -> str:
+        """
+        Returns an HTML link to the scan instance's *change* view.
+
+        Parameters
+        ----------
+        scan : Scan
+            Scan instance
+
+        Returns
+        -------
+        str
+            HTML link
+        """
+
         url = reverse(SCAN_VIEW_NAME, args=(scan.id,))
         link_html = SCAN_LINK_HTML.format(url=url, text=scan.number)
         return mark_safe(link_html)
