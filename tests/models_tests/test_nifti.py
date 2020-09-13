@@ -1,4 +1,4 @@
-import factory
+import factory, pytz
 import numpy as np
 
 from django.db.models import signals
@@ -6,6 +6,7 @@ from django.test import TestCase
 from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
+from django_mri.models.session import Session
 from tests.utils import load_common_sequences
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
@@ -14,6 +15,7 @@ from tests.fixtures import (
 )
 from tests.models import Subject
 from pathlib import Path
+from datetime import datetime
 
 
 class NIfTIModelTestCase(TestCase):
@@ -23,10 +25,17 @@ class NIfTIModelTestCase(TestCase):
         load_common_sequences()
 
         # MPRAGE scan
-        Image.objects.import_path(DICOM_MPRAGE_PATH, progressbar=False, report=False)
+        Image.objects.import_path(
+            DICOM_MPRAGE_PATH, progressbar=False, report=False
+        )
         series = Image.objects.first().series
         subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        cls.simple_scan = Scan.objects.create(dicom=series)
+        header = series.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session = Session.objects.create(subject=subject, time=session_time)
+        cls.simple_scan = Scan.objects.create(dicom=series, session=session)
         cls.simple_nifti = cls.simple_scan.nifti
 
         # DWI scan
@@ -35,7 +44,14 @@ class NIfTIModelTestCase(TestCase):
         )
         series_dwi = Image.objects.last().series
         subject_dwi, _ = Subject.objects.from_dicom_patient(series_dwi.patient)
-        cls.dwi_scan = Scan.objects.create(dicom=series_dwi)
+        header = series_dwi.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session, _ = Session.objects.get_or_create(
+            subject=subject_dwi, time=session_time
+        )
+        cls.dwi_scan = Scan.objects.create(dicom=series_dwi, session=session)
         cls.dwi_nifti = cls.dwi_scan.nifti
 
     ##########

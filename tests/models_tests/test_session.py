@@ -1,4 +1,4 @@
-import factory
+import factory, pytz
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
@@ -9,6 +9,7 @@ from tests.fixtures import (
     SIEMENS_DWI_SERIES_PATH,
 )
 from tests.models import Subject, Group
+from datetime import datetime
 
 
 class SessionModelTestCase(TestCase):
@@ -20,7 +21,14 @@ class SessionModelTestCase(TestCase):
         )
         cls.series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(cls.series.patient)
-        cls.scan = Scan.objects.create(dicom=cls.series)
+        header = cls.series.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session = Session.objects.create(
+            subject=cls.subject, time=session_time
+        )
+        cls.scan = Scan.objects.create(dicom=cls.series, session=session)
 
     def setUp(self):
         self.session = self.scan.session
@@ -62,5 +70,5 @@ class SessionModelTestCase(TestCase):
 
     def test_study_groups(self):
         result = self.session.study_groups
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 0)
         self.assertIsNone(result.first())

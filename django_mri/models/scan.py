@@ -42,11 +42,16 @@ class Scan(TimeStampedModel):
     institution_name = models.CharField(max_length=64, blank=True, null=True)
 
     #: Acquisition datetime.
-    time = models.DateTimeField(blank=True, null=True, help_text=help_text.SCAN_TIME)
+    time = models.DateTimeField(
+        blank=True, null=True, help_text=help_text.SCAN_TIME
+    )
 
     #: Short description of the scan's acquisition parameters.
     description = models.CharField(
-        max_length=100, blank=True, null=True, help_text=help_text.SCAN_DESCRIPTION,
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text=help_text.SCAN_DESCRIPTION,
     )
 
     #: The relative number of this scan in the session in which it was
@@ -85,11 +90,16 @@ class Scan(TimeStampedModel):
     )
 
     #: The spatial resolution of the image in millimeters.
-    spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
+    spatial_resolution = ArrayField(
+        models.FloatField(), size=3, blank=True, null=True
+    )
 
     #: Any other comments about this scan.
     comments = models.TextField(
-        max_length=1000, blank=True, null=True, help_text=help_text.SCAN_COMMENTS,
+        max_length=1000,
+        blank=True,
+        null=True,
+        help_text=help_text.SCAN_COMMENTS,
     )
 
     #: If this instance's origin is a DICOM file, or it was saved as one, this
@@ -134,9 +144,9 @@ class Scan(TimeStampedModel):
         on_delete=models.SET_NULL,
     )
 
-    # #: Associates this scan with some session of a subject.
+    #: Associates this scan with some session of a subject.
     session = models.ForeignKey(
-        "django_mri.Session", blank=True, null=True, on_delete=models.CASCADE,
+        "django_mri.Session", on_delete=models.CASCADE,
     )
 
     objects = ScanManager()
@@ -175,21 +185,7 @@ class Scan(TimeStampedModel):
 
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
-        try:
-            subject = Subject.objects.get(id_number=self.dicom.patient.uid)
-            header = self.dicom.image_set.first().header.instance
-            session_time = datetime.combine(
-                header.get("StudyDate"), header.get("StudyTime")
-            ).replace(tzinfo=pytz.UTC)
-            sessions = subject.mri_session_set.filter(time=session_time)
-            if len(sessions) == 0:
-                Session.objects.create(time=session_time, subject=subject)
-                sessions = subject.mri_session_set.all()
-            self.session = sessions.first()
-        except models.ObjectDoesNotExist:  # The subject does not exist.
-            self.session = Session.objects.create(time=session_time)
-        super(Scan, self).save(*args, **kwargs)
-        self.session.save()
+        super().save(*args, **kwargs)
 
     def update_fields_from_dicom(self) -> None:
         """
@@ -212,7 +208,9 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
-            raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")
+            raise AttributeError(
+                f"No DICOM data associated with MRI scan {self.id}!"
+            )
 
     def infer_sequence_type_from_dicom(self) -> SequenceType:
         """
@@ -380,21 +378,6 @@ class Scan(TimeStampedModel):
         )
         warnings.warn(message)
 
-    def suggest_subject(self, subject) -> None:
-        if subject is not None:
-            # If this scan actually belongs to a different subject (and
-            # self.subject is not None), warn the user and return.
-            session = self.session
-            curr_subject = session.subject
-            mismatch = curr_subject != subject
-            if curr_subject and mismatch:
-                self.warn_subject_mismatch(subject)
-            # Else, if this scan is not assigned to any subject but a subject
-            # was provided (and not None), associate this scan with it.
-            else:
-                session.subject = subject
-                session.save()
-
     def convert_to_mif(self) -> Path:
         """
         Creates a *.mif* version of this scan using mrconvert_.
@@ -407,7 +390,9 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import get_mrconvert_node
+        from django_mri.analysis.utils.get_mrconvert_node import (
+            get_mrconvert_node,
+        )
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()

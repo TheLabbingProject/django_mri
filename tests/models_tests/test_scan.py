@@ -1,10 +1,10 @@
-import factory
+import factory, pytz
 
 from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
-from django_mri.models import Scan, NIfTI
+from django_mri.models import Scan, NIfTI, Session
 from django_mri.models.sequence_type import SequenceType
 from pathlib import Path
 from tests.fixtures import (
@@ -13,6 +13,7 @@ from tests.fixtures import (
 )
 from tests.utils import load_common_sequences
 from tests.models import Subject
+from datetime import datetime
 
 
 class ScanModelTestCase(TestCase):
@@ -26,12 +27,22 @@ class ScanModelTestCase(TestCase):
         cls.subject, _ = Subject.objects.from_dicom_patient(cls.series.patient)
 
     def setUp(self):
-        self.scan = Scan.objects.create(dicom=self.series)
-        self.session = self.scan.session
+        header = self.series.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session, _ = Session.objects.get_or_create(
+            subject=self.subject, time=session_time
+        )
+        self.scan = Scan.objects.create(dicom=self.series, session=session)
 
     ########
     # Meta #
     ########
+
+    def test_unique_together(self):
+        expected = (("number", "session"),)
+        self.assertTupleEqual(Scan._meta.unique_together, expected)
 
     def test_ordering(self):
         self.assertListEqual(Scan._meta.ordering, [])
@@ -185,10 +196,10 @@ class ScanModelTestCase(TestCase):
         self.assertTrue(field.null)
 
     # session_id
-    def test_session_id_blank_and_null(self):
+    def test_session_id_not_blank_and_not_null(self):
         field = Scan._meta.get_field("session_id")
-        self.assertTrue(field.blank)
-        self.assertTrue(field.null)
+        self.assertFalse(field.blank)
+        self.assertFalse(field.null)
 
     ###########
     # Methods #
@@ -199,7 +210,9 @@ class ScanModelTestCase(TestCase):
         result = str(self.scan)
         self.assertEqual(result, expected)
 
-    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(self,):
+    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(
+        self,
+    ):
         self.scan.dicom = None
         with self.assertRaises(AttributeError):
             self.scan.update_fields_from_dicom()
@@ -253,20 +266,6 @@ class ScanModelTestCase(TestCase):
     def test__nifti_before_dicom_to_nifti(self):
         result = self.scan._nifti
         self.assertIsNone(result)
-
-    def test_suggest_subject(self):
-        self.scan.suggest_subject(self.subject)
-        self.assertEqual(self.scan.session.subject, self.subject)
-
-    def test_suggest_subject_mismatch(self):
-        subject = Subject.objects.create()
-        self.scan.suggest_subject(subject)
-        self.assertEqual(self.scan.session.subject, self.subject)
-
-    def test_suggest_subject_none(self):
-        subject = None
-        self.scan.suggest_subject(subject)
-        self.assertEqual(self.scan.session.subject, self.subject)
 
     ##############
     # Properties #

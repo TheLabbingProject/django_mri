@@ -1,11 +1,11 @@
-import factory
+import factory, pytz
 
 from django.db.models import signals
 from django.test import TestCase
 from django_analyses.models import AnalysisVersion, Run
 from django_dicom.models import Image, Series
 from django_mri import serializers
-from django_mri.models import Scan, NIfTI
+from django_mri.models import Scan, NIfTI, Session
 from django_mri.models.outputs import NiftiOutput, NiftiOutputDefinition
 from django_mri.models.outputs.output_definitions import OutputDefinitions
 from django_mri.serializers.output import NiftiOutputSerializer
@@ -20,6 +20,7 @@ from tests.fixtures import (
 )
 from tests.utils import load_common_sequences
 from tests.models import Subject
+from datetime import datetime
 
 
 class NiftiOutputModelTestCase(TestCase):
@@ -32,7 +33,12 @@ class NiftiOutputModelTestCase(TestCase):
         )
         series = Series.objects.first()
         subject, _ = Subject.objects.from_dicom_patient(series.patient)
-        scan = Scan.objects.create(dicom=series)
+        header = series.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session = Session.objects.create(subject=subject, time=session_time)
+        scan = Scan.objects.create(dicom=series, session=session)
         cls.nifti = scan.nifti
 
         cls.definition = NiftiOutputDefinition.objects.create(key="test")

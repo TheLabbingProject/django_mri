@@ -2,10 +2,12 @@
 General app utilites.
 """
 
+import pytz
 from django.apps import apps
+from django.db.models import ObjectDoesNotExist
 from django.conf import settings
 from pathlib import Path
-from datetime import timedelta
+from datetime import datetime
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.
@@ -68,3 +70,26 @@ def get_dicom_root() -> Path:
     """
 
     return get_mri_root() / DEFAULT_DICOM_DIR_NAME
+
+
+def get_session(series):
+    """
+    Returns the appropriate session to the current series.
+    """
+
+    Session = apps.get_model("django_mri", "Session")
+
+    header = series.image_set.first().header.instance
+    session_time = datetime.combine(
+        header.get("StudyDate"), header.get("StudyTime")
+    ).replace(tzinfo=pytz.UTC)
+    try:
+        subject = get_subject_model().objects.get(id_number=series.patient.uid)
+        session = subject.mri_session_set.filter(time=session_time).first()
+        if not session:
+            session = Session.objects.create(
+                time=session_time, subject=subject
+            )
+    except ObjectDoesNotExist:  # The subject does not exist.
+        session = Session.objects.create(time=session_time)
+    return session

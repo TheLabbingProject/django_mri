@@ -25,7 +25,9 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         view_name="dicom:series-detail", queryset=Series.objects.all()
     )
     session = serializers.HyperlinkedRelatedField(
-        view_name="mri:session-detail", queryset=Session.objects.all(), required=True
+        view_name="mri:session-detail",
+        queryset=Session.objects.all(),
+        required=True,
     )
     nifti = serializers.HyperlinkedRelatedField(
         source="_nifti",

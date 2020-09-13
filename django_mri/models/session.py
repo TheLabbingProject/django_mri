@@ -1,9 +1,11 @@
 from django_extensions.db.models import TimeStampedModel
 from django.db.models import QuerySet
-from django_mri.utils import get_subject_model
+from django_mri.utils import get_subject_model, get_group_model
 from django_mri.models import help_text
 from django.db import models
 from datetime import datetime
+
+Group = get_group_model()
 
 
 class Session(TimeStampedModel):
@@ -20,11 +22,15 @@ class Session(TimeStampedModel):
     )
 
     comments = models.TextField(
-        max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
+        max_length=1000,
+        blank=True,
+        null=True,
+        help_text=help_text.SESSION_COMMENTS,
     )
 
     time = models.DateTimeField()
 
     @property
     def study_groups(self) -> QuerySet:
-        return self.scan_set.values_list("study_groups", flat=True)
+        ids = self.scan_set.values_list("study_groups", flat=True)
+        return Group.objects.filter(id__in=ids)
