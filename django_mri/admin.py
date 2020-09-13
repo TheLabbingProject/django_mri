@@ -22,14 +22,14 @@ class ScanAdmin(admin.ModelAdmin):
     #: Fields displayed on the change list page of the admin.
     list_display = (
         "id",
-        "subject",
+        "session",
         "time",
         "number",
         "description",
     )
 
     #: List ordering in the Django admin views.
-    ordering = ("subject", "time", "number")
+    ordering = ("session", "time", "number")
 
 
 admin.site.register(Scan, ScanAdmin)

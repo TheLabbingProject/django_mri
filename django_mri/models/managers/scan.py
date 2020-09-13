@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Manager
 from django_dicom.models.image import Image as DicomImage
 from django_mri.utils.scan_type import ScanType

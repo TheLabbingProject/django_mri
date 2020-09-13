@@ -28,8 +28,10 @@ class AnalysesTestCase(TestCase):
     def test_pipline_creation(self):
         NIfTI.objects.create(path=FAKE_MNI)
         Analysis.objects.from_list(analysis_definitions)
-        from django_mri.analysis.pipeline_definitions import pipeline_definitions
-        
+        from django_mri.analysis.pipeline_definitions import (
+            pipeline_definitions,
+        )
+
         try:
             pipelines = Pipeline.objects.from_list(pipeline_definitions)
         except Exception as e:

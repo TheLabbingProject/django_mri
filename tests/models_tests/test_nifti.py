@@ -1,4 +1,4 @@
-import factory
+import factory, pytz
 import numpy as np
 
 from django.db.models import signals
@@ -6,14 +6,16 @@ from django.test import TestCase
 from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
+from django_mri.models.session import Session
 from tests.utils import load_common_sequences
-from tests.factories import SubjectFactory
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
+from tests.models import Subject
 from pathlib import Path
+from datetime import datetime
 
 
 class NIfTIModelTestCase(TestCase):
@@ -21,16 +23,19 @@ class NIfTIModelTestCase(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
         load_common_sequences()
-        cls.subject = SubjectFactory()
 
         # MPRAGE scan
         Image.objects.import_path(
             DICOM_MPRAGE_PATH, progressbar=False, report=False
         )
         series = Image.objects.first().series
-        cls.simple_scan = Scan.objects.create(
-            dicom=series, subject=cls.subject
-        )
+        subject, _ = Subject.objects.from_dicom_patient(series.patient)
+        header = series.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session = Session.objects.create(subject=subject, time=session_time)
+        cls.simple_scan = Scan.objects.create(dicom=series, session=session)
         cls.simple_nifti = cls.simple_scan.nifti
 
         # DWI scan
@@ -38,9 +43,15 @@ class NIfTIModelTestCase(TestCase):
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
         series_dwi = Image.objects.last().series
-        cls.dwi_scan = Scan.objects.create(
-            dicom=series_dwi, subject=cls.subject
+        subject_dwi, _ = Subject.objects.from_dicom_patient(series_dwi.patient)
+        header = series_dwi.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session, _ = Session.objects.get_or_create(
+            subject=subject_dwi, time=session_time
         )
+        cls.dwi_scan = Scan.objects.create(dicom=series_dwi, session=session)
         cls.dwi_nifti = cls.dwi_scan.nifti
 
     ##########
@@ -137,6 +148,21 @@ class NIfTIModelTestCase(TestCase):
         result = self.simple_nifti.uncompress()
         self.assertEqual(result, expected)
 
+    def test_get_total_readout_time(self):
+        expected = self.simple_nifti.json_data.get("TotalReadoutTime")
+        result = self.simple_nifti.get_total_readout_time()
+        self.assertEqual(result, expected)
+
+    def test_get_effective_spacing(self):
+        expected = self.simple_nifti.json_data.get("EffectiveEchoSpacing")
+        result = self.simple_nifti.get_effective_spacing()
+        self.assertEqual(result, expected)
+
+    def test_get_phase_encoding_direction(self):
+        expected = self.simple_nifti.json_data.get("PhaseEncodingDirection")
+        result = self.simple_nifti.get_phase_encoding_direction()
+        self.assertEqual(result, expected)
+
     ##############
     # Properties #
     ##############
@@ -169,4 +195,15 @@ class NIfTIModelTestCase(TestCase):
         if self.simple_nifti.is_compressed:
             expected = Path(str(expected).replace(".gz", ""))
         result = self.simple_nifti.uncompressed
+        self.assertEqual(result, expected)
+
+    def test_json_data(self):
+        expected = self.simple_nifti.read_json()
+        result = self.simple_nifti.json_data
+        self.assertEqual(result, expected)
+
+    def test_json_data_if_not_none(self):
+        expected = self.simple_nifti.read_json()
+        self.simple_nifti._json_data = expected
+        result = self.simple_nifti.json_data
         self.assertEqual(result, expected)

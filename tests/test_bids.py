@@ -1,12 +1,11 @@
-import factory
+import factory, pytz
 
 from django.db.models import signals
 from django.test import TestCase
-from django_mri.models import Scan
+from django_mri.models import Scan, Session
 from django_dicom.models import Image, Series
 from django_mri.models.sequence_type import SequenceType
 from tests.utils import load_common_sequences
-from tests.factories import SubjectFactory
 from tests.fixtures import (
     DICOM_MPRAGE_PATH,
     DICOM_DWI_PATH,
@@ -14,6 +13,8 @@ from tests.fixtures import (
     DICOM_FMRI_BOLD_PATH,
     DICOM_IREPI_PATH,
 )
+from tests.models import Subject
+from datetime import datetime
 
 
 class BidsTestCase(TestCase):
@@ -21,32 +22,86 @@ class BidsTestCase(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
         load_common_sequences()
-        cls.subject = SubjectFactory()
+
         Image.objects.import_path(
             DICOM_MPRAGE_PATH, progressbar=False, report=False
         )
         series_mprage = Series.objects.get(description__icontains="MPRAGE")
-        Scan.objects.get_or_create(dicom=series_mprage, subject=cls.subject)
+        subject_mprage, _ = Subject.objects.from_dicom_patient(
+            series_mprage.patient
+        )
+        header = series_mprage.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session_mprage = Session.objects.create(
+            subject=subject_mprage, time=session_time
+        )
+        Scan.objects.get_or_create(dicom=series_mprage, session=session_mprage)
+
         Image.objects.import_path(
             DICOM_DWI_PATH, progressbar=False, report=False
         )
         series_dwi = Series.objects.get(description__icontains="ep2d")
-        Scan.objects.get_or_create(dicom=series_dwi, subject=cls.subject)
+        subject_dwi, _ = Subject.objects.from_dicom_patient(series_dwi.patient)
+        header = series_dwi.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session_dwi = Session.objects.create(
+            subject=subject_dwi, time=session_time
+        )
+        Scan.objects.get_or_create(dicom=series_dwi, session=session_dwi)
+
         Image.objects.import_path(
             DICOM_FLAIR_PATH, progressbar=False, report=False
         )
         series_flair = Series.objects.get(description__icontains="FLAIR")
-        Scan.objects.get_or_create(dicom=series_flair, subject=cls.subject)
+        subject_flair, _ = Subject.objects.from_dicom_patient(
+            series_flair.patient
+        )
+        header = series_flair.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session_flair = Session.objects.create(
+            subject=subject_flair, time=session_time
+        )
+        Scan.objects.get_or_create(dicom=series_flair, session=session_flair)
+
         Image.objects.import_path(
             DICOM_FMRI_BOLD_PATH, progressbar=False, report=False
         )
         series_fmri_bold = Series.objects.get(description__icontains="FMRI")
-        Scan.objects.get_or_create(dicom=series_fmri_bold, subject=cls.subject)
+        subject_fmri_bold, _ = Subject.objects.from_dicom_patient(
+            series_fmri_bold.patient
+        )
+        header = series_fmri_bold.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session_fmri_bold = Session.objects.create(
+            subject=subject_fmri_bold, time=session_time
+        )
+        Scan.objects.get_or_create(
+            dicom=series_fmri_bold, session=session_fmri_bold
+        )
+
         Image.objects.import_path(
             DICOM_IREPI_PATH, progressbar=False, report=False
         )
         series_irepi = Series.objects.get(description__icontains="IR-EPI")
-        Scan.objects.get_or_create(dicom=series_irepi, subject=cls.subject)
+        subject_irepi, _ = Subject.objects.from_dicom_patient(
+            series_irepi.patient
+        )
+        header = series_irepi.image_set.first().header.instance
+        session_time = datetime.combine(
+            header.get("StudyDate"), header.get("StudyTime")
+        ).replace(tzinfo=pytz.UTC)
+        session_irepi = Session.objects.create(
+            subject=subject_irepi, time=session_time
+        )
+        Scan.objects.get_or_create(dicom=series_irepi, session=session_irepi)
 
         dwi = SequenceType.objects.get(title="DWI")
         mprage = SequenceType.objects.get(title="MPRAGE")
