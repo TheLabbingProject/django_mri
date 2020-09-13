@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.utils import IntegrityError
+from psycopg2.errors import UniqueViolation
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
@@ -15,10 +17,16 @@ from django_mri.models.managers.scan import ScanManager
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.utils.utils import get_subject_model, get_group_model
-from django_mri.utils.utils import get_mri_root
+from django_mri.models.session import Session
+from django_mri.utils.utils import (
+    get_subject_model,
+    get_group_model,
+    get_mri_root,
+)
 from django_mri.utils.bids import Bids
 from pathlib import Path
+from datetime import datetime
+import pytz
 
 
 class Scan(TimeStampedModel):
@@ -118,17 +126,6 @@ class Scan(TimeStampedModel):
         "django_mri.NIfTI", on_delete=models.SET_NULL, blank=True, null=True
     )
 
-    #: Associates this scan with some subject. Subjects are expected to be
-    #: represented by a model specified as `SUBJECT_MODEL` in the project's
-    #: settings.
-    subject = models.ForeignKey(
-        get_subject_model(),
-        on_delete=models.PROTECT,
-        related_name="mri_scans",
-        blank=True,
-        null=True,
-    )
-
     #: Individual scans may be associated with multiple `Group` instances.
     #: This is meant to provide flexibility in managing access to data between
     #: researchers working on different studies.
@@ -147,10 +144,16 @@ class Scan(TimeStampedModel):
         on_delete=models.SET_NULL,
     )
 
+    #: Associates this scan with some session of a subject.
+    session = models.ForeignKey(
+        "django_mri.Session", on_delete=models.CASCADE,
+    )
+
     objects = ScanManager()
 
     class Meta:
         verbose_name_plural = "MRI Scans"
+        unique_together = ("number", "session")
 
     def __str__(self) -> str:
         """
@@ -177,6 +180,8 @@ class Scan(TimeStampedModel):
         .. _overriding model methods:
            https://docs.djangoproject.com/en/3.0/topics/db/models/#overriding-model-methods
         """
+
+        Subject = get_subject_model()
 
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
@@ -368,23 +373,10 @@ class Scan(TimeStampedModel):
 
         message = messages.SUBJECT_MISMATCH.format(
             scan_id=self.id,
-            existing_subject_id=self.subject.id,
+            existing_subject_id=self.session.subject.id,
             assigned_subject_id=subject.id,
         )
         warnings.warn(message)
-
-    def suggest_subject(self, subject) -> None:
-        if subject is not None:
-            # If this scan actually belongs to a different subject (and
-            # self.subject is not None), warn the user and return.
-            mismatch = self.subject != subject
-            if self.subject and mismatch:
-                self.warn_subject_mismatch(subject)
-            # Else, if this scan is not assigned to any subject but a subject
-            # was provided (and not None), associate this scan with it.
-            else:
-                self.subject = subject
-                self.save()
 
     def convert_to_mif(self) -> Path:
         """
@@ -482,3 +474,4 @@ class Scan(TimeStampedModel):
             self._nifti = self.dicom_to_nifti()
             self.save()
         return self._nifti
+

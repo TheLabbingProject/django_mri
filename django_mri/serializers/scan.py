@@ -5,6 +5,7 @@ Definition of the :class:`~django_mri.serializers.scan.ScanSerializer` class.
 from django_dicom.models import Series
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
+from django_mri.models.session import Session
 from django_mri.serializers.sequence_type import SequenceTypeSerializer
 from django_mri.utils.utils import get_subject_model, get_group_model
 from rest_framework import serializers
@@ -12,7 +13,7 @@ from rest_framework import serializers
 
 class ScanSerializer(serializers.HyperlinkedModelSerializer):
     """
-    Serializer class for the :class:`~accounts.models.user.User` model.
+    Serializer class for the :class:`~django_mri.models.scan.Scan` model.
 
     References
     ----------
@@ -23,10 +24,10 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     dicom = serializers.HyperlinkedRelatedField(
         view_name="dicom:series-detail", queryset=Series.objects.all()
     )
-    subject = serializers.HyperlinkedRelatedField(
-        view_name="research:subject-detail",
-        queryset=get_subject_model().objects.all(),
-        required=False,
+    session = serializers.HyperlinkedRelatedField(
+        view_name="mri:session-detail",
+        queryset=Session.objects.all(),
+        required=True,
     )
     nifti = serializers.HyperlinkedRelatedField(
         source="_nifti",
@@ -51,7 +52,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "url",
             "dicom",
-            "subject",
+            "session",
             "nifti",
             "study_groups",
             "institution_name",

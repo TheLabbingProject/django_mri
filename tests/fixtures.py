@@ -59,6 +59,7 @@ DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "DWI")
 SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "Siemens")
 SIEMENS_DWI_SERIES = {
     "time": datetime(2018, 5, 1, 12, 37, 55, 433000, tzinfo=pytz.utc),
+    "study_time": datetime(2018, 5, 1, 12, 21, 56, 958000, tzinfo=pytz.utc),
     "description": "Ax1D_advdiff_d12D21_TE51_B1000",
     "number": 4,
     "echo_time": 51.0,

@@ -16,7 +16,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_dicom.models.series import Series
 from django_mri.models.scan import Scan
-from django_mri.utils import get_subject_model
+from django_mri.models.session import Session
+from django_mri.utils import get_subject_model, get_session
 
 _SCAN_FROM_SERIES_FAILURE = (
     "Failed to create Scan instance for DICOM series {series_id}!\n{exception}"
@@ -25,9 +26,9 @@ _SCAN_FROM_SERIES_FAILURE = (
 _logger = logging.getLogger("data.mri.signals")
 
 
-@receiver(post_save, sender=Scan)
+@receiver(post_save, sender=Session)
 def scan_post_save_receiver(
-    sender: Model, instance: Scan, created: bool, **kwargs
+    sender: Model, instance: Session, created: bool, **kwargs
 ) -> None:
     """
     Creates a new subject automatically if a subject was not assigned and a
@@ -37,16 +38,16 @@ def scan_post_save_receiver(
     Parameters
     ----------
     sender : ~django.db.models.Model
-        The :class:`~django_mri.models.scan.Scan` model
-    instance : ~django_mri.models.scan.Scan
+        The :class:`~django_mri.models.session.Session` model
+    instance : ~django_mri.models.session.Session
         Scan instance
     created : bool
-        Whether the scan instance was created or not
+        Whether the session instance was created or not
     """
 
-    if instance.dicom and not instance.subject:
+    if not instance.subject:
         Subject = get_subject_model()
-        patient = instance.dicom.patient
+        patient = instance.scan_set.first().dicom.patient
         if patient:
             instance.subject, _ = Subject.objects.from_dicom_patient(patient)
             instance.save()
@@ -71,7 +72,8 @@ def series_post_save_receiver(
     """
 
     try:
-        Scan.objects.get_or_create(dicom=instance)
+        session = get_session(instance)
+        Scan.objects.get_or_create(dicom=instance, session=session)
     except Exception as exception:
         message = _SCAN_FROM_SERIES_FAILURE.format(
             series_id=instance.id, exception=exception
