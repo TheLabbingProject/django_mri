@@ -16,22 +16,26 @@ class Migration(migrations.Migration):
         Session = apps.get_model("django_mri", "Session")
 
         for scan in Scan.objects.all():
-            subjects = Subject.objects.filter(id_number=scan.dicom.patient.uid)
+            subject = Subject.objects.filter(
+                id_number=scan.dicom.patient.uid
+            ).first()
             header = DicomHeader(scan.dicom.image_set.first().dcm.path)
             session_time = datetime.combine(
                 header.get("StudyDate"), header.get("StudyTime")
             )
-            subject = None
-            if len(subjects) == 0:
-                scan.session_id = Session.objects.create(time=session_time).id
+            if not subject:
+                session = Session.objects.create(time=session_time)
+                scan.session_id = session.id
                 scan.save()
             else:
-                subject = subjects.first()
-                sessions = subject.mri_session_set.filter(time=session_time)
-                if len(sessions) == 0:
-                    Session.objects.create(subject_id=subject.id, time=session_time)
-                    sessions = subject.mri_session_set.all()
-                scan.session_id = sessions.first().id
+                session = subject.mri_session_set.filter(
+                    time=session_time
+                ).first()
+                if not session:
+                    session = Session.objects.create(
+                        subject_id=subject.id, time=session_time
+                    )
+                scan.session_id = session.id
                 scan.save()
 
     def session_to_scan_subject(apps, schema_editor):
