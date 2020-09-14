@@ -3,7 +3,6 @@ from django.db.models import QuerySet
 from django_mri.utils import get_subject_model, get_group_model
 from django_mri.models import help_text
 from django.db import models
-from datetime import datetime
 
 Group = get_group_model()
 
