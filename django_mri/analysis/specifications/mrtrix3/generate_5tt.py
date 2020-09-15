@@ -49,7 +49,7 @@ GENERATE_5TT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Path to output image.",
         "is_output_path": True,
-        "default": "5tt.nii.gz",
+        "default": "5tt.mif",
     },
     "bval_scale": {
         "type": StringInputDefinition,

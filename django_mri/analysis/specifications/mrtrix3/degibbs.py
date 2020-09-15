@@ -31,19 +31,12 @@ DEGIBBS_INPUT_SPECIFICATION = {
         "type": FileInputDefinition,
         "required": True,
         "is_configuration": False,
-        "db_value_preprocessing": "path",
     },
     "axes": {
         "type": ListInputDefinition,
         "element_type": "INT",
         "description": "Indicate the plane in which the data was acquired (axial = 0,1; coronal = 0,2; sagittal = 1,2).",  # noqa: E501
         "default": [0, 1],
-    },
-    "bval_scale": {
-        "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
-        "choices": ["yes", "no"],
-        "default": "yes",
     },
     "grad_file": {
         "type": StringInputDefinition,
@@ -84,7 +77,7 @@ DEGIBBS_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output denoised DWI image.",
-        "default": "denoised.mif",
+        "default": "degibbsed.mif",
     },
 }
 

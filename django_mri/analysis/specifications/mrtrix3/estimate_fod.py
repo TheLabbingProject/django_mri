@@ -38,11 +38,10 @@ DWI2FOD_INPUT_SPECIFICATION = {
         "choices": ["csd", "msmt_csd"],
     },
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "description": "Input DWI image.",
         "required": True,
         "is_configuration": False,
-        "value_attribute": "nifti.path",
     },
     "wm_odf": {
         "type": StringInputDefinition,
@@ -56,12 +55,6 @@ DWI2FOD_INPUT_SPECIFICATION = {
         "description": "WM response text.",
         "is_output_path": True,
         "default": "wm_fod.txt",
-    },
-    "bval_scale": {
-        "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
-        "choices": ["yes", "no"],
-        "default": "yes",
     },
     "csf_odf": {
         "type": StringInputDefinition,

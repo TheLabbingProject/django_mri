@@ -1,81 +1,45 @@
 """
 Definition of the
-:class:`~django_mri.analysis.interfaces.mrtrix3.dwifslpreproc` interface.
+:class:`~django_mri.analysis.interfaces.mrtrix3.dwi2tensor` interface.
 """
 
 import os
 from pathlib import Path
 
 
-class DwiFslPreproc:
+class Tensor2metric:
     """
-    An interface for the MRtrix3 *dwifslpreproc* script.
+    An interface for the MRtrix3 *dwi2tensor* script.
 
     References
     ----------
-    * dwifslpreproc_
+    * tensor2metric_
 
-    .. _dwifslpreproc:
-       https://mrtrix.readthedocs.io/en/latest/reference/commands/dwifslpreproc.html
+    .. _tensor2metric:
+       https://mrtrix.readthedocs.io/en/latest/reference/commands/dwi2tensor.html
     """
 
     #: "Flags" indicate parameters that are specified without any arguments,
     #: i.e. they are a switch for some binary configuration.
     FLAGS = (
-        "align_seepi",
-        "rpe_none",
-        "rpe_pair",
-        "rpe_all",
-        "rpe_header",
+        "ols",
         "force",
         "quiet",
         "info",
         "nocleanup",
     )
-
-    #: Non-default output configuration.
-    SUPPLEMENTARY_OUTPUTS = ["eddyqc_all"]
-    DEFAULT_INPUTS = ["json_import", "fslgrad"]
-    #: Default name for primary output file.
-    DEFAULT_OUTPUT_NAME = "preprocessed_dwi.mif"
-
-    #: *eddy* output files by key.
-    #:
-    #: References
-    #: ----------
-    #: * eddy_
-    #:
-    #: .. _eddy:
-    #:    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
-    EDDY_OUTPUTS = {
-        "out_movement_rms": "eddy_movement_rms",
-        "eddy_mask": "eddy_mask.mif",
-        "out_outlier_map": "eddy_outlier_map",
-        "out_outlier_n_sqr_stdev_map": "eddy_outlier_n_sqr_stdev_map",
-        "out_outlier_n_stdev_map": "eddy_outlier_n_stdev_map",
-        "out_outlier_report": "eddy_outlier_report",
-        "out_parameter": "eddy_parameters",
-        "out_restricted_movement_rms": "eddy_restricted_movement_rms",
-        "out_shell_alignment_parameters": "eddy_post_eddy_shell_alignment_parameters",  # noqa: E501
-        "out_shell_pe_translation_parameters": "eddy_post_eddy_shell_PE_translation_parameters",  # noqa: E501
-    }
+    #: Default name for primary output files.
+    DEFAULT_OUTPUTS = {"tensor_file": "tensor.mif"}
 
     __version__ = "BETA"
 
     def __init__(self, **kwargs):
         self.configuration = kwargs
 
-    def add_supplementary_outputs(self, destination: Path) -> dict:
+    def add_outputs(self, destination: Path) -> dict:
         """
-        Adds the *eddy* output files to the interface's configuration before
+        Adds the tensor output file to the interface's configuration before
         generating the command to run.
-
-        References
-        ----------
-        * eddy_
-
-        .. _eddy:
-            https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
 
         Parameters
         ----------
@@ -89,11 +53,9 @@ class DwiFslPreproc:
         """
 
         config = self.configuration.copy()
-        print(config)
-        for key in self.SUPPLEMENTARY_OUTPUTS:
-            print(key)
+        for key in self.DEFAULT_OUTPUTS:
             if key not in config.keys():
-                config[key] = destination
+                config[key] = destination / config[key]
         return config
 
     def set_configuration_by_keys(self, config: dict):
@@ -127,19 +89,10 @@ class DwiFslPreproc:
             Complete execution command
         """
 
-        output_path = destination / self.DEFAULT_OUTPUT_NAME
-        scan = config.pop("scan")
-        # pe_direction = scan.nifti.get_phase_encoding_direction()
-        command = f"dwifslpreproc {scan} {output_path}"
+        # output_path = destination / self.DEFAULT_OUTPUT_NAME
+        in_file = config.pop("in_file")
+        command = f"dwi2tensor {in_file}"
         return command + self.set_configuration_by_keys(config)
-        # "".join(
-        #     [
-        #         f" -{key}"
-        #         if key in self.FLAGS and value
-        #         else f" -{key} {value}"
-        #         for key, value in config.items()
-        #     ]
-        # )
 
     def generate_output_dict(self, destination: Path) -> dict:
         """
@@ -156,11 +109,9 @@ class DwiFslPreproc:
             Output files by key
         """
 
-        output_dict = {
-            "preprocessed_dwi": destination / self.DEFAULT_OUTPUT_NAME,
-        }
-        for key, value in self.EDDY_OUTPUTS.items():
-            output_dict[key] = destination / value
+        output_dict = {}
+        for key, val in self.DEFAULT_OUTPUTS:
+            output_dict[key] = destination / val
         return output_dict
 
     def run(self, destination: Path = None) -> dict:
@@ -186,13 +137,15 @@ class DwiFslPreproc:
         RuntimeError
             Run failure
         """
-
-        destination = Path(destination) if destination else scan.path.parent
-        config = self.add_supplementary_outputs(destination)
+        in_file = self.configuration.pop("in_file")
+        destination = (
+            Path(destination) if destination else Path(in_file).parent
+        )
+        config = self.add_outputs(destination)
         command = self.generate_command(destination, config)
         raise_exception = os.system(command)
         if raise_exception:
             raise RuntimeError(
-                f"Failed to run dwifslpreproc!\nExecuted command: {command}"
+                f"Failed to run dwi2tensor!\nExecuted command: {command}"
             )
         return self.generate_output_dict(destination)

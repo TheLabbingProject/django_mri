@@ -21,6 +21,7 @@ from django.conf import settings
 from django_mri.analysis import messages
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
+from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -121,6 +122,14 @@ from django_mri.analysis.specifications.mrtrix3.generate_5tt import (
     GENERATE_5TT_INPUT_SPECIFICATION,
     GENERATE_5TT_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.mrtrix3.estimate_tensors import (
+    DWI2TENSOR_INPUT_SPECIFICATION,
+    DWI2TENSOR_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.compute_metrics import (
+    TENSOR2METRICS_INPUT_SPECIFICATION,
+    TENSOR2METRIC_OUTPUT_SPECIFICATION,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -146,6 +155,7 @@ from nipype.interfaces.mrtrix3 import (
     ConstrainedSphericalDeconvolution,
     ResponseSD,
     Generate5tt,
+    FitTensor,
 )
 from nipype.interfaces.fsl.base import no_fsl
 
@@ -471,6 +481,19 @@ analysis_definitions = [
         ],
     },
     {
+        "title": "dwi2tensor",
+        "description": "Convert diffusion-weighted images to tensor images.",  # noqa: E501
+        "versions": [
+            {
+                "title": FitTensor().version or "1.0",
+                "description": f"Default FitTensor version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWI2TENSOR_INPUT_SPECIFICATION,
+                "output": DWI2TENSOR_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
         "title": "dwifslpreproc",
         "description": "Perform diffusion image pre-processing using FSL’s eddy tool; including inhomogeneity distortion correction using FSL’s topup tool if possible",  # noqa: E501
         "versions": [
@@ -479,7 +502,18 @@ analysis_definitions = [
                 "description": f"Default dwifslpreproc version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DWIFSLPREPROC_INPUT_SPECIFICATION,
                 "output": DWIFSLPREPROC_OUTPUT_SPECIFICATION,
-                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "tensor2metric",
+        "description": "Generate maps of tensor-derived parameters",  # noqa: E501
+        "versions": [
+            {
+                "title": Tensor2metric.__version__ or "1.0",
+                "description": f"Default tensor2metric version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": TENSOR2METRICS_INPUT_SPECIFICATION,
+                "output": TENSOR2METRIC_OUTPUT_SPECIFICATION,
             }
         ],
     },
