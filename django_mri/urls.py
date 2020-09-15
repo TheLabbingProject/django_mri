@@ -28,6 +28,7 @@ router.register(r"scan", views.ScanViewSet)
 router.register(r"nifti", views.NiftiViewSet)
 router.register(r"sequence_type", views.SequenceTypeViewSet)
 router.register(r"sequence_type_definition", views.SequenceTypeDefinitionViewSet)
+router.register(r"session", views.SessionViewSet)
 
 
 urlpatterns = [

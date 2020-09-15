@@ -7,6 +7,7 @@ Definition of the app's models_.
 
 from django_mri.models.scan import Scan
 from django_mri.models.nifti import NIfTI
+from django_mri.models.session import Session
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.models.inputs.nifti_input import NiftiInput
