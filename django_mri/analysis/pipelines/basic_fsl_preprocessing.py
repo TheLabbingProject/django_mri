@@ -7,21 +7,10 @@ NIfTI.DoesNotExist
     MNI152_T1_2mm_brain template could not be found
 """
 
-from django_mri.models.nifti import NIfTI
-from pathlib import Path
+from django_mri.analysis.utils import get_mni
 
 
-try:
-    MNI = NIfTI.objects.get(path__contains="MNI152_T1_2mm_brain")
-except NIfTI.DoesNotExist:
-    mni_path = (
-        Path(__file__).parent.parent.parent
-        / "utils"
-        / "atlases"
-        / "MNI152_T1_2mm_brain.nii.gz"
-    )
-    MNI = NIfTI.objects.create(path=mni_path)
-
+MNI = get_mni()
 
 # Node configurations
 

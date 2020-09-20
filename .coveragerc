@@ -4,6 +4,7 @@ omit = ../*migrations*
     setup.py
     venv/**
     tox/**
+    .tox/**
     *tests*
 
 source = .
