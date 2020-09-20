@@ -12,5 +12,12 @@ CAT12_SEGMENTATION_TEMPLATE = (
     CAT12_MODULE_PATH / "segmentation" / "batch_template_12_7.m"
 )
 
+CAT12_LONGITUDINAL_SEGMENTATION_TEMPLATE = (
+    CAT12_MODULE_PATH / "longitudinal_segmentation" / "batch_template.m"
+)
+
 #: Batch template file path by interface (string) key.
-CAT12_TEMPLATES = {"CAT12 Segmentation": CAT12_SEGMENTATION_TEMPLATE}
+CAT12_TEMPLATES = {
+    "CAT12 Segmentation": CAT12_SEGMENTATION_TEMPLATE,
+    "CAT12 Longitudinal Segmentation": CAT12_LONGITUDINAL_SEGMENTATION_TEMPLATE,  # noqa: E501
+}
