@@ -27,7 +27,7 @@ _logger = logging.getLogger("data.mri.signals")
 
 
 @receiver(post_save, sender=Session)
-def scan_post_save_receiver(
+def session_post_save_receiver(
     sender: Model, instance: Session, created: bool, **kwargs
 ) -> None:
     """
@@ -40,16 +40,18 @@ def scan_post_save_receiver(
     sender : ~django.db.models.Model
         The :class:`~django_mri.models.session.Session` model
     instance : ~django_mri.models.session.Session
-        Scan instance
+        Session instance
     created : bool
         Whether the session instance was created or not
     """
 
     if not instance.subject:
         Subject = get_subject_model()
-        patient = instance.scan_set.first().dicom.patient
-        if patient:
-            instance.subject, _ = Subject.objects.from_dicom_patient(patient)
+        scan = instance.scan_set.first()
+        if scan and scan.dicom.patient:
+            instance.subject, _ = Subject.objects.from_dicom_patient(
+                scan.dicom.patient
+            )
             instance.save()
 
 
@@ -72,10 +74,16 @@ def series_post_save_receiver(
     """
 
     session = get_session_by_series(instance)
-    try:
-        Scan.objects.get_or_create(dicom=instance, session=session)
-    except Exception as exception:
-        message = _SCAN_FROM_SERIES_FAILURE.format(
-            series_id=instance.id, exception=exception
-        )
-        _logger.warning(message)
+    if session:
+        try:
+            scan, created = Scan.objects.get_or_create(
+                dicom=instance, session=session
+            )
+        except Exception as exception:
+            message = _SCAN_FROM_SERIES_FAILURE.format(
+                series_id=instance.id, exception=exception
+            )
+            _logger.warning(message)
+        else:
+            if created:
+                session.save()
