@@ -72,24 +72,31 @@ def get_dicom_root() -> Path:
     return get_mri_root() / DEFAULT_DICOM_DIR_NAME
 
 
-def get_session(series):
+def get_session_by_series(series):
     """
     Returns the appropriate session to the current series.
     """
 
     Session = apps.get_model("django_mri", "Session")
+    Subject = get_subject_model()
 
     header = series.image_set.first().header.instance
-    session_time = datetime.combine(
-        header.get("StudyDate"), header.get("StudyTime")
-    ).replace(tzinfo=pytz.UTC)
+    study_date, study_time = header.get("StudyDate"), header.get("StudyTime")
+    session_time = datetime.combine(study_date, study_time).replace(
+        tzinfo=pytz.UTC
+    )
     try:
-        subject = get_subject_model().objects.get(id_number=series.patient.uid)
+        subject = Subject.objects.get(id_number=series.patient.uid)
+    # If the subject doesn't exist in the database, create a new session
+    # without an associated subject.
+    except ObjectDoesNotExist:
+        session = Session.objects.create(time=session_time)
+    # If the subject does exist, look for an existing session by time.
+    else:
         session = subject.mri_session_set.filter(time=session_time).first()
+        # If no existing session exists, create one.
         if not session:
             session = Session.objects.create(
                 time=session_time, subject=subject
             )
-    except ObjectDoesNotExist:  # The subject does not exist.
-        session = Session.objects.create(time=session_time)
     return session

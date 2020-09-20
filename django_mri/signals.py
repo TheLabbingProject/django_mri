@@ -17,7 +17,7 @@ from django.dispatch import receiver
 from django_dicom.models.series import Series
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
-from django_mri.utils import get_subject_model, get_session
+from django_mri.utils import get_subject_model, get_session_by_series
 
 _SCAN_FROM_SERIES_FAILURE = (
     "Failed to create Scan instance for DICOM series {series_id}!\n{exception}"
@@ -71,8 +71,8 @@ def series_post_save_receiver(
         Whether the series instance was created or not
     """
 
+    session = get_session_by_series(instance)
     try:
-        session = get_session(instance)
         Scan.objects.get_or_create(dicom=instance, session=session)
     except Exception as exception:
         message = _SCAN_FROM_SERIES_FAILURE.format(
