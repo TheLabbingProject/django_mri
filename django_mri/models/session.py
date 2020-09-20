@@ -9,9 +9,10 @@ Group = get_group_model()
 
 class Session(TimeStampedModel):
     """
-        Represents a scanning session of a specific subject.
+    Represents a single MRI scanning session.
     """
 
+    #: The associated `Subject` model (optional).
     subject = models.ForeignKey(
         get_subject_model(),
         on_delete=models.CASCADE,
@@ -20,6 +21,7 @@ class Session(TimeStampedModel):
         null=True,
     )
 
+    #: Any other information about this scanning sequence.
     comments = models.TextField(
         max_length=1000,
         blank=True,
@@ -27,9 +29,21 @@ class Session(TimeStampedModel):
         help_text=help_text.SESSION_COMMENTS,
     )
 
+    #: The date and time in which this scanning sequence began.
     time = models.DateTimeField()
 
     @property
     def study_groups(self) -> QuerySet:
+        """
+        The experimental groups with which scans in this session are
+        associated. This property is only relevant if `STUDY_GROUP_MODEL` is
+        set in the project's settings.
+
+        Returns
+        -------
+        QuerySet
+            The associated study groups
+        """
+
         ids = self.scan_set.values_list("study_groups", flat=True)
         return Group.objects.filter(id__in=ids)
