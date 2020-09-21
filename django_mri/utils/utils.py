@@ -72,24 +72,47 @@ def get_dicom_root() -> Path:
     return get_mri_root() / DEFAULT_DICOM_DIR_NAME
 
 
-def get_session(series):
+def get_session_by_series(series):
     """
-    Returns the appropriate session to the current series.
+    Returns the appropriate session for the given
+    :class:`~django_dicom.models.series.Series` instance.
+
+    Parameters
+    ----------
+    series : :class:`~django_dicom.models.series.Series`
+        DICOM series to infer the session from
+
+    Returns
+    -------
+    :class:`~django_mri.models.session.Session`
+        The appropriate session
     """
 
     Session = apps.get_model("django_mri", "Session")
+    Subject = get_subject_model()
 
-    header = series.image_set.first().header.instance
-    session_time = datetime.combine(
-        header.get("StudyDate"), header.get("StudyTime")
-    ).replace(tzinfo=pytz.UTC)
-    try:
-        subject = get_subject_model().objects.get(id_number=series.patient.uid)
-        session = subject.mri_session_set.filter(time=session_time).first()
-        if not session:
-            session = Session.objects.create(
-                time=session_time, subject=subject
-            )
-    except ObjectDoesNotExist:  # The subject does not exist.
-        session = Session.objects.create(time=session_time)
-    return session
+    image = series.image_set.first()
+    if image:
+        header = image.header.instance
+        study_date, study_time = (
+            header.get("StudyDate"),
+            header.get("StudyTime"),
+        )
+        session_time = datetime.combine(study_date, study_time).replace(
+            tzinfo=pytz.UTC
+        )
+        try:
+            subject = Subject.objects.get(id_number=series.patient.uid)
+        # If the subject doesn't exist in the database, create a new session
+        # without an associated subject.
+        except ObjectDoesNotExist:
+            session = Session.objects.create(time=session_time)
+        # If the subject does exist, look for an existing session by time.
+        else:
+            session = subject.mri_session_set.filter(time=session_time).first()
+            # If no existing session exists, create one.
+            if not session:
+                session = Session.objects.create(
+                    time=session_time, subject=subject
+                )
+        return session
