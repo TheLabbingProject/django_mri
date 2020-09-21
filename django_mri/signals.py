@@ -17,7 +17,7 @@ from django.dispatch import receiver
 from django_dicom.models.series import Series
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
-from django_mri.utils import get_subject_model, get_session
+from django_mri.utils import get_subject_model, get_session_by_series
 
 _SCAN_FROM_SERIES_FAILURE = (
     "Failed to create Scan instance for DICOM series {series_id}!\n{exception}"
@@ -27,7 +27,7 @@ _logger = logging.getLogger("data.mri.signals")
 
 
 @receiver(post_save, sender=Session)
-def scan_post_save_receiver(
+def session_post_save_receiver(
     sender: Model, instance: Session, created: bool, **kwargs
 ) -> None:
     """
@@ -40,16 +40,18 @@ def scan_post_save_receiver(
     sender : ~django.db.models.Model
         The :class:`~django_mri.models.session.Session` model
     instance : ~django_mri.models.session.Session
-        Scan instance
+        Session instance
     created : bool
         Whether the session instance was created or not
     """
 
     if not instance.subject:
         Subject = get_subject_model()
-        patient = instance.scan_set.first().dicom.patient
-        if patient:
-            instance.subject, _ = Subject.objects.from_dicom_patient(patient)
+        scan = instance.scan_set.first()
+        if scan and scan.dicom.patient:
+            instance.subject, _ = Subject.objects.from_dicom_patient(
+                scan.dicom.patient
+            )
             instance.save()
 
 
@@ -71,11 +73,17 @@ def series_post_save_receiver(
         Whether the series instance was created or not
     """
 
-    try:
-        session = get_session(instance)
-        Scan.objects.get_or_create(dicom=instance, session=session)
-    except Exception as exception:
-        message = _SCAN_FROM_SERIES_FAILURE.format(
-            series_id=instance.id, exception=exception
-        )
-        _logger.warning(message)
+    session = get_session_by_series(instance)
+    if session:
+        try:
+            scan, created = Scan.objects.get_or_create(
+                dicom=instance, session=session
+            )
+        except Exception as exception:
+            message = _SCAN_FROM_SERIES_FAILURE.format(
+                series_id=instance.id, exception=exception
+            )
+            _logger.warning(message)
+        else:
+            if created:
+                session.save()
