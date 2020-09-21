@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Manager
 from django_dicom.models.image import Image as DicomImage
 from django_mri.utils.scan_type import ScanType
+from django_mri.models.sequence_type import SequenceType
 from pathlib import Path
 
 
@@ -21,3 +22,20 @@ class ScanManager(Manager):
     ) -> tuple:
         dicom_scans = self.import_dicom_data(path, progressbar, report)
         return {ScanType.DICOM.value: dicom_scans}
+
+    def scan_by_method(self, method: str) -> list:
+        mri_method_definitions = SequenceType.objects.get(
+            title__iexact=method
+        ).sequence_definitions
+        sequence_variants = map(
+            lambda definition: definition["sequence_variant"],
+            mri_method_definitions,
+        )
+        scanning_sequences = map(
+            lambda definition: definition["scanning_sequence"],
+            mri_method_definitions,
+        )
+        return self.filter(
+            dicom__sequence_variant__contains=list(sequence_variants),
+            dicom__scanning_sequence__contains=list(scanning_sequences),
+        )
