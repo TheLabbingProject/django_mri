@@ -3,6 +3,7 @@ Default values for the various keys required in the batch template.
 """
 
 LONGITUDINAL_SEGMENTATION_DEFAULTS = {
+    "longitudinal_model": "small",
     "n_processes": 8,
     "affine_regularisation": "mni",
     "bias_strength": "medium",

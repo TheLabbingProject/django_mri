@@ -1,7 +1,5 @@
 """
-Definition of the
-:class:`~django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.segmentation.Segmentation`
-class.
+Definition of the :class:`LongitudinalSegmentation` class.
 """
 
 from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.defaults import (  # noqa: E501
@@ -29,7 +27,7 @@ from django_mri.analysis.interfaces.matlab.spm.utils.nifti_validator import (
 )
 from django_mri.utils.compression import uncompress
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 
 class LongitudinalSegmentation(SPMProcedure):
@@ -77,15 +75,15 @@ class LongitudinalSegmentation(SPMProcedure):
             transformed[key] = int(value) if isinstance(value, bool) else value
         return transformed
 
-    def update_batch_template(self, data_path: Path) -> str:
+    def update_batch_template(self, scans: List[Path]) -> str:
         """
         Returns a copy of the batch template, updated with the configured
-        options and data path.
+        options and scan paths.
 
         Parameters
         ----------
-        data_path : Path
-            Path of the input *.nii* file
+        scans : List[Path]
+            Paths of the input *.nii* files
 
         Returns
         -------
@@ -95,7 +93,9 @@ class LongitudinalSegmentation(SPMProcedure):
 
         batch = self.read_batch_template()
         options = self.transform_options()
-        batch = batch.replace("$DATA_PATH", str(data_path))
+        t1w_scans = [f"'{scan.nifti.uncompressed},1'" for scan in scans]
+        t1w_scans = "\n".join(t1w_scans)
+        batch = batch.replace("$T1W_SCANS", t1w_scans)
         batch = batch.replace(
             "$TPM_PATH", str(self.tissue_probability_map_path)
         )
@@ -106,36 +106,39 @@ class LongitudinalSegmentation(SPMProcedure):
             batch = batch.replace(f"${key.upper()}", str(value))
         return batch
 
-    def validate_and_fix_input_data(self, path: Path) -> Tuple[Path, bool]:
+    def validate_and_fix_input_data(self, scans: List[Path]) -> List[Path]:
         """
         Validate the provided data path and creates an unzipped version if
         required.
 
         Parameters
         ----------
-        path : Path
-            Path to input data
+        path : List[Path]
+            List of T1-weighted scan paths
 
         Returns
         -------
-        Tuple[Path, bool]
-            Fixed input data path, whether is was unzipped or not
+        List[tuple]
+            List of tuples with shape (path string, created)
         """
 
-        path = self.nifti_validator.validate_and_fix(path)
+        scans = [self.nifti_validator.validate_and_fix(path) for path in scans]
 
-        # If the input is zipped, check for an existing unzipped version or
-        # create one.
-        if path.suffix == ".gz":
-            # In case un unzipped version exists already, return the unzipped
-            # version and 'False' for having created it.
-            if path.with_suffix("").is_file():
-                return path.with_suffix(""), False
-
-            # Otherwise, create an unzipped version and return 'True' for
-            # having created it.
-            return uncompress(path), True
-        return path, False
+        results = []
+        for path in scans:
+            # If the input is zipped, check for an existing unzipped version or
+            # create one.
+            if path.suffix == ".gz":
+                # In case un unzipped version exists already, return the
+                # unzipped version and 'False' for having created it.
+                if path.with_suffix("").is_file():
+                    results.append((path.with_suffix(""), False))
+                # Otherwise, create an unzipped version and return 'True' for
+                # having created it.
+                results.append(uncompress(path), True)
+            else:
+                results.append((path, False))
+        return results
 
     def remove_redundant_logs(self, run_dir: Path):
         """
@@ -152,8 +155,8 @@ class LongitudinalSegmentation(SPMProcedure):
 
     def organize_output(
         self,
-        path: Path,
-        created_uncompressed_version: bool,
+        scans: List[str],
+        created_uncompressed_version: List[bool],
         destination: Path,
         remove_redundant_logs: bool,
         verbose_output_dict: bool = False,
@@ -165,11 +168,11 @@ class LongitudinalSegmentation(SPMProcedure):
         ----------
         path : Path
             Input file path
-        created_uncompressed_version : bool
-            Whether an uncompressed version of the input value was created or
-            not
         destination : Path
             Output files destination directory
+        created_uncompressed_version : List[bool]
+            List of boolean values signaling whether a .nii version was created
+            for the purposes of this run and should be removed
         remove_redundant_logs : bool
             Whether to remove logs created during execution or not
         verbose_output_dict : bool, optional
@@ -182,11 +185,15 @@ class LongitudinalSegmentation(SPMProcedure):
             Output files by keys
         """
 
+        # TODO:
+        #   * Find out if there are created logs and what is the run dir if different directories and fix
+        #     remove_redundant_long, create_output_dict, and move_output accordingly
         if remove_redundant_logs:
             self.remove_redundant_logs(path.parent)
-        if created_uncompressed_version:
-            path.unlink()
-        output_dict = self.create_output_dict(path)
+        for i, created in enumerate(created_uncompressed_version):
+            if created:
+                Path(scans[i]).unlink()
+        output_dict = self.create_output_dict(scans)
         if destination:
             output_dict = self.move_output(
                 output_dict=output_dict,
@@ -199,7 +206,7 @@ class LongitudinalSegmentation(SPMProcedure):
 
     def run(
         self,
-        path: Path,
+        scans: List[Path],
         destination: Path = None,
         remove_redundant_logs: bool = True,
         verbose_output_dict: bool = False,
@@ -210,8 +217,8 @@ class LongitudinalSegmentation(SPMProcedure):
 
         Parameters
         ----------
-        path : Path
-            Input file
+        scans : List[Path]
+            Single subject's T1-weighted scans from different time-points
         destination : Path, optional
             Output file destination directory, by default None
         remove_redundant_logs : bool, optional
@@ -227,15 +234,14 @@ class LongitudinalSegmentation(SPMProcedure):
             Output files by key
         """
 
-        path, created_uncompressed_version = self.validate_and_fix_input_data(
-            path
-        )
-        batch_file = self.create_batch_file(path)
+        scans, created = zip(*self.validate_and_fix_input_data(scans))
+        batch_file = self.create_batch_file(scans)
         self.engine.run(str(batch_file), nargout=0)
         return self.organize_output(
-            path,
-            created_uncompressed_version,
+            scans,
+            created,
             destination,
             remove_redundant_logs,
             verbose_output_dict,
         )
+

@@ -5,6 +5,7 @@ Definition of the :obj:`LONGITUDINAL_SEGMENTATION_TRANSFORMATIONS` dictionary.
 
 #: Transformation to apply to option values before editing the batch template.
 LONGITUDINAL_SEGMENTATION_TRANSFORMATIONS = {
+    "longitudinal_model": {"small": 1, "large": 2},
     "bias_strength": {"light": 0.25, "medium": 0.5, "strong": 0.75},
     "accuracy": {"average": 0.5, "high": 0.75, "ultra high": 1},
     "affine_preprocessing": {"none": 0, "light": 1, "full": 2, "rough": 1070},

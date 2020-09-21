@@ -4,7 +4,6 @@ Definition of the :class:`~django_mri.models.nifti.NIfTI` model.
 
 import nibabel as nib
 import numpy as np
-import os
 import json
 
 from django.db import models

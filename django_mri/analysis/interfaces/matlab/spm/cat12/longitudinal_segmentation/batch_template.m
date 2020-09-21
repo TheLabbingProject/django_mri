@@ -1,7 +1,11 @@
 spm('defaults', 'fmri');
 spm_jobman('initcfg');
-matlabbatch{1}.spm.tools.cat.long.datalong.subjects = {};
-matlabbatch{1}.spm.tools.cat.long.longmodel = 1;
+matlabbatch{1}.spm.tools.cat.long.datalong.subjects = {
+                                                       {
+                                                       $T1W_SCANS
+                                                       }
+                                                       };
+matlabbatch{1}.spm.tools.cat.long.longmodel = $LONGITUDINAL_MODEL;
 matlabbatch{1}.spm.tools.cat.long.nproc = $N_PROCESSES;
 matlabbatch{1}.spm.tools.cat.long.opts.tpm = {'$TPM_PATH'};
 matlabbatch{1}.spm.tools.cat.long.opts.affreg = 'mni';

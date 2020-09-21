@@ -10,11 +10,7 @@ Group = get_group_model()
 
 class Session(TimeStampedModel):
     """
-<<<<<<< HEAD
-    Represents a scanning session of a specific subject.
-=======
     Represents a single MRI scanning session.
->>>>>>> fixes
     """
 
     #: The associated `Subject` model (optional).
