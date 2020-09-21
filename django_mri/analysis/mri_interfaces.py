@@ -17,6 +17,7 @@ References
 
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
+from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import (
     Segmentation as Cat12Segmentation,
 )
@@ -46,7 +47,6 @@ from nipype.interfaces.mrtrix3 import (
     ConstrainedSphericalDeconvolution,
     ResponseSD,
     Generate5tt,
-    FitTensor,
 )
 
 
@@ -80,6 +80,6 @@ interfaces = {
     },
     "dwi2response": {ResponseSD().version: ResponseSD},
     "5ttgen": {Generate5tt().version: Generate5tt},
-    "dwi2tensor": {FitTensor().version: FitTensor},
+    "dwi2tensor": {Dwi2Tensor.__version__: Dwi2Tensor},
     "tensor2metric": {Tensor2metric.__version__: Tensor2metric},
 }

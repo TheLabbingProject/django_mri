@@ -57,7 +57,7 @@ DWI2TENSOR_INPUT_SPECIFICATION = {
     "iter": {
         "type": IntegerInputDefinition,
         "description": "number of iterative reweightings for IWLS algorithm",
-        "default": True,
+        "default": 2,
     },
     "predicted_signal": {
         "type": StringInputDefinition,

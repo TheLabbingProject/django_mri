@@ -129,17 +129,9 @@ class DwiFslPreproc:
 
         output_path = destination / self.DEFAULT_OUTPUT_NAME
         scan = config.pop("scan")
-        # pe_direction = scan.nifti.get_phase_encoding_direction()
         command = f"dwifslpreproc {scan} {output_path}"
         return command + self.set_configuration_by_keys(config)
-        # "".join(
-        #     [
-        #         f" -{key}"
-        #         if key in self.FLAGS and value
-        #         else f" -{key} {value}"
-        #         for key, value in config.items()
-        #     ]
-        # )
+        
 
     def generate_output_dict(self, destination: Path) -> dict:
         """

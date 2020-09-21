@@ -45,8 +45,9 @@ DWIFSLPREPROC_CONFIGURATION = {
 }
 DEGIBBS_CONFIGURATION = {}
 # BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
-BIAS_CORRECT_CONFIGURATION = {"use_ants": True}
-
+BIAS_CORRECT_CONFIGURATION = {"use_fsl": True}
+DWI2TENSOR_CONFIGURATION = {}
+TENSOR2METRIC_CONFIGURATION = {}
 # Nodes
 FSLROI_NODE = {
     "analysis_version": "fslroi",
@@ -81,7 +82,14 @@ BIAS_CORRECT_NODE = {
     "analysis_version": "bias_correct",
     "configuration": BIAS_CORRECT_CONFIGURATION,
 }
-
+DWI2TENSOR_NODE = {
+    "analysis_version": "dwi2tensor",
+    "configuration": DWI2TENSOR_CONFIGURATION,
+}
+TENSOR2METRIC_NODE = {
+    "analysis_version": "tensor2metric",
+    "configuration": TENSOR2METRIC_CONFIGURATION,
+}
 
 # Pipes
 
@@ -152,6 +160,21 @@ MASK_TO_BIAS_CORRECT = {
     "destination": BIAS_CORRECT_NODE,
     "destination_port": "in_mask",
 }
+
+### REGISTER TO MNI ###
+
+BIAS_CORRECT_TO_TENSOR = {
+    "source": BIAS_CORRECT_NODE,
+    "source_port": "out_file",
+    "destination": DWI2TENSOR_NODE,
+    "destination_port": "in_file",
+}
+TENSOR_TO_METRICS = {
+    "source": DWI2TENSOR_NODE,
+    "source_port": "out_file",
+    "destination": TENSOR2METRIC_NODE,
+    "destination_port": "in_file",
+}
 DWI_PREPROCESSING_PIPELINE = {
     "title": "Basic DWI Preprocessing",
     "description": "Basic DWI preprocessing pipeline using FSL and Mrtrix3.",
@@ -166,5 +189,7 @@ DWI_PREPROCESSING_PIPELINE = {
         PREPROCESSED_TO_DEGIBBS,
         DEGIBBS_TO_BIAS_CORRECT,
         MASK_TO_BIAS_CORRECT,
+        BIAS_CORRECT_TO_TENSOR,
+        TENSOR_TO_METRICS,
     ],
 }

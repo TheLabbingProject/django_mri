@@ -58,8 +58,11 @@ class Bids:
     DATASET_DESCRIPTION_FILE_NAME = "dataset_description.json"
     PARTICIPANTS_FILE_NAME = "participants.tsv"
 
-    def __init__(self, scan):
-        self.scan = scan
+    def get_session_timestamp(self, scan):
+        """
+        Extracts session from scan and convert it to timestamp representation
+        """
+        return scan.session.time.strftime("%Y%m%d%H%M")
 
     def calculate_age(self, born: date) -> float:
         """
@@ -87,7 +90,7 @@ class Bids:
             age = "n/a"
         return age
 
-    def get_subject_data(self):
+    def get_subject_data(self, scan):
         """
         Extract relevant Scan-related subject's parameters, as stated by BIDS
         structure.
@@ -99,7 +102,7 @@ class Bids:
             "handedness","age" and "sex" fields
         """
 
-        subject = self.scan.session.subject
+        subject = scan.session.subject
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else "n/a",
@@ -111,7 +114,7 @@ class Bids:
         }
         return subject_dict
 
-    def get_data(self):
+    def get_data(self, scan):
         """
         Extracts relevant parameters for BIDS-compatible naming.
 
@@ -138,16 +141,16 @@ class Bids:
             images. Either "AP","PA" or None
         """
 
-        sequence_type = self.scan.sequence_type
+        sequence_type = scan.sequence_type
         if sequence_type is None:
             raise ValueError(messages.BIDS_NO_SEQUENCE_TYPE)
         sequence_type = str(sequence_type).lower().replace("-", "_")
         data_type = DATA_TYPES[sequence_type].value
         modality_label = MODALITY_LABELS[sequence_type].value
-        dicom_image = self.scan.dicom.image_set.first()
+        dicom_image = scan.dicom.image_set.first()
         header = dicom_image.header.instance
-        parent = self.scan.get_default_nifti_destination().parent.parent.parent
-        acq = None
+        parent = scan.get_default_nifti_destination().parent.parent.parent
+        acq = scan.id
         task = None
         pe_dir = None
         if "dwi" in data_type:
@@ -159,14 +162,14 @@ class Bids:
             image_type = header["ImageType"]
             if sequence_type == "mprage":
                 if "NORM" in image_type:
-                    acq = "corrected"
+                    acq = f"{acq}corrected"
                 else:
-                    acq = "uncorrected"
+                    acq = f"{acq}uncorrected"
             elif "ir_epi" in sequence_type:
                 ti = int(header["InversionTime"])
-                acq = f"IREPI{ti}"
+                acq = f"{acq}TI{ti}"
         if "localizer" in modality_label:
-            acq = "ignore-bids"
+            acq = f"{acq}ignore-bids"
         if "func" in data_type:
             image_type = header["ImageType"]
             task = "rest"
@@ -174,7 +177,7 @@ class Bids:
                 modality_label = "sbref"
         return parent, data_type, modality_label, acq, task, pe_dir
 
-    def compose_bids_path(self):
+    def compose_bids_path(self, scan):
         """
         Uses parameters extracted by {self.get_data} to compose a BIDS-
         compatible file path
@@ -186,19 +189,26 @@ class Bids:
             parameters.
         """
 
-        subject_dict = self.get_subject_data()
+        subject_dict = self.get_subject_data(scan)
         subject_id = subject_dict["participant_id"]
-        parent, data_type, modality_label, acq, task, pe_dir = self.get_data()
-        bids_path = Path(
-            parent, f"sub-{subject_id}", data_type, f"sub-{subject_id}"
+        parent, data_type, modality_label, acq, task, pe_dir = self.get_data(
+            scan
         )
-        if acq:
-            bids_path = Path(f"{bids_path}_acq-{acq}")
+        bids_path = Path(
+            parent,
+            f"sub-{subject_id}",
+            f"ses-{self.get_session_timestamp(scan)}",
+            data_type,
+            f"sub-{subject_id}",
+        )
         if task:
             bids_path = Path(f"{bids_path}_task-{task}")
+        if acq:
+            bids_path = Path(f"{bids_path}_acq-{acq}")
         if pe_dir:
             bids_path = Path(f"{bids_path}_dir-{pe_dir}")
         bids_path = Path(f"{bids_path}_{modality_label}")
+
         self.set_description_json(parent)
         self.set_participant_tsv_and_json(parent, subject_dict)
         self.generate_bidsignore(parent)

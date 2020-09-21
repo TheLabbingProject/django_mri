@@ -26,17 +26,15 @@ from django_mri.models.outputs.nifti_output_definition import (
 #: *FNIRT* input specification dictionary.
 FNIRT_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "A NIfTI format file to register to the reference.",
         "is_configuration": False,
-        "value_attribute": "path.__str__",
     },
     "ref_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "A NIfTI format file to register the input file with.",
-        "value_attribute": "path.__str__",
     },
     "affine_file": {
         "type": FileInputDefinition,

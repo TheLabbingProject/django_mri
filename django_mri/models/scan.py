@@ -298,7 +298,7 @@ class Scan(TimeStampedModel):
             BIDS-compatible NIfTI file destination
         """
 
-        bids_path = Bids(self).compose_bids_path()
+        bids_path = Bids().compose_bids_path(self)
         return bids_path
 
     def compile_to_bids(self, bids_path: Path):
