@@ -25,7 +25,7 @@ class ScanManager(Manager):
 
     def scan_by_method(self, method: str) -> list:
         mri_method_definitions = SequenceType.objects.get(
-            title__iexact=method
+            title__icontains=method
         ).sequence_definitions
         sequence_variants = map(
             lambda definition: definition["sequence_variant"],

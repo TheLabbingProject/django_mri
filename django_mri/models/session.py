@@ -1,6 +1,10 @@
 from django_extensions.db.models import TimeStampedModel
 from django.db.models import QuerySet
-from django_mri.utils import get_subject_model, get_group_model
+from django_mri.utils import (
+    get_subject_model,
+    get_group_model,
+    get_measurement_model,
+)
 from django_mri.models import help_text
 from django.db import models
 
@@ -27,13 +31,13 @@ class Session(TimeStampedModel):
         help_text=help_text.SESSION_COMMENTS,
     )
 
-    measurement = models.ForeignKey(
-        get_measurement_model(),
-        related_name="mri_session_set"
-        blank=True,
-        null=True,
-        on_delete=models.RESTRICT,
-    )
+    # measurement = models.ForeignKey(
+    #     get_measurement_model(),
+    #     related_name="mri_session_set",
+    #     blank=True,
+    #     null=True,
+    #     on_delete=models.PROTECT,
+    # )
 
     time = models.DateTimeField()
 
