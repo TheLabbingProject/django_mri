@@ -42,4 +42,12 @@ def paired_diffusion_preprocessing(
         for out_file in metrices_results.output_set:
             if out_file.definition.key == "fa":
                 fas.append(out_file)
-    reference = get_template_fa()
+    reference = get_template_fa()  ## REPLACE WITH MNI BRAIN
+
+
+
+docker run -ti --rm \
+-v /media/groot/Data/BeforeAfterCovid19_BIDS_dataset:/bids_dataset \
+-v /media/groot/Data/BeforeAfterCovid19_derivatives/ndmg_derivatives:/outputs \
+bids/ndmg \
+/bids_dataset /outputs participant --participant_label 0010

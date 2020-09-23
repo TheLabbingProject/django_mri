@@ -6,44 +6,39 @@ from django_analyses.models.pipeline import Pipeline
 from django_analyses.pipeline_runner import PipelineRunner
 
 
-def dwi_preprocessing_wrapper(AP: Scan, PA: Scan, T1w: Scan):
+def dwi_preprocessing_wrapper(AP: Scan, PA: Scan):
     bvec_file = AP.nifti.b_vector_file
     bval_file = AP.nifti.b_value_file
-    json_file = AP.nifti.json_file
-    pe_dir = AP.nifti.get_phase_encoding_direction()
-    fslroi_inputs = {"in_file": AP.nifti}
-    # bet_inputs = {"in_file": T1w.nifti}
-    flirt_inputs = {"in_file": T1w.nifti}
-    fslmerge_inputs = {"in_files": [PA.nifti]}
-    denoise_inputs = {"in_file": AP}
-    dwifslpreproc_inputs = {
-        "json_import": str(json_file),
+    dwi_json_file = AP.nifti.json_file
+    fmap_json_file = PA.nifti.json_file
+    dwi_convert_inputs = {
+        "in_file": AP.nifti.path,
         "fslgrad": [str(bvec_file), str(bval_file)],
-        "pe_dir": pe_dir,
+        "json_import": dwi_json_file,
+    }
+    fmap_convert_inputs = {
+        "in_file": PA.nifti.path,
+        "json_import": fmap_json_file,
+    }
+    dwifslpreproc_inputs = {
+        "json_import": str(dwi_json_file),
+        "fslgrad": [str(bvec_file), str(bval_file)],
     }
     dwi_pipeline = Pipeline.objects.from_dict(DWI_PREPROCESSING_PIPELINE)
     runner = PipelineRunner(dwi_pipeline)
-    fslroi_node = dwi_pipeline.node_set.get(
-        analysis_version__analysis__title="fslroi"
-    )
-    flirt_node = dwi_pipeline.node_set.get(
-        analysis_version__analysis__title="FLIRT"
-    )
-    fslmerge_node = dwi_pipeline.node_set.get(
-        analysis_version__analysis__title="fslmerge"
-    )
+    dwi_convert_node = dwi_pipeline.node_set.filter(
+        analysis_version__analysis__title="mrconvert"
+    ).last()
+    fmap_convert_node = dwi_pipeline.node_set.filter(
+        analysis_version__analysis__title="mrconvert"
+    ).last()
     dwifslpreproc_node = dwi_pipeline.node_set.get(
         analysis_version__analysis__title="dwifslpreproc"
     )
-    denoise_node = dwi_pipeline.node_set.get(
-        analysis_version__analysis__title="denoise"
-    )
     return runner.run(
         inputs={
-            fslroi_node: fslroi_inputs,
-            flirt_node: flirt_inputs,
-            fslmerge_node: fslmerge_inputs,
+            dwi_convert_node: dwi_convert_inputs,
+            fmap_convert_node: fmap_convert_inputs,
             dwifslpreproc_node: dwifslpreproc_inputs,
-            denoise_node: denoise_inputs,
         }
     )

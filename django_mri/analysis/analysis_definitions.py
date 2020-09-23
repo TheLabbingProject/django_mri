@@ -23,6 +23,8 @@ from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
+from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
+from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -131,6 +133,10 @@ from django_mri.analysis.specifications.mrtrix3.compute_metrics import (
     TENSOR2METRICS_INPUT_SPECIFICATION,
     TENSOR2METRIC_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.mrtrix3.mrcat import (
+    MRCAT_INPUT_SPECIFICATION,
+    MRCAT_OUTPUT_SPECIFICATION,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -152,7 +158,6 @@ from nipype.interfaces.mrtrix3 import (
     DWIDenoise,
     DWIBiasCorrect,
     MRDeGibbs,
-    MRConvert,
     ConstrainedSphericalDeconvolution,
     ResponseSD,
     Generate5tt,
@@ -394,11 +399,10 @@ analysis_definitions = [
         "description": "Performs conversion between different file types and optionally extract a subset of the input image",  # noqa: E501
         "versions": [
             {
-                "title": MRConvert().version or "1.0",
+                "title": MRConvert.__version__ or "1.0",
                 "description": f"Default mrconvert version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": MRCONVERT_INPUT_SPECIFICATION,
                 "output": MRCONVERT_OUTPUT_SPECIFICATION,
-                "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
     },
@@ -513,6 +517,18 @@ analysis_definitions = [
                 "description": f"Default tensor2metric version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": TENSOR2METRICS_INPUT_SPECIFICATION,
                 "output": TENSOR2METRIC_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "mrcat",
+        "description": "Concatenate several images into one",  # noqa: E501
+        "versions": [
+            {
+                "title": MRCat.__version__ or "1.0",
+                "description": "mrtrix3's mrcat implementation.",  # noqa: E501
+                "input": MRCAT_INPUT_SPECIFICATION,
+                "output": MRCAT_OUTPUT_SPECIFICATION,
             }
         ],
     },

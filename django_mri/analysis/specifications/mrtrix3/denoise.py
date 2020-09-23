@@ -31,10 +31,9 @@ from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 DENOISE_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "is_configuration": False,
-        "value_attribute": "nifti.path.__str__",
     },
     "extent": {
         "type": ListInputDefinition,

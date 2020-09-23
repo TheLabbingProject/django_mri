@@ -78,9 +78,8 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "description": "Manually specify the total readout time of the input series (in seconds)",  # noqa: E501
     },
     "se_epi": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Provide an additional image series consisting of spin-echo EPI images, which is to be used exclusively by topup for estimating the inhomogeneity field (i.e. it will not form part of the output image series)",  # noqa: E501
-        "value_attribute": "path.__str__",
     },
     "align_seepi": {
         "type": BooleanInputDefinition,

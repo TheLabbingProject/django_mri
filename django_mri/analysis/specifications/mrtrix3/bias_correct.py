@@ -41,7 +41,6 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
     "use_fsl": {
         "type": BooleanInputDefinition,
         "description": "Use FSL FAST to estimate the inhomogeneity field. Mutually exclusive with inputs: use_ants.",  # noqa: E501
-        "default": True,
     },
     "bias": {
         "type": StringInputDefinition,
