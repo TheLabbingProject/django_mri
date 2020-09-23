@@ -21,10 +21,6 @@ MRCONVERT_FMAP_NODE = {
     "analysis_version": "mrconvert",
     "configuration": MRCONVERT_FMAP_CONFIGURATION,
 }
-# """
-# - Importing T1 image into temporary directory
-# """
-# MRCONVERT_T1_CONFIGURATION = {}
 
 """
 - Concatenating DWI and fmap data for combined pre-processing
