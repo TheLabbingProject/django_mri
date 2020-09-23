@@ -27,6 +27,14 @@ class Session(TimeStampedModel):
         help_text=help_text.SESSION_COMMENTS,
     )
 
+    measurement = models.ForeignKey(
+        get_measurement_model(),
+        related_name="mri_session_set"
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,
+    )
+
     time = models.DateTimeField()
 
     @property
