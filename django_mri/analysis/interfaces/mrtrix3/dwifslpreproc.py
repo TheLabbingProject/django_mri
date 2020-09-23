@@ -89,9 +89,7 @@ class DwiFslPreproc:
         """
 
         config = self.configuration.copy()
-        print(config)
         for key in self.SUPPLEMENTARY_OUTPUTS:
-            print(key)
             if key not in config.keys():
                 config[key] = destination
         return config

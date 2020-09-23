@@ -20,6 +20,7 @@ from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
+from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import (
     Segmentation as Cat12Segmentation,
 )
@@ -84,4 +85,5 @@ interfaces = {
     "dwi2tensor": {Dwi2Tensor.__version__: Dwi2Tensor},
     "tensor2metric": {Tensor2metric.__version__: Tensor2metric},
     "mrcat": {MRCat.__version__: MRCat},
+    "dwigradcheck": {DwiGradCheck.__version__: DwiGradCheck},
 }

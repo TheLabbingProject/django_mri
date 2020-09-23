@@ -25,6 +25,7 @@ from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
+from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -136,6 +137,10 @@ from django_mri.analysis.specifications.mrtrix3.compute_metrics import (
 from django_mri.analysis.specifications.mrtrix3.mrcat import (
     MRCAT_INPUT_SPECIFICATION,
     MRCAT_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.dwigradcheck import (
+    DWIGRADCHECK_INPUT_SPECIFICATION,
+    DWIGRADCHECK_OUTPUT_SPECIFICATION,
 )
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
@@ -529,6 +534,18 @@ analysis_definitions = [
                 "description": "mrtrix3's mrcat implementation.",  # noqa: E501
                 "input": MRCAT_INPUT_SPECIFICATION,
                 "output": MRCAT_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "dwigradcheck",
+        "description": "Check the orientation of the diffusion gradient table",  # noqa: E501
+        "versions": [
+            {
+                "title": DwiGradCheck.__version__ or "1.0",
+                "description": f"Default dwigradcheck version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWIGRADCHECK_INPUT_SPECIFICATION,
+                "output": DWIGRADCHECK_OUTPUT_SPECIFICATION,
             }
         ],
     },

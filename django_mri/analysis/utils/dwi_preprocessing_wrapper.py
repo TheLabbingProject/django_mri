@@ -20,21 +20,27 @@ def dwi_preprocessing_wrapper(AP: Scan, PA: Scan):
         "in_file": str(PA.nifti.path),
         "json_import": str(fmap_json_file),
     }
+    dwigradcheck_inputs = {
+        "fslgrad": [str(bvec_file), str(bval_file)],
+    }
     dwifslpreproc_inputs = {
         "json_import": str(dwi_json_file),
-        "fslgrad": [str(bvec_file), str(bval_file)],
     }
     dwi_pipeline = Pipeline.objects.from_dict(DWI_PREPROCESSING_PIPELINE)
     runner = PipelineRunner(dwi_pipeline)
     mrconvert_node = dwi_pipeline.node_set.filter(
         analysis_version__analysis__title="mrconvert"
     ).last()
+    dwigradcheck_node = dwi_pipeline.node_set.get(
+        analysis_version__analysis__title="dwigradcheck"
+    )
     dwifslpreproc_node = dwi_pipeline.node_set.get(
         analysis_version__analysis__title="dwifslpreproc"
     )
     return runner.run(
         inputs={
             mrconvert_node: [dwi_convert_inputs, fmap_convert_inputs],
+            dwigradcheck_node: dwigradcheck_inputs,
             dwifslpreproc_node: dwifslpreproc_inputs,
         }
     )

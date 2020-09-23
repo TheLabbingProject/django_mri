@@ -62,7 +62,11 @@ MRCONVERT_SEPERATE_2_NODE = {
     "analysis_version": "mrconvert",
     "configuration": MRCONVERT_SEPERATE_2_CONFIGURATION,
 }  #### Ask Zvi if I can get information regarding the size of the image - need to extract volumes 1:end
-
+DWIGRADCHECK_CONFIGURATION = {}
+DWIGRADCHECK_NODE = {
+    "analysis_version": "dwigradcheck",
+    "configuration": DWIGRADCHECK_CONFIGURATION,
+}
 """
 - Performing various geometric corrections of DWIs
 """
@@ -108,16 +112,22 @@ DENOISE_TO_DEGIBBS = {
     "destination": DEGIBBS_NODE,
     "destination_port": "in_file",
 }
-DEGIBBS_TO_SEP = {
+DEGIBBS_TO_SEP_1 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
     "destination": MRCONVERT_SEPERATE_1_NODE,
     "destination_port": "in_file",
 }
-DEGIBBS_TO_SEP = {
+DEGIBBS_TO_SEP_2 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
     "destination": MRCONVERT_SEPERATE_2_NODE,
+    "destination_port": "in_file",
+}
+SEPERATE_TO_DWIGRADCHECK = {
+    "source": MRCONVERT_SEPERATE_2_NODE,
+    "source_port": "out_file",
+    "destination": DWIGRADCHECK_NODE,
     "destination_port": "in_file",
 }
 FMAP_TO_DWIFSLPREPROC = {
@@ -125,6 +135,18 @@ FMAP_TO_DWIFSLPREPROC = {
     "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "se_epi",
+}
+BVEC_TO_DWIFSLPREPROC = {
+    "source": DWIGRADCHECK_NODE,
+    "source_port": "grad_fsl_bvec",
+    "destination": DWIFSLPREPROC_NODE,
+    "destination_port": "fslgrad",
+}
+BVAL_TO_DWIFSLPREPROC = {
+    "source": DWIGRADCHECK_NODE,
+    "source_port": "grad_fsl_bval",
+    "destination": DWIFSLPREPROC_NODE,
+    "destination_port": "fslgrad",
 }
 DWI_TO_DWIFSLPREPROC = {
     "source": MRCONVERT_SEPERATE_2_NODE,
@@ -146,8 +168,12 @@ DWI_PREPROCESSING_PIPELINE = {
         MIF_DWI_TO_CAT,
         MIF_FMAP_TO_CAT,
         CAT_TO_DENOISE,
-        DEGIBBS_TO_SEP,
+        DEGIBBS_TO_SEP_1,
+        DEGIBBS_TO_SEP_2,
+        SEPERATE_TO_DWIGRADCHECK,
         FMAP_TO_DWIFSLPREPROC,
+        BVEC_TO_DWIFSLPREPROC,
+        BVAL_TO_DWIFSLPREPROC,
         DWI_TO_DWIFSLPREPROC,
         PREPROCESSED_TO_BIAS_CORRECT,
     ],
