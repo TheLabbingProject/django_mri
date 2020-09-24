@@ -25,19 +25,16 @@ class Session(TimeStampedModel):
     )
 
     comments = models.TextField(
-        max_length=1000,
-        blank=True,
-        null=True,
-        help_text=help_text.SESSION_COMMENTS,
+        max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
     )
 
-    # measurement = models.ForeignKey(
-    #     get_measurement_model(),
-    #     related_name="mri_session_set",
-    #     blank=True,
-    #     null=True,
-    #     on_delete=models.PROTECT,
-    # )
+    measurement = models.ForeignKey(
+        get_measurement_model(),
+        related_name="mri_session_set",
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+    )
 
     time = models.DateTimeField()
 
