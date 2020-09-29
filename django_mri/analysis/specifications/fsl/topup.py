@@ -17,12 +17,8 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 from pathlib import Path
 import os
 
@@ -170,10 +166,7 @@ TOPUP_INPUT_SPECIFICATION = {
         "min_value": 0,
         "max_value": 1,
     },
-    "subsamp": {
-        "type": IntegerInputDefinition,
-        "description": "Sub-sampling scheme.",
-    },
+    "subsamp": {"type": IntegerInputDefinition, "description": "Sub-sampling scheme.",},
     "warp_res": {
         "type": FloatInputDefinition,
         "description": "(approximate) resolution (in mm) of warp basis for the different sub-sampling levels.",  # noqa: E501

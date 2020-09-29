@@ -108,9 +108,7 @@ class GenerateDatain:
         command = f"dwifslpreproc {scan.path} {output_path} {config}"
         return command + "".join(
             [
-                f" -{key}"
-                if key in self.FLAGS and value
-                else f" -{key} {value}"
+                f" -{key}" if key in self.FLAGS and value else f" -{key} {value}"
                 for key, value in self.configuration.items()
             ]
         )

@@ -23,9 +23,7 @@ from django_analyses.models.input.definitions import (
     TupleInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
@@ -66,10 +64,7 @@ DENOISE_INPUT_SPECIFICATION = {
 }
 
 DENOISE_OUTPUT_SPECIFICATION = {
-    "noise": {
-        "type": FileOutputDefinition,
-        "description": "The output noise map.",
-    },
+    "noise": {"type": FileOutputDefinition, "description": "The output noise map.",},
     "out_file": {
         "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",

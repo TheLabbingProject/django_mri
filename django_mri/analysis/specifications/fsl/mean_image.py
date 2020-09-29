@@ -13,12 +13,8 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
     FileInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 #: *MeanImage* input specification dictionary.
 MEAN_IMAGE_INPUT_SPECIFICATION = {

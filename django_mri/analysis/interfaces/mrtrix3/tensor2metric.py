@@ -74,11 +74,7 @@ class Tensor2metric:
 
         # output_path = destination / self.DEFAULT_OUTPUT_NAME
         in_file = config.pop("in_file")
-        return (
-            "tensor2metric"
-            + self.set_configuration_by_keys(config)
-            + f" {in_file}"
-        )
+        return "tensor2metric" + self.set_configuration_by_keys(config) + f" {in_file}"
 
     def generate_output_dict(self, destination: Path) -> dict:
         """

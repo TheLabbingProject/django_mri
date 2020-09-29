@@ -42,16 +42,11 @@ class Scan(TimeStampedModel):
     institution_name = models.CharField(max_length=64, blank=True, null=True)
 
     #: Acquisition datetime.
-    time = models.DateTimeField(
-        blank=True, null=True, help_text=help_text.SCAN_TIME
-    )
+    time = models.DateTimeField(blank=True, null=True, help_text=help_text.SCAN_TIME)
 
     #: Short description of the scan's acquisition parameters.
     description = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        help_text=help_text.SCAN_DESCRIPTION,
+        max_length=100, blank=True, null=True, help_text=help_text.SCAN_DESCRIPTION,
     )
 
     #: The relative number of this scan in the session in which it was
@@ -90,16 +85,11 @@ class Scan(TimeStampedModel):
     )
 
     #: The spatial resolution of the image in millimeters.
-    spatial_resolution = ArrayField(
-        models.FloatField(), size=3, blank=True, null=True
-    )
+    spatial_resolution = ArrayField(models.FloatField(), size=3, blank=True, null=True)
 
     #: Any other comments about this scan.
     comments = models.TextField(
-        max_length=1000,
-        blank=True,
-        null=True,
-        help_text=help_text.SCAN_COMMENTS,
+        max_length=1000, blank=True, null=True, help_text=help_text.SCAN_COMMENTS,
     )
 
     #: If this instance's origin is a DICOM file, or it was saved as one, this
@@ -145,9 +135,7 @@ class Scan(TimeStampedModel):
     )
 
     #: Associates this scan with some session of a subject.
-    session = models.ForeignKey(
-        "django_mri.Session", on_delete=models.CASCADE,
-    )
+    session = models.ForeignKey("django_mri.Session", on_delete=models.CASCADE,)
 
     objects = ScanManager()
 
@@ -208,9 +196,7 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
-            raise AttributeError(
-                f"No DICOM data associated with MRI scan {self.id}!"
-            )
+            raise AttributeError(f"No DICOM data associated with MRI scan {self.id}!")
 
     def infer_sequence_type_from_dicom(self) -> SequenceType:
         """
@@ -390,9 +376,7 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import (
-            get_mrconvert_node,
-        )
+        from django_mri.analysis.utils.get_mrconvert_node import get_mrconvert_node
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
@@ -474,4 +458,3 @@ class Scan(TimeStampedModel):
             self._nifti = self.dicom_to_nifti()
             self.save()
         return self._nifti
-

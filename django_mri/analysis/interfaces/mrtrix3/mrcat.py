@@ -123,7 +123,5 @@ class MRCat:
         command = self.generate_command(self.configuration)
         raise_exception = os.system(command)
         if raise_exception:
-            raise RuntimeError(
-                f"Failed to run mrcat!\nExecuted command: {command}"
-            )
+            raise RuntimeError(f"Failed to run mrcat!\nExecuted command: {command}")
         return self.generate_output_dict(destination)

@@ -83,10 +83,7 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
 
 #: *DWIBiasCorrect* output specification dictionary.
 BIAS_CORRECT_OUTPUT_SPECIFICATION = {
-    "bias": {
-        "type": FileOutputDefinition,
-        "description": "The output bias field.",
-    },
+    "bias": {"type": FileOutputDefinition, "description": "The output bias field.",},
     "out_file": {
         "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",

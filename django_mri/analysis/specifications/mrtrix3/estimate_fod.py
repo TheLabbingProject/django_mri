@@ -22,13 +22,9 @@ from django_analyses.models.input.definitions import (
     TupleInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 DWI2FOD_INPUT_SPECIFICATION = {
     "algorithm": {
@@ -118,16 +114,7 @@ DWI2FOD_INPUT_SPECIFICATION = {
 }
 
 DWI2FOD_OUTPUT_SPECIFICATION = {
-    "csf_odf": {
-        "type": NiftiOutputDefinition,
-        "description": "Output CSF ODF.",
-    },
-    "gm_odf": {
-        "type": NiftiOutputDefinition,
-        "description": "Output WM ODF.",
-    },
-    "wm_odf": {
-        "type": NiftiOutputDefinition,
-        "description": "Output WM ODF.",
-    },
+    "csf_odf": {"type": NiftiOutputDefinition, "description": "Output CSF ODF.",},
+    "gm_odf": {"type": NiftiOutputDefinition, "description": "Output WM ODF.",},
+    "wm_odf": {"type": NiftiOutputDefinition, "description": "Output WM ODF.",},
 }

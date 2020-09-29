@@ -5,21 +5,15 @@ steps:
 """
 
 """
-- Importing DWI data into temporary directory
+- MRCONVERT #0 Importing DWI data into temporary directory
+- MRCONVERT #1 Importing fmap data into temporary directory
+- MRCONVERT #2 Separating fmap image from concatenated series
+- MRCONVERT #3 Separating DWI images from concatenated series
 """
-MRCONVERT_DWI_CONFIGURATION = {}
-MRCONVERT_DWI_NODE = {
+MRCONVERT_CONFIGURATION = {}
+MRCONVERT_NODE = {
     "analysis_version": "mrconvert",
-    "configuration": MRCONVERT_DWI_CONFIGURATION,
-}
-
-"""
-- Importing fmap data into temporary directory
-"""
-MRCONVERT_FMAP_CONFIGURATION = {}
-MRCONVERT_FMAP_NODE = {
-    "analysis_version": "mrconvert",
-    "configuration": MRCONVERT_FMAP_CONFIGURATION,
+    "configuration": MRCONVERT_CONFIGURATION,
 }
 
 """
@@ -49,19 +43,6 @@ DEGIBBS_NODE = {
     "configuration": DEGIBBS_CONFIGURATION,
 }
 
-"""
-- Separating DWIs and fmap images from concatenated series
-"""
-MRCONVERT_SEPERATE_1_CONFIGURATION = {"coord": "3 0:0"}
-MRCONVERT_SEPERATE_1_NODE = {
-    "analysis_version": "mrconvert",
-    "configuration": MRCONVERT_SEPERATE_1_CONFIGURATION,
-}
-MRCONVERT_SEPERATE_2_CONFIGURATION = {"coord": "3 1:88"}
-MRCONVERT_SEPERATE_2_NODE = {
-    "analysis_version": "mrconvert",
-    "configuration": MRCONVERT_SEPERATE_2_CONFIGURATION,
-}  #### Ask Zvi if I can get information regarding the size of the image - need to extract volumes 1:end
 DWIGRADCHECK_CONFIGURATION = {}
 DWIGRADCHECK_NODE = {
     "analysis_version": "dwigradcheck",
@@ -88,17 +69,21 @@ BIAS_CORRECT_NODE = {
     "configuration": BIAS_CORRECT_CONFIGURATION,
 }
 # Pipes
-MIF_DWI_TO_CAT = {
-    "source": MRCONVERT_DWI_NODE,
-    "source_port": "out_file",
-    "destination": MRCAT_NODE,
-    "destination_port": "in_files",
-}
 MIF_FMAP_TO_CAT = {
-    "source": MRCONVERT_FMAP_NODE,
+    "source": MRCONVERT_NODE,
     "source_port": "out_file",
+    "source_run_index":1,
     "destination": MRCAT_NODE,
     "destination_port": "in_files",
+    "index":0,
+}
+MIF_DWI_TO_CAT = {
+    "source": MRCONVERT_NODE,
+    "source_port": "out_file",
+    "source_run_index":0,
+    "destination": MRCAT_NODE,
+    "destination_port": "in_files",
+    "index":1,
 }
 CAT_TO_DENOISE = {
     "source": MRCAT_NODE,
@@ -115,23 +100,27 @@ DENOISE_TO_DEGIBBS = {
 DEGIBBS_TO_SEP_1 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
-    "destination": MRCONVERT_SEPERATE_1_NODE,
+    "destination": MRCONVERT_NODE,
+    "destination_run_index":2,
     "destination_port": "in_file",
 }
 DEGIBBS_TO_SEP_2 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
-    "destination": MRCONVERT_SEPERATE_2_NODE,
+    "destination": MRCONVERT_NODE,
+    "destination_run_index":3,
     "destination_port": "in_file",
 }
 SEPERATE_TO_DWIGRADCHECK = {
-    "source": MRCONVERT_SEPERATE_2_NODE,
+    "source": MRCONVERT_NODE,
+    "source_run_index":3,
     "source_port": "out_file",
     "destination": DWIGRADCHECK_NODE,
     "destination_port": "in_file",
 }
 FMAP_TO_DWIFSLPREPROC = {
-    "source": MRCONVERT_SEPERATE_1_NODE,
+    "source": MRCONVERT_NODE,
+    "source_run_index":2,
     "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "se_epi",
@@ -149,7 +138,8 @@ BVAL_TO_DWIFSLPREPROC = {
     "destination_port": "fslgrad",
 }
 DWI_TO_DWIFSLPREPROC = {
-    "source": MRCONVERT_SEPERATE_2_NODE,
+    "source": MRCONVERT_NODE,
+    "source_run_index":3,
     "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "scan",
@@ -165,9 +155,10 @@ DWI_PREPROCESSING_PIPELINE = {
     "title": "Basic and robust DWI Preprocessing",
     "description": "Basic DWI preprocessing pipeline using FSL and Mrtrix3.",
     "pipes": [
-        MIF_DWI_TO_CAT,
         MIF_FMAP_TO_CAT,
+        MIF_DWI_TO_CAT,
         CAT_TO_DENOISE,
+        DENOISE_TO_DEGIBBS,
         DEGIBBS_TO_SEP_1,
         DEGIBBS_TO_SEP_2,
         SEPERATE_TO_DWIGRADCHECK,

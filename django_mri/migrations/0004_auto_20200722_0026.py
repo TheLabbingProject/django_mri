@@ -6,20 +6,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_mri', '0003_auto_20200714_0504'),
+        ("django_mri", "0003_auto_20200714_0504"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='sequencetypedefinition',
-            options={'ordering': ('id',)},
+            name="sequencetypedefinition", options={"ordering": ("id",)},
         ),
         migrations.RemoveField(
-            model_name='sequencetypedefinition',
-            name='description',
+            model_name="sequencetypedefinition", name="description",
         ),
-        migrations.RemoveField(
-            model_name='sequencetypedefinition',
-            name='title',
-        ),
+        migrations.RemoveField(model_name="sequencetypedefinition", name="title",),
     ]

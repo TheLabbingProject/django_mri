@@ -4,9 +4,7 @@ Definition of the
 constant.
 """
 
-from django_mri.analysis.interfaces.matlab.spm.cat12.utils import (
-    CAT12_TEMPLATES,
-)
+from django_mri.analysis.interfaces.matlab.spm.cat12.utils import CAT12_TEMPLATES
 
 #: Batch templates dictionary, associating interface keys with template paths.
 TEMPLATES = CAT12_TEMPLATES

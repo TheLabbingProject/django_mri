@@ -22,9 +22,7 @@ from django_analyses.models.input.definitions import (
     TupleInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
@@ -92,10 +90,7 @@ DWI2RESPONSE_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
     },
-    "mtt_file": {
-        "type": NiftiInputDefinition,
-        "description": "Input 5tt image.",
-    },
+    "mtt_file": {"type": NiftiInputDefinition, "description": "Input 5tt image.",},
 }
 
 DWI2RESPONSE_OUTPUT_SPECIFICATION = {

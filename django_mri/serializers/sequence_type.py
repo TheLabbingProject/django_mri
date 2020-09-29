@@ -17,4 +17,3 @@ class SequenceTypeSerializer(serializers.HyperlinkedModelSerializer):
             "sequence_definitions",
             "url",
         )
-

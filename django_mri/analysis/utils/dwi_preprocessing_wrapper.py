@@ -9,6 +9,7 @@ from django_analyses.pipeline_runner import PipelineRunner
 def dwi_preprocessing_wrapper(AP: Scan, PA: Scan):
     bvec_file = AP.nifti.b_vector_file
     bval_file = AP.nifti.b_value_file
+    n_dwi_volumes = int(AP.nifti.get_data().shape[-1])
     dwi_json_file = AP.nifti.json_file
     fmap_json_file = PA.nifti.json_file
     dwi_convert_inputs = {
@@ -20,6 +21,10 @@ def dwi_preprocessing_wrapper(AP: Scan, PA: Scan):
         "in_file": str(PA.nifti.path),
         "json_import": str(fmap_json_file),
     }
+    mrconvert_extract_fmap_inputs = {"coord": "3 0:0"}
+    mrconvert_extract_dwi_inputs = {"coord": f"3 1:{n_dwi_volumes}"}
+    mrconvert_list = [dwi_convert_inputs,fmap_convert_inputs,mrconvert_extract_fmap_inputs,mrconvert_extract_dwi_inputs]
+
     dwigradcheck_inputs = {
         "fslgrad": [str(bvec_file), str(bval_file)],
     }
@@ -39,7 +44,7 @@ def dwi_preprocessing_wrapper(AP: Scan, PA: Scan):
     )
     return runner.run(
         inputs={
-            mrconvert_node: [dwi_convert_inputs, fmap_convert_inputs],
+            mrconvert_node: mrconvert_list,
             dwigradcheck_node: dwigradcheck_inputs,
             dwifslpreproc_node: dwifslpreproc_inputs,
         }

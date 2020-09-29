@@ -23,12 +23,8 @@ def dwi_preprocessing_wrapper(AP: Scan, PA: Scan, T1w: Scan):
     }
     dwi_pipeline = Pipeline.objects.from_dict(DWI_PREPROCESSING_PIPELINE)
     runner = PipelineRunner(dwi_pipeline)
-    fslroi_node = dwi_pipeline.node_set.get(
-        analysis_version__analysis__title="fslroi"
-    )
-    flirt_node = dwi_pipeline.node_set.get(
-        analysis_version__analysis__title="FLIRT"
-    )
+    fslroi_node = dwi_pipeline.node_set.get(analysis_version__analysis__title="fslroi")
+    flirt_node = dwi_pipeline.node_set.get(analysis_version__analysis__title="FLIRT")
     fslmerge_node = dwi_pipeline.node_set.get(
         analysis_version__analysis__title="fslmerge"
     )

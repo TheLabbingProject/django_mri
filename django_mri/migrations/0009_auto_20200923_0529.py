@@ -6,13 +6,11 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_mri', '0008_auto_20200827_0229'),
+        ("django_mri", "0008_auto_20200827_0229"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='session',
-            name='time',
-            field=models.DateTimeField(),
+            model_name="session", name="time", field=models.DateTimeField(),
         ),
     ]

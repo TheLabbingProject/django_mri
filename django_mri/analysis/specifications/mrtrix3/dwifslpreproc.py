@@ -24,13 +24,9 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 
 #: *DwiFslPreproc* input specification dictionary.

@@ -129,7 +129,6 @@ class DwiFslPreproc:
         scan = config.pop("scan")
         command = f"dwifslpreproc {scan} {output_path}"
         return command + self.set_configuration_by_keys(config)
-        
 
     def generate_output_dict(self, destination: Path) -> dict:
         """
