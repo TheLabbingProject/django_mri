@@ -49,9 +49,7 @@ def session_post_save_receiver(
         Subject = get_subject_model()
         scan = instance.scan_set.first()
         if scan and scan.dicom.patient:
-            instance.subject, _ = Subject.objects.from_dicom_patient(
-                scan.dicom.patient
-            )
+            instance.subject, _ = Subject.objects.from_dicom_patient(scan.dicom.patient)
             instance.save()
 
 
@@ -76,9 +74,7 @@ def series_post_save_receiver(
     session = get_session_by_series(instance)
     if session:
         try:
-            scan, created = Scan.objects.get_or_create(
-                dicom=instance, session=session
-            )
+            scan, created = Scan.objects.get_or_create(dicom=instance, session=session)
         except Exception as exception:
             message = _SCAN_FROM_SERIES_FAILURE.format(
                 series_id=instance.id, exception=exception

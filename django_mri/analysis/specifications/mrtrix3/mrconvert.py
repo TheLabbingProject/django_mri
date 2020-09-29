@@ -21,80 +21,163 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
     FileInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 #: *MRConvert* input specification dictionary.
 MRCONVERT_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
-        "value_attribute": "path.__str__",
     },
     "out_file": {
         "type": StringInputDefinition,
         "is_output_path": True,
-        "description": "The output denoised DWI image.",
-        "default": "denoised.nii.gz",
-    },
-    "axes": {
-        "type": ListInputDefinition,
-        "element_type": "INT",
-        "description": "specify the axes that will be used",
-    },
-    "bval_scale": {
-        "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
-        "choices": ["yes", "no"],
+        "description": "The output converted image.",
+        "default": "converted.mif",
     },
     "coord": {
-        "type": ListInputDefinition,
-        "element_type": "FLT",
+        "type": StringInputDefinition,
         "description": "extract data at the specified coordinates",
-    },
-    "grad_file": {
-        "type": FileInputDefinition,
-        "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",  # noqa: E501
-    },
-    "grad_fsl": {
-        "type": ListInputDefinition,
-        "element_type": "STR",
-        "description": "(bvec, bval) DW gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",  # noqa: E501
-    },
-    "in_bval": {
-        "type": FileInputDefinition,
-        "description": "Bvals file in FSL format.",
-    },
-    "in_bvec": {
-        "type": FileInputDefinition,
-        "description": "Bvecs file in FSL format.",
-    },
-    "nthreads": {
-        "type": IntegerInputDefinition,
-        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
-    },
-    "scaling": {
-        "type": ListInputDefinition,
-        "element_type": "FLT",
-        "description": "specify the data scaling parameter",
     },
     "vox": {
         "type": ListInputDefinition,
         "element_type": "FLT",
         "description": "Change the voxel dimensions.",
     },
+    "axes": {
+        "type": ListInputDefinition,
+        "element_type": "INT",
+        "description": "specify the axes that will be used",
+    },
+    "scaling": {
+        "type": ListInputDefinition,
+        "element_type": "FLT",
+        "description": "specify the data scaling parameters used to rescale the intensity values.",  # noqa: E501
+    },
+    "json_import": {
+        "type": FileInputDefinition,
+        "description": "import data from a JSON file into header key-value pairs",
+    },
+    "json_export": {
+        "type": StringInputDefinition,
+        "description": "export data from an image header key-value pairs into a JSON file",
+        "is_output_path": True,
+    },
+    "clear_property": {
+        "type": StringInputDefinition,
+        "description": "remove the specified key from the image header altogether.",
+    },
+    "set_property": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "set the value of the specified key in the image header.",
+    },
+    "append_property": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "append the given value to the specified key in the image header (this adds the value specified as a new line in the header value).",
+    },
+    "strides": {
+        "type": ListInputDefinition,
+        "element_type": "INT",
+        "description": " specify the strides of the output data in memory;",
+    },
+    "datatype": {
+        "type": StringInputDefinition,
+        "description": "specify output image data type.",
+        "choices": [
+            "float32",
+            "float32le",
+            "float32be",
+            "float64",
+            "float64le",
+            "float64be",
+            "int64",
+            "uint64",
+            "int64le",
+            "uint64le",
+            "int64be",
+            "uint64be",
+            "int32",
+            "uint32",
+            "int32le",
+            "uint32le",
+            "int32be",
+            "uint32be",
+            "int16",
+            "uint16",
+            "int16le",
+            "uint16le",
+            "int16be",
+            "uint16be",
+            "cfloat32",
+            "cfloat32le",
+            "cfloat32be",
+            "cfloat64",
+            "cfloat64le",
+            "cfloat64be",
+            "int8",
+            "uint8",
+            "bit",
+        ],
+    },
+    "grad": {
+        "type": FileInputDefinition,
+        "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",  # noqa: E501
+    },
+    "fslgrad": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "(bvec, bval) DW gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",  # noqa: E501
+    },
+    "bvalue_scaling": {
+        "type": StringInputDefinition,
+        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
+        "choices": ["yes", "no"],
+    },
+    "export_grad_mrtrix": {
+        "type": StringInputDefinition,
+        "description": "export the diffusion-weighted gradient table to file in MRtrix format",
+        "is_output_path": True,
+    },
+    "export_grad_fsl": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "export the diffusion-weighted gradient table to files in FSL (bvecs / bvals) format",
+    },
+    "import_pe_table": {
+        "type": FileInputDefinition,
+        "description": "import a phase-encoding table from file",
+    },
+    "import_pe_table": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "import phase-encoding information from an EDDY-style config / index file pair",
+    },
+    "export_pe_table": {
+        "type": StringInputDefinition,
+        "description": "export a phase-encoding table to a file",
+        "is_output_path": True,
+    },
+    "export_pe_eddy": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "export phase-encoding information to an EDDY-style config / index file pair",
+    },
+    "nthreads": {
+        "type": IntegerInputDefinition,
+        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
+    },
 }
 
 #: *MRConvert* output specification dictionary.
 MRCONVERT_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "The output converted image.",
     },
 }

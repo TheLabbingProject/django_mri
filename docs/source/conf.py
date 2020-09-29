@@ -87,15 +87,9 @@ autosectionlabel_prefix_document = True
 # Intersphinx
 intersphinx_mapping = {
     "django": ("http://django.readthedocs.org/en/latest/", None),
-    "django_analyses": (
-        "http://django_analyses.readthedocs.org/en/latest/",
-        None,
-    ),
+    "django_analyses": ("http://django_analyses.readthedocs.org/en/latest/", None,),
     "django_dicom": ("http://django_dicom.readthedocs.org/en/latest/", None),
-    "django_filters": (
-        "https://django-filter.readthedocs.io/en/master/",
-        None,
-    ),
+    "django_filters": ("https://django-filter.readthedocs.io/en/master/", None,),
     "nipype": ("http://nipype.readthedocs.org/en/latest/", None),
     "python": ("https://docs.python.org/3", None),
 }

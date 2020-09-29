@@ -98,9 +98,7 @@ def get_session_by_series(series):
             header.get("StudyDate"),
             header.get("StudyTime"),
         )
-        session_time = datetime.combine(study_date, study_time).replace(
-            tzinfo=pytz.UTC
-        )
+        session_time = datetime.combine(study_date, study_time).replace(tzinfo=pytz.UTC)
         try:
             subject = Subject.objects.get(id_number=series.patient.uid)
         # If the subject doesn't exist in the database, create a new session
@@ -112,7 +110,5 @@ def get_session_by_series(series):
             session = subject.mri_session_set.filter(time=session_time).first()
             # If no existing session exists, create one.
             if not session:
-                session = Session.objects.create(
-                    time=session_time, subject=subject
-                )
+                session = Session.objects.create(time=session_time, subject=subject)
         return session

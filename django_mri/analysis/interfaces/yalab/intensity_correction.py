@@ -67,9 +67,9 @@ class IntensityCorrection:
         """
 
         current_min, current_max = image.min(), image.max()
-        return (
-            ((image - current_min) / (current_max - current_min)) ** gamma
-        ) * (highest_value - lowest_value) + lowest_value
+        return (((image - current_min) / (current_max - current_min)) ** gamma) * (
+            highest_value - lowest_value
+        ) + lowest_value
 
     def prepare_reference(self) -> np.ndarray:
         mni = get_mni().get_data()
@@ -105,4 +105,3 @@ class IntensityCorrection:
         ax3.set_title("Corrected")
         plt.tight_layout()
         plt.show()
-

@@ -24,10 +24,7 @@ SEGMENTATION_OUTPUT = {
     ],
     "lpba40": ["label/catROI_{file_name}.mat", "label/catROI_{file_name}.xml"],
     "cobra": ["label/catROI_{file_name}.mat", "label/catROI_{file_name}.xml"],
-    "hammers": [
-        "label/catROI_{file_name}.mat",
-        "label/catROI_{file_name}.xml",
-    ],
+    "hammers": ["label/catROI_{file_name}.mat", "label/catROI_{file_name}.xml",],
     "native_grey_matter": "mri/p1{file_name}.nii",
     "modulated_grey_matter": "mri/mwp1{file_name}.nii",
     "dartel_grey_matter": {

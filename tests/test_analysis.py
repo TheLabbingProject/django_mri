@@ -18,9 +18,7 @@ class AnalysesTestCase(TestCase):
         try:
             self.analyses = Analysis.objects.from_list(analysis_definitions)
         except Exception as e:
-            message = CREATION_FAILURE_MESSAGE.format(
-                models="analyses", exception=e
-            )
+            message = CREATION_FAILURE_MESSAGE.format(models="analyses", exception=e)
             self.fail(message)
         else:
             self.assertIsInstance(self.analyses, dict)
@@ -28,16 +26,12 @@ class AnalysesTestCase(TestCase):
     def test_pipline_creation(self):
         NIfTI.objects.create(path=FAKE_MNI)
         Analysis.objects.from_list(analysis_definitions)
-        from django_mri.analysis.pipeline_definitions import (
-            pipeline_definitions,
-        )
+        from django_mri.analysis.pipeline_definitions import pipeline_definitions
 
         try:
             pipelines = Pipeline.objects.from_list(pipeline_definitions)
         except Exception as e:
-            message = CREATION_FAILURE_MESSAGE.format(
-                models="pipelines", exception=e
-            )
+            message = CREATION_FAILURE_MESSAGE.format(models="pipelines", exception=e)
             self.fail(message)
         else:
             self.assertIsInstance(pipelines, list)

@@ -21,12 +21,8 @@ from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 #: *applytopup* input specification.
 APPLY_TOPUP_INPUT_SPECIFICATION = {

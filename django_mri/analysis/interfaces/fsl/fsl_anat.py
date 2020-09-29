@@ -190,9 +190,7 @@ class FslAnat:
             Run failure
         """
 
-        destination = (
-            Path(destination) if destination else Path(scan.path).parent
-        )
+        destination = Path(destination) if destination else Path(scan.path).parent
         command = self.generate_command(scan, destination).split()
         process = subprocess.run(command, capture_output=True)
         if process.returncode:

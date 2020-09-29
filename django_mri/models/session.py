@@ -23,10 +23,7 @@ class Session(TimeStampedModel):
 
     #: Any other information about this scanning sequence.
     comments = models.TextField(
-        max_length=1000,
-        blank=True,
-        null=True,
-        help_text=help_text.SESSION_COMMENTS,
+        max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
     )
 
     #: The date and time in which this scanning sequence began.

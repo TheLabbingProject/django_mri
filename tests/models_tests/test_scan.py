@@ -210,9 +210,7 @@ class ScanModelTestCase(TestCase):
         result = str(self.scan)
         self.assertEqual(result, expected)
 
-    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(
-        self,
-    ):
+    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(self,):
         self.scan.dicom = None
         with self.assertRaises(AttributeError):
             self.scan.update_fields_from_dicom()

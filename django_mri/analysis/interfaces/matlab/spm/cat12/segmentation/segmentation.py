@@ -21,9 +21,7 @@ from django_mri.analysis.interfaces.matlab.spm.cat12.utils.template_files import
 from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.transformations import (  # noqa: E501
     SEGMENTATION_TRANSFORMATIONS,
 )
-from django_mri.analysis.interfaces.matlab.spm.spm_procedure import (
-    SPMProcedure,
-)
+from django_mri.analysis.interfaces.matlab.spm.spm_procedure import SPMProcedure
 from django_mri.analysis.interfaces.matlab.spm.utils.nifti_validator import (
     NiftiValidator,
 )
@@ -52,8 +50,7 @@ class Segmentation(SPMProcedure):
             self.spm_directory / RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION
         )
         self.shooting_tpm_path = (
-            self.spm_directory
-            / RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION
+            self.spm_directory / RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION
         )
         # Removed in version 12.7
         # self.dartel_template_path = (
@@ -100,12 +97,8 @@ class Segmentation(SPMProcedure):
         batch = self.read_batch_template()
         options = self.transform_options()
         batch = batch.replace("$DATA_PATH", str(data_path))
-        batch = batch.replace(
-            "$TPM_PATH", str(self.tissue_probability_map_path)
-        )
-        batch = batch.replace(
-            "$SHOOTING_TPM_PATH", str(self.shooting_tpm_path)
-        )
+        batch = batch.replace("$TPM_PATH", str(self.tissue_probability_map_path))
+        batch = batch.replace("$SHOOTING_TPM_PATH", str(self.shooting_tpm_path))
         # Removed in version 12.7
         # batch = batch.replace(
         #     "$DARTEL_TEMPLATE_PATH", str(self.dartel_template_path)
@@ -197,9 +190,7 @@ class Segmentation(SPMProcedure):
         output_dict = self.create_output_dict(path)
         if destination:
             output_dict = self.move_output(
-                output_dict=output_dict,
-                run_dir=path.parent,
-                destination=destination,
+                output_dict=output_dict, run_dir=path.parent, destination=destination,
             )
         if verbose_output_dict:
             return verbosify_output_dict(output_dict)
@@ -234,9 +225,7 @@ class Segmentation(SPMProcedure):
             Output files by key
         """
 
-        path, created_uncompressed_version = self.validate_and_fix_input_data(
-            path
-        )
+        path, created_uncompressed_version = self.validate_and_fix_input_data(path)
         batch_file = self.create_batch_file(path)
         self.engine.run(str(batch_file), nargout=0)
         return self.organize_output(

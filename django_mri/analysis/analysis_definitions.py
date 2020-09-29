@@ -21,6 +21,11 @@ from django.conf import settings
 from django_mri.analysis import messages
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
+from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
+from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
+from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
+from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
+from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -109,6 +114,34 @@ from django_mri.analysis.specifications.mrtrix3.dwifslpreproc import (
     DWIFSLPREPROC_INPUT_SPECIFICATION,
     DWIFSLPREPROC_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.mrtrix3.estimate_fod import (
+    DWI2FOD_INPUT_SPECIFICATION,
+    DWI2FOD_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.estimate_response import (
+    DWI2RESPONSE_INPUT_SPECIFICATION,
+    DWI2RESPONSE_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.generate_5tt import (
+    GENERATE_5TT_INPUT_SPECIFICATION,
+    GENERATE_5TT_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.estimate_tensors import (
+    DWI2TENSOR_INPUT_SPECIFICATION,
+    DWI2TENSOR_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.compute_metrics import (
+    TENSOR2METRICS_INPUT_SPECIFICATION,
+    TENSOR2METRIC_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.mrcat import (
+    MRCAT_INPUT_SPECIFICATION,
+    MRCAT_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mrtrix3.dwigradcheck import (
+    DWIGRADCHECK_INPUT_SPECIFICATION,
+    DWIGRADCHECK_OUTPUT_SPECIFICATION,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -130,7 +163,9 @@ from nipype.interfaces.mrtrix3 import (
     DWIDenoise,
     DWIBiasCorrect,
     MRDeGibbs,
-    MRConvert,
+    ConstrainedSphericalDeconvolution,
+    ResponseSD,
+    Generate5tt,
 )
 from nipype.interfaces.fsl.base import no_fsl
 
@@ -369,11 +404,10 @@ analysis_definitions = [
         "description": "Performs conversion between different file types and optionally extract a subset of the input image",  # noqa: E501
         "versions": [
             {
-                "title": MRConvert().version or "1.0",
+                "title": MRConvert.__version__ or "1.0",
                 "description": f"Default mrconvert version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": MRCONVERT_INPUT_SPECIFICATION,
                 "output": MRCONVERT_OUTPUT_SPECIFICATION,
-                "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
     },
@@ -417,6 +451,57 @@ analysis_definitions = [
         ],
     },
     {
+        "title": "dwi2fod",
+        "description": "Estimate fibre orientation distributions from diffusion data using spherical deconvolution.",  # noqa: E501
+        "versions": [
+            {
+                "title": ConstrainedSphericalDeconvolution().version or "1.0",
+                "description": f"Default ConstrainedSphericalDeconvolution version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWI2FOD_INPUT_SPECIFICATION,
+                "output": DWI2FOD_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "dwi2response",
+        "description": "Estimate response function(s) for spherical deconvolution using the specified algorithm.",  # noqa: E501
+        "versions": [
+            {
+                "title": ResponseSD().version or "1.0",
+                "description": f"Default ResponseSD version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWI2RESPONSE_INPUT_SPECIFICATION,
+                "output": DWI2RESPONSE_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "5ttgen",
+        "description": "Generate a 5TT image suitable for ACT using the selected algorithm.",  # noqa: E501
+        "versions": [
+            {
+                "title": Generate5tt().version or "1.0",
+                "description": f"Default Generate5tt version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": GENERATE_5TT_INPUT_SPECIFICATION,
+                "output": GENERATE_5TT_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "dwi2tensor",
+        "description": "Convert diffusion-weighted images to tensor images.",  # noqa: E501
+        "versions": [
+            {
+                "title": Dwi2Tensor.__version__ or "1.0",
+                "description": f"Default FitTensor version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWI2TENSOR_INPUT_SPECIFICATION,
+                "output": DWI2TENSOR_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
         "title": "dwifslpreproc",
         "description": "Perform diffusion image pre-processing using FSL’s eddy tool; including inhomogeneity distortion correction using FSL’s topup tool if possible",  # noqa: E501
         "versions": [
@@ -425,7 +510,42 @@ analysis_definitions = [
                 "description": f"Default dwifslpreproc version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DWIFSLPREPROC_INPUT_SPECIFICATION,
                 "output": DWIFSLPREPROC_OUTPUT_SPECIFICATION,
-                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "tensor2metric",
+        "description": "Generate maps of tensor-derived parameters",  # noqa: E501
+        "versions": [
+            {
+                "title": Tensor2metric.__version__ or "1.0",
+                "description": f"Default tensor2metric version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": TENSOR2METRICS_INPUT_SPECIFICATION,
+                "output": TENSOR2METRIC_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "mrcat",
+        "description": "Concatenate several images into one",  # noqa: E501
+        "versions": [
+            {
+                "title": MRCat.__version__ or "1.0",
+                "description": "mrtrix3's mrcat implementation.",  # noqa: E501
+                "input": MRCAT_INPUT_SPECIFICATION,
+                "output": MRCAT_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "dwigradcheck",
+        "description": "Check the orientation of the diffusion gradient table",  # noqa: E501
+        "versions": [
+            {
+                "title": DwiGradCheck.__version__ or "1.0",
+                "description": f"Default dwigradcheck version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": DWIGRADCHECK_INPUT_SPECIFICATION,
+                "output": DWIGRADCHECK_OUTPUT_SPECIFICATION,
             }
         ],
     },

@@ -52,9 +52,7 @@ class NiftiValidator:
             path = Path(path)
         if not self.validate_extension(path):
             valid_extensions = ".nii or .nii.gz" if self.allow_gz else ".nii"
-            raise ValueError(
-                f"Input file must have a {valid_extensions} suffix!"
-            )
+            raise ValueError(f"Input file must have a {valid_extensions} suffix!")
         if not path.is_file():
             raise FileNotFoundError(f"{path} does not exist!")
         return path

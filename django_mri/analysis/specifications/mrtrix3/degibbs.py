@@ -19,6 +19,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
+    FileInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
@@ -27,22 +28,15 @@ from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 #: *MRDeGibbs* input specification.
 DEGIBBS_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "is_configuration": False,
-        "value_attribute": "mif.__str__",
     },
     "axes": {
         "type": ListInputDefinition,
         "element_type": "INT",
         "description": "Indicate the plane in which the data was acquired (axial = 0,1; coronal = 0,2; sagittal = 1,2).",  # noqa: E501
         "default": [0, 1],
-    },
-    "bval_scale": {
-        "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
-        "choices": ["yes", "no"],
-        "default": "yes",
     },
     "grad_file": {
         "type": StringInputDefinition,
@@ -83,7 +77,7 @@ DEGIBBS_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output denoised DWI image.",
-        "default": "denoised.mif",
+        "default": "degibbsed.mif",
     },
 }
 
