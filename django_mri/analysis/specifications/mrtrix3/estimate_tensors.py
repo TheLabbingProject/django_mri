@@ -19,14 +19,9 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
-    TupleInputDefinition,
-    FloatInputDefinition,
     BooleanInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 DWI2TENSOR_INPUT_SPECIFICATION = {
     "in_file": {
@@ -37,7 +32,7 @@ DWI2TENSOR_INPUT_SPECIFICATION = {
     },
     "ols": {
         "type": BooleanInputDefinition,
-        "description": "perform initial fit using an ordinary least-squares (OLS) fit",
+        "description": "perform initial fit using an ordinary least-squares (OLS) fit",  # noqa: E501
         "default": False,
     },
     "b0": {
@@ -83,5 +78,8 @@ DWI2TENSOR_INPUT_SPECIFICATION = {
 }
 
 DWI2TENSOR_OUTPUT_SPECIFICATION = {
-    "out_file": {"type": FileOutputDefinition, "description": "The output DTI file.",},
+    "out_file": {
+        "type": FileOutputDefinition,
+        "description": "The output DTI file.",
+    },
 }

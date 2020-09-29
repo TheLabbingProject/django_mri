@@ -15,14 +15,14 @@ For more information, see MRtrix3's `dwi2response reference`_.
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.preprocess.html#responsesd
 """
 from django_analyses.models.input.definitions import (
-    FileInputDefinition,
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
-    TupleInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.inputs.nifti_input_definition import (
+    NiftiInputDefinition,
+)
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 
@@ -84,13 +84,16 @@ DWI2RESPONSE_INPUT_SPECIFICATION = {
     "max_sh": {
         "type": ListInputDefinition,
         "element_type": "INT",
-        "description": "Maximum harmonic degree of response function - single value for single-shell response, list for multi-shell response.",
+        "description": "Maximum harmonic degree of response function - single value for single-shell response, list for multi-shell response.",  # noqa: E501
     },
     "nthreads": {
         "type": IntegerInputDefinition,
         "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
     },
-    "mtt_file": {"type": NiftiInputDefinition, "description": "Input 5tt image.",},
+    "mtt_file": {
+        "type": NiftiInputDefinition,
+        "description": "Input 5tt image.",
+    },
 }
 
 DWI2RESPONSE_OUTPUT_SPECIFICATION = {

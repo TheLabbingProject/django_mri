@@ -19,12 +19,10 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     ListInputDefinition,
     StringInputDefinition,
-    TupleInputDefinition,
 )
-from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 DWI2FOD_INPUT_SPECIFICATION = {
     "algorithm": {
@@ -94,13 +92,13 @@ DWI2FOD_INPUT_SPECIFICATION = {
     },
     "in_dirs": {
         "type": StringInputDefinition,
-        "description": "pecify the directions over which to apply the non-negativity constraint (by default, the built-in 300 direction set is used). These should be supplied as a text file containing the [ az el ] pairs for the directions.",
+        "description": "pecify the directions over which to apply the non-negativity constraint (by default, the built-in 300 direction set is used). These should be supplied as a text file containing the [ az el ] pairs for the directions.",  # noqa: E501
     },
     "mask_file": {"type": StringInputDefinition, "description": "Mask image."},
     "max_sh": {
         "type": ListInputDefinition,
         "element_type": "INT",
-        "description": "Maximum harmonic degree of response function - single value for single-shell response, list for multi-shell response.",
+        "description": "Maximum harmonic degree of response function - single value for single-shell response, list for multi-shell response.",  # noqa: E501
     },
     "nthreads": {
         "type": IntegerInputDefinition,
@@ -114,7 +112,16 @@ DWI2FOD_INPUT_SPECIFICATION = {
 }
 
 DWI2FOD_OUTPUT_SPECIFICATION = {
-    "csf_odf": {"type": NiftiOutputDefinition, "description": "Output CSF ODF.",},
-    "gm_odf": {"type": NiftiOutputDefinition, "description": "Output WM ODF.",},
-    "wm_odf": {"type": NiftiOutputDefinition, "description": "Output WM ODF.",},
+    "csf_odf": {
+        "type": NiftiOutputDefinition,
+        "description": "Output CSF ODF.",
+    },
+    "gm_odf": {
+        "type": NiftiOutputDefinition,
+        "description": "Output WM ODF.",
+    },
+    "wm_odf": {
+        "type": NiftiOutputDefinition,
+        "description": "Output WM ODF.",
+    },
 }

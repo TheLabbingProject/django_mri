@@ -15,16 +15,13 @@ For more information, see MRtrix3's `5ttgen reference`_.
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.utils.html#generate5tt
 """
 from django_analyses.models.input.definitions import (
-    FileInputDefinition,
     IntegerInputDefinition,
-    ListInputDefinition,
     StringInputDefinition,
-    TupleInputDefinition,
 )
-from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.outputs.nifti_output_definition import (
+    NiftiOutputDefinition,
+)
 
 GENERATE_5TT_INPUT_SPECIFICATION = {
     "algorithm": {
@@ -76,5 +73,8 @@ GENERATE_5TT_INPUT_SPECIFICATION = {
 }
 
 GENERATE_5TT_OUTPUT_SPECIFICATION = {
-    "out_file": {"type": NiftiOutputDefinition, "description": "Output image.",},
+    "out_file": {
+        "type": NiftiOutputDefinition,
+        "description": "Output image.",
+    },
 }
