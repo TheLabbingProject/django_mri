@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                     )
                 else:
                     existing_scan_number = Scan.objects.filter(
-                        session=session, number=scan.number
+                        session_id=session.id, number=scan.number
                     )
                     if existing_scan_number:
                         session = Session.objects.create(
