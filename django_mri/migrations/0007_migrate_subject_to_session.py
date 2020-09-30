@@ -32,13 +32,14 @@ class Migration(migrations.Migration):
                     session = Session.objects.create(
                         subject_id=subject.id, time=session_time
                     )
-                scan.session_id = session.id
-            try:
-                scan.save()
-            except IntegrityError:
-                session = Session.objects.create(
-                    subject_id=subject.id, time=session_time
-                )
+                else:
+                    existing_scan_number = Scan.objects.filter(
+                        session=session, number=scan.number
+                    )
+                    if existing_scan_number:
+                        session = Session.objects.create(
+                            subject_id=subject.id, time=session_time
+                        )
                 scan.session_id = session.id
             scan.save()
 
