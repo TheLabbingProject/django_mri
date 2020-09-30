@@ -36,21 +36,37 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "id_number",
-                    CharNullField(blank=True, max_length=64, null=True, unique=True),
+                    CharNullField(
+                        blank=True, max_length=64, null=True, unique=True
+                    ),
                 ),
                 (
                     "first_name",
-                    models.fields.CharField(max_length=64, blank=True, null=True),
+                    models.fields.CharField(
+                        max_length=64, blank=True, null=True
+                    ),
                 ),
                 (
                     "last_name",
-                    models.fields.CharField(max_length=64, blank=True, null=True),
+                    models.fields.CharField(
+                        max_length=64, blank=True, null=True
+                    ),
                 ),
-                ("date_of_birth", models.fields.DateField(blank=True, null=True),),
-                ("sex", models.fields.CharField(max_length=5, blank=True, null=True),),
+                (
+                    "date_of_birth",
+                    models.fields.DateField(blank=True, null=True),
+                ),
+                (
+                    "sex",
+                    models.fields.CharField(
+                        max_length=5, blank=True, null=True
+                    ),
+                ),
                 (
                     "dominant_hand",
-                    models.fields.CharField(max_length=5, blank=True, null=True),
+                    models.fields.CharField(
+                        max_length=5, blank=True, null=True
+                    ),
                 ),
             ],
         ),
@@ -78,10 +94,39 @@ class Migration(migrations.Migration):
                         auto_now=True, verbose_name="modified"
                     ),
                 ),
-                ("title", models.CharField(max_length=255, verbose_name="title")),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="title"),
+                ),
                 (
                     "description",
-                    models.TextField(blank=True, null=True, verbose_name="description"),
+                    models.TextField(
+                        blank=True, null=True, verbose_name="description"
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="MeasurementDefinition",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="title"),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True, null=True, verbose_name="description"
+                    ),
                 ),
             ],
         ),
