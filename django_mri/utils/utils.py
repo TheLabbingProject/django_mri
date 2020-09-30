@@ -2,12 +2,14 @@
 General app utilites.
 """
 
+import datetime
 import pytz
+
 from django.apps import apps
 from django.db.models import ObjectDoesNotExist
 from django.conf import settings
 from pathlib import Path
-from datetime import datetime
+
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.
@@ -96,9 +98,11 @@ def get_session_by_series(series):
         header = image.header.instance
         study_date, study_time = (
             header.get("StudyDate"),
-            header.get("StudyTime"),
+            header.get("StudyTime", datetime.time()),
         )
-        session_time = datetime.combine(study_date, study_time).replace(tzinfo=pytz.UTC)
+        session_time = datetime.datetime.combine(
+            study_date, study_time
+        ).replace(tzinfo=pytz.UTC)
         try:
             subject = Subject.objects.get(id_number=series.patient.uid)
         # If the subject doesn't exist in the database, create a new session
@@ -110,5 +114,7 @@ def get_session_by_series(series):
             session = subject.mri_session_set.filter(time=session_time).first()
             # If no existing session exists, create one.
             if not session:
-                session = Session.objects.create(time=session_time, subject=subject)
+                session = Session.objects.create(
+                    time=session_time, subject=subject
+                )
         return session
