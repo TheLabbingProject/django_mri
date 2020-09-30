@@ -19,7 +19,13 @@ class Migration(migrations.Migration):
             first_image = scan.dicom.image_set.first().dcm.path
             header = DicomHeader(first_image)
             date = header.get("StudyDate") or header.get("SeriesDate")
-            time = header.get("StudyTime") or datetime.time()
+            try:
+                time = header.get("StudyTime")
+            except ValueError:
+                time = datetime.time()
+            else:
+                if not time:
+                    time = datetime.time()
             session_time = datetime.datetime.combine(date, time)
             if not subject:
                 session = Session.objects.create(time=session_time)
