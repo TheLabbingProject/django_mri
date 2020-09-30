@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                     subject_id=subject.id, time=session_time
                 )
                 scan.session_id = session.id
-                scan.save()
+            scan.save()
 
     def session_to_scan_subject(apps, schema_editor):
         Scan = apps.get_model("django_mri", "Scan")
