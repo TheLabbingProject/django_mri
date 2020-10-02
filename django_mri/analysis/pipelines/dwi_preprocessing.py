@@ -68,6 +68,24 @@ BIAS_CORRECT_NODE = {
     "analysis_version": "bias_correct",
     "configuration": BIAS_CORRECT_CONFIGURATION,
 }
+"""
+- Calculating tensors from preprocessed DWI image
+"""
+DWI2TENSOR_CONFIGURATION = {}
+DWI2TENSOR_NODE = {
+    "analysis_version": "dwi2tensor",
+    "configuration": DWI2TENSOR_CONFIGURATION,
+}
+
+"""
+- Calculating several metrices including FA and MD
+"""
+TENSOR2METRIC_CONFIGURATION = {}
+TENSOR2METRIC_NODE = {
+    "analysis_version": "tensor2metric",
+    "configuration": TENSOR2METRIC_CONFIGURATION,
+}
+
 # Pipes
 MIF_FMAP_TO_CAT = {
     "source": MRCONVERT_NODE,
@@ -150,6 +168,18 @@ PREPROCESSED_TO_BIAS_CORRECT = {
     "destination": BIAS_CORRECT_NODE,
     "destination_port": "in_file",
 }
+BIAS_CORRECT_TO_TENSOR = {
+    "source": BIAS_CORRECT_NODE,
+    "source_port": "out_file",
+    "destination": DWI2TENSOR_NODE,
+    "destination_port": "in_file",
+}
+TENSOR_TO_METRICS = {
+    "source": DWI2TENSOR_NODE,
+    "source_port": "out_file",
+    "destination": TENSOR2METRIC_NODE,
+    "destination_port": "in_file",
+}
 
 DWI_PREPROCESSING_PIPELINE = {
     "title": "Basic and robust DWI Preprocessing",
@@ -167,5 +197,7 @@ DWI_PREPROCESSING_PIPELINE = {
         BVAL_TO_DWIFSLPREPROC,
         DWI_TO_DWIFSLPREPROC,
         PREPROCESSED_TO_BIAS_CORRECT,
+        BIAS_CORRECT_TO_TENSOR,
+        TENSOR_TO_METRICS
     ],
 }
