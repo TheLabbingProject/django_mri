@@ -142,6 +142,10 @@ from django_mri.analysis.specifications.mrtrix3.dwigradcheck import (
     DWIGRADCHECK_INPUT_SPECIFICATION,
     DWIGRADCHECK_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.yalab.mutual_information_score import (
+    MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION,
+    MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -546,6 +550,18 @@ analysis_definitions = [
                 "description": f"Default dwigradcheck version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
                 "input": DWIGRADCHECK_INPUT_SPECIFICATION,
                 "output": DWIGRADCHECK_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "Mutual Information Score",
+        "description": "Calculate mutual information score for two anatomical scans.",  # noqa: E501
+        "versions": [
+            {
+                "title": "1.0",
+                "description": "Calculates mutual information using the example from this SO post: https://stackoverflow.com/a/20505476/4416932",  # noqa: E501,
+                "input": MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION,
+                "output": MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION,
             }
         ],
     },

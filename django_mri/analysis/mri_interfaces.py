@@ -27,6 +27,9 @@ from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import (
 from django_mri.analysis.interfaces.fsl.fast import FastWrapper
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.fsl.topup import TopupWrapper
+from django_mri.analysis.interfaces.yalab.mutual_information_score import (
+    MutualInformationScore,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -78,7 +81,7 @@ interfaces = {
     "dwifslpreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
     "mrconvert": {MRConvert.__version__: MRConvert},
     "dwi2fod": {
-        ConstrainedSphericalDeconvolution().version: ConstrainedSphericalDeconvolution
+        ConstrainedSphericalDeconvolution().version: ConstrainedSphericalDeconvolution  # noqa: E501
     },
     "dwi2response": {ResponseSD().version: ResponseSD},
     "5ttgen": {Generate5tt().version: Generate5tt},
@@ -86,4 +89,5 @@ interfaces = {
     "tensor2metric": {Tensor2metric.__version__: Tensor2metric},
     "mrcat": {MRCat.__version__: MRCat},
     "dwigradcheck": {DwiGradCheck.__version__: DwiGradCheck},
+    "Mutual Information Score": {"1.0": MutualInformationScore},
 }
