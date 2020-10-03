@@ -4,7 +4,6 @@ Definition of the :class:`~django_mri.models.nifti.NIfTI` model.
 
 import nibabel as nib
 import numpy as np
-import os
 import json
 
 from django.db import models
@@ -226,7 +225,9 @@ class NIfTI(TimeStampedModel):
 
         if not self.is_compressed:
             uncompressed_path = Path(self.path)
-            compressed_path = compress(uncompressed_path, keep_source=keep_source)
+            compressed_path = compress(
+                uncompressed_path, keep_source=keep_source
+            )
             self.path = str(compressed_path)
             self.save()
         return Path(self.path)
@@ -249,7 +250,9 @@ class NIfTI(TimeStampedModel):
 
         if self.is_compressed:
             compressed_path = Path(self.path)
-            uncompressed_path = uncompress(compressed_path, keep_source=keep_source)
+            uncompressed_path = uncompress(
+                compressed_path, keep_source=keep_source
+            )
             self.path = str(uncompressed_path)
             self.save()
         return Path(self.path)
