@@ -3,8 +3,7 @@ Definition of the
 :class:`~django_mri.analysis.interfaces.mrtrix3.dwifslpreproc` interface.
 """
 
-import subprocess
-
+import os
 from pathlib import Path
 
 
@@ -34,9 +33,9 @@ class DwiFslPreproc:
         "nocleanup",
     )
 
-    #: Non-default output configurations.
-    SUPPLEMENTARY_OUTPUTS = "eddyqc_text", "eddyqc_all"
-
+    #: Non-default output configuration.
+    SUPPLEMENTARY_OUTPUTS = ["eddyqc_all"]
+    DEFAULT_INPUTS = ["json_import", "fslgrad"]
     #: Default name for primary output file.
     DEFAULT_OUTPUT_NAME = "preprocessed_dwi.mif"
 
@@ -50,7 +49,7 @@ class DwiFslPreproc:
     #:    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
     EDDY_OUTPUTS = {
         "out_movement_rms": "eddy_movement_rms",
-        "eddy_mask": "eddy_mask.nii",
+        "eddy_mask": "eddy_mask.mif",
         "out_outlier_map": "eddy_outlier_map",
         "out_outlier_n_sqr_stdev_map": "eddy_outlier_n_sqr_stdev_map",
         "out_outlier_n_stdev_map": "eddy_outlier_n_stdev_map",
@@ -63,8 +62,8 @@ class DwiFslPreproc:
 
     __version__ = "BETA"
 
-    def __init__(self, configuration: dict):
-        self.configuration = configuration
+    def __init__(self, **kwargs):
+        self.configuration = kwargs
 
     def add_supplementary_outputs(self, destination: Path) -> dict:
         """
@@ -95,17 +94,29 @@ class DwiFslPreproc:
                 config[key] = destination
         return config
 
-    def generate_command(self, scan, destination: Path, config: str) -> str:
+    def set_configuration_by_keys(self, config: dict):
+        key_command = ""
+        for key, value in config.items():
+            key_addition = f" -{key}"
+            if isinstance(value, list):
+                for val in value:
+                    key_addition += f" {val}"
+            elif key in self.FLAGS and value:
+                pass
+            else:
+                key_addition += f" {value}"
+            key_command += key_addition
+        return key_command
+
+    def generate_command(self, destination: Path, config: dict) -> str:
         """
         Returns the command to be executed in order to run the analysis.
 
         Parameters
         ----------
-        scan : ~django_mri.models.scan.Scan
-            Input scan
         destination : Path
             Output files destination direcotry
-        config : str
+        config : dict
             Configuration arguments for the command
 
         Returns
@@ -115,15 +126,9 @@ class DwiFslPreproc:
         """
 
         output_path = destination / self.DEFAULT_OUTPUT_NAME
-        command = f"dwifslpreproc {scan.path} {output_path} {config}"
-        return command + "".join(
-            [
-                f" -{key}"
-                if key in self.FLAGS and value
-                else f" -{key} {value}"
-                for key, value in self.configuration.items()
-            ]
-        )
+        scan = config.pop("scan")
+        command = f"dwifslpreproc {scan} {output_path}"
+        return command + self.set_configuration_by_keys(config)
 
     def generate_output_dict(self, destination: Path) -> dict:
         """
@@ -141,13 +146,13 @@ class DwiFslPreproc:
         """
 
         output_dict = {
-            "corrected_image": destination / self.DEFAULT_OUTPUT_NAME,
+            "preprocessed_dwi": destination / self.DEFAULT_OUTPUT_NAME,
         }
         for key, value in self.EDDY_OUTPUTS.items():
             output_dict[key] = destination / value
         return output_dict
 
-    def run(self, scan, destination: Path = None) -> dict:
+    def run(self, destination: Path = None) -> dict:
         """
         Runs *dwifslpreproc* with the provided *scan* as input.
         If *destination* is not specified, output files will be created within
@@ -173,8 +178,10 @@ class DwiFslPreproc:
 
         destination = Path(destination) if destination else scan.path.parent
         config = self.add_supplementary_outputs(destination)
-        command = self.generate_command(scan, destination, config).split()
-        process = subprocess.run(command, capture_output=True)
-        if process.returncode:
-            raise RuntimeError("Failed to run dwifslpreproc!")
+        command = self.generate_command(destination, config)
+        raise_exception = os.system(command)
+        if raise_exception:
+            raise RuntimeError(
+                f"Failed to run dwifslpreproc!\nExecuted command: {command}"
+            )
         return self.generate_output_dict(destination)

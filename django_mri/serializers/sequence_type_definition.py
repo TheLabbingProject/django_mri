@@ -31,4 +31,3 @@ class SequenceTypeDefinitionSerializer(serializers.HyperlinkedModelSerializer):
         return SequenceTypeDefinition.objects.create(
             sequence_type=sequence_type, **validated_data
         )
-

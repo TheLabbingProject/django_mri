@@ -11,12 +11,8 @@ from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     IntegerInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 #: *fslroi* input specification dictionary.
 FSLROI_INPUT_SPECIFICATION = {
@@ -60,8 +56,5 @@ FSLROI_INPUT_SPECIFICATION = {
 
 #: *fslroi* output specification dictionary.
 FSLROI_OUTPUT_SPECIFICATION = {
-    "roi_file": {
-        "type": NiftiOutputDefinition,
-        "description": "Path to output file.",
-    },
+    "roi_file": {"type": NiftiOutputDefinition, "description": "Path to output file.",},
 }

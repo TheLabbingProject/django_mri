@@ -267,7 +267,7 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "",
     },
-    "left_hemisphere_pbt": {"type": FileOutputDefinition, "description": "",},
+    "left_hemisphere_pbt": {"type": FileOutputDefinition, "description": ""},
     "right_hemisphere_central_surface": {
         "type": FileOutputDefinition,
         "description": "",
@@ -284,7 +284,7 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "",
     },
-    "right_hemisphere_pbt": {"type": FileOutputDefinition, "description": "",},
+    "right_hemisphere_pbt": {"type": FileOutputDefinition, "description": ""},
     "labels_mat": {"type": FileOutputDefinition, "description": ""},
     "labels_xml": {"type": FileOutputDefinition, "description": ""},
     "surface_labels_mat": {"type": FileOutputDefinition, "description": ""},
@@ -293,10 +293,7 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
     "modulated_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "dartel_grey_matter": {"type": FileOutputDefinition, "description": ""},
     "native_white_matter": {"type": FileOutputDefinition, "description": ""},
-    "modulated_white_matter": {
-        "type": FileOutputDefinition,
-        "description": "",
-    },
+    "modulated_white_matter": {"type": FileOutputDefinition, "description": "",},
     "dartel_white_matter": {"type": FileOutputDefinition, "description": ""},
     "native_pve": {
         "type": FileOutputDefinition,
@@ -326,20 +323,11 @@ CAT12_SEGMENTATION_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "MATLAB format .mat file containing the run's log.",
     },
-    "report_xml": {
-        "type": FileOutputDefinition,
-        "description": "XML log of the run.",
-    },
+    "report_xml": {"type": FileOutputDefinition, "description": "XML log of the run.",},
     "report_txt": {
         "type": FileOutputDefinition,
         "description": "Text format log file.",
     },
-    "report_pdf": {
-        "type": FileOutputDefinition,
-        "description": "PDF log of the run.",
-    },
-    "report_jpg": {
-        "type": FileOutputDefinition,
-        "description": "JPG log of the run.",
-    },
+    "report_pdf": {"type": FileOutputDefinition, "description": "PDF log of the run.",},
+    "report_jpg": {"type": FileOutputDefinition, "description": "JPG log of the run.",},
 }

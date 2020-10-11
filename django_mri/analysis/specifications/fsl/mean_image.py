@@ -11,22 +11,18 @@ wrapping FSL's fslmaths_.
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     StringInputDefinition,
+    FileInputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 #: *MeanImage* input specification dictionary.
 MEAN_IMAGE_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to image to operate on.",
         "required": True,
         "is_configuration": False,
-        "value_attribute": "path.__str__",
     },
     "dimension": {
         "type": StringInputDefinition,

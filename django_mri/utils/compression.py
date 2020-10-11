@@ -39,9 +39,7 @@ def uncompress(
     return destination
 
 
-def compress(
-    source: Path, destination: Path = None, keep_source: bool = True
-) -> Path:
+def compress(source: Path, destination: Path = None, keep_source: bool = True) -> Path:
     """
     Compresses the provided *source* file.
 

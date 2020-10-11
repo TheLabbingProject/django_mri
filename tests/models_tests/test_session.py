@@ -25,9 +25,7 @@ class SessionModelTestCase(TestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(
-            subject=cls.subject, time=session_time
-        )
+        session = Session.objects.create(subject=cls.subject, time=session_time)
         cls.scan = Scan.objects.create(dicom=cls.series, session=session)
 
     def setUp(self):

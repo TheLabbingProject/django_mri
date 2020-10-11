@@ -25,9 +25,7 @@ class NIfTIModelTestCase(TestCase):
         load_common_sequences()
 
         # MPRAGE scan
-        Image.objects.import_path(
-            DICOM_MPRAGE_PATH, progressbar=False, report=False
-        )
+        Image.objects.import_path(DICOM_MPRAGE_PATH, progressbar=False, report=False)
         series = Image.objects.first().series
         subject, _ = Subject.objects.from_dicom_patient(series.patient)
         header = series.image_set.first().header.instance

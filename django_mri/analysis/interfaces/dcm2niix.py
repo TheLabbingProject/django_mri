@@ -118,10 +118,7 @@ class Dcm2niix:
             *dcm2niix* executable could not be found
         """
         command = self.generate_command(
-            path,
-            destination,
-            compressed=compressed,
-            generate_json=generate_json,
+            path, destination, compressed=compressed, generate_json=generate_json,
         )
         try:
             process = subprocess.Popen(

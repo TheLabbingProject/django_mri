@@ -298,12 +298,22 @@ class Scan(TimeStampedModel):
             BIDS-compatible NIfTI file destination
         """
 
-        bids_path = Bids(self).compose_bids_path()
+        bids_path = Bids().compose_bids_path(self)
         return bids_path
 
     def compile_to_bids(self, bids_path: Path):
-        Bids(self).clean_unwanted_files(bids_path)
-        Bids(self).fix_functional_json(bids_path)
+        """
+        Fix some BIDS related issues after NIfTI coversion.
+
+        Parameters
+        ----------
+        bids_path : Path
+            Scan's BIDS path
+        """
+
+        bids = Bids()
+        bids.clean_unwanted_files(bids_path)
+        bids.fix_functional_json(bids_path)
 
     def dicom_to_nifti(
         self,
@@ -474,4 +484,3 @@ class Scan(TimeStampedModel):
             self._nifti = self.dicom_to_nifti()
             self.save()
         return self._nifti
-

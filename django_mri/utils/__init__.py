@@ -8,5 +8,5 @@ from django_mri.utils.utils import (
     get_group_model,
     get_measurement_model,
     get_mri_root,
-    get_session,
+    get_session_by_series,
 )

@@ -83,9 +83,7 @@ class ScanInline(admin.TabularInline):
         """
 
         try:
-            return " x ".join(
-                [f"{number:.2g}" for number in scan.spatial_resolution]
-            )
+            return " x ".join([f"{number:.2g}" for number in scan.spatial_resolution])
         except TypeError:
             return ""
 

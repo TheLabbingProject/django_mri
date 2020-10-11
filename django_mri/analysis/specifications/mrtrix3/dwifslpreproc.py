@@ -24,21 +24,18 @@ from django_analyses.models.input.definitions import (
     StringInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 
 #: *DwiFslPreproc* input specification dictionary.
 DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "scan": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
-        "run_method_input": True,
-        "value_attribute": "mif.__str__",
     },
     "destination": {
         "type": DirectoryInputDefinition,
@@ -99,6 +96,7 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "eddy_mask": {
         "type": FileInputDefinition,
         "description": "Provide a processing mask to use for eddy, instead of having dwifslpreproc generate one internally using dwi2mask",  # noqa: E501
+        "db_value_preprocessing": "path",
     },
     "eddy_slspec": {
         "type": FileInputDefinition,
@@ -134,10 +132,10 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Provide the diffusion gradient table in MRtrix format",
     },
-    "grad_fsl": {
+    "fslgrad": {
         "type": ListInputDefinition,
         "element_type": "STR",
-        "description": "Provide the diffusion gradient table in MRtrix format",
+        "description": "Provide the diffusion gradient table in FSL bvecs/bvals format",
     },
     "export_grad_mrtrix": {
         "type": StringInputDefinition,

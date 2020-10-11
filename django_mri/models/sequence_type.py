@@ -36,4 +36,3 @@ class SequenceType(TitleDescriptionModel, TimeStampedModel):
                 "id", "scanning_sequence", "sequence_variant"
             )
         )
-
