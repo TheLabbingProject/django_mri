@@ -8,8 +8,8 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.MEASUREMENT_MODEL),
         ("django_mri", "0008_auto_20200827_0229"),
+        migrations.swappable_dependency(settings.MEASUREMENT_MODEL),
     ]
 
     operations = [
