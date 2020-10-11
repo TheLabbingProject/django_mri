@@ -27,8 +27,10 @@ class Session(TimeStampedModel):
 
     #: Any other information about this scanning sequence.
     comments = models.TextField(
-        max_length=1000, blank=True, null=True, help_text=help_text.SESSION_COMMENTS,
-<<<<<<< HEAD
+        max_length=1000,
+        blank=True,
+        null=True,
+        help_text=help_text.SESSION_COMMENTS,
     )
 
     measurement = models.ForeignKey(
@@ -37,8 +39,6 @@ class Session(TimeStampedModel):
         blank=True,
         null=True,
         on_delete=models.PROTECT,
-=======
->>>>>>> master
     )
 
     #: The date and time in which this scanning sequence began.
