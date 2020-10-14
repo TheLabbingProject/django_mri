@@ -33,6 +33,7 @@ class Session(TimeStampedModel):
         help_text=help_text.SESSION_COMMENTS,
     )
 
+    #: The associated `Measurement` model (optional).
     measurement = models.ForeignKey(
         get_measurement_model(),
         related_name="mri_session_set",
