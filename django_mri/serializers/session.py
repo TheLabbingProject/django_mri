@@ -25,4 +25,4 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Session
-        fields = ("url", "subject", "comments", "time", "scan_set")
+        fields = ("id", "url", "subject", "comments", "time", "scan_set")

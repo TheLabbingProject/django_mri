@@ -25,6 +25,9 @@ DEFAULT_SUBJECT_MODEL = "research.Subject"
 #: Default identifier for a study group model scans should be related to.
 DEFAULT_STUDY_GROUP_MODEL = "research.Group"
 
+#: Default identifier for a measurement model sessions should be related to.
+DEFAULT_MEASUREMENT_MODEL = "research.MeasurementDefinition"
+
 
 def get_subject_model():
     """
@@ -54,6 +57,21 @@ def get_group_model():
         settings, "STUDY_GROUP_MODEL", DEFAULT_STUDY_GROUP_MODEL
     )
     return apps.get_model(study_group_model, require_ready=False)
+
+
+def get_measurement_model():
+    """
+    Returns the measurement model MRI sessions should be related to.
+
+    Returns
+    -------
+    django.db.models.Model
+        Measurement model
+    """
+    measurement_model = getattr(
+        settings, "MEASUREMENT_MODEL", DEFAULT_MEASUREMENT_MODEL
+    )
+    return apps.get_model(measurement_model, require_ready=False)
 
 
 def get_mri_root() -> Path:

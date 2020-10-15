@@ -94,6 +94,7 @@ ROOT_URLCONF = "tests.urls"
 
 SUBJECT_MODEL = "tests.Subject"
 STUDY_GROUP_MODEL = "tests.Group"
+MEASUREMENT_MODEL = "tests.MeasurementDefinition"
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
