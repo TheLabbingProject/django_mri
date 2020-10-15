@@ -27,14 +27,14 @@ class ScanManager(Manager):
         mri_method_definitions = SequenceType.objects.get(
             title__icontains=method
         ).sequence_definitions
-        sequence_variants = map(
-            lambda definition: definition["sequence_variant"],
-            mri_method_definitions,
-        )
-        scanning_sequences = map(
-            lambda definition: definition["scanning_sequence"],
-            mri_method_definitions,
-        )
+        sequence_variants = [
+            definition["sequence_variant"]
+            for definition in mri_method_definitions
+        ]
+        scanning_sequences = [
+            definition["scanning_sequence"]
+            for definition in mri_method_definitions
+        ]
         return self.filter(
             dicom__sequence_variant__contains=list(sequence_variants),
             dicom__scanning_sequence__contains=list(scanning_sequences),
