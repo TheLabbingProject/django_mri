@@ -27,7 +27,7 @@ def filter_by_sequence_type(queryset, field_name, value):
 class ScanFilter(filters.FilterSet):
     """
     Provides useful filtering options for the
-    :class:`~django_dicom.models.series.Series` class.
+    :class:`~django_dicom.models.scan.Scan` class.
 
     """
 
