@@ -90,18 +90,18 @@ TENSOR2METRIC_NODE = {
 MIF_FMAP_TO_CAT = {
     "source": MRCONVERT_NODE,
     "source_port": "out_file",
-    "source_run_index":1,
+    "source_run_index": 1,
     "destination": MRCAT_NODE,
     "destination_port": "in_files",
-    "index":0,
+    "index": 0,
 }
 MIF_DWI_TO_CAT = {
     "source": MRCONVERT_NODE,
     "source_port": "out_file",
-    "source_run_index":0,
+    "source_run_index": 0,
     "destination": MRCAT_NODE,
     "destination_port": "in_files",
-    "index":1,
+    "index": 1,
 }
 CAT_TO_DENOISE = {
     "source": MRCAT_NODE,
@@ -119,26 +119,26 @@ DEGIBBS_TO_SEP_1 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
     "destination": MRCONVERT_NODE,
-    "destination_run_index":2,
+    "destination_run_index": 2,
     "destination_port": "in_file",
 }
 DEGIBBS_TO_SEP_2 = {
     "source": DEGIBBS_NODE,
     "source_port": "out_file",
     "destination": MRCONVERT_NODE,
-    "destination_run_index":3,
+    "destination_run_index": 3,
     "destination_port": "in_file",
 }
 SEPERATE_TO_DWIGRADCHECK = {
     "source": MRCONVERT_NODE,
-    "source_run_index":3,
+    "source_run_index": 3,
     "source_port": "out_file",
     "destination": DWIGRADCHECK_NODE,
     "destination_port": "in_file",
 }
 FMAP_TO_DWIFSLPREPROC = {
     "source": MRCONVERT_NODE,
-    "source_run_index":2,
+    "source_run_index": 2,
     "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "se_epi",
@@ -148,16 +148,18 @@ BVEC_TO_DWIFSLPREPROC = {
     "source_port": "grad_fsl_bvec",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "fslgrad",
+    "index": 0,
 }
 BVAL_TO_DWIFSLPREPROC = {
     "source": DWIGRADCHECK_NODE,
     "source_port": "grad_fsl_bval",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "fslgrad",
+    "index": 1,
 }
 DWI_TO_DWIFSLPREPROC = {
     "source": MRCONVERT_NODE,
-    "source_run_index":3,
+    "source_run_index": 3,
     "source_port": "out_file",
     "destination": DWIFSLPREPROC_NODE,
     "destination_port": "scan",
@@ -198,6 +200,6 @@ DWI_PREPROCESSING_PIPELINE = {
         DWI_TO_DWIFSLPREPROC,
         PREPROCESSED_TO_BIAS_CORRECT,
         BIAS_CORRECT_TO_TENSOR,
-        TENSOR_TO_METRICS
+        TENSOR_TO_METRICS,
     ],
 }
