@@ -13,6 +13,7 @@ References
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django_mri.models.data_directory import DataDirectory
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 
@@ -23,7 +24,8 @@ SCAN_LINK_HTML = html = '<a href="{url}">{text}</a>'
 
 class ScanAdmin(admin.ModelAdmin):
     """
-    Adds the :class:`~django_mri.models.scan.Scan` to the admin interface.
+    Adds the :class:`~django_mri.models.scan.Scan` class to the admin
+    interface.
     """
 
     #: Fields displayed on the change list page of the admin.
@@ -36,7 +38,7 @@ class ScanAdmin(admin.ModelAdmin):
     )
 
     #: List ordering in the Django admin views.
-    ordering = ("session", "time", "number")
+    ordering = "session", "time", "number"
 
 
 class ScanInline(admin.TabularInline):
@@ -83,7 +85,9 @@ class ScanInline(admin.TabularInline):
         """
 
         try:
-            return " x ".join([f"{number:.2g}" for number in scan.spatial_resolution])
+            return " x ".join(
+                [f"{number:.2g}" for number in scan.spatial_resolution]
+            )
         except TypeError:
             return ""
 
@@ -109,7 +113,7 @@ class ScanInline(admin.TabularInline):
 
 class SessionAdmin(admin.ModelAdmin):
     """
-    Adds the :class:`~django_mri.models.session.Session` to the admin
+    Adds the :class:`~django_mri.models.session.Session` model to the admin
     interface.
     """
 
@@ -131,5 +135,15 @@ class SessionAdmin(admin.ModelAdmin):
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
 
 
+class DataDirectoryAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.data_directory.DataDirectory` model to
+    the admin interface.
+    """
+
+    list_display = "id", "title", "description", "created", "modified"
+
+
 admin.site.register(Scan, ScanAdmin)
 admin.site.register(Session, SessionAdmin)
+admin.site.register(DataDirectory, DataDirectoryAdmin)
