@@ -1,9 +1,9 @@
 bokeh~=2.0
 bs4~=0.0
-Django==3.*
-djangorestframework~=3.11
-django-extensions~=2.2
-django-filter~=2.2
+Django~=3.1
+djangorestframework~=3.12
+django-extensions~=3.0
+django-filter~=2.4
 nibabel~=3.1
 nipype~=1.5
 numpy~=1.19

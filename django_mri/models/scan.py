@@ -8,16 +8,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.utils import IntegrityError
-from psycopg2.errors import UniqueViolation
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
-from django_mri.models.managers.scan import ScanManager
+from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.models.session import Session
 from django_mri.utils.utils import (
     get_subject_model,
     get_group_model,
@@ -25,8 +22,6 @@ from django_mri.utils.utils import (
 )
 from django_mri.utils.bids import Bids
 from pathlib import Path
-from datetime import datetime
-import pytz
 
 
 class Scan(TimeStampedModel):
@@ -149,7 +144,7 @@ class Scan(TimeStampedModel):
         "django_mri.Session", on_delete=models.CASCADE,
     )
 
-    objects = ScanManager()
+    objects = ScanQuerySet.as_manager()
 
     class Meta:
         verbose_name_plural = "MRI Scans"
