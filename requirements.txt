@@ -2,6 +2,7 @@ bokeh~=2.0
 bs4~=0.0
 Django~=3.1
 djangorestframework~=3.12
+django-celery-results~=1.2
 django-extensions~=3.0
 django-filter~=2.4
 nibabel~=3.1
