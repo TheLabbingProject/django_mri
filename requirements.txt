@@ -1,5 +1,7 @@
 bokeh~=2.0
 bs4~=0.0
+celery~=5.0
+dicom_parser==0.1.4
 Django~=3.1
 djangorestframework~=3.12
 django-extensions~=3.0
@@ -10,6 +12,6 @@ numpy~=1.19
 tqdm~=4.40
 niwidgets~=0.2
 scikit-learn~=0.22
+git+https://github.com/celery/django-celery-results.git@master#egg=django-celery-results
 git+https://github.com/TheLabbingProject/django_analyses.git@master#egg=django_analyses
 git+https://github.com/TheLabbingProject/django_dicom.git@master#egg=django_dicom
-git+https://github.com/ZviBaratz/dicom_parser.git@master#egg=dicom_parser

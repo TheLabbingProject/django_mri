@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "rest_framework",
+    "django_celery_results",
     "django_mri",
     "django_dicom",
     "django_analyses",
