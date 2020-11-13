@@ -22,7 +22,7 @@ class SessionFilter(filters.FilterSet):
             ("exact", "Exact"),
         ],
     )
-    session_time = filters.DateTimeFromToRangeFilter("time")
+    session_date = filters.DateTimeFromToRangeFilter("time__date")
     subject_id_in = NumberInFilter(field_name="subject__id", lookup_expr="in")
     scan_set = NumberInFilter(field_name="scan_set", method="in")
 
@@ -34,5 +34,5 @@ class SessionFilter(filters.FilterSet):
             "comments",
             "time",
             "scan_set",
-            "session_time",
+            "session_date",
         )
