@@ -12,7 +12,7 @@ class SessionViewSet(DefaultsMixin, viewsets.ModelViewSet):
     """
 
     pagination_class = StandardResultsSetPagination
-    queryset = Session.objects.order_by("-time__date", "time__time")
+    queryset = Session.objects.order_by("-time__date", "-time__time")
     serializer_class = SessionSerializer
     filter_class = SessionFilter
     search_fields = ("id", "subject", "comments", "time", "scan_set")
