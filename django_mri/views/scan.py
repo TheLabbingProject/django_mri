@@ -28,7 +28,7 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     """
 
     pagination_class = StandardResultsSetPagination
-    queryset = Scan.objects.order_by("-time__date", "-time__time")
+    queryset = Scan.objects.order_by("-time__date", "time__time")
     serializer_class = ScanSerializer
     filter_class = ScanFilter
     search_fields = (
