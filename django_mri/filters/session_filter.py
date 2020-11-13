@@ -1,5 +1,5 @@
 """
-Definition of the :class:`~django_mri.filters.session_filter.SessionFilter` class.
+Definition of the :class:`SessionFilter` class.
 """
 
 from django_filters import rest_framework as filters
@@ -28,4 +28,11 @@ class SessionFilter(filters.FilterSet):
 
     class Meta:
         model = Session
-        fields = ("id", "subject", "comments", "time", "scan_set")
+        fields = (
+            "id",
+            "subject",
+            "comments",
+            "time",
+            "scan_set",
+            "session_time",
+        )

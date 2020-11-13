@@ -16,4 +16,11 @@ class SessionViewSet(DefaultsMixin, viewsets.ModelViewSet):
     serializer_class = SessionSerializer
     filter_class = SessionFilter
     search_fields = ("id", "subject", "comments", "time", "scan_set")
-    ordering_fields = ("id", "subject", "comments", "time", "scan_set")
+    ordering_fields = (
+        "id",
+        "subject",
+        "comments",
+        "time__date",
+        "time__time",
+        "scan_set",
+    )

@@ -1,11 +1,21 @@
 """
 Definition of the :class:`SessionSerializer` class.
 """
-
-from django_mri.serializers.scan import ScanSerializer
 from django_mri.models.session import Session
 from django_mri.utils.utils import get_subject_model
 from rest_framework import serializers
+
+Subject = get_subject_model()
+
+
+class MiniSubjectSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Minified serializer class for the :class:`Subject` model.
+    """
+
+    class Meta:
+        model = Subject
+        fields = "id", "id_number", "first_name", "last_name"
 
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
@@ -17,12 +27,8 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    url = serializers.HyperlinkedIdentityField(view_name="mri:session-detail")
-    subject = serializers.HyperlinkedRelatedField(
-        view_name="research:subject-detail",
-        queryset=get_subject_model().objects.all(),
-    )
+    subject = MiniSubjectSerializer()
 
     class Meta:
         model = Session
-        fields = "id", "url", "subject", "comments", "time"
+        fields = "id", "subject", "comments", "time"
