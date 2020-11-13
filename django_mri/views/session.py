@@ -19,8 +19,6 @@ class SessionViewSet(DefaultsMixin, viewsets.ModelViewSet):
     ordering_fields = (
         "id",
         "subject",
-        "comments",
         "time__date",
         "time__time",
-        "scan_set",
     )
