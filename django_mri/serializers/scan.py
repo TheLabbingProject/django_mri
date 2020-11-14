@@ -7,7 +7,8 @@ from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 from django_mri.serializers.sequence_type import SequenceTypeSerializer
-from django_mri.utils.utils import get_subject_model, get_group_model
+from django_mri.serializers.utils import MiniSubjectSerializer
+from django_mri.utils.utils import get_group_model
 from rest_framework import serializers
 
 
@@ -20,16 +21,12 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    url = serializers.HyperlinkedIdentityField(view_name="mri:scan-detail")
-    dicom = serializers.HyperlinkedRelatedField(
-        view_name="dicom:series-detail", queryset=Series.objects.all()
+    dicom = serializers.PrimaryKeyRelatedField(queryset=Series.objects.all())
+    session = serializers.PrimaryKeyRelatedField(
+        queryset=Session.objects.all(), required=True,
     )
-    session = serializers.HyperlinkedRelatedField(
-        view_name="mri:session-detail", queryset=Session.objects.all(), required=True,
-    )
-    nifti = serializers.HyperlinkedRelatedField(
+    nifti = serializers.PrimaryKeyRelatedField(
         source="_nifti",
-        view_name="mri:nifti-detail",
         queryset=NIfTI.objects.all(),
         required=False,
         allow_null=True,
@@ -43,12 +40,12 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     sequence_type = SequenceTypeSerializer(
         source="infer_sequence_type_from_dicom", read_only=True
     )
+    subject = MiniSubjectSerializer(source="session.subject")
 
     class Meta:
         model = Scan
         fields = (
             "id",
-            "url",
             "dicom",
             "session",
             "nifti",
@@ -63,6 +60,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
             "spatial_resolution",
             "comments",
             "sequence_type",
+            "subject",
         )
 
     def create(self, data: dict):

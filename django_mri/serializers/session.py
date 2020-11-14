@@ -2,20 +2,8 @@
 Definition of the :class:`SessionSerializer` class.
 """
 from django_mri.models.session import Session
-from django_mri.utils.utils import get_subject_model
+from django_mri.serializers.utils import MiniSubjectSerializer
 from rest_framework import serializers
-
-Subject = get_subject_model()
-
-
-class MiniSubjectSerializer(serializers.HyperlinkedModelSerializer):
-    """
-    Minified serializer class for the :class:`Subject` model.
-    """
-
-    class Meta:
-        model = Subject
-        fields = "id", "id_number", "first_name", "last_name"
 
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
