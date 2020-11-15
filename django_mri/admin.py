@@ -123,6 +123,7 @@ class SessionAdmin(admin.ModelAdmin):
     #: Fields displayed on the change list page of the admin.
     list_display = (
         "id",
+        "measurement",
         "subject",
         "time",
         "comments",
