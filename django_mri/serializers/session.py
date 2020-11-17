@@ -2,7 +2,10 @@
 Definition of the :class:`SessionSerializer` class.
 """
 from django_mri.models.session import Session
-from django_mri.serializers.utils import MiniSubjectSerializer
+from django_mri.serializers.utils import (
+    MiniMeasurementSerializer,
+    MiniSubjectSerializer,
+)
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -16,11 +19,12 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
+    measurement = MiniMeasurementSerializer()
     subject = MiniSubjectSerializer()
 
     class Meta:
         model = Session
-        fields = "id", "subject", "comments", "time"
+        fields = "id", "subject", "comments", "time", "measurement"
 
     def patch(self, request, pk) -> Response:
         """

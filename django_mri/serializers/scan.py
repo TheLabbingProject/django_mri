@@ -12,6 +12,9 @@ from django_mri.utils.utils import get_group_model
 from rest_framework import serializers
 
 
+Group = get_group_model()
+
+
 class ScanSerializer(serializers.HyperlinkedModelSerializer):
     """
     Serializer class for the :class:`~django_mri.models.scan.Scan` model.
@@ -21,9 +24,11 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    dicom = serializers.PrimaryKeyRelatedField(queryset=Series.objects.all())
+    dicom = serializers.PrimaryKeyRelatedField(
+        queryset=Series.objects.all(), allow_null=True
+    )
     session = serializers.PrimaryKeyRelatedField(
-        queryset=Session.objects.all(), required=True,
+        queryset=Session.objects.all(), allow_null=False,
     )
     nifti = serializers.PrimaryKeyRelatedField(
         source="_nifti",
@@ -31,11 +36,8 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
         required=False,
         allow_null=True,
     )
-    study_groups = serializers.HyperlinkedRelatedField(
-        view_name="research:group-detail",
-        queryset=get_group_model().objects.all(),
-        many=True,
-        required=False,
+    study_groups = serializers.PrimaryKeyRelatedField(
+        queryset=Group.objects.all(), many=True, allow_null=True,
     )
     sequence_type = SequenceTypeSerializer(
         source="infer_sequence_type_from_dicom", read_only=True
