@@ -1,16 +1,19 @@
 """
-Definition of the :class:`SessionSerializer` class.
+Definition of the :class:`SessionReadSerializer` class.
 """
 from django_mri.models.session import Session
 from django_mri.serializers.utils import (
     MiniMeasurementSerializer,
     MiniSubjectSerializer,
 )
+from django_mri.utils import get_measurement_model, get_subject_model
 from rest_framework import serializers
-from rest_framework.response import Response
+
+Measurement = get_measurement_model()
+Subject = get_subject_model()
 
 
-class SessionSerializer(serializers.HyperlinkedModelSerializer):
+class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     """
     Serializer class for the :class:`~django_mri.models.session.Session` model.
 
@@ -26,28 +29,23 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
         model = Session
         fields = "id", "subject", "comments", "time", "measurement"
 
-    def patch(self, request, pk) -> Response:
-        """
-        Handles "PATCH" requests.
 
-        Parameters
-        ----------
-        request : Request
-            HTTP request object
-        pk : int
-            Session primary key
+class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Serializer class for the :class:`~django_mri.models.session.Session` model.
 
-        Returns
-        -------
-        Response
-            HTTP response with updated instance or error message
-        """
+    References
+    ----------
+    * https://www.django-rest-framework.org/api-guide/serializers/
+    """
 
-        instance = Session.objects.get(id=pk)
-        serializer = SessionSerializer(
-            instance=instance, data=request.data, partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(code=201, data=serializer.data)
-        return Response(code=400, data=f"Failed to patch session #{pk}")
+    measurement = serializers.PrimaryKeyRelatedField(
+        queryset=Measurement.objects.all()
+    )
+    subject = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.all()
+    )
+
+    class Meta:
+        model = Session
+        fields = "id", "subject", "comments", "time", "measurement"

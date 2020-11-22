@@ -15,4 +15,5 @@ from django_mri.serializers.sequence_type import SequenceTypeSerializer
 from django_mri.serializers.sequence_type_definition import (
     SequenceTypeDefinitionSerializer,
 )
-from django_mri.serializers.session import SessionSerializer
+from django_mri.serializers.session import SessionReadSerializer
+from django_mri.serializers.session import SessionWriteSerializer
