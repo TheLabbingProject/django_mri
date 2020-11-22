@@ -59,7 +59,7 @@ class ScanInputModelTestCase(TestCase):
         expected = {
             "id": self.input.id,
             "key": self.definition.key,
-            "value": self.scan_serializer.data["url"],
+            "value": self.scan_serializer.data["id"],
             "run": Run.objects.last().id,
             "definition": self.definition.id,
         }

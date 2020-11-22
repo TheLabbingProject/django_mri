@@ -47,6 +47,8 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     )
     ordering_fields = (
         "id",
+        "time__date",
+        "time__time",
         "description",
         "number",
         "created",
@@ -142,7 +144,8 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             series = Series.objects.get(id=series_id)
         except ObjectDoesNotExist:
             return Response(
-                "Invalid DICOM primary key!", status=status.HTTP_400_BAD_REQUEST,
+                "Invalid DICOM primary key!",
+                status=status.HTTP_400_BAD_REQUEST,
             )
         try:
             scan = Scan.objects.get(dicom=series)
