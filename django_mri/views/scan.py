@@ -3,7 +3,7 @@ from bokeh.embed import server_session
 from django.db.models.query import QuerySet
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan
@@ -16,6 +16,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.request import Request
 from django.conf import settings
+import pandas as pd
+import os
 
 
 HOST_NAME = getattr(settings, "APP_IP", "localhost")
@@ -142,7 +144,8 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             series = Series.objects.get(id=series_id)
         except ObjectDoesNotExist:
             return Response(
-                "Invalid DICOM primary key!", status=status.HTTP_400_BAD_REQUEST,
+                "Invalid DICOM primary key!",
+                status=status.HTTP_400_BAD_REQUEST,
             )
         try:
             scan = Scan.objects.get(dicom=series)
@@ -170,3 +173,42 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             html = server_session(session_id=session.id, url=BOKEH_URL)
             script = fix_bokeh_script(html, destination_id=destination_id)
         return HttpResponse(script, content_type="text/javascript")
+
+    @action(detail=False, methods=["POST"])
+    def get_csv(self, request: Request) -> Response:
+        pks = request.data["pks"]
+        filename = "filtered_scans.csv"
+        scans = Scan.objects.filter(dicom__id__in=pks)
+        dict_scans = []
+        for scan in scans:
+            dict_scans.append(
+                {
+                    "ID": scan.id,
+                    "RepetitionTime": scan.repetition_time,
+                    "InversionTime": scan.inversion_time,
+                    "PixelSpacing": scan.dicom.pixel_spacing,
+                    "SliceThickness": scan.dicom.slice_thickness,
+                    "SeriesDescription": scan.dicom.description,
+                    "SequenceName": scan.dicom.image_set.first().header.instance.get(
+                        "SequenceName"
+                    ),
+                    "InternalPulseSequenceName": scan.dicom.image_set.first().header.instance.get(
+                        "InternalPulseSequenceName"
+                    ),
+                    "StudyTime": scan.session.time.time(),
+                    "StudyDate": scan.session.time.date(),
+                    "Manufacturer": scan.dicom.manufacturer,
+                    "ScanningSequence": scan.dicom.scanning_sequence,
+                    "SequenceVariant": scan.dicom.sequence_variant,
+                }
+            )
+        pd.DataFrame.from_records(dict_scans).to_csv(
+            filename, encoding="utf-8-sig", index=False
+        )
+        return FileResponse(open(filename, "rb"), as_attachment=True)
+
+    @action(detail=False, methods=["GET"])
+    def delete_tmp_csv(self, request: Request, pk: int = None):
+        os.unlink("filtered_scans.csv")
+        return HttpResponse({"Message": "tmp file deleted."})
+
