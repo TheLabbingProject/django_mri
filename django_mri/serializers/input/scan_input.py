@@ -16,11 +16,9 @@ class ScanInputSerializer(serializers.ModelSerializer):
     model.
     """
 
-    #: Hyperlink to the actual :class:`django_mri.models.scan.Scan` instance
+    #: Primary key of the actual :class:`django_mri.models.scan.Scan` instance
     #: that was used.
-    value = serializers.HyperlinkedRelatedField(
-        view_name="mri:scan-detail", queryset=Scan.objects.all()
-    )
+    value = serializers.PrimaryKeyRelatedField(queryset=Scan.objects.all())
 
     class Meta:
         model = ScanInput

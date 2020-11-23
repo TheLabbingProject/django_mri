@@ -49,6 +49,8 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     )
     ordering_fields = (
         "id",
+        "time__date",
+        "time__time",
         "description",
         "number",
         "created",
