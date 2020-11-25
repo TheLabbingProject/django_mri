@@ -28,6 +28,9 @@ DEFAULT_STUDY_GROUP_MODEL = "research.Group"
 #: Default identifier for a measurement model sessions should be related to.
 DEFAULT_MEASUREMENT_MODEL = "research.MeasurementDefinition"
 
+#: Default value for an MRI data share root directory
+DATA_SHARE_ROOT_DEFAULT = "/mnt/"
+
 
 def get_subject_model():
     """
@@ -136,3 +139,8 @@ def get_session_by_series(series):
                     time=session_time, subject=subject
                 )
         return session
+
+
+def get_data_share_root() -> Path:
+    path = getattr(settings, "DATA_SHARE_ROOT", DATA_SHARE_ROOT_DEFAULT)
+    return Path(path)

@@ -44,7 +44,9 @@ class ScanFilter(filters.FilterSet):
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
     dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
-    sequence_type = NumberInFilter(method=filter_by_sequence_type)
+    sequence_type = NumberInFilter(
+        method=filter_by_sequence_type, label="Sequence Type is in"
+    )
 
     class Meta:
         model = Scan

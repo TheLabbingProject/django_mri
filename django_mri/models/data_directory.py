@@ -5,6 +5,7 @@ from django.db import models
 from django.urls import reverse
 from django_extensions.db.models import TitleDescriptionModel, TimeStampedModel
 from django_mri.models.scan import Scan
+from django_mri.utils.utils import get_data_share_root
 from pathlib import Path
 
 
@@ -14,7 +15,9 @@ class DataDirectory(TitleDescriptionModel, TimeStampedModel):
     data.
     """
 
-    path = models.FilePathField(allow_files=False, allow_folders=True)
+    path = models.FilePathField(
+        path=get_data_share_root, allow_files=False, allow_folders=True
+    )
     known_subdirectories = models.JSONField(default=list)
 
     class Meta:
