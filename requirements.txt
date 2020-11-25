@@ -3,6 +3,7 @@ bs4~=0.0
 celery~=5.0
 dicom_parser==0.1.4
 Django~=3.1
+django-celery-beat~=2.1
 djangorestframework~=3.12
 django-extensions~=3.0
 django-filter~=2.4
