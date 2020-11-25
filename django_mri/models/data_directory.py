@@ -18,7 +18,7 @@ class DataDirectory(TitleDescriptionModel, TimeStampedModel):
     path = models.FilePathField(
         path=get_data_share_root, allow_files=False, allow_folders=True
     )
-    known_subdirectories = models.JSONField(default=list)
+    known_subdirectories = models.JSONField(default=list, blank=True)
 
     class Meta:
         verbose_name_plural = "Data Directories"
