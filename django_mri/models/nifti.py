@@ -153,10 +153,8 @@ class NIfTI(TimeStampedModel):
             doesn't exist
         """
 
-        base_name = Path(self.path).name.split(".")[0]
-        json_file = (Path(self.path).parent / base_name).with_suffix(".json")
-        if json_file.is_file():
-            with open(json_file, "r") as f:
+        if self.json_file.is_file():
+            with open(self.json_file, "r") as f:
                 return json.load(f)
         return {}
 
@@ -258,6 +256,19 @@ class NIfTI(TimeStampedModel):
             self.path = str(uncompressed_path)
             self.save()
         return Path(self.path)
+
+    @property
+    def json_file(self) -> Path:
+        """
+        Return path to the corresponding json file.
+        Returns
+        -------
+        Path
+            Corresponding json file
+        """
+
+        base_name = Path(self.path).name.split(".")[0]
+        return (Path(self.path).parent / base_name).with_suffix(".json")
 
     @property
     def json_data(self) -> dict:

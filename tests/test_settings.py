@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "rest_framework",
+    "django_celery_results",
     "django_mri",
     "django_dicom",
     "django_analyses",
@@ -94,6 +95,7 @@ ROOT_URLCONF = "tests.urls"
 
 SUBJECT_MODEL = "tests.Subject"
 STUDY_GROUP_MODEL = "tests.Group"
+MEASUREMENT_MODEL = "tests.MeasurementDefinition"
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

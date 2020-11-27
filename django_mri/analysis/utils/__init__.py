@@ -7,3 +7,4 @@ from django_mri.analysis.utils.get_latest_analysis_version import (
 )
 from django_mri.analysis.utils.get_mni import get_mni
 from django_mri.analysis.utils.load_mri_analyses import load_mri_analyses
+from django_mri.analysis.utils.get_fsl_dir import get_fsl_dir, get_template_fa

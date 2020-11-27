@@ -1,14 +1,19 @@
 """
-Definition of the :class:`~django_mri.serializers.session.SessionSerializer` class.
+Definition of the :class:`SessionReadSerializer` class.
 """
-
-from django_mri.serializers.scan import ScanSerializer
 from django_mri.models.session import Session
-from django_mri.utils.utils import get_subject_model, get_group_model
+from django_mri.serializers.utils import (
+    MiniMeasurementSerializer,
+    MiniSubjectSerializer,
+)
+from django_mri.utils import get_measurement_model, get_subject_model
 from rest_framework import serializers
 
+Measurement = get_measurement_model()
+Subject = get_subject_model()
 
-class SessionSerializer(serializers.HyperlinkedModelSerializer):
+
+class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     """
     Serializer class for the :class:`~django_mri.models.session.Session` model.
 
@@ -17,12 +22,30 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    url = serializers.HyperlinkedIdentityField(view_name="mri:session-detail")
-    subject = serializers.HyperlinkedRelatedField(
-        view_name="research:subject-detail", queryset=get_subject_model().objects.all(),
-    )
-    scan_set = ScanSerializer(many=True)
+    measurement = MiniMeasurementSerializer()
+    subject = MiniSubjectSerializer()
 
     class Meta:
         model = Session
-        fields = ("url", "subject", "comments", "time", "scan_set")
+        fields = "id", "subject", "comments", "time", "measurement"
+
+
+class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Serializer class for the :class:`~django_mri.models.session.Session` model.
+
+    References
+    ----------
+    * https://www.django-rest-framework.org/api-guide/serializers/
+    """
+
+    measurement = serializers.PrimaryKeyRelatedField(
+        queryset=Measurement.objects.all()
+    )
+    subject = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.all()
+    )
+
+    class Meta:
+        model = Session
+        fields = "id", "subject", "comments", "time", "measurement"

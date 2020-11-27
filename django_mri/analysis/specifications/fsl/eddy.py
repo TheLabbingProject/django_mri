@@ -13,12 +13,8 @@ from django_analyses.models.input.definitions import (
 )
 
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 
 #: *eddy* input specification dictionary.
@@ -206,10 +202,7 @@ EDDY_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "description": "Detect and replace outlier slices.",
     },
-    "residuals": {
-        "type": BooleanInputDefinition,
-        "description": "Output Residuals.",
-    },
+    "residuals": {"type": BooleanInputDefinition, "description": "Output Residuals.",},
     "session": {
         "type": StringInputDefinition,
         "description": "File containing session indices for all volumes in –imain.",  # noqa: E501

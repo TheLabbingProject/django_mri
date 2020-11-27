@@ -20,12 +20,8 @@ from django_analyses.models.input.definitions.directory_input_definition import 
 from django_analyses.models.output.definitions.file_output_definition import (
     FileOutputDefinition,
 )
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 #: *fsl_anat* input specification dictionary.
 FSL_ANAT_INPUT_SPECIFICATION = {

@@ -5,7 +5,9 @@ from .managers import SubjectQuerySet
 
 
 class Subject(TimeStampedModel):
-    id_number = CharNullField(max_length=64, unique=True, blank=True, null=True)
+    id_number = CharNullField(
+        max_length=64, unique=True, blank=True, null=True
+    )
     first_name = models.CharField(max_length=64, blank=True, null=True)
     last_name = models.CharField(max_length=64, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -16,4 +18,8 @@ class Subject(TimeStampedModel):
 
 
 class Group(TitleDescriptionModel, TimeStampedModel):
+    pass
+
+
+class MeasurementDefinition(TitleDescriptionModel):
     pass

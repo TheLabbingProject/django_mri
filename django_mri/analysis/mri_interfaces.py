@@ -16,12 +16,20 @@ References
 """
 
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
+from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
+from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
+from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
+from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
+from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import (
     Segmentation as Cat12Segmentation,
 )
 from django_mri.analysis.interfaces.fsl.fast import FastWrapper
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.fsl.topup import TopupWrapper
+from django_mri.analysis.interfaces.yalab.mutual_information_score import (
+    MutualInformationScore,
+)
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -41,7 +49,9 @@ from nipype.interfaces.mrtrix3 import (
     DWIDenoise,
     MRDeGibbs,
     DWIBiasCorrect,
-    MRConvert,
+    ConstrainedSphericalDeconvolution,
+    ResponseSD,
+    Generate5tt,
 )
 
 
@@ -68,6 +78,16 @@ interfaces = {
     "denoise": {DWIDenoise().version: DWIDenoise},
     "degibbs": {MRDeGibbs().version: MRDeGibbs},
     "bias_correct": {DWIBiasCorrect().version: DWIBiasCorrect},
-    "dwipreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
-    "mrconvert": {MRConvert().version: MRConvert},
+    "dwifslpreproc": {DwiFslPreproc.__version__: DwiFslPreproc},
+    "mrconvert": {MRConvert.__version__: MRConvert},
+    "dwi2fod": {
+        ConstrainedSphericalDeconvolution().version: ConstrainedSphericalDeconvolution  # noqa: E501
+    },
+    "dwi2response": {ResponseSD().version: ResponseSD},
+    "5ttgen": {Generate5tt().version: Generate5tt},
+    "dwi2tensor": {Dwi2Tensor.__version__: Dwi2Tensor},
+    "tensor2metric": {Tensor2metric.__version__: Tensor2metric},
+    "mrcat": {MRCat.__version__: MRCat},
+    "dwigradcheck": {DwiGradCheck.__version__: DwiGradCheck},
+    "Mutual Information Score": {"1.0": MutualInformationScore},
 }

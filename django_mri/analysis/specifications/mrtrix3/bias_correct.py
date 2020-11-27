@@ -20,6 +20,7 @@ from django_analyses.models.input.definitions import (
     IntegerInputDefinition,
     StringInputDefinition,
     BooleanInputDefinition,
+    FileInputDefinition,
 )
 from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
@@ -28,11 +29,10 @@ from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 #: *DWIBiasCorrect* input specification dictionary.
 BIAS_CORRECT_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Input DWI image.",
         "is_configuration": False,
-        "value_attribute": "mif.__str__",
     },
     "use_ants": {
         "type": BooleanInputDefinition,
@@ -47,12 +47,6 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "is_output_path": True,
         "description": "The output noise map.",
         "default": "bias.mif",
-    },
-    "bval_scale": {
-        "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
-        "choices": ["yes", "no"],
-        "default": "yes",
     },
     "grad_file": {
         "type": StringInputDefinition,
@@ -71,9 +65,9 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "description": "Bvecs file in FSL format.",
     },
     "in_mask": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "description": "Mask image.",
-        "value_attribute": "mif.__str__",
+        "db_value_preprocessing": "path",
     },
     "nthreads": {
         "type": IntegerInputDefinition,
@@ -83,16 +77,13 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "is_output_path": True,
         "description": "The output denoised DWI image.",
-        "default": "bias_corrected.nii.gz",
+        "default": "bias_corrected.mif",
     },
 }
 
 #: *DWIBiasCorrect* output specification dictionary.
 BIAS_CORRECT_OUTPUT_SPECIFICATION = {
-    "bias": {
-        "type": FileOutputDefinition,
-        "description": "The output bias field.",
-    },
+    "bias": {"type": FileOutputDefinition, "description": "The output bias field.",},
     "out_file": {
         "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",

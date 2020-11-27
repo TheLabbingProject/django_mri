@@ -46,9 +46,7 @@ class LoggedOutScanViewTestCase(TestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(
-            subject=cls.subject, time=session_time
-        )
+        session = Session.objects.create(subject=cls.subject, time=session_time)
         cls.test_instance = Scan.objects.create(dicom=series, session=session)
 
     def test_scan_list_unautherized(self):
@@ -95,9 +93,7 @@ class LoggedInScanViewTestCase(APITestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(
-            subject=cls.subject, time=session_time
-        )
+        session = Session.objects.create(subject=cls.subject, time=session_time)
         cls.test_scan = Scan.objects.create(dicom=series, session=session)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
@@ -188,9 +184,7 @@ class LoggedOutNIfTIViewTestCase(TestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(
-            subject=cls.subject, time=session_time
-        )
+        session = Session.objects.create(subject=cls.subject, time=session_time)
         scan = Scan.objects.create(dicom=series, session=session)
         cls.test_nifti = scan.nifti
 
@@ -226,9 +220,7 @@ class LoggedInNIfTIViewTestCase(APITestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(
-            subject=cls.subject, time=session_time
-        )
+        session = Session.objects.create(subject=cls.subject, time=session_time)
         scan = Scan.objects.create(dicom=series, session=session)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True

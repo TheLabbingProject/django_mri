@@ -2,12 +2,14 @@
 General app utilites.
 """
 
+import datetime
 import pytz
+
 from django.apps import apps
 from django.db.models import ObjectDoesNotExist
 from django.conf import settings
 from pathlib import Path
-from datetime import datetime
+
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.
@@ -22,6 +24,12 @@ DEFAULT_SUBJECT_MODEL = "research.Subject"
 
 #: Default identifier for a study group model scans should be related to.
 DEFAULT_STUDY_GROUP_MODEL = "research.Group"
+
+#: Default identifier for a measurement model sessions should be related to.
+DEFAULT_MEASUREMENT_MODEL = "research.MeasurementDefinition"
+
+#: Default value for an MRI data share root directory
+DATA_SHARE_ROOT_DEFAULT = "/mnt/"
 
 
 def get_subject_model():
@@ -52,6 +60,21 @@ def get_group_model():
         settings, "STUDY_GROUP_MODEL", DEFAULT_STUDY_GROUP_MODEL
     )
     return apps.get_model(study_group_model, require_ready=False)
+
+
+def get_measurement_model():
+    """
+    Returns the measurement model MRI sessions should be related to.
+
+    Returns
+    -------
+    django.db.models.Model
+        Measurement model
+    """
+    measurement_model = getattr(
+        settings, "MEASUREMENT_MODEL", DEFAULT_MEASUREMENT_MODEL
+    )
+    return apps.get_model(measurement_model, require_ready=False)
 
 
 def get_mri_root() -> Path:
@@ -96,11 +119,11 @@ def get_session_by_series(series):
         header = image.header.instance
         study_date, study_time = (
             header.get("StudyDate"),
-            header.get("StudyTime"),
+            header.get("StudyTime", datetime.time()),
         )
-        session_time = datetime.combine(study_date, study_time).replace(
-            tzinfo=pytz.UTC
-        )
+        session_time = datetime.datetime.combine(
+            study_date, study_time
+        ).replace(tzinfo=pytz.UTC)
         try:
             subject = Subject.objects.get(id_number=series.patient.uid)
         # If the subject doesn't exist in the database, create a new session
@@ -116,3 +139,8 @@ def get_session_by_series(series):
                     time=session_time, subject=subject
                 )
         return session
+
+
+def get_data_share_root() -> Path:
+    path = getattr(settings, "DATA_SHARE_ROOT", DATA_SHARE_ROOT_DEFAULT)
+    return Path(path)

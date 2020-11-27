@@ -10,9 +10,7 @@ from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
 )
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
 
 
 #: *fslmerge* input specification dictionary.
