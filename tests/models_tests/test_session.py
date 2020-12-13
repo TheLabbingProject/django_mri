@@ -1,4 +1,6 @@
-import factory, pytz
+import factory
+import pytz
+
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
@@ -8,7 +10,6 @@ from tests.fixtures import (
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
-from tests.models import Subject, Group
 from datetime import datetime
 
 
@@ -25,7 +26,9 @@ class SessionModelTestCase(TestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(subject=cls.subject, time=session_time)
+        session = Session.objects.create(
+            subject=cls.subject, time=session_time
+        )
         cls.scan = Scan.objects.create(dicom=cls.series, session=session)
 
     def setUp(self):
