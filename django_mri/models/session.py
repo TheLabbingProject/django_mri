@@ -1,3 +1,7 @@
+"""
+Definition of the :class:`Session` class.
+"""
+
 from django.db import models
 from django.db.models import QuerySet
 from django_extensions.db.models import TimeStampedModel
@@ -45,6 +49,11 @@ class Session(TimeStampedModel):
 
     #: The date and time in which this scanning sequence began.
     time = models.DateTimeField()
+
+    #: Associated IRB approval.
+    irb = models.ForeignKey(
+        "django_mri.IrbApproval", on_delete=models.SET_NULL, null=True
+    )
 
     objects = SessionQuerySet.as_manager()
 
