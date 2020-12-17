@@ -1,7 +1,7 @@
 bokeh~=2.0
 bs4~=0.0
 celery~=5.0
-dicom_parser==0.1.4
+dicom_parser==0.1.5
 Django~=3.1
 djangorestframework~=3.12
 django-extensions~=3.0
