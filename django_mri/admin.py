@@ -14,6 +14,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_mri.models.data_directory import DataDirectory
+from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 
@@ -126,6 +127,7 @@ class SessionAdmin(admin.ModelAdmin):
         "measurement",
         "subject",
         "time",
+        "irb",
         "comments",
     )
 
@@ -145,6 +147,16 @@ class DataDirectoryAdmin(admin.ModelAdmin):
     list_display = "id", "title", "description", "created", "modified"
 
 
+class IrbApprovalAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.irb_approval.IrbApproval` model to
+    the admin interface.
+    """
+
+    list_display = "id", "institution", "number", "document"
+
+
 admin.site.register(Scan, ScanAdmin)
 admin.site.register(Session, SessionAdmin)
 admin.site.register(DataDirectory, DataDirectoryAdmin)
+admin.site.register(IrbApproval, IrbApprovalAdmin)

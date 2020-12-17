@@ -31,6 +31,7 @@ router.register(
     r"sequence_type_definition", views.SequenceTypeDefinitionViewSet
 )
 router.register(r"session", views.SessionViewSet)
+router.register(r"irb_approval", views.IrbApprovalViewSet)
 
 
 urlpatterns = [

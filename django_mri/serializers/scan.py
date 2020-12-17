@@ -1,5 +1,5 @@
 """
-Definition of the :class:`~django_mri.serializers.scan.ScanSerializer` class.
+Definition of the :class:`ScanSerializer` class.
 """
 
 from django_dicom.models import Series

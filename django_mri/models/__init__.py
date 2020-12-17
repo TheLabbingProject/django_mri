@@ -6,6 +6,7 @@ Definition of the app's models_.
 """
 
 from django_mri.models.data_directory import DataDirectory
+from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.scan import Scan
 from django_mri.models.nifti import NIfTI
 from django_mri.models.session import Session
@@ -21,3 +22,6 @@ from django_mri.models.outputs.nifti_output import NiftiOutput
 from django_mri.models.outputs.nifti_output_definition import (
     NiftiOutputDefinition,
 )
+
+
+# flake8: noqa: F401

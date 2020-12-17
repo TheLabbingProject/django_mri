@@ -29,4 +29,3 @@ class SessionViewSet(
         "time__date",
         "time__time",
     )
-

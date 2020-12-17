@@ -1,5 +1,7 @@
-import factory, pytz
+import factory
+import pytz
 
+from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
@@ -11,9 +13,8 @@ from tests.fixtures import (
     SIEMENS_DWI_SERIES,
     SIEMENS_DWI_SERIES_PATH,
 )
-from tests.utils import load_common_sequences
 from tests.models import Subject
-from datetime import datetime
+from tests.utils import load_common_sequences
 
 
 class ScanModelTestCase(TestCase):
@@ -210,7 +211,9 @@ class ScanModelTestCase(TestCase):
         result = str(self.scan)
         self.assertEqual(result, expected)
 
-    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(self,):
+    def test_update_fields_from_dicom_with_no_dicom_raises_attribute_error(
+        self,
+    ):
         self.scan.dicom = None
         with self.assertRaises(AttributeError):
             self.scan.update_fields_from_dicom()
