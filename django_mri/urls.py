@@ -55,9 +55,4 @@ urlpatterns = [
         views.ScanViewSet.as_view({"post": "get_csv"}),
         name="get_csv",
     ),
-    path(
-        "mri/scan/delete_tmp_csv/",
-        views.ScanViewSet.as_view({"get": "delete_tmp_csv"}),
-        name="delete_tmp_csv",
-    ),
 ]

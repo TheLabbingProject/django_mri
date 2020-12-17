@@ -181,36 +181,28 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         pks = request.data["pks"]
         filename = "filtered_scans.csv"
         scans = Scan.objects.filter(dicom__id__in=pks)
-        dict_scans = []
-        for scan in scans:
-            dict_scans.append(
-                {
-                    "ID": scan.id,
-                    "RepetitionTime": scan.repetition_time,
-                    "InversionTime": scan.inversion_time,
-                    "PixelSpacing": scan.dicom.pixel_spacing,
-                    "SliceThickness": scan.dicom.slice_thickness,
-                    "SeriesDescription": scan.dicom.description,
-                    "SequenceName": scan.dicom.image_set.first().header.instance.get(
-                        "SequenceName"
-                    ),
-                    "InternalPulseSequenceName": scan.dicom.image_set.first().header.instance.get(
-                        "InternalPulseSequenceName"
-                    ),
-                    "StudyTime": scan.session.time.time(),
-                    "StudyDate": scan.session.time.date(),
-                    "Manufacturer": scan.dicom.manufacturer,
-                    "ScanningSequence": scan.dicom.scanning_sequence,
-                    "SequenceVariant": scan.dicom.sequence_variant,
-                }
-            )
-        pd.DataFrame.from_records(dict_scans).to_csv(
-            filename, encoding="utf-8-sig", index=False
-        )
-        return FileResponse(open(filename, "rb"), as_attachment=True)
-
-    @action(detail=False, methods=["GET"])
-    def delete_tmp_csv(self, request: Request, pk: int = None):
-        os.unlink("filtered_scans.csv")
-        return HttpResponse({"Message": "tmp file deleted."})
-
+        fields = {
+            "ID": "id",
+            "EchoTime": "echo_time",
+            "RepetitionTime": "repetition_time",
+            "InversionTime": "inversion_time",
+            "PixelSpacing": "dicom__pixel_spacing",
+            "SliceThickness": "dicom__slice_thickness",
+            "StudyDescription": "dicom__study__description",
+            "SequenceName": "dicom__sequence_name",
+            "PulseSequenceName": "dicom__pulse_sequence_name",
+            "StudyTime": "session__time",
+            "StudyDate": "session__time",
+            "Manufacturer": "dicom__manufacturer",
+            "ScanningSequence": "dicom__scanning_sequence",
+            "SequenceVariant": "dicom__sequence_variant",
+        }
+        columns = dict(enumerate(fields.keys()))
+        scans = scans.values_list(*list(fields.values()))
+        output = pd.DataFrame.from_records(scans).rename(columns=columns)
+        output["StudyTime"] = output["StudyTime"].apply(lambda x: x.time())
+        output["StudyDate"] = output["StudyDate"].apply(lambda x: x.date())
+        output.to_csv(filename, encoding="utf-8-sig", index=False)
+        response = FileResponse(open(filename, "rb"), as_attachment=True)
+        os.unlink(filename)
+        return response
