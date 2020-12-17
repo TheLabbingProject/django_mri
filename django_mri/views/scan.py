@@ -3,7 +3,7 @@ from bokeh.embed import server_session
 from django.db.models.query import QuerySet
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan
@@ -16,6 +16,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.request import Request
 from django.conf import settings
+import pandas as pd
+import os
 
 
 HOST_NAME = getattr(settings, "APP_IP", "localhost")
@@ -173,3 +175,34 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             html = server_session(session_id=session.id, url=BOKEH_URL)
             script = fix_bokeh_script(html, destination_id=destination_id)
         return HttpResponse(script, content_type="text/javascript")
+
+    @action(detail=False, methods=["POST"])
+    def get_csv(self, request: Request) -> Response:
+        pks = request.data["pks"]
+        filename = "filtered_scans.csv"
+        scans = Scan.objects.filter(dicom__id__in=pks)
+        fields = {
+            "ID": "id",
+            "EchoTime": "echo_time",
+            "RepetitionTime": "repetition_time",
+            "InversionTime": "inversion_time",
+            "PixelSpacing": "dicom__pixel_spacing",
+            "SliceThickness": "dicom__slice_thickness",
+            "StudyDescription": "dicom__study__description",
+            "SequenceName": "dicom__sequence_name",
+            "PulseSequenceName": "dicom__pulse_sequence_name",
+            "StudyTime": "session__time",
+            "StudyDate": "session__time",
+            "Manufacturer": "dicom__manufacturer",
+            "ScanningSequence": "dicom__scanning_sequence",
+            "SequenceVariant": "dicom__sequence_variant",
+        }
+        columns = dict(enumerate(fields.keys()))
+        scans = scans.values_list(*list(fields.values()))
+        output = pd.DataFrame.from_records(scans).rename(columns=columns)
+        output["StudyTime"] = output["StudyTime"].apply(lambda x: x.time())
+        output["StudyDate"] = output["StudyDate"].apply(lambda x: x.date())
+        output.to_csv(filename, encoding="utf-8-sig", index=False)
+        response = FileResponse(open(filename, "rb"), as_attachment=True)
+        os.unlink(filename)
+        return response
