@@ -27,7 +27,9 @@ router = routers.DefaultRouter()
 router.register(r"scan", views.ScanViewSet)
 router.register(r"nifti", views.NiftiViewSet)
 router.register(r"sequence_type", views.SequenceTypeViewSet)
-router.register(r"sequence_type_definition", views.SequenceTypeDefinitionViewSet)
+router.register(
+    r"sequence_type_definition", views.SequenceTypeDefinitionViewSet
+)
 router.register(r"session", views.SessionViewSet)
 
 
@@ -47,5 +49,10 @@ urlpatterns = [
         "mri/scan/plot/<int:scan_id>/",
         views.ScanViewSet.as_view({"get": "plot"}),
         name="plot",
+    ),
+    path(
+        "mri/scan/get_csv/",
+        views.ScanViewSet.as_view({"post": "get_csv"}),
+        name="get_csv",
     ),
 ]
