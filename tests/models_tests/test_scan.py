@@ -46,10 +46,10 @@ class ScanModelTestCase(TestCase):
         self.assertTupleEqual(Scan._meta.unique_together, expected)
 
     def test_ordering(self):
-        self.assertListEqual(Scan._meta.ordering, [])
+        self.assertTupleEqual(Scan._meta.ordering, ("-time",))
 
     def test_verbose_name_plural(self):
-        self.assertTrue(Scan._meta.verbose_name_plural, "MRI Scans")
+        self.assertTrue(Scan._meta.verbose_name_plural, "Scans")
 
     ##########
     # Fields #
