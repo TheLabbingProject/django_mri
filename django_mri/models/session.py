@@ -57,6 +57,9 @@ class Session(TimeStampedModel):
 
     objects = SessionQuerySet.as_manager()
 
+    class Meta:
+        ordering = ("-time",)
+
     @property
     def study_groups(self) -> QuerySet:
         """
