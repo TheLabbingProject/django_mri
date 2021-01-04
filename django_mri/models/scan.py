@@ -1,5 +1,5 @@
 """
-Definition of the :class:`~django_mri.models.scan.Scan` model.
+Definition of the :class:`Scan` model.
 """
 
 import warnings
@@ -8,6 +8,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
+from django_analyses.models.pipeline.node import Node
+from django_analyses.models.run import Run
+from django_analyses.tasks import execute_node
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
@@ -16,7 +19,6 @@ from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.utils import (
-    get_subject_model,
     get_group_model,
     get_mri_root,
 )
@@ -147,8 +149,9 @@ class Scan(TimeStampedModel):
     objects = ScanQuerySet.as_manager()
 
     class Meta:
-        verbose_name_plural = "MRI Scans"
+        verbose_name_plural = "Scans"
         unique_together = ("number", "session")
+        ordering = ("-time",)
 
     def __str__(self) -> str:
         """
@@ -175,8 +178,6 @@ class Scan(TimeStampedModel):
         .. _overriding model methods:
            https://docs.djangoproject.com/en/3.0/topics/db/models/#overriding-model-methods
         """
-
-        Subject = get_subject_model()
 
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
@@ -423,6 +424,33 @@ class Scan(TimeStampedModel):
         """
 
         return get_mri_root() / "mif" / f"{self.id}.mif"
+
+    def get_existing_recon_all(self, configuration: dict = None) -> list:
+        if self._nifti:
+            configuration = configuration or {}
+            runs = Run.objects.filter(
+                analysis_version__analysis__title="ReconAll"
+            )
+            return [
+                run
+                for run in runs
+                if self.nifti.path in run.input_configuration.get("T1_files")
+            ]
+        return []
+
+    def run_recon_all(self, configuration: dict = None):
+        mprage = SequenceType.objects.filter(title="MPRAGE").first()
+        if mprage and self.sequence_type == mprage:
+            configuration = configuration or {}
+            recon_all_node, _ = Node.objects.get_or_create(
+                analysis_version__analysis__title="ReconAll",
+                configuration=configuration,
+            )
+            inputs = {"T1_files": [str(self.nifti.path)]}
+            return execute_node.delay(node_id=recon_all_node.id, inputs=inputs)
+        raise TypeError(
+            "ReconAll is currently only available for MPRAGE type scans."
+        )
 
     @property
     def mif(self) -> Path:
