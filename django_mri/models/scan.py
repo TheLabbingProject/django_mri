@@ -149,7 +149,6 @@ class Scan(TimeStampedModel):
     objects = ScanQuerySet.as_manager()
 
     class Meta:
-        verbose_name_plural = "Scans"
         unique_together = ("number", "session")
         ordering = ("-time",)
 
