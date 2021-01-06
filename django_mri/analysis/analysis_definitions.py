@@ -400,6 +400,7 @@ analysis_definitions = [
                 "input": RECON_ALL_INPUT_SPECIFICATION,
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
+                "max_parallel": 10,
             }
         ],
     },
