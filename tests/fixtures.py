@@ -1,7 +1,7 @@
 import os
-import pytz
-
 from datetime import datetime
+
+import pytz
 
 # Find the path for the base tests directory
 TESTS_DIR = os.path.dirname(os.path.realpath(__file__))

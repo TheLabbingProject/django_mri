@@ -1,4 +1,4 @@
-from django_extensions.db.models import TitleDescriptionModel, TimeStampedModel
+from django_extensions.db.models import TimeStampedModel, TitleDescriptionModel
 from django_mri.models.managers.sequence_type import SequenceTypeManager
 
 

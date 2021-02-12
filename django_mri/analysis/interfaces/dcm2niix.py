@@ -6,10 +6,9 @@ class.
 import re
 import subprocess
 import warnings
-
-from django_mri.analysis.interfaces import messages
 from pathlib import Path
 
+from django_mri.analysis.interfaces import messages
 
 #: Project's base directory.
 BASE_DIR = Path(__file__).absolute().parent.parent.parent

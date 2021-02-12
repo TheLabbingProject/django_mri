@@ -1,9 +1,9 @@
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
-
 from django_mri.analysis.utils import get_mni
 from skimage.exposure import match_histograms
-from typing import Tuple
 
 
 class IntensityCorrection:

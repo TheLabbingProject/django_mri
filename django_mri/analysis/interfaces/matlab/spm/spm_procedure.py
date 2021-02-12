@@ -5,11 +5,10 @@ class.
 """
 
 import shutil
-
-from django_mri.analysis.interfaces.matlab.spm.utils.batch_templates import (
-    TEMPLATES,
-)
 from pathlib import Path
+
+from django_mri.analysis.interfaces.matlab.spm.utils.batch_templates import \
+    TEMPLATES
 
 
 class SPMProcedure:

@@ -3,6 +3,7 @@ Definition of the :class:`Scan` model.
 """
 
 import warnings
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -18,12 +19,8 @@ from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.utils.utils import (
-    get_group_model,
-    get_mri_root,
-)
 from django_mri.utils.bids import Bids
-from pathlib import Path
+from django_mri.utils.utils import get_group_model, get_mri_root
 
 
 class Scan(TimeStampedModel):
@@ -162,7 +159,8 @@ class Scan(TimeStampedModel):
             String representation of this instance
         """
 
-        return self.description
+        formatted_time = self.time.strftime("%Y-%m-%d %H:%M:%S")
+        return f"{self.description} from {formatted_time}"
 
     def save(self, *args, **kwargs) -> None:
         """
@@ -506,3 +504,26 @@ class Scan(TimeStampedModel):
             self._nifti = self.dicom_to_nifti()
             self.save()
         return self._nifti
+
+    @property
+    def subject_age(self) -> float:
+        """
+        Returns the subject's age in years at the time of the scan. If the
+        subject's date of birth or the scan's acquisition time are not
+        available, returns `None`.
+
+        Returns
+        -------
+        float
+            Subject age in years at the time of the scan's acquisition
+        """
+
+        conditions = (
+            self.time
+            and self.session
+            and self.session.subject
+            and self.session.subject.date_of_birth
+        )
+        if conditions:
+            delta = self.time.date() - self.session.subject.date_of_birth
+            return delta.total_seconds() / (60 * 60 * 24 * 365)

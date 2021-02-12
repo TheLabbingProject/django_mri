@@ -11,4 +11,5 @@ See Also
    http://www.neuro.uni-jena.de/cat12/CAT12-Manual.pdf
 """
 
-from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import Segmentation
+from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import \
+    Segmentation

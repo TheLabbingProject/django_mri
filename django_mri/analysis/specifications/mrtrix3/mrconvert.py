@@ -15,15 +15,15 @@ For more information, see MRtrix3's `mrconvert reference`_.
    https://nipype.readthedocs.io/en/1.5.0/api/generated/nipype.interfaces.mrtrix3.utils.html#mrconvert
 """
 
-from django_analyses.models.input.definitions import (
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-    FileInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *MRConvert* input specification dictionary.
 MRCONVERT_INPUT_SPECIFICATION = {

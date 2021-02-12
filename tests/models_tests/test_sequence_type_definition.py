@@ -2,9 +2,8 @@ from django.test import TestCase
 from django_mri.models.choices import ScanningSequence, SequenceVariant
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.serializers.sequence_type_definition import (
-    SequenceTypeDefinitionSerializer,
-)
+from django_mri.serializers.sequence_type_definition import \
+    SequenceTypeDefinitionSerializer
 from tests.utils import load_common_sequences
 
 

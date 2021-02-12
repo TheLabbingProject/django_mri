@@ -5,7 +5,6 @@ Definition of the :func:`~django_mri.utils.compression.compress` and
 
 import gzip
 import shutil
-
 from pathlib import Path
 
 

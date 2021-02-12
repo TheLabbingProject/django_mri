@@ -14,17 +14,13 @@ For more information, see MRtrix3's `dwi2response reference`_.
 .. _nipype.interfaces.mrtrix3.preprocess.ConstrainedSphericalDeconvolution:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.preprocess.html#responsesd
 """
-from django_analyses.models.input.definitions import (
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-
 
 DWI2RESPONSE_INPUT_SPECIFICATION = {
     "algorithm": {

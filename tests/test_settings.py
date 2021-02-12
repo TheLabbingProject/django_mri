@@ -1,6 +1,6 @@
-import environ
 import os
 
+import environ
 
 env = environ.Env(
     DB_NAME=(str, "django_mri"),

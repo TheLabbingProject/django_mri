@@ -2,32 +2,25 @@
 Definition of the :class:`LongitudinalSegmentation` class.
 """
 
-from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.defaults import (  # noqa: E501
-    LONGITUDINAL_SEGMENTATION_DEFAULTS,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.outputs import (  # noqa: E501
-    LONGITUDINAL_SEGMENTATION_OUTPUT,
-    AUXILIARY_OUTPUT,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.utils import (  # noqa: E501
-    verbosify_output_dict,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.transformations import (  # noqa: E501
-    LONGITUDINAL_SEGMENTATION_TRANSFORMATIONS,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.utils.template_files import (  # noqa: E501
-    RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION,
-    RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION,
-)
-from django_mri.analysis.interfaces.matlab.spm.spm_procedure import (
-    SPMProcedure,
-)
-from django_mri.analysis.interfaces.matlab.spm.utils.nifti_validator import (
-    NiftiValidator,
-)
-from django_mri.utils.compression import uncompress
 from pathlib import Path
 from typing import List, Tuple
+
+from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.defaults import \
+    LONGITUDINAL_SEGMENTATION_DEFAULTS  # noqa: E501
+from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.outputs import (  # noqa: E501
+    AUXILIARY_OUTPUT, LONGITUDINAL_SEGMENTATION_OUTPUT)
+from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.transformations import \
+    LONGITUDINAL_SEGMENTATION_TRANSFORMATIONS  # noqa: E501
+from django_mri.analysis.interfaces.matlab.spm.cat12.longitudinal_segmentation.utils import \
+    verbosify_output_dict  # noqa: E501
+from django_mri.analysis.interfaces.matlab.spm.cat12.utils.template_files import (  # noqa: E501
+    RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION,
+    RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION)
+from django_mri.analysis.interfaces.matlab.spm.spm_procedure import \
+    SPMProcedure
+from django_mri.analysis.interfaces.matlab.spm.utils.nifti_validator import \
+    NiftiValidator
+from django_mri.utils.compression import uncompress
 
 
 class LongitudinalSegmentation(SPMProcedure):

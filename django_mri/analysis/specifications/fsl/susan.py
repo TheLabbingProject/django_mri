@@ -6,15 +6,14 @@ Input and output specification dictionaries for FSL's SUSAN_ script.
 """
 
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    StringInputDefinition,
-)
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
-
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FloatInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      StringInputDefinition)
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *SUSAN* input specification dictionary.
 SUSAN_INPUT_SPECIFICATION = {

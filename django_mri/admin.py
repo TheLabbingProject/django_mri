@@ -18,7 +18,6 @@ from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 
-
 SCAN_VIEW_NAME = "admin:django_mri_scan_change"
 SCAN_LINK_HTML = html = '<a href="{url}">{text}</a>'
 

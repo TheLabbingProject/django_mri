@@ -1,10 +1,10 @@
+from pathlib import Path
+
 import pydicom
 from django.db import models
-
 from django_dicom.models import Image
 from django_mri.models.common_sequences import sequences
 from django_mri.models.sequence_type import SequenceType
-from pathlib import Path
 
 
 def restore_image_path(id: str, old_path: Path) -> None:

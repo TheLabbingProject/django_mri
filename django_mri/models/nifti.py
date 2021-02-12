@@ -1,16 +1,16 @@
 """
-Definition of the :class:`~django_mri.models.nifti.NIfTI` model.
+Definition of the :class:`NIfTI` model.
 """
+
+import json
+from pathlib import Path
+from typing import List
 
 import nibabel as nib
 import numpy as np
-import json
-
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django_mri.utils.compression import compress, uncompress
-from pathlib import Path
-from typing import List
 
 
 class NIfTI(TimeStampedModel):
@@ -47,7 +47,7 @@ class NIfTI(TimeStampedModel):
             Pixel data.
         """
 
-        return nib.load(str(self.path)).get_data()
+        return nib.load(str(self.path)).get_fdata()
 
     def get_b_value(self) -> List[int]:
         """

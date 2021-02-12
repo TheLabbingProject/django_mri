@@ -9,9 +9,10 @@ interface, wrapping FSL's fslreorient2std_.
 """
 
 from django_analyses.models.input.definitions import StringInputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
-
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *Reorient2Std* input specification dictionary.
 REORIENT2STD_INPUT_SPECIFICATION = {

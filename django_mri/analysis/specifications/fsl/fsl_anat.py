@@ -5,23 +5,20 @@ Input and output specification dictionaries for FSL's fsl_anat_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fsl_anat
 """
 
-from django_analyses.models.input.definitions.boolean_input_definition import (
-    BooleanInputDefinition,
-)
-from django_analyses.models.input.definitions.float_input_definition import (
-    FloatInputDefinition,
-)
-from django_analyses.models.input.definitions.string_input_definition import (
-    StringInputDefinition,
-)
-from django_analyses.models.input.definitions.directory_input_definition import (  # noqa: E501
-    DirectoryInputDefinition,
-)
-from django_analyses.models.output.definitions.file_output_definition import (
-    FileOutputDefinition,
-)
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_analyses.models.input.definitions.boolean_input_definition import \
+    BooleanInputDefinition
+from django_analyses.models.input.definitions.directory_input_definition import \
+    DirectoryInputDefinition  # noqa: E501
+from django_analyses.models.input.definitions.float_input_definition import \
+    FloatInputDefinition
+from django_analyses.models.input.definitions.string_input_definition import \
+    StringInputDefinition
+from django_analyses.models.output.definitions.file_output_definition import \
+    FileOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *fsl_anat* input specification dictionary.
 FSL_ANAT_INPUT_SPECIFICATION = {

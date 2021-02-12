@@ -2,9 +2,9 @@
 Definition of the :func:`get_mni` utility function.
 """
 
-from django_mri.models.nifti import NIfTI
 from pathlib import Path
 
+from django_mri.models.nifti import NIfTI
 
 MNI_TEMPLATE_PATH = (
     Path(__file__).parent.parent.parent

@@ -11,7 +11,6 @@ from django_mri.serializers.utils import MiniSubjectSerializer
 from django_mri.utils.utils import get_group_model
 from rest_framework import serializers
 
-
 Group = get_group_model()
 
 

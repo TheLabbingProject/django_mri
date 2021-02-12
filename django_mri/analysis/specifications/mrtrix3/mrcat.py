@@ -10,15 +10,15 @@ For more information, see MRtrix3's `mrcat reference`_.
    https://mrtrix.readthedocs.io/en/latest/reference/commands/mrcat.html
 """
 
-from django_analyses.models.input.definitions import (
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-    FileInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *MRCat* input specification dictionary.
 MRCAT_INPUT_SPECIFICATION = {

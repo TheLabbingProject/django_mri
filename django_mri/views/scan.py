@@ -1,9 +1,13 @@
+import os
+
+import pandas as pd
 from bokeh.client import pull_session
 from bokeh.embed import server_session
-from django.db.models.query import QuerySet
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse, FileResponse
+from django.db.models.query import QuerySet
+from django.http import FileResponse, HttpResponse
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan
@@ -13,12 +17,8 @@ from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import fix_bokeh_script
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.request import Request
-from django.conf import settings
-import pandas as pd
-import os
-
+from rest_framework.response import Response
 
 HOST_NAME = getattr(settings, "APP_IP", "localhost")
 BOKEH_URL = f"http://{HOST_NAME}:5006/series_viewer"

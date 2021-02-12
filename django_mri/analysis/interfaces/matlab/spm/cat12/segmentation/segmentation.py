@@ -4,32 +4,25 @@ Definition of the
 class.
 """
 
-from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.defaults import (  # noqa: E501
-    SEGMENTATION_DEFAULTS,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.outputs import (  # noqa: E501
-    SEGMENTATION_OUTPUT,
-    AUXILIARY_OUTPUT,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.utils import (  # noqa: E501
-    verbosify_output_dict,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.utils.template_files import (  # noqa: E501
-    RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION,
-    RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION,
-)
-from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.transformations import (  # noqa: E501
-    SEGMENTATION_TRANSFORMATIONS,
-)
-from django_mri.analysis.interfaces.matlab.spm.spm_procedure import (
-    SPMProcedure,
-)
-from django_mri.analysis.interfaces.matlab.spm.utils.nifti_validator import (
-    NiftiValidator,
-)
-from django_mri.utils.compression import uncompress
 from pathlib import Path
 from typing import Tuple
+
+from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.defaults import \
+    SEGMENTATION_DEFAULTS  # noqa: E501
+from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.outputs import (  # noqa: E501
+    AUXILIARY_OUTPUT, SEGMENTATION_OUTPUT)
+from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.transformations import \
+    SEGMENTATION_TRANSFORMATIONS  # noqa: E501
+from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation.utils import \
+    verbosify_output_dict  # noqa: E501
+from django_mri.analysis.interfaces.matlab.spm.cat12.utils.template_files import (  # noqa: E501
+    RELATIVE_SHOOTING_TISSUE_PROBABILITY_MAP_LOCATION,
+    RELATIVE_TISSUE_PROBABILITY_MAP_LOCATION)
+from django_mri.analysis.interfaces.matlab.spm.spm_procedure import \
+    SPMProcedure
+from django_mri.analysis.interfaces.matlab.spm.utils.nifti_validator import \
+    NiftiValidator
+from django_mri.utils.compression import uncompress
 
 
 class Segmentation(SPMProcedure):

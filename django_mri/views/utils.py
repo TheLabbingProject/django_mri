@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 
-
 DEFAULT_DESTINATION_ID = "bk-app"
 
 

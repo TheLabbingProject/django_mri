@@ -14,15 +14,12 @@ For more information, see MRtrix3's `dwi2fod reference`_.
 .. _nipype.interfaces.mrtrix3.preprocess.ConstrainedSphericalDeconvolution:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.reconst.html#constrainedsphericaldeconvolution
 """
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 DWI2FOD_INPUT_SPECIFICATION = {
     "algorithm": {

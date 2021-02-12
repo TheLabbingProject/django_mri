@@ -16,17 +16,13 @@ Guide`_
    https://nipype.readthedocs.io/en/1.1.7/interfaces/generated/interfaces.fsl/epi.html#applytopup
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
-from django_mri.models.inputs.nifti_input_definition import (
-    NiftiInputDefinition,
-)
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *applytopup* input specification.
 APPLY_TOPUP_INPUT_SPECIFICATION = {

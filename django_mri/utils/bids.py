@@ -5,13 +5,13 @@ Definition of the :class:`~django_mri.utils.bids.Bids` class.
 import glob
 import json
 import os
-import pandas as pd
 import shutil
-
 from datetime import date
-from django_mri.utils import messages
 from enum import Enum
 from pathlib import Path
+
+import pandas as pd
+from django_mri.utils import messages
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"

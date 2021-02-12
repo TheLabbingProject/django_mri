@@ -3,13 +3,12 @@ General app utilites.
 """
 
 import datetime
-import pytz
-
-from django.apps import apps
-from django.db.models import ObjectDoesNotExist
-from django.conf import settings
 from pathlib import Path
 
+import pytz
+from django.apps import apps
+from django.conf import settings
+from django.db.models import ObjectDoesNotExist
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.

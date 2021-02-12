@@ -2,11 +2,14 @@
 Definition of the :class:`ScanQuerySet` class.
 """
 
+from itertools import chain
+from pathlib import Path
+from typing import Iterable, Union
+
 from django.db.models import Q, QuerySet
 from django_dicom.models.image import Image as DicomImage
-from django_mri.utils.scan_type import ScanType
 from django_mri.models.sequence_type import SequenceType
-from pathlib import Path
+from django_mri.utils.scan_type import ScanType
 
 
 class ScanQuerySet(QuerySet):
@@ -47,15 +50,18 @@ class ScanQuerySet(QuerySet):
         return scans
 
     def import_path(
-        self, path: Path, progressbar: bool = True, report: bool = True
+        self,
+        path: Union[Path, Iterable[Path]],
+        progressbar: bool = True,
+        report: bool = True,
     ) -> dict:
         """
         Import MRI data from the given path.
 
         Parameters
         ----------
-        path : Path
-            Path to import *.dcm* files from
+        path : Union[Path, Iterable[Path]]
+            Path or paths to import *.dcm* files from
         progressbar : bool, optional
             Whether to print a progressbar or not, by default True
         report : bool, optional
@@ -67,7 +73,17 @@ class ScanQuerySet(QuerySet):
             Created database instances by MRI scan type
         """
 
-        dicom_scans = self.import_dicom_data(path, progressbar, report)
+        if isinstance(path, (Path, str)):
+            dicom_scans = self.import_dicom_data(path, progressbar, report)
+        else:
+            dicom_scans = list(
+                chain(
+                    *[
+                        self.import_dicom_data(p, progressbar, report)
+                        for p in path
+                    ]
+                )
+            )
         return {ScanType.DICOM.value: dicom_scans}
 
     def filter_by_sequence_type(self, title: str) -> QuerySet:
