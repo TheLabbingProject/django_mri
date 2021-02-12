@@ -204,7 +204,9 @@ class ScanModelTestCase(TestCase):
     ###########
 
     def test_string(self):
-        expected = SIEMENS_DWI_SERIES["description"]
+        time = self.scan.time.strftime("%Y-%m-%d %H:%M:%S")
+        description = self.scan.description
+        expected = f"{description} from {time}"
         result = str(self.scan)
         self.assertEqual(result, expected)
 
