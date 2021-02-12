@@ -1,7 +1,9 @@
-from django_analyses.models.output.definitions.output_definition import OutputDefinition
+from pathlib import Path
+
+from django_analyses.models.output.definitions.output_definition import \
+    OutputDefinition
 from django_mri.models.nifti import NIfTI
 from django_mri.models.outputs.nifti_output import NiftiOutput
-from pathlib import Path
 
 
 class NiftiOutputDefinition(OutputDefinition):

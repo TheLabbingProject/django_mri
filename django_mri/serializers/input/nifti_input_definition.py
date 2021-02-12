@@ -4,7 +4,8 @@ Definition of the
 class.
 """
 
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
 from rest_framework import serializers
 
 

@@ -6,17 +6,13 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 """
 
 from django.conf import settings
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FileInputDefinition,
-    DirectoryInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
-
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      DirectoryInputDefinition,
+                                                      FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
-
 
 #: *recon_all* input specification.
 RECON_ALL_INPUT_SPECIFICATION = {
@@ -63,11 +59,13 @@ RECON_ALL_INPUT_SPECIFICATION = {
         "element_type": "FIL",
         "required": False,
         "description": "A list of T1 files to be processed, in either DICOM or NIfTI format.",  # noqa: E501
+        "is_configuration": False,
     },
     "T2_file": {
         "type": FileInputDefinition,
         "required": False,
         "description": "Path to T2 image to be used for improved pial surface estimation (can be either a DICOM, MGH or NIFTI file)",  # noqa: E501
+        "is_configuration": False,
     },
     "use_T2": {
         "type": BooleanInputDefinition,

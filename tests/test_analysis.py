@@ -1,11 +1,7 @@
 from django.test import TestCase
-from django_analyses.models import (
-    Analysis,
-    Pipeline,
-)
+from django_analyses.models import Analysis, Pipeline
 from django_mri.analysis.analysis_definitions import analysis_definitions
 from django_mri.models.nifti import NIfTI
-
 
 CREATION_FAILURE_MESSAGE = (
     "Failed to create MRI {models} with the following exception:\n{exception}"
@@ -26,7 +22,8 @@ class AnalysesTestCase(TestCase):
     def test_pipline_creation(self):
         NIfTI.objects.create(path=FAKE_MNI)
         Analysis.objects.from_list(analysis_definitions)
-        from django_mri.analysis.pipeline_definitions import pipeline_definitions
+        from django_mri.analysis.pipeline_definitions import \
+            pipeline_definitions
 
         try:
             pipelines = Pipeline.objects.from_list(pipeline_definitions)

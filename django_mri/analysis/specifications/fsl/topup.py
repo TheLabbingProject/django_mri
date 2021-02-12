@@ -5,23 +5,20 @@ Input and output specification dictionaries for FSL's topup_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/topup/TopupUsersGuide
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
-
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
-)
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
-from pathlib import Path
 import os
+from pathlib import Path
 
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      FloatInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
+from django_analyses.models.output.definitions import (FileOutputDefinition,
+                                                       ListOutputDefinition)
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 try:
     FSLDIR = os.environ["FSLDIR"]

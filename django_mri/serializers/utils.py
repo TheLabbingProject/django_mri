@@ -1,6 +1,5 @@
-from django_mri.utils.utils import get_subject_model, get_measurement_model
+from django_mri.utils.utils import get_measurement_model, get_subject_model
 from rest_framework import serializers
-
 
 Measurement = get_measurement_model()
 Subject = get_subject_model()

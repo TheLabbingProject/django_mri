@@ -1,8 +1,10 @@
-from django.test import TestCase
-from django.conf import settings
-from .models import Subject, Group
-import django_mri.utils.utils as utils
 from pathlib import Path
+
+import django_mri.utils.utils as utils
+from django.conf import settings
+from django.test import TestCase
+
+from .models import Group, Subject
 
 
 class UtilsTestCase(TestCase):

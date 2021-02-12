@@ -15,14 +15,11 @@ For more information, see MRtrix3's `tensor2metric reference`_.
 .. _nipype.interfaces.mrtrix3.utils.TensorMetrics:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.utils.html#tensormetrics
 """
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
-
 
 TENSOR2METRICS_INPUT_SPECIFICATION = {
     "in_file": {

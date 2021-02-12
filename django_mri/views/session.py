@@ -1,12 +1,10 @@
+from django_mri.filters.session_filter import SessionFilter
 from django_mri.models.session import Session
-from django_mri.serializers import (
-    SessionReadSerializer,
-    SessionWriteSerializer,
-)
+from django_mri.serializers import (SessionReadSerializer,
+                                    SessionWriteSerializer)
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import ReadWriteSerializerMixin
-from django_mri.filters.session_filter import SessionFilter
 from rest_framework import viewsets
 
 

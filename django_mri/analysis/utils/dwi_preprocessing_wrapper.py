@@ -1,9 +1,8 @@
-from django_mri.models.scan import Scan
-from django_mri.analysis.pipelines.dwi_preprocessing import (
-    DWI_PREPROCESSING_PIPELINE,
-)
 from django_analyses.models.pipeline import Pipeline
 from django_analyses.pipeline_runner import PipelineRunner
+from django_mri.analysis.pipelines.dwi_preprocessing import \
+    DWI_PREPROCESSING_PIPELINE
+from django_mri.models.scan import Scan
 
 # from django_analyses.tasks import execute_pipeline
 

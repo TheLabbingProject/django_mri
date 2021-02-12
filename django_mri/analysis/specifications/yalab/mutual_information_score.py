@@ -1,7 +1,5 @@
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition)
 from django_analyses.models.output.definitions import FloatOutputDefinition
 
 MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION = {

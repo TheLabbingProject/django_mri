@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
-from .views import SubjectViewSet, GroupViewSet
 
+from .views import GroupViewSet, SubjectViewSet
 
 router = routers.DefaultRouter()
 router.register(r"subject", SubjectViewSet)

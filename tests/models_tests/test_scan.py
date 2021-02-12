@@ -1,18 +1,15 @@
+from datetime import datetime
+from pathlib import Path
+
 import factory
 import pytz
-
-from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
-from django_mri.models import Scan, NIfTI, Session
+from django_mri.models import NIfTI, Scan, Session
 from django_mri.models.sequence_type import SequenceType
-from pathlib import Path
-from tests.fixtures import (
-    SIEMENS_DWI_SERIES,
-    SIEMENS_DWI_SERIES_PATH,
-)
+from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject
 from tests.utils import load_common_sequences
 

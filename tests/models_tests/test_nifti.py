@@ -1,21 +1,19 @@
-import factory, pytz
-import numpy as np
+from datetime import datetime
+from pathlib import Path
 
+import factory
+import numpy as np
+import pytz
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
-from tests.utils import load_common_sequences
-from tests.fixtures import (
-    DICOM_MPRAGE_PATH,
-    SIEMENS_DWI_SERIES,
-    SIEMENS_DWI_SERIES_PATH,
-)
+from tests.fixtures import (DICOM_MPRAGE_PATH, SIEMENS_DWI_SERIES,
+                            SIEMENS_DWI_SERIES_PATH)
 from tests.models import Subject
-from pathlib import Path
-from datetime import datetime
+from tests.utils import load_common_sequences
 
 
 class NIfTIModelTestCase(TestCase):

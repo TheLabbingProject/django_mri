@@ -1,5 +1,6 @@
-from .models import Subject
 from rest_framework import serializers
+
+from .models import Subject
 
 
 class SubjectSerializer(serializers.HyperlinkedModelSerializer):

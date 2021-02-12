@@ -4,9 +4,10 @@ Definition of the
 function.
 """
 
+from typing import Union
+
 from django_analyses.models.analysis import Analysis
 from django_analyses.models.analysis_version import AnalysisVersion
-from typing import Union
 
 _BAD_ANALYSIS_IDENTIFIER = "Analysis identifier must be either a string representing the title, the analysis ID, or an instance of the Analysis class!"  # noqa: E501
 

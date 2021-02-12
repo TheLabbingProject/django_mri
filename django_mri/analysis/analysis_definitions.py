@@ -16,163 +16,85 @@ Example
 """
 
 import nipype
-
 from django.conf import settings
 from django_mri.analysis import messages
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
-from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
-from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
+from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
+from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
-from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
+from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.specifications.freesurfer.recon_all import (
-    RECON_ALL_INPUT_SPECIFICATION,
-    RECON_ALL_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.bet import (
-    BET_INPUT_SPECIFICATION,
-    BET_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.fast import (
-    FAST_INPUT_SPECIFICATION,
-    FAST_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.flirt import (
-    FLIRT_INPUT_SPECIFICATION,
-    FLIRT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.fnirt import (
-    FNIRT_INPUT_SPECIFICATION,
-    FNIRT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.fsl_anat import (
-    FSL_ANAT_INPUT_SPECIFICATION,
-    FSL_ANAT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.reorient2std import (
-    REORIENT2STD_INPUT_SPECIFICATION,
-    REORIENT2STD_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.robustfov import (
-    ROBUSTFOV_INPUT_SPECIFICATION,
-    ROBUSTFOV_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.susan import (
-    SUSAN_INPUT_SPECIFICATION,
-    SUSAN_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.fslmerge import (
-    FSLMERGE_INPUT_SPECIFICATION,
-    FSLMERGE_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.fslroi import (
-    FSLROI_INPUT_SPECIFICATION,
-    FSLROI_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.topup import (
-    TOPUP_INPUT_SPECIFICATION,
-    TOPUP_OUTPUT_SPECIFICATION,
-)
+    RECON_ALL_INPUT_SPECIFICATION, RECON_ALL_OUTPUT_SPECIFICATION)
 from django_mri.analysis.specifications.fsl.apply_topup import (
-    APPLY_TOPUP_INPUT_SPECIFICATION,
-    APPLY_TOPUP_OUTPUT_SPECIFICATION,
-)
+    APPLY_TOPUP_INPUT_SPECIFICATION, APPLY_TOPUP_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.bet import (
+    BET_INPUT_SPECIFICATION, BET_OUTPUT_SPECIFICATION)
 from django_mri.analysis.specifications.fsl.binary_maths import (
-    BINARY_MATHS_INPUT_SPECIFICATION,
-    BINARY_MATHS_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.fsl.mean_image import (
-    MEAN_IMAGE_INPUT_SPECIFICATION,
-    MEAN_IMAGE_OUTPUT_SPECIFICATION,
-)
+    BINARY_MATHS_INPUT_SPECIFICATION, BINARY_MATHS_OUTPUT_SPECIFICATION)
 from django_mri.analysis.specifications.fsl.eddy import (
-    EDDY_INPUT_SPECIFICATION,
-    EDDY_OUTPUT_SPECIFICATION,
-)
+    EDDY_INPUT_SPECIFICATION, EDDY_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.fast import (
+    FAST_INPUT_SPECIFICATION, FAST_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.flirt import (
+    FLIRT_INPUT_SPECIFICATION, FLIRT_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.fnirt import (
+    FNIRT_INPUT_SPECIFICATION, FNIRT_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.fsl_anat import (
+    FSL_ANAT_INPUT_SPECIFICATION, FSL_ANAT_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.fslmerge import (
+    FSLMERGE_INPUT_SPECIFICATION, FSLMERGE_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.fslroi import (
+    FSLROI_INPUT_SPECIFICATION, FSLROI_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.mean_image import (
+    MEAN_IMAGE_INPUT_SPECIFICATION, MEAN_IMAGE_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.reorient2std import (
+    REORIENT2STD_INPUT_SPECIFICATION, REORIENT2STD_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.robustfov import (
+    ROBUSTFOV_INPUT_SPECIFICATION, ROBUSTFOV_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.susan import (
+    SUSAN_INPUT_SPECIFICATION, SUSAN_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.fsl.topup import (
+    TOPUP_INPUT_SPECIFICATION, TOPUP_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.bias_correct import (
+    BIAS_CORRECT_INPUT_SPECIFICATION, BIAS_CORRECT_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.compute_metrics import (
+    TENSOR2METRIC_OUTPUT_SPECIFICATION, TENSOR2METRICS_INPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.degibbs import (
+    DEGIBBS_INPUT_SPECIFICATION, DEGIBBS_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.denoise import (
+    DENOISE_INPUT_SPECIFICATION, DENOISE_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.dwifslpreproc import (
+    DWIFSLPREPROC_INPUT_SPECIFICATION, DWIFSLPREPROC_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.dwigradcheck import (
+    DWIGRADCHECK_INPUT_SPECIFICATION, DWIGRADCHECK_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.estimate_fod import (
+    DWI2FOD_INPUT_SPECIFICATION, DWI2FOD_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.estimate_response import (
+    DWI2RESPONSE_INPUT_SPECIFICATION, DWI2RESPONSE_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.estimate_tensors import (
+    DWI2TENSOR_INPUT_SPECIFICATION, DWI2TENSOR_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.generate_5tt import (
+    GENERATE_5TT_INPUT_SPECIFICATION, GENERATE_5TT_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.mrcat import (
+    MRCAT_INPUT_SPECIFICATION, MRCAT_OUTPUT_SPECIFICATION)
+from django_mri.analysis.specifications.mrtrix3.mrconvert import (
+    MRCONVERT_INPUT_SPECIFICATION, MRCONVERT_OUTPUT_SPECIFICATION)
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
-    CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.mrconvert import (
-    MRCONVERT_INPUT_SPECIFICATION,
-    MRCONVERT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.denoise import (
-    DENOISE_INPUT_SPECIFICATION,
-    DENOISE_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.degibbs import (
-    DEGIBBS_INPUT_SPECIFICATION,
-    DEGIBBS_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.bias_correct import (
-    BIAS_CORRECT_INPUT_SPECIFICATION,
-    BIAS_CORRECT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.dwifslpreproc import (
-    DWIFSLPREPROC_INPUT_SPECIFICATION,
-    DWIFSLPREPROC_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.estimate_fod import (
-    DWI2FOD_INPUT_SPECIFICATION,
-    DWI2FOD_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.estimate_response import (
-    DWI2RESPONSE_INPUT_SPECIFICATION,
-    DWI2RESPONSE_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.generate_5tt import (
-    GENERATE_5TT_INPUT_SPECIFICATION,
-    GENERATE_5TT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.estimate_tensors import (
-    DWI2TENSOR_INPUT_SPECIFICATION,
-    DWI2TENSOR_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.compute_metrics import (
-    TENSOR2METRICS_INPUT_SPECIFICATION,
-    TENSOR2METRIC_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.mrcat import (
-    MRCAT_INPUT_SPECIFICATION,
-    MRCAT_OUTPUT_SPECIFICATION,
-)
-from django_mri.analysis.specifications.mrtrix3.dwigradcheck import (
-    DWIGRADCHECK_INPUT_SPECIFICATION,
-    DWIGRADCHECK_OUTPUT_SPECIFICATION,
-)
+    CAT12_SEGMENTATION_OUTPUT_SPECIFICATION)
 from django_mri.analysis.specifications.yalab.mutual_information_score import (
     MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION,
-    MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION,
-)
+    MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION)
 from nipype.interfaces.freesurfer import ReconAll
-from nipype.interfaces.fsl import (
-    BET,
-    FAST,
-    FLIRT,
-    FNIRT,
-    SUSAN,
-    Reorient2Std,
-    RobustFOV,
-    Merge,
-    TOPUP,
-    ApplyTOPUP,
-    BinaryMaths,
-    MeanImage,
-    ExtractROI,
-    Eddy,
-)
-from nipype.interfaces.mrtrix3 import (
-    DWIDenoise,
-    DWIBiasCorrect,
-    MRDeGibbs,
-    ConstrainedSphericalDeconvolution,
-    ResponseSD,
-    Generate5tt,
-)
+from nipype.interfaces.fsl import (BET, FAST, FLIRT, FNIRT, SUSAN, TOPUP,
+                                   ApplyTOPUP, BinaryMaths, Eddy, ExtractROI,
+                                   MeanImage, Merge, Reorient2Std, RobustFOV)
 from nipype.interfaces.fsl.base import no_fsl
-
+from nipype.interfaces.mrtrix3 import (ConstrainedSphericalDeconvolution,
+                                       DWIBiasCorrect, DWIDenoise, Generate5tt,
+                                       MRDeGibbs, ResponseSD)
 
 #: Raise ImportError if FSL is not accessible.
 test_mode = getattr(settings, "TESTING_MODE", False)

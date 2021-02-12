@@ -16,15 +16,12 @@ For more information, see MRtrix3's `dwibiascorrect reference`_.
    https://nipype.readthedocs.io/en/1.4.1/api/generated/nipype.interfaces.mrtrix3.preprocess.html#dwibiascorrect
 """
 
-from django_analyses.models.input.definitions import (
-    IntegerInputDefinition,
-    StringInputDefinition,
-    BooleanInputDefinition,
-    FileInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-
 
 #: *DWIBiasCorrect* input specification dictionary.
 BIAS_CORRECT_INPUT_SPECIFICATION = {

@@ -9,7 +9,6 @@ NIfTI.DoesNotExist
 
 from django_mri.analysis.utils import get_mni
 
-
 MNI = get_mni()
 
 # Node configurations

@@ -1,20 +1,17 @@
-import factory, pytz
+from datetime import datetime
 
+import factory
+import pytz
 from django.db.models import signals
 from django.test import TestCase
-from django_mri.models import Scan, Session
 from django_dicom.models import Image, Series
+from django_mri.models import Scan, Session
 from django_mri.models.sequence_type import SequenceType
-from tests.utils import load_common_sequences
-from tests.fixtures import (
-    DICOM_MPRAGE_PATH,
-    DICOM_DWI_PATH,
-    DICOM_FLAIR_PATH,
-    DICOM_FMRI_BOLD_PATH,
-    DICOM_IREPI_PATH,
-)
+from tests.fixtures import (DICOM_DWI_PATH, DICOM_FLAIR_PATH,
+                            DICOM_FMRI_BOLD_PATH, DICOM_IREPI_PATH,
+                            DICOM_MPRAGE_PATH)
 from tests.models import Subject
-from datetime import datetime
+from tests.utils import load_common_sequences
 
 
 class BidsTestCase(TestCase):

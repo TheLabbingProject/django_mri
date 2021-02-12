@@ -9,7 +9,7 @@ References
    https://docs.djangoproject.com/en/3.0/topics/http/urls/#url-dispatcher
 """
 
-from django.urls import path, include
+from django.urls import include, path
 from django_mri import views
 from rest_framework import routers
 

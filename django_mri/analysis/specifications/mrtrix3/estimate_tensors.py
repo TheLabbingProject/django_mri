@@ -14,13 +14,11 @@ For more information, see MRtrix3's `dwi2fod reference`_.
 .. _nipype.interfaces.mrtrix3.reconst.FitTensor:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.reconst.html#fittensor
 """
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-    BooleanInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 DWI2TENSOR_INPUT_SPECIFICATION = {

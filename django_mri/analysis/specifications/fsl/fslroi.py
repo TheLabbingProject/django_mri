@@ -5,14 +5,14 @@ Input and output specification dictionaries for FSL's fslroi_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fslroi
 """
 
-from django_analyses.models.input.definitions import (
-    ListInputDefinition,
-    StringInputDefinition,
-    BooleanInputDefinition,
-    IntegerInputDefinition,
-)
-from django_mri.models.inputs.nifti_input_definition import NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import NiftiOutputDefinition
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
+from django_mri.models.inputs.nifti_input_definition import \
+    NiftiInputDefinition
+from django_mri.models.outputs.nifti_output_definition import \
+    NiftiOutputDefinition
 
 #: *fslroi* input specification dictionary.
 FSLROI_INPUT_SPECIFICATION = {

@@ -5,13 +5,12 @@ dicom_parser==0.1.5
 Django~=3.1
 django-celery-beat~=2.1
 djangorestframework~=3.12
-django-extensions~=3.0
+django-extensions~=3.1
 django-filter~=2.4
 nibabel~=3.1
 nipype~=1.5
 numpy~=1.19
 tqdm~=4.40
-niwidgets~=0.2
 scikit-learn~=0.22
 git+https://github.com/celery/django-celery-results.git@master#egg=django-celery-results
 git+https://github.com/TheLabbingProject/django_analyses.git@master#egg=django_analyses

@@ -1,6 +1,8 @@
-import factory
-import sys, pytz
+import sys
+from datetime import datetime
 
+import factory
+import pytz
 from django.contrib.auth import get_user_model
 from django.db.models import signals
 from django.test import TestCase
@@ -11,10 +13,8 @@ from django_mri.models import Scan, Session
 from rest_framework import status
 from rest_framework.test import APITestCase
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
-from tests.utils import load_common_sequences
 from tests.models import Subject
-from datetime import datetime
-
+from tests.utils import load_common_sequences
 
 User = get_user_model()
 Group = get_group_model()

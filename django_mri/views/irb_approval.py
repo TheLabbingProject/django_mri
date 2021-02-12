@@ -1,8 +1,8 @@
+from django_mri.filters.irb_approval_filter import IrbApprovalFilter
 from django_mri.models.irb_approval import IrbApproval
 from django_mri.serializers.irb_approval import IrbApprovalSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
-from django_mri.filters.irb_approval_filter import IrbApprovalFilter
 from rest_framework import viewsets
 
 
