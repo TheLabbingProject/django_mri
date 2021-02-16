@@ -23,9 +23,6 @@ from django_analyses.models.input.definitions.string_input_definition import (
 from django_analyses.models.output.definitions.file_output_definition import (
     FileOutputDefinition,
 )
-from django_mri.models.outputs.nifti_output_definition import (
-    NiftiOutputDefinition,
-)
 
 #: *fsl_anat* input specification dictionary.
 FSL_ANAT_INPUT_SPECIFICATION = {
@@ -99,19 +96,19 @@ FSL_ANAT_INPUT_SPECIFICATION = {
 #: *fsl_anat* output specification dictionary.
 FSL_ANAT_OUTPUT_SPECIFICATION = {
     "linear_registration": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Linear registration output.",
     },
     "nonlinear_registration": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Non-linear registration output.",
     },
     "nonlinear_registration_field": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Non-linear warp field.",
     },
     "nonlinear_registration_jacobian": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Jacobian of the non-linear warp field.",
     },
     "volume_scales": {
@@ -119,35 +116,35 @@ FSL_ANAT_OUTPUT_SPECIFICATION = {
         "description": "A file containing a scaling factor and brain volumes, based on skull-contrained registration, suitable for head-size normalisation (as the scaling is based on the skull size, not the brain size).",  # noqa: E501
     },
     "bias_corrected_brain": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Bias-corrected brain extraction result.",
     },
     "bias_corrected_brain_mask": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Mask of bias-corrected brain extraction result.",
     },
     "fast_bias_correction": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Bias-corrected version used for FAST segmentation.",
     },
     "csf_partial_volume": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "CSF partial volume segmenetation.",
     },
     "grey_matter_partial_volume": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Grey matter partial volume segmenetation.",
     },
     "white_matter_partial_volume": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "White matter partial volume segmenetation.",
     },
     "segmentation_summary": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "A summary image showing the tissue with the greatest partial volume fraction per voxel.",  # noqa: E501
     },
     "subcortical_segmentation_summary": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "A summary image of subcortical segmentation results.",
     },
 }
