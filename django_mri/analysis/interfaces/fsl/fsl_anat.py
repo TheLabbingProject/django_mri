@@ -1,10 +1,10 @@
 """
-Definition of the :class:`~django_mri.analysis.interfaces.fsl.fsl_anat.FslAnat`
-class.
+Definition of the :class:`FslAnat` class.
 """
 
 import subprocess
 from pathlib import Path
+from typing import Union
 
 
 class FslAnat:
@@ -107,15 +107,19 @@ class FslAnat:
                 default = att_name.replace("_", "")
                 flag = self.FLAGS.get(att_name, default)
                 flags += f" --{flag}"
+            if flags:
+                flags += " "
             return flags
 
-    def generate_command(self, scan, destination: Path = None) -> str:
+    def generate_command(
+        self, image: Union[str, Path], destination: Path = None
+    ) -> str:
         """
         Returns the command to be executed in order to run the analysis.
 
         Parameters
         ----------
-        scan : ~django_mri.models.nifti.NIfTI
+        scan : Union[str, Path]
             The scan to run the analysis on
         destination : Path, optional
             The directory in which output files should be created, by default
@@ -129,7 +133,7 @@ class FslAnat:
 
         flags = self.generate_flags()
         destination_arg = f" -o {str(destination)}" if destination else ""
-        return f"fsl_anat {flags} -i {str(scan.path)}{destination_arg}"
+        return f"fsl_anat {flags}-i {str(image)}{destination_arg}"
 
     def fix_output_path(self, destination: Path) -> None:
         """
@@ -166,15 +170,17 @@ class FslAnat:
             if (destination / value).is_file()
         }
 
-    def run(self, scan, destination: Path = None) -> dict:
+    def run(
+        self, image: Union[str, Path] = None, destination: Path = None
+    ) -> dict:
         """
-        Runs *fsl_anat* with the provided *scan* as input and *destination* as
+        Runs *fsl_anat* with the provided *image* as input and *destination* as
         the destination directory.
 
         Parameters
         ----------
-        scan : ~django_mri.models.nifti.NIfTI
-            Input scan
+        image : Union[str, Path]
+            Input scan path, by default None
         destination : Path, optional
             Destination directory, by default None
 
@@ -189,9 +195,11 @@ class FslAnat:
             Run failure
         """
 
-        destination = Path(destination) if destination else Path(scan.path).parent
-        command = self.generate_command(scan, destination).split()
+        if image is None:
+            raise ValueError("Image path must be specified!")
+        destination = Path(destination) if destination else Path(image).parent
+        command = self.generate_command(image, destination).split()
         process = subprocess.run(command, capture_output=True)
         if process.returncode:
-            raise RuntimeError("Failed to run fsl_anat!")
+            raise RuntimeError(f"Failed to run fsl_anat!\n{process.stderr}")
         return self.generate_output_dict(destination)
