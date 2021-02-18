@@ -1,5 +1,5 @@
 """
-Definition of the :class:`~django_mri.utils.bids.Bids` class.
+Definition of the :class:`Bids` class.
 """
 
 import glob
@@ -106,7 +106,9 @@ class Bids:
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else "n/a",
-            "handedness": subject.dominant_hand if subject.dominant_hand else "n/a",
+            "handedness": subject.dominant_hand
+            if subject.dominant_hand
+            else "n/a",
             "age": age,
             "sex": subject.sex if subject.sex else "n/a",
         }
@@ -189,7 +191,9 @@ class Bids:
 
         subject_dict = self.get_subject_data(scan)
         subject_id = subject_dict["participant_id"]
-        parent, data_type, modality_label, acq, task, pe_dir = self.get_data(scan)
+        parent, data_type, modality_label, acq, task, pe_dir = self.get_data(
+            scan
+        )
         bids_path = Path(
             parent,
             f"sub-{subject_id}",
@@ -249,7 +253,9 @@ class Bids:
         """
         if "func" in str(bids_path):
             task = str(bids_path).split("task-")[-1].split("_")[0]
-            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(".json")
+            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(
+                ".json"
+            )
             with open(json_file, "r+") as f:
                 data = json.load(f)
                 data["TaskName"] = task
@@ -311,7 +317,9 @@ class Bids:
                 participants_template = TEMPLATES_DIR / participants_file.name
                 shutil.copy(str(participants_template), str(participants_file))
         participants_df = pd.read_csv(participants_tsv, "\t")
-        subject_dict["participant_id"] = f"sub-{subject_dict['participant_id']}"
+        subject_dict[
+            "participant_id"
+        ] = f"sub-{subject_dict['participant_id']}"
         if (
             not subject_dict["participant_id"]
             in participants_df["participant_id"].values
