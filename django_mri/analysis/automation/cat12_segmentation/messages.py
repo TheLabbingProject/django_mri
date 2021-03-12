@@ -15,7 +15,7 @@ INVALID_INPUTS = (
 
 #: No anatomicals in the database.
 NO_T1_WEIGHTED = (
-    bcolors.BOLD
+    bcolors.WARNING
     + "No anatomical scans could be detected in the database!"
     + bcolors.ENDC
 )
