@@ -143,7 +143,10 @@ class Bids:
 
         sequence_type = scan.sequence_type
         if sequence_type is None:
-            raise ValueError(messages.BIDS_NO_SEQUENCE_TYPE)
+            if "spgr" in scan.description.lower():
+                sequence_type = "mprage"
+            else:
+                raise ValueError(messages.BIDS_NO_SEQUENCE_TYPE)
         sequence_type = str(sequence_type).lower().replace("-", "_")
         data_type = DATA_TYPES[sequence_type].value
         modality_label = MODALITY_LABELS[sequence_type].value

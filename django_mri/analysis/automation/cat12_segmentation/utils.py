@@ -8,7 +8,7 @@ from django_analyses.models.input.definitions.input_definition import (
     InputDefinition,
 )
 from django_analyses.models.pipeline.node import Node
-from django_mri.analysis.automation.utils import get_mprage
+from django_mri.analysis.automation.utils import get_anatomicals
 
 TITLE = "CAT12 Segmentation"
 CONFIGURATION = {
@@ -46,15 +46,15 @@ def get_node() -> Node:
 
 
 def get_missing() -> QuerySet:
-    mprage = get_mprage()
+    anatomicals = get_anatomicals()
     input_definition = get_input_definition()
     existing = [
         scan.id
-        for scan in mprage
+        for scan in anatomicals
         if scan._nifti
         and input_definition.input_set.filter(value=scan.nifti.path)
     ]
-    return mprage.exclude(id__in=existing)
+    return anatomicals.exclude(id__in=existing)
 
 
 def get_run_set() -> QuerySet:

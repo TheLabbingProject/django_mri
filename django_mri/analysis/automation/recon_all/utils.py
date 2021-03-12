@@ -17,7 +17,6 @@ from django_mri.analysis.automation.recon_all.messages import (
     NO_RECON_ALL_VERSIONS,
 )
 from django_mri.models.scan import Scan
-from sklearn.preprocessing import StandardScaler
 
 ANALYSIS_TITLE = "ReconAll"
 VERSION_TITLE = "6.0.0"
