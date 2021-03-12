@@ -12,7 +12,7 @@ from django_analyses.models.input.definitions.input_definition import (
     InputDefinition,
 )
 from django_analyses.models.pipeline.node import Node
-from django_mri.analysis.automation.utils import get_anatomicals
+from django_mri.analysis.automation.utils import get_t1_weighted
 from django_mri.models.scan import Scan
 
 #: :class:`~django_analyses.models.analysis.Analysis` instance title.
@@ -109,7 +109,7 @@ def get_missing() -> QuerySet:
     QuerySet
         Pending anatomical scans to be processed
     """
-    anatomicals = get_anatomicals()
+    anatomicals = get_t1_weighted()
     existing = get_existing(anatomicals)
     return anatomicals.exclude(id__in=existing)
 

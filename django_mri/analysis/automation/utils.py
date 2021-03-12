@@ -8,7 +8,7 @@ MPRAGE_FILTER = {
 ANATOMICAL_QUERY = Q(**MPRAGE_FILTER) | Q(description__icontains="SPGR")
 
 
-def get_anatomicals() -> QuerySet:
+def get_t1_weighted() -> QuerySet:
     return Scan.objects.filter(ANATOMICAL_QUERY).order_by("-time")
 
 

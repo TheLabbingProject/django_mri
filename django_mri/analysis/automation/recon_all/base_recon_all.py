@@ -7,7 +7,7 @@ from django_mri.analysis.automation.recon_all.utils import (
     get_recon_all_node,
     get_t1_files_definition,
 )
-from django_mri.analysis.automation.utils import get_anatomicals
+from django_mri.analysis.automation.utils import get_t1_weighted
 from django_mri.models.scan import Scan
 
 PROGRESSBAR_KWARGS = {"unit": "scan", "desc": "Preparing NIfTI file inputs"}
@@ -22,7 +22,7 @@ def has_base_result(scan: Scan) -> bool:
 
 def get_missing_base_recon_all() -> QuerySet:
     scan_ids = [
-        scan.id for scan in get_anatomicals() if not has_base_result(scan)
+        scan.id for scan in get_t1_weighted() if not has_base_result(scan)
     ]
     return Scan.objects.filter(id__in=scan_ids)
 

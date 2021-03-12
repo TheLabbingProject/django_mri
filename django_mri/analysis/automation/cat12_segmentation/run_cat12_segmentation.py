@@ -14,6 +14,7 @@ from django_mri.analysis.automation.cat12_segmentation.utils import (
     get_missing,
     get_node,
 )
+from django_mri.analysis.automation.utils import get_t1_weighted
 from django_mri.models.scan import Scan
 
 # tqdm progressbar configuration.
@@ -64,6 +65,7 @@ def create_inputs(
     iterable = create_progressbar(
         scans, disable=not progressbar, **_PROGRESSBAR_KWARGS
     )
+    # Filter any scans with existing results from a user-provided queryset.
     existing = get_existing(scans)
     inputs = [
         create_input_specification(scan)
@@ -128,15 +130,22 @@ def run_cat12_segmentation(
     celery.result.AsyncResult
         Created celery asynchronous result instance
     """
+    # Modify/query T1-weighted queryset
     db_run = queryset is None
     queryset = get_missing() if db_run else queryset
     queryset = queryset[:max_total]
+    # Generate input specifications and execute.
     if queryset:
         inputs = create_inputs(queryset, prep_progressbar)
         if inputs:
             node = get_node()
             return execute_node.delay(node_id=node.id, inputs=inputs)
+        # Handle user-provided queryset with none pending.
         else:
             report_empty_inputs(queryset, db_run)
-    elif db_run:
-        print(messages.NO_ANATOMICALS)
+    # Report no T1-weighted scans found in the database.
+    elif not get_t1_weighted():
+        print(messages.NO_T1_WEIGHTED)
+    # Handle default run over T1-weighted dataset with none pending.
+    else:
+        report_empty_inputs(queryset, db_run)
