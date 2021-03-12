@@ -59,3 +59,4 @@ class ReconAllStats:
         for column_name in COLUMNS_TO_INT:
             stats[column_name] = stats[column_name].astype("int64")
         return stats
+    
