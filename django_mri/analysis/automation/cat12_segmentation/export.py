@@ -1,3 +1,6 @@
+"""
+Export CAT12 segmentation results as an xarray dataset.
+"""
 from typing import Dict, List
 
 import dask.array as da
