@@ -5,6 +5,7 @@ Module contents
 ---------------
 
 .. automodule:: django_mri.analysis.interfaces.matlab.spm.cat12.segmentation
+   :noindex:
    :members:
    :undoc-members:
    :show-inheritance:

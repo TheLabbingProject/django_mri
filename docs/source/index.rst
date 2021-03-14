@@ -7,7 +7,7 @@ Welcome to django_mri's documentation!
 
    overview
    installation
-   user_guide/importing_data
+   user_guide/user_guide
    modules/modules
 
 

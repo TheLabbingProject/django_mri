@@ -15,6 +15,7 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 
+   django_mri.analysis.automation
    django_mri.analysis.interfaces
    django_mri.analysis.pipelines
    django_mri.analysis.specifications

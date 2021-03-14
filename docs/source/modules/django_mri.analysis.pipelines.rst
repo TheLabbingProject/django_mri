@@ -27,11 +27,3 @@ django\_mri.analysis.pipelines.dwi\_preprocessing module
    :members:
    :undoc-members:
    :show-inheritance:
-
-django\_mri.analysis.pipelines.fieldmap\_correction module
-----------------------------------------------------------
-
-.. automodule:: django_mri.analysis.pipelines.fieldmap_correction
-   :members:
-   :undoc-members:
-   :show-inheritance:
