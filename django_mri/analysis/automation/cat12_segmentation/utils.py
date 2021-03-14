@@ -1,8 +1,8 @@
 """
 Utilties for CAT12 segmentation automation.
 """
-
 from pathlib import Path
+from typing import Tuple
 
 import nibabel as nib
 import numpy as np
@@ -12,7 +12,7 @@ from django_analyses.models.input.definitions.input_definition import (
     InputDefinition,
 )
 from django_analyses.models.pipeline.node import Node
-from django_mri.analysis.automation.utils import get_t1_weighted
+from django_mri.analysis.automation.cat12_segmentation import messages
 from django_mri.models.scan import Scan
 
 #: :class:`~django_analyses.models.analysis.Analysis` instance title.
@@ -79,41 +79,6 @@ def get_node() -> Node:
     )[0]
 
 
-def get_existing(anatomicals: QuerySet) -> QuerySet:
-    """
-    Returns a queryset of scans detected as anatomical and not having existing
-    results for the default CAT12 segmentation node.
-
-    Returns
-    -------
-    QuerySet
-        Pending anatomical scans to be processed
-    """
-    input_definition = get_input_definition()
-    scan_ids = [
-        scan.id
-        for scan in anatomicals
-        if scan._nifti
-        and input_definition.input_set.filter(value=scan.nifti.path)
-    ]
-    return Scan.objects.filter(id__in=scan_ids)
-
-
-def get_missing() -> QuerySet:
-    """
-    Returns a queryset of scans detected as anatomical and not having existing
-    results for the default CAT12 segmentation node.
-
-    Returns
-    -------
-    QuerySet
-        Pending anatomical scans to be processed
-    """
-    anatomicals = get_t1_weighted()
-    existing = get_existing(anatomicals)
-    return anatomicals.exclude(id__in=existing)
-
-
 def get_run_set() -> QuerySet:
     """
     Returns a queryset of existing (successful) CAT12 segmentation runs.
@@ -128,4 +93,3 @@ def get_run_set() -> QuerySet:
 
 def read_nifti(path: Path) -> np.ndarray:
     return np.asarray(nib.load(str(path)).dataobj)
-    # return np.nan_to_num(data.flatten())

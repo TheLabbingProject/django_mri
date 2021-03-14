@@ -1,5 +1,5 @@
 """
-Input and output specification dictionaries for FSL's BET_ script.
+Input and output specification dictionaries for FSL's BET script.
 
 See Also
 --------
@@ -16,12 +16,14 @@ For more information about BET, see FSL's `BET documentation`_.
 """
 
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FileInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *BET* input specification dictionary.
