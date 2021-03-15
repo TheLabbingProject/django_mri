@@ -31,7 +31,7 @@ class AnatomicalPreprocessing(QuerySetRunner):
     """
 
     #: The database model for scans (the base input class).
-    MODEL = Scan
+    DATA_MODEL = Scan
 
     #: Override
     #: :attr:`~django_analyses.runner.queryset_runner.QuerysetRunner.
@@ -68,7 +68,10 @@ class AnatomicalPreprocessing(QuerySetRunner):
             T1-weighted scans
         """
         queryset = super().filter_queryset(queryset, log_level)
-        return queryset.filter(ANATOMICAL_QUERY).order_by("-time")
+        self.log_filter_start(log_level)
+        queryset = queryset.filter(ANATOMICAL_QUERY).order_by("-time")
+        self.log_filter_end(n_candidates=queryset.count(), log_level=log_level)
+        return queryset
 
     def get_instance_representation(self, instance: Scan) -> str:
         """
