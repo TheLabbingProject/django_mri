@@ -104,5 +104,7 @@ class AnatomicalPreprocessing(QuerySetRunner):
         bool
             Whether the provided scan has an existing run or not
         """
-        value = self.get_instance_representation(instance)
-        return instance._nifti and self.input_set.filter(value=value)
+        if instance._nifti:
+            value = self.get_instance_representation(instance)
+            return self.input_set.filter(value=value).exists()
+        return False
