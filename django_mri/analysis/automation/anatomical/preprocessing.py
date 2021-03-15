@@ -106,5 +106,5 @@ class AnatomicalPreprocessing(QuerySetRunner):
         """
         if instance._nifti:
             value = self.get_instance_representation(instance)
-            return bool(self.input_set.filter(value=value))
+            return self.input_set.filter(value=value).exists()
         return False
