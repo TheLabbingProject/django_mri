@@ -9,9 +9,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django_analyses.models.pipeline.node import Node
+from django_analyses.models.input import FileInput, Input, ListInput
 from django_analyses.models.run import Run
-from django_analyses.tasks import execute_node
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
@@ -142,6 +141,13 @@ class Scan(TimeStampedModel):
     session = models.ForeignKey(
         "django_mri.Session", on_delete=models.CASCADE,
     )
+
+    REPRESENTATIONS = (
+        "dicom_representation",
+        "nifti_representation",
+        "mif_representation",
+    )
+    DERIVATIVE_QUERY = {FileInput: "value", ListInput: "value__contains"}
 
     objects = ScanQuerySet.as_manager()
 
@@ -422,32 +428,93 @@ class Scan(TimeStampedModel):
 
         return get_mri_root() / "mif" / f"{self.id}.mif"
 
-    def get_existing_recon_all(self, configuration: dict = None) -> list:
-        if self._nifti:
-            configuration = configuration or {}
-            runs = Run.objects.filter(
-                analysis_version__analysis__title="ReconAll"
-            )
-            return [
-                run
-                for run in runs
-                if self.nifti.path in run.input_configuration.get("T1_files")
-            ]
-        return []
+    def get_dicom_representation(self) -> str:
+        """
+        Returns the expected DICOM representation of this scan as part of any
+        analysis' input specification.
 
-    def run_recon_all(self, configuration: dict = None):
-        mprage = SequenceType.objects.filter(title="MPRAGE").first()
-        if mprage and self.sequence_type == mprage:
-            configuration = configuration or {}
-            recon_all_node, _ = Node.objects.get_or_create(
-                analysis_version__analysis__title="ReconAll",
-                configuration=configuration,
-            )
-            inputs = {"T1_files": [str(self.nifti.path)]}
-            return execute_node.delay(node_id=recon_all_node.id, inputs=inputs)
-        raise TypeError(
-            "ReconAll is currently only available for MPRAGE type scans."
-        )
+        Returns
+        -------
+        str
+            Input value DICOM representation of this scan
+
+        See Also
+        --------
+        :property:`dicom_representation`
+        """
+        if self.dicom:
+            return str(self.dicom.path)
+
+    def get_nifti_representation(self) -> str:
+        """
+        Returns the expected NIfTI representation of this scan as part of any
+        analysis' input specification.
+
+        Returns
+        -------
+        str
+            Input value NIfTI representation of this scan
+
+        See Also
+        --------
+        :property:`nifti_representation`
+        """
+        if self._nifti:
+            return str(self._nifti.path)
+
+    def get_mif_representation(self) -> str:
+        """
+        Returns the expected *.mif* representation of this scan as part of any
+        analysis' input specification.
+
+        Returns
+        -------
+        str
+            Input value NIfTI representation of this scan
+
+        See Also
+        --------
+        :property:`mif_representation`
+        """
+        destination = self.get_default_mif_path()
+        if destination.exists():
+            return str(destination)
+
+    def query_input_set(self) -> models.QuerySet:
+        """
+        Returns a queryset of
+        :class:`~django_analyses.models.input.input.Input` subclass instances
+        in which this scan is represented.
+
+        Returns
+        -------
+        models.QuerySet
+            Input queryset
+        """
+        all_input_ids = []
+        for InputClass, filter_key in self.DERIVATIVE_QUERY.items():
+            query = models.Q()
+            for representation in self.REPRESENTATIONS:
+                value = getattr(self, representation, None)
+                if value is not None:
+                    query |= models.Q(**{filter_key: value})
+                inputs = InputClass.objects.filter(query)
+                input_ids = list(inputs.values_list("id", flat=True))
+                all_input_ids += input_ids
+        return Input.objects.filter(id__in=all_input_ids).select_subclasses()
+
+    def query_run_set(self) -> models.QuerySet:
+        """
+        Returns a queryset of :class:`~django_analyses.models.run.Run`
+        instances in which this scan was included in the inputs.
+
+        Returns
+        -------
+        models.QuerySet
+            Input queryset
+        """
+        run_ids = self.input_set.values_list("run", flat=True)
+        return Run.objects.filter(id__in=run_ids)
 
     @property
     def mif(self) -> Path:
@@ -469,6 +536,23 @@ class Scan(TimeStampedModel):
         if not destination.exists():
             self.convert_to_mif()
         return destination
+
+    @property
+    def mif_representation(self) -> str:
+        """
+        Returns the expected *.mif* representation of this scan as part of any
+        analysis' input specification.
+
+        Returns
+        -------
+        str
+            Input value NIfTI representation of this scan
+
+        See Also
+        --------
+        :func:`get_mif_representation`
+        """
+        return self.get_mif_representation()
 
     @property
     def sequence_type(self) -> SequenceType:
@@ -506,6 +590,40 @@ class Scan(TimeStampedModel):
         return self._nifti
 
     @property
+    def nifti_representation(self) -> str:
+        """
+        Returns the expected NIfTI representation of this scan as part of any
+        analysis' input specification.
+
+        Returns
+        -------
+        str
+            Input value NIfTI representation of this scan
+
+        See Also
+        --------
+        :func:`get_nifti_representation`
+        """
+        return self.get_nifti_representation()
+
+    @property
+    def dicom_representation(self) -> str:
+        """
+        Returns the expected DICOM representation of this scan as part of any
+        analysis' input specification.
+
+        Returns
+        -------
+        str
+            Input value DICOM representation of this scan
+
+        See Also
+        --------
+        :func:`get_dicom_representation`
+        """
+        return self.get_dicom_representation()
+
+    @property
     def subject_age(self) -> float:
         """
         Returns the subject's age in years at the time of the scan. If the
@@ -527,3 +645,38 @@ class Scan(TimeStampedModel):
         if conditions:
             delta = self.time.date() - self.session.subject.date_of_birth
             return delta.total_seconds() / (60 * 60 * 24 * 365)
+
+    @property
+    def input_set(self) -> models.QuerySet:
+        """
+        Returns a queryset of
+        :class:`~django_analyses.models.input.input.Input` subclass instances
+        in which this scan is represented.
+
+        Returns
+        -------
+        models.QuerySet
+            Input queryset
+
+        See Also
+        --------
+        :func:`query_input_set`
+        """
+        return self.query_input_set()
+
+    @property
+    def run_set(self) -> models.QuerySet:
+        """
+        Returns a queryset of :class:`~django_analyses.models.run.Run`
+        instances in which this scan was included in the inputs.
+
+        Returns
+        -------
+        models.QuerySet
+            Input queryset
+
+        See Also
+        --------
+        :func:`query_run_set`
+        """
+        return self.query_input_set()
