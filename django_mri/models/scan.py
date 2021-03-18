@@ -4,6 +4,7 @@ Definition of the :class:`Scan` model.
 
 import warnings
 from pathlib import Path
+from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -516,6 +517,17 @@ class Scan(TimeStampedModel):
         run_ids = self.input_set.values_list("run", flat=True)
         return Run.objects.filter(id__in=run_ids)
 
+    def query_derivatives(self) -> Dict[Run, Dict[str, Any]]:
+        """
+        Returns a dictionary of associated runs and their outputs.
+
+        Returns
+        -------
+        Dict[Run, Dict[str, Any]]
+            Derivatives
+        """
+        return {run: run.output_configuration for run in self.run_set.all()}
+
     @property
     def mif(self) -> Path:
         """
@@ -679,4 +691,4 @@ class Scan(TimeStampedModel):
         --------
         :func:`query_run_set`
         """
-        return self.query_input_set()
+        return self.query_run_set()
