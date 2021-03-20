@@ -401,9 +401,8 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import (
-            get_mrconvert_node,
-        )
+        from django_mri.analysis.utils.get_mrconvert_node import \
+            get_mrconvert_node
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
@@ -542,6 +541,8 @@ class Scan(TimeStampedModel):
                     cmap=cm.black_blue,
                     symmetric_cmap=False,
                 )
+            # elif data.ndim == 4:
+            #     mean_image = mean_img()
 
     @property
     def mif(self) -> Path:

@@ -13,6 +13,8 @@ References
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django_analyses.models.run import Run
+from nonrelated_inlines.admin import NonrelatedStackedInline
 
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.irb_approval import IrbApproval
@@ -38,6 +40,34 @@ def custom_titled_filter(title: str):
             return instance
 
     return Wrapper
+
+
+class ScanRunInline(NonrelatedStackedInline):
+    model = Run
+    fields = "run_link", "analysis_version_link", "status"
+    readonly_fields = "run_link", "analysis_version_link", "status"
+    can_delete = False
+    extra = 0
+
+    def has_add_permission(self, request, instance: Scan):
+        return False
+
+    def get_form_queryset(self, instance: Scan):
+        return instance.run_set.all()
+
+    def run_link(self, instance: Run) -> str:
+        model_name = instance.__class__.__name__
+        pk = instance.id
+        return Html.admin_link(model_name, pk)
+
+    def analysis_version_link(self, instance: Run) -> str:
+        model_name = instance.analysis_version.__class__.__name__
+        pk = instance.analysis_version.id
+        text = str(instance.analysis_version)
+        return Html.admin_link(model_name, pk, text)
+
+    analysis_version_link.short_description = "Anaylsis Version"
+    run_link.short_description = "Run"
 
 
 class ScanAdmin(admin.ModelAdmin):
@@ -100,6 +130,7 @@ class ScanAdmin(admin.ModelAdmin):
         "mif",
     )
     search_fields = ("session__id", "description", "comments")
+    inlines = (ScanRunInline,)
 
     class Media:
         js = ("//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js",)
@@ -111,15 +142,6 @@ class ScanAdmin(admin.ModelAdmin):
         form_url: str = "",
         extra_context: dict = None,
     ):
-        extra_context = extra_context or {}
-        # scan = Scan.objects.get(id=object_id)
-        # html_doc = scan.html_plot()
-        # if html_doc is not None:
-        #     iframe = html_doc.get_iframe(width=1000, height=500)
-        #     scan_preview = mark_safe(iframe)
-        # else:
-        #     scan_preview = False
-        extra_context["scan_id"] = object_id
         return super().change_view(request, object_id, form_url, extra_context)
 
     def session_link(self, instance: Scan) -> str:
