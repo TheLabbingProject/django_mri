@@ -8,6 +8,7 @@ djangorestframework~=3.12
 django-extensions~=3.1
 django-filter~=2.4
 nibabel~=3.2
+nilearn~=0.7
 nipype~=1.5
 numpy~=1.20
 tqdm~=4.40
