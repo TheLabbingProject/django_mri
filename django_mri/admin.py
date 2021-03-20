@@ -13,13 +13,31 @@ References
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.irb_approval import IrbApproval
+from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
+from django_mri.utils.html import Html
 
 SCAN_VIEW_NAME = "admin:django_mri_scan_change"
-SCAN_LINK_HTML = html = '<a href="{url}">{text}</a>'
+SCAN_LINK_HTML = '<a href="{url}">{text}</a>'
+
+
+def custom_titled_filter(title: str):
+    """
+    Copied from SO:
+    https://stackoverflow.com/a/21223908/4416932
+    """
+
+    class Wrapper(admin.FieldListFilter):
+        def __new__(cls, *args, **kwargs):
+            instance = admin.FieldListFilter.create(*args, **kwargs)
+            instance.title = title
+            return instance
+
+    return Wrapper
 
 
 class ScanAdmin(admin.ModelAdmin):
@@ -28,17 +46,129 @@ class ScanAdmin(admin.ModelAdmin):
     interface.
     """
 
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": [
+                    "session",
+                    "number",
+                    "description",
+                    "time",
+                    "echo_time",
+                    "repetition_time",
+                    "inversion_time",
+                    "spatial_resolution",
+                    "institution_name",
+                    "comments",
+                ]
+            },
+        ),
+        (
+            "File formats",
+            {
+                "fields": [
+                    "dicom_link",
+                    "is_updated_from_dicom",
+                    "nifti",
+                    "mif",
+                ]
+            },
+        ),
+        ("Research", {"fields": ["study_groups"]}),
+        (None, {"fields": ["added_by"]}),
+    )
+
     #: Fields displayed on the change list page of the admin.
     list_display = (
         "id",
-        "session",
-        "time",
+        "session_link",
         "number",
+        "time",
         "description",
+        "echo_time",
+        "inversion_time",
+        "repetition_time",
+        "spatial_resolution_",
+        "comments",
     )
+    readonly_fields = (
+        "dicom_link",
+        "session_link",
+        "spatial_resolution_",
+        "nifti",
+        "mif",
+    )
+    search_fields = ("session__id", "description", "comments")
 
-    #: List ordering in the Django admin views.
-    ordering = "session", "time", "number"
+    class Media:
+        js = ("//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js",)
+
+    def change_view(
+        self,
+        request,
+        object_id: int,
+        form_url: str = "",
+        extra_context: dict = None,
+    ):
+        extra_context = extra_context or {}
+        # scan = Scan.objects.get(id=object_id)
+        # html_doc = scan.html_plot()
+        # if html_doc is not None:
+        #     iframe = html_doc.get_iframe(width=1000, height=500)
+        #     scan_preview = mark_safe(iframe)
+        # else:
+        #     scan_preview = False
+        extra_context["scan_id"] = object_id
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    def session_link(self, instance: Scan) -> str:
+        model_name = instance.session.__class__.__name__
+        pk = instance.session.id
+        return Html.admin_link(model_name, pk)
+
+    def dicom_link(self, instance: Scan) -> str:
+        if instance.dicom:
+            model_name = instance.dicom.__class__.__name__
+            pk = instance.dicom.id
+            return Html.admin_link(model_name, pk)
+
+    def nifti(self, instance: Scan) -> str:
+        if instance._nifti:
+            model_name = instance.nifti.__class__.__name__
+            pk = instance.nifti.id
+            return Html.admin_link(model_name, pk)
+
+    def mif(self, instance: Scan) -> str:
+        expected = instance.get_default_mif_path()
+        if expected.exists():
+            return str(expected)
+
+    def spatial_resolution_(self, scan: Scan) -> str:
+        """
+        Returns a nicely formatted representation of the scan's spatial
+        resolution.
+
+        Parameters
+        ----------
+        scan : Scan
+            Scan instance
+
+        Returns
+        -------
+        str
+            Formatted spatial resolution representation
+        """
+
+        try:
+            return " x ".join(
+                [f"{number:.2g}" for number in scan.spatial_resolution]
+            )
+        except TypeError:
+            return ""
+
+    session_link.short_description = "Session"
+    dicom_link.short_description = "DICOM"
 
 
 class ScanInline(admin.TabularInline):
@@ -67,15 +197,19 @@ class ScanInline(admin.TabularInline):
         "spatial_resolution_",
     )
     ordering = ("number",)
+    extra = 0
 
-    def spatial_resolution_(self, scan: Scan) -> str:
+    def has_add_permission(self, request, instance: Scan):
+        return False
+
+    def spatial_resolution_(self, instance: Scan) -> str:
         """
         Returns a nicely formatted representation of the scan's spatial
         resolution.
 
         Parameters
         ----------
-        scan : Scan
+        instance : Scan
             Scan instance
 
         Returns
@@ -86,7 +220,7 @@ class ScanInline(admin.TabularInline):
 
         try:
             return " x ".join(
-                [f"{number:.2g}" for number in scan.spatial_resolution]
+                [f"{number:.2g}" for number in instance.spatial_resolution]
             )
         except TypeError:
             return ""
@@ -123,18 +257,66 @@ class SessionAdmin(admin.ModelAdmin):
     #: Fields displayed on the change list page of the admin.
     list_display = (
         "id",
-        "measurement",
-        "subject",
         "time",
+        "subject_link",
+        "measurement_link",
+        "scan_count",
         "irb",
         "comments",
     )
-
-    #: List ordering in the Django admin views.
-    ordering = ("-time",)
+    list_filter = (
+        "time",
+        ("measurement__title", custom_titled_filter("measurement definition")),
+        ("irb", custom_titled_filter("IRB approval")),
+    )
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
+
+    def subject_link(self, instance: Session) -> str:
+        if instance.subject:
+            model_name = instance.subject.__class__.__name__
+            pk = instance.subject.id
+            text = instance.subject.id_number
+            return Html.admin_link(model_name, pk, text)
+
+    def measurement_link(self, instance: Session) -> str:
+        if instance.measurement:
+            model_name = instance.measurement.__class__.__name__
+            pk = instance.measurement.id
+            text = instance.measurement.title
+            return Html.admin_link(model_name, pk, text)
+
+    def scan_count(self, instance: Session) -> int:
+        return instance.scan_set.count()
+
+    measurement_link.short_description = "Measurement Definition"
+    subject_link.short_description = "Subject"
+
+
+class NiftiAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.nifti.NIfTI` model to the admin
+    interface.
+    """
+
+    fields = "path", "is_raw", "has_json"
+    list_display = "id", "path", "scan_link"
+    readonly_fields = "has_json", "path", "scan_link"
+
+    def scan_link(self, instance: NIfTI) -> str:
+        try:
+            scan = Scan.objects.get(_nifti=instance)
+        except Scan.DoesNotExist:
+            pass
+        else:
+            return Html.admin_link("Scan", scan.id)
+
+    def has_json(self, instance: NIfTI) -> str:
+        return instance.json_file.exists()
+
+    has_json.boolean = True
+    scan_link.short_description = "Scan"
 
 
 class DataDirectoryAdmin(admin.ModelAdmin):
@@ -155,7 +337,8 @@ class IrbApprovalAdmin(admin.ModelAdmin):
     list_display = "id", "institution", "number", "document"
 
 
-admin.site.register(Scan, ScanAdmin)
-admin.site.register(Session, SessionAdmin)
 admin.site.register(DataDirectory, DataDirectoryAdmin)
 admin.site.register(IrbApproval, IrbApprovalAdmin)
+admin.site.register(NIfTI, NiftiAdmin)
+admin.site.register(Scan, ScanAdmin)
+admin.site.register(Session, SessionAdmin)

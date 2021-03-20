@@ -27,9 +27,6 @@ class DjangoMriConfig(AppConfig):
     #: Full Python path to the application.
     name = "django_mri"
 
-    #: Human-readable name for the application.
-    verbose_name = "MRI Data Management"
-
     def ready(self):
         """
         Loads the app's signals.

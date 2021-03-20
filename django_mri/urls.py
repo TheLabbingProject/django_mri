@@ -10,8 +10,9 @@ References
 """
 
 from django.urls import include, path
-from django_mri import views
 from rest_framework import routers
+
+from django_mri import views
 
 app_name = "mri"
 
@@ -50,5 +51,10 @@ urlpatterns = [
         "mri/scan/plot/<int:scan_id>/",
         views.ScanViewSet.as_view({"get": "plot"}),
         name="plot",
+    ),
+    path(
+        "mri/scan/<int:scan_id>/nilearn_plot/",
+        views.ScanViewSet.as_view({"get": "nilearn_plot"}),
+        name="nilearn_plot",
     ),
 ]

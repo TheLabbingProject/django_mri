@@ -52,7 +52,11 @@ class Session(TimeStampedModel):
 
     #: Associated IRB approval.
     irb = models.ForeignKey(
-        "django_mri.IrbApproval", on_delete=models.SET_NULL, null=True
+        "django_mri.IrbApproval",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name="IRB approval",
     )
 
     objects = SessionQuerySet.as_manager()

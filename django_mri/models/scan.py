@@ -4,6 +4,7 @@ Definition of the :class:`Scan` model.
 
 import warnings
 from pathlib import Path
+from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -20,6 +21,7 @@ from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.bids import Bids
 from django_mri.utils.utils import get_group_model, get_mri_root
+from nilearn.plotting import cm, view_img
 
 
 class Scan(TimeStampedModel):
@@ -516,6 +518,31 @@ class Scan(TimeStampedModel):
         run_ids = self.input_set.values_list("run", flat=True)
         return Run.objects.filter(id__in=run_ids)
 
+    def query_derivatives(self) -> Dict[Run, Dict[str, Any]]:
+        """
+        Returns a dictionary of associated runs and their outputs.
+
+        Returns
+        -------
+        Dict[Run, Dict[str, Any]]
+            Derivatives
+        """
+        return {run: run.output_configuration for run in self.run_set.all()}
+
+    def html_plot(self):
+        try:
+            data = self.nifti.get_data()
+        except RuntimeError:
+            return
+        else:
+            if data.ndim == 3:
+                return view_img(
+                    str(self.nifti.path),
+                    bg_img=False,
+                    cmap=cm.black_blue,
+                    symmetric_cmap=False,
+                )
+
     @property
     def mif(self) -> Path:
         """
@@ -679,4 +706,4 @@ class Scan(TimeStampedModel):
         --------
         :func:`query_run_set`
         """
-        return self.query_input_set()
+        return self.query_run_set()
