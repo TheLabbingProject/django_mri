@@ -7,12 +7,13 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
 
 ADMIN_VIEW_NAMES = {
+    "AnalysisVersion": "admin:django_analyses_analysisversion_change",
     "MeasurementDefinition": "admin:research_measurementdefinition_change",
     "Series": "admin:django_dicom_series_change",
     "Subject": "admin:research_subject_change",
     "IrbApproval": "admin:django_mri_irbapproval_change",
     "NIfTI": "admin:django_mri_nifti_change",
-    "Run": "admin:django_analysis_run_change",
+    "Run": "admin:django_analyses_run_change",
     "Scan": "admin:django_mri_scan_change",
     "Session": "admin:django_mri_session_change",
 }

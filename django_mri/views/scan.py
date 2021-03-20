@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
+from django_analyses.models.output.types.file_output import FileOutput
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan

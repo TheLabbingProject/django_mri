@@ -34,7 +34,7 @@ $("#scan-preview-button").click(function () {
   document.getElementById('scan-preview-button').innerHTML = "Loading...";
   $(this).prop('disabled', true);
   $.ajax({
-      url: "{% url 'mri:nilearn_plot' scan_id %}",
+      url: "{% url 'mri:nilearn_plot' original.id %}",
       dataType: 'json',
       success: function (data) {
         document.getElementById('scan-preview').innerHTML = data["content"];
