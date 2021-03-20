@@ -1,13 +1,10 @@
-import os
-
-import pandas as pd
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
-from django.http import FileResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan
@@ -175,3 +172,13 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             html = server_session(session_id=session.id, url=BOKEH_URL)
             script = fix_bokeh_script(html, destination_id=destination_id)
         return HttpResponse(script, content_type="text/javascript")
+
+    @action(detail=True, methods=["GET"])
+    def nilearn_plot(self, request: Request, pk: int = None) -> Response:
+        scan = Scan.objects.get(id=pk)
+        html_doc = scan.html_plot()
+        if html_doc:
+            content = html_doc.get_iframe(width=1000, height=500)
+        else:
+            content = "No preview available :("
+        return JsonResponse({"content": content})

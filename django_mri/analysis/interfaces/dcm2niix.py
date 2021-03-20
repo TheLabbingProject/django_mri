@@ -117,14 +117,22 @@ class Dcm2niix:
             *dcm2niix* executable could not be found
         """
         command = self.generate_command(
-            path, destination, compressed=compressed, generate_json=generate_json,
+            path,
+            destination,
+            compressed=compressed,
+            generate_json=generate_json,
         )
         try:
             process = subprocess.Popen(
                 command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
+        except FileNotFoundError:
+            raise NotImplementedError(messages.NO_DCM2NIIX)
+        else:
             stdout, stderr = process.communicate()
             returned_path = self.extract_output_path(str(stdout), compressed)
+            # TODO: This logic should be changed to be more flexible and allow
+            # for non-BIDS-compatible conversions.
             expected_path = destination.with_suffix(".nii.gz")
             if returned_path != expected_path:
                 message = messages.DCM2NIIX_PATH_MISMATCH.format(
@@ -134,9 +142,12 @@ class Dcm2niix:
             if Path(str(returned_path)).is_file():
                 return returned_path
             else:
-                raise RuntimeError(messages.DCM2NIIX_FAILURE)
-        except FileNotFoundError:
-            raise NotImplementedError(messages.NO_DCM2NIIX)
+                message = messages.DCM2NIIX_FAILURE.format(
+                    path=path,
+                    destination=expected_path,
+                    returned=returned_path,
+                )
+                raise RuntimeError(message)
 
     def extract_output_path(self, stdout: str, compressed: bool) -> Path:
         """
