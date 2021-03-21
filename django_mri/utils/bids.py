@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 from django_mri.utils import messages
+from django_mri.utils import the_base
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"
@@ -140,6 +141,21 @@ class Bids:
             PhaseEncodingDirection for DWI-related images or fieldmap-related
             images. Either "AP","PA" or None
         """
+        parent = scan.get_default_nifti_destination().parent.parent.parent
+        dicom_image = scan.dicom.image_set.first()
+        header = dicom_image.header.instance
+        acq = scan.id
+        task = None
+        pe_dir = None
+
+        thebase = the_base.get_modality_and_data_type(scan, header, acq)
+        if thebase:
+            data_type = thebase.get("data_type")
+            modality_label = thebase.get("modality")
+            acq = thebase.get("acq")
+            task = thebase.get("task")
+            pe_dir = thebase.get("pe_dir")
+            return parent, data_type, modality_label, acq, task, pe_dir
 
         sequence_type = scan.sequence_type
         if sequence_type is None:
@@ -150,12 +166,6 @@ class Bids:
         sequence_type = str(sequence_type).lower().replace("-", "_")
         data_type = DATA_TYPES[sequence_type].value
         modality_label = MODALITY_LABELS[sequence_type].value
-        dicom_image = scan.dicom.image_set.first()
-        header = dicom_image.header.instance
-        parent = scan.get_default_nifti_destination().parent.parent.parent
-        acq = scan.id
-        task = None
-        pe_dir = None
         if "dwi" in data_type:
             image_type = header["ImageType"]
             pe_dir = "AP" if "MOSAIC" in image_type else "PA"
