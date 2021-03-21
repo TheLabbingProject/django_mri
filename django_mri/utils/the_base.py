@@ -18,6 +18,17 @@ NAME_TO_LOC = {
         "pe_dir": "AP",
         "modality": "dwi",
     },
+    "ep2d_d15.5D60_MB3_AP": {
+        "data_type": "dwi",
+        "pe_dir": "AP",
+        "modality": "dwi",
+    },
+    "ep2d_d15.5D60_MB3_PA": {
+        "data_type": "fmap",
+        "pe_dir": "PA",
+        "acq": "dwi",
+        "modality": "epi",
+    },
     "dMRI_MB4_185dirs_d15D45_AP_SBRef": {
         "data_type": "fmap",
         "pe_dir": "AP",
@@ -32,6 +43,16 @@ NAME_TO_LOC = {
     },
     "rsfMRI_AP": {"data_type": "func", "task": "rest", "modality": "bold",},
     "rsfMRI_AP_SBRef": {
+        "data_type": "func",
+        "task": "rest",
+        "modality": "sbref",
+    },
+    "rfMRI_REST_AP": {
+        "data_type": "func",
+        "task": "rest",
+        "modality": "bold",
+    },
+    "rfMRI_REST_AP_SBRef": {
         "data_type": "func",
         "task": "rest",
         "modality": "sbref",
