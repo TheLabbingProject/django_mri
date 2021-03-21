@@ -66,10 +66,8 @@ def get_modality_and_data_type(scan, header, acq) -> dict:
     [dict]
         [A dictionary containing relevant for proper naming of the scan]
     """
-    try:
-        data = NAME_TO_LOC.get(
-            scan.description.split(" ")[0].replace("-", "_")
-        )
+    data = NAME_TO_LOC.get(scan.description.split(" ")[0].replace("-", "_"))
+    if data:
         if ("anat" in data.get("data_type")) and (
             "T1w" in data.get("modality") or "T2w" in data.get("modality")
         ):
@@ -83,6 +81,6 @@ def get_modality_and_data_type(scan, header, acq) -> dict:
                 data["acq"] = f"{acq}{data.get('acq')}"
             else:
                 data["acq"] = acq
-    except KeyError:
+    else:
         return None
     return data
