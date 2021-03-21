@@ -1,67 +1,55 @@
 from enum import Enum
 
 
-class NAME_TO_LOC(Enum):
-    dMRI_MB4_6dirs_d15D45_PA = {
+NAME_TO_LOC = {
+    "dMRI_MB4_6dirs_d15D45_PA": {
         "data_type": "dwi",
         "pe_dir": "PA",
         "modality": "dwi",
-    }
-    dMRI_MB4_6dirs_d15D45_PA_SBRef = {
+    },
+    "dMRI_MB4_6dirs_d15D45_PA_SBRef": {
         "data_type": "fmap",
         "pe_dir": "PA",
         "acq": "dwi",
         "modality": "epi",
-    }
-    dMRI_MB4_185dirs_d15D45_AP = {
+    },
+    "dMRI_MB4_185dirs_d15D45_AP": {
         "data_type": "dwi",
         "pe_dir": "AP",
         "modality": "dwi",
-    }
-    dMRI_MB4_185dirs_d15D45_AP_SBRef = {
+    },
+    "dMRI_MB4_185dirs_d15D45_AP_SBRef": {
         "data_type": "fmap",
         "pe_dir": "AP",
         "acq": "dwi",
         "modality": "epi",
-    }
-    T2w_SPC_RL = {
-        "data_type": "anat",
-        "modality": "T2w",
-    }
-    T1w_MPRAGE_RL = {
-        "data_type": "anat",
-        "modality": "T1w",
-    }
-    t2_tirm_tra_dark_fluid_FLAIR = {
+    },
+    "T2w_SPC_RL": {"data_type": "anat", "modality": "T2w",},
+    "T1w_MPRAGE_RL": {"data_type": "anat", "modality": "T1w",},
+    "t2_tirm_tra_dark_fluid_FLAIR": {
         "data_type": "anat",
         "modality": "FLAIR",
-    }
-    rsfMRI_AP = {
-        "data_type": "func",
-        "task": "rest",
-        "modality": "bold",
-    }
-    rsfMRI_AP_SBRef = {
+    },
+    "rsfMRI_AP": {"data_type": "func", "task": "rest", "modality": "bold",},
+    "rsfMRI_AP_SBRef": {
         "data_type": "func",
         "task": "rest",
         "modality": "sbref",
-    }
-    SpinEchoFieldMap_PA = {
+    },
+    "SpinEchoFieldMap_PA": {
         "data_type": "fmap",
         "pe_dir": "PA",
         "acq": "func",
         "modality": "epi",
-    }
-    SpinEchoFieldMap_AP = {
+    },
+    "SpinEchoFieldMap_AP": {
         "data_type": "fmap",
         "pe_dir": "AP",
         "acq": "func",
         "modality": "epi",
-    }
-    localizer_3D_2 = {
-        "data_type": "anat",
-        "modality": "localizer",
-    }
+    },
+    "localizer_3D_2": {"data_type": "anat", "modality": "localizer"},
+}
 
 
 def get_modality_and_data_type(scan, header, acq) -> dict:
@@ -79,9 +67,9 @@ def get_modality_and_data_type(scan, header, acq) -> dict:
         [A dictionary containing relevant for proper naming of the scan]
     """
     try:
-        data = NAME_TO_LOC[
+        data = NAME_TO_LOC.get(
             scan.description.split(" ")[0].replace("-", "_")
-        ].value
+        )
         if ("anat" in data.get("data_type")) and (
             "T1w" in data.get("modality") or "T2w" in data.get("modality")
         ):
