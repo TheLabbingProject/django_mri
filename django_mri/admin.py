@@ -23,6 +23,7 @@ from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 from django_mri.utils.html import Html
 
+DOWNLOAD_BUTTON = '<span style="padding-left:20px;"><a href={url} type="button" class="button" id="{file_format}-download-button">Download</a></span>'  # noqa: E501
 SCAN_VIEW_NAME = "admin:django_mri_scan_change"
 SCAN_LINK_HTML = '<a href="{url}">{text}</a>'
 
@@ -98,8 +99,7 @@ class ScanAdmin(admin.ModelAdmin):
             "File formats",
             {
                 "fields": [
-                    "dicom_link",
-                    "is_updated_from_dicom",
+                    ("dicom_link", "is_updated_from_dicom"),
                     "nifti",
                     "mif",
                 ]
@@ -153,13 +153,19 @@ class ScanAdmin(admin.ModelAdmin):
         if instance.dicom:
             model_name = instance.dicom.__class__.__name__
             pk = instance.dicom.id
-            return Html.admin_link(model_name, pk)
+            link = Html.admin_link(model_name, pk)
+            url = reverse("dicom:to_zip", args=(instance.dicom.id,))
+            button = DOWNLOAD_BUTTON.format(url=url, file_format="dicom")
+            return mark_safe(f"{link}{button}")
 
     def nifti(self, instance: Scan) -> str:
         if instance._nifti:
             model_name = instance.nifti.__class__.__name__
             pk = instance.nifti.id
-            return Html.admin_link(model_name, pk)
+            link = Html.admin_link(model_name, pk)
+            url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
+            button = DOWNLOAD_BUTTON.format(url=url, file_format="dicom")
+            return mark_safe(f"{link}{button}")
 
     def mif(self, instance: Scan) -> str:
         expected = instance.get_default_mif_path()
