@@ -22,6 +22,7 @@ from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.bids import Bids
 from django_mri.utils.utils import get_group_model, get_mri_root
 from nilearn.plotting import cm, view_img
+from pandas.core.accessor import delegate_names
 
 
 class Scan(TimeStampedModel):
@@ -298,8 +299,11 @@ class Scan(TimeStampedModel):
         pathlib.Path
             BIDS-compatible NIfTI file destination
         """
-
-        bids_path = Bids().compose_bids_path(self)
+        try:
+            bids_path = Bids().compose_bids_path(self)
+        except ValueError as e:
+            print(e.args)
+            return None
         return bids_path
 
     def compile_to_bids(self, bids_path: Path):
@@ -351,10 +355,8 @@ class Scan(TimeStampedModel):
         if self.dicom:
             dcm2niix = Dcm2niix()
             if destination is None:
-                try:
-                    destination = self.get_bids_destination()
-                except ValueError as e:
-                    print(e.args)
+                destination = self.get_bids_destination()
+                if destination is None:
                     destination = self.get_default_nifti_destination()
             elif not isinstance(destination, Path):
                 destination = Path(destination)
@@ -401,8 +403,9 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import \
-            get_mrconvert_node
+        from django_mri.analysis.utils.get_mrconvert_node import (
+            get_mrconvert_node,
+        )
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
