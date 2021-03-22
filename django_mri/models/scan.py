@@ -21,8 +21,11 @@ from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.bids import Bids
 from django_mri.utils.utils import get_group_model, get_mri_root
+from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
-from pandas.core.accessor import delegate_names
+
+FLAG_3D = "mprage", "spgr", "flair", "t1", "t2"
+FLAG_4D = "fmri", "dmri"
 
 
 class Scan(TimeStampedModel):
@@ -532,20 +535,34 @@ class Scan(TimeStampedModel):
         return {run: run.output_configuration for run in self.run_set.all()}
 
     def html_plot(self):
-        try:
-            data = self.nifti.get_data()
-        except RuntimeError:
-            return
+        has_3d_flag = any(
+            [flag in self.description.lower() for flag in FLAG_3D]
+        )
+        has_4d_flag = any(
+            [flag in self.description.lower() for flag in FLAG_4D]
+        )
+        if not (has_3d_flag or has_4d_flag):
+            try:
+                data = self.nifti.get_data()
+            except RuntimeError:
+                return
+            else:
+                ndim = data.ndim
         else:
-            if data.ndim == 3:
-                return view_img(
-                    str(self.nifti.path),
-                    bg_img=False,
-                    cmap=cm.black_blue,
-                    symmetric_cmap=False,
-                )
-            # elif data.ndim == 4:
-            #     mean_image = mean_img()
+            ndim = 3 if has_3d_flag else 4
+        if ndim == 3:
+            image = str(self.nifti.path)
+            title = self.description
+        elif ndim == 4:
+            image = mean_img(str(self.nifti.path))
+            title = f"{self.description} (Mean Image)"
+        return view_img(
+            image,
+            bg_img=False,
+            cmap=cm.black_blue,
+            symmetric_cmap=False,
+            title=title,
+        )
 
     @property
     def mif(self) -> Path:
