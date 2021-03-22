@@ -62,4 +62,14 @@ urlpatterns = [
         views.NiftiViewSet.as_view({"get": "to_zip"}),
         name="nifti_to_zip",
     ),
+    path(
+        "mri/session/<int:session_id>/dicom_zip/",
+        views.SessionViewSet.as_view({"get": "dicom_zip"}),
+        name="session_dicom_zip",
+    ),
+    path(
+        "mri/session/<int:session_id>/nifti_zip/",
+        views.SessionViewSet.as_view({"get": "nifti_zip"}),
+        name="session_nifti_zip",
+    ),
 ]

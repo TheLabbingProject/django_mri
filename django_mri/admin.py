@@ -23,9 +23,10 @@ from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 from django_mri.utils.html import Html
 
-DOWNLOAD_BUTTON = '<span style="padding-left:20px;"><a href={url} type="button" class="button" id="{file_format}-download-button">Download</a></span>'  # noqa: E501
+DOWNLOAD_BUTTON = '<span style="padding-left:20px;"><a href={url} type="button" class="button" id="{file_format}-download-button">{text}</a></span>'  # noqa: E501
 SCAN_VIEW_NAME = "admin:django_mri_scan_change"
 SCAN_LINK_HTML = '<a href="{url}">{text}</a>'
+ZIP_VIEWS = {"dicom": "dicom:to_zip", "nifti": "mri:nifti_to_zip"}
 
 
 def custom_titled_filter(title: str):
@@ -121,6 +122,7 @@ class ScanAdmin(admin.ModelAdmin):
         "repetition_time",
         "spatial_resolution_",
         "comments",
+        "download",
     )
     readonly_fields = (
         "dicom_link",
@@ -128,6 +130,7 @@ class ScanAdmin(admin.ModelAdmin):
         "spatial_resolution_",
         "nifti",
         "mif",
+        "download",
     )
     search_fields = ("session__id", "description", "comments")
     inlines = (ScanRunInline,)
@@ -155,7 +158,9 @@ class ScanAdmin(admin.ModelAdmin):
             pk = instance.dicom.id
             link = Html.admin_link(model_name, pk)
             url = reverse("dicom:to_zip", args=(instance.dicom.id,))
-            button = DOWNLOAD_BUTTON.format(url=url, file_format="dicom")
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="dicom", text="Download"
+            )
             return mark_safe(f"{link}{button}")
 
     def nifti(self, instance: Scan) -> str:
@@ -164,13 +169,31 @@ class ScanAdmin(admin.ModelAdmin):
             pk = instance.nifti.id
             link = Html.admin_link(model_name, pk)
             url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
-            button = DOWNLOAD_BUTTON.format(url=url, file_format="dicom")
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="nifti", text="Download"
+            )
             return mark_safe(f"{link}{button}")
 
     def mif(self, instance: Scan) -> str:
         expected = instance.get_default_mif_path()
         if expected.exists():
             return str(expected)
+
+    def download(self, instance: Scan) -> str:
+        links = ""
+        if instance.dicom:
+            url = reverse("dicom:to_zip", args=(instance.dicom.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="dicom", text="DICOM"
+            )
+            links += button
+        if instance._nifti:
+            url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="nifti", text="NIfTI"
+            )
+            links += button
+        return mark_safe(links)
 
     def spatial_resolution_(self, scan: Scan) -> str:
         """
@@ -214,6 +237,7 @@ class ScanInline(admin.TabularInline):
         "repetition_time",
         "spatial_resolution_",
         "comments",
+        "download",
     )
     readonly_fields = (
         "number_",
@@ -223,9 +247,27 @@ class ScanInline(admin.TabularInline):
         "inversion_time",
         "repetition_time",
         "spatial_resolution_",
+        "download",
     )
     ordering = ("number",)
     extra = 0
+    can_delete = False
+
+    def download(self, instance: Scan) -> str:
+        links = ""
+        if instance.dicom:
+            url = reverse("dicom:to_zip", args=(instance.dicom.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="dicom", text="DICOM"
+            )
+            links += button
+        if instance._nifti:
+            url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="nifti", text="NIfTI"
+            )
+            links += button
+        return mark_safe(links)
 
     def has_add_permission(self, request, instance: Scan):
         return False
@@ -291,15 +333,33 @@ class SessionAdmin(admin.ModelAdmin):
         "scan_count",
         "irb",
         "comments",
+        "download",
     )
     list_filter = (
         "time",
         ("measurement__title", custom_titled_filter("measurement definition")),
         ("irb", custom_titled_filter("IRB approval")),
     )
+    readonly_fields = ("download",)
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
+
+    def download(self, instance: Session) -> str:
+        links = ""
+        url = reverse("mri:session_nifti_zip", args=(instance.id,))
+        button = DOWNLOAD_BUTTON.format(
+            url=url, file_format="nifti", text="NIfTI"
+        )
+        links += button
+        first_scan = instance.scan_set.first()
+        if first_scan.dicom:
+            url = reverse("mri:session_dicom_zip", args=(instance.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="dicom", text="DICOM"
+            )
+            links += button
+        return mark_safe(links)
 
     def subject_link(self, instance: Session) -> str:
         if instance.subject:
