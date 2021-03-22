@@ -89,6 +89,7 @@ def get_modality_and_data_type(scan, header, acq) -> dict:
     """
     data = NAME_TO_LOC.get(scan.description.split(" ")[0].replace("-", "_"))
     if data:
+        data = data.copy()
         if ("anat" in data.get("data_type")) and (
             "T1w" in data.get("modality") or "T2w" in data.get("modality")
         ):
