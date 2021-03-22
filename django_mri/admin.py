@@ -237,6 +237,7 @@ class ScanInline(admin.TabularInline):
         "repetition_time",
         "spatial_resolution_",
         "comments",
+        "download",
     )
     readonly_fields = (
         "number_",
@@ -246,9 +247,27 @@ class ScanInline(admin.TabularInline):
         "inversion_time",
         "repetition_time",
         "spatial_resolution_",
+        "download",
     )
     ordering = ("number",)
     extra = 0
+    can_delete = False
+
+    def download(self, instance: Scan) -> str:
+        links = ""
+        if instance.dicom:
+            url = reverse("dicom:to_zip", args=(instance.dicom.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="dicom", text="DICOM"
+            )
+            links += button
+        if instance._nifti:
+            url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="nifti", text="NIfTI"
+            )
+            links += button
+        return mark_safe(links)
 
     def has_add_permission(self, request, instance: Scan):
         return False
@@ -314,15 +333,33 @@ class SessionAdmin(admin.ModelAdmin):
         "scan_count",
         "irb",
         "comments",
+        "download",
     )
     list_filter = (
         "time",
         ("measurement__title", custom_titled_filter("measurement definition")),
         ("irb", custom_titled_filter("IRB approval")),
     )
+    readonly_fields = ("download",)
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
+
+    def download(self, instance: Session) -> str:
+        links = ""
+        url = reverse("mri:session_nifti_zip", args=(instance.id,))
+        button = DOWNLOAD_BUTTON.format(
+            url=url, file_format="nifti", text="NIfTI"
+        )
+        links += button
+        first_scan = instance.scan_set.first()
+        if first_scan.dicom:
+            url = reverse("mri:session_dicom_zip", args=(instance.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format="dicom", text="DICOM"
+            )
+            links += button
+        return mark_safe(links)
 
     def subject_link(self, instance: Session) -> str:
         if instance.subject:
