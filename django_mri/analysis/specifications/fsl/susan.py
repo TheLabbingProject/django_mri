@@ -6,14 +6,14 @@ Input and output specification dictionaries for FSL's SUSAN_ script.
 """
 
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *SUSAN* input specification dictionary.
 SUSAN_INPUT_SPECIFICATION = {
@@ -28,10 +28,9 @@ SUSAN_INPUT_SPECIFICATION = {
         "description": "FWHM of smoothing, in millimeters.",
     },
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Filename of input time-series.",
-        "value_attribute": "path.__str__",
     },
     "dimension": {
         "type": IntegerInputDefinition,
@@ -71,7 +70,7 @@ SUSAN_INPUT_SPECIFICATION = {
 #: *SUSAN* output specification dictionary.
 SUSAN_OUTPUT_SPECIFICATION = {
     "smoothed_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Smoothed output file.",
     }
 }

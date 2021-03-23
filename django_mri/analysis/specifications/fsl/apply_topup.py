@@ -16,13 +16,12 @@ Guide`_
    https://nipype.readthedocs.io/en/1.1.7/interfaces/generated/interfaces.fsl/epi.html#applytopup
 """
 
-from django_analyses.models.input.definitions import (FileInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *applytopup* input specification.
 APPLY_TOPUP_INPUT_SPECIFICATION = {
@@ -49,7 +48,7 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
         "description": "Comma separated list of indices corresponding to –datain.",  # noqa: E501
     },
     "in_topup_fieldcoef": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to topup file containing the field coefficients. Requires inputs: in_topup_movpar",  # noqa: E501
     },
     "in_topup_movpar": {
@@ -81,7 +80,7 @@ APPLY_TOPUP_INPUT_SPECIFICATION = {
 #: *applytopup* output specification.
 APPLY_TOPUP_OUTPUT_SPECIFICATION = {
     "out_corrected": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path to 4D image file with unwarped images.",
     },
 }

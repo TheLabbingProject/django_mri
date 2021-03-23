@@ -5,17 +5,15 @@ Input and output specification dictionaries for FSL's FNIRT_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FileInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *FNIRT* input specification dictionary.
 FNIRT_INPUT_SPECIFICATION = {
@@ -291,14 +289,20 @@ FNIRT_OUTPUT_SPECIFICATION = {
         "type": FileOutputDefinition,
         "description": "Field coefficients.",
     },
-    "warped_file": {"type": NiftiOutputDefinition, "description": "Warped image.",},
-    "field_file": {"type": NiftiOutputDefinition, "description": "Warp field.",},
+    "warped_file": {
+        "type": FileOutputDefinition,
+        "description": "Warped image.",
+    },
+    "field_file": {
+        "type": FileOutputDefinition,
+        "description": "Warp field.",
+    },
     "jacobian_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Jacobian of the field.",
     },
     "modulatedref_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Intensity modulated reference.",
     },
     # "out_intensitymap_file": {

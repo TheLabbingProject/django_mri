@@ -10,21 +10,18 @@ For more information, see MRtrix3's `mrcat reference`_.
    https://mrtrix.readthedocs.io/en/latest/reference/commands/mrcat.html
 """
 
-from django_analyses.models.input.definitions import (FileInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *MRCat* input specification dictionary.
 MRCAT_INPUT_SPECIFICATION = {
     "in_files": {
         "type": ListInputDefinition,
-        "element_type": "STR",
+        "element_type": "FIL",
         "required": True,
         "description": "Input images.",
         "is_configuration": False,
@@ -37,7 +34,7 @@ MRCAT_INPUT_SPECIFICATION = {
     },
     "axis": {
         "type": IntegerInputDefinition,
-        "description": "specify axis along which concatenation should be performed.",
+        "description": "specify axis along which concatenation should be performed.",  # noqa: E501
     },
     "datatype": {
         "type": StringInputDefinition,

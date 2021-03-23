@@ -5,23 +5,22 @@ Input and output specification dictionaries for FSL's fslroi_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fslroi
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *fslroi* input specification dictionary.
 FSLROI_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "A NIfTI to extract an ROI from.",
         "is_configuration": False,
-        "value_attribute": "path.__str__",
     },
     "crop_list": {
         "type": ListInputDefinition,
@@ -56,5 +55,8 @@ FSLROI_INPUT_SPECIFICATION = {
 
 #: *fslroi* output specification dictionary.
 FSLROI_OUTPUT_SPECIFICATION = {
-    "roi_file": {"type": NiftiOutputDefinition, "description": "Path to output file.",},
+    "roi_file": {
+        "type": FileOutputDefinition,
+        "description": "Path to output file.",
+    },
 }

@@ -8,25 +8,25 @@ interface, wrapping FSL's fslmaths_.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.maths.html#binarymaths
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FloatInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *BinaryMaths* input specification dictionary.
 BINARY_MATHS_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to image to operate on.",
         "required": True,
         "is_configuration": False,
         "value_attribute": "path.__str__",
     },
     "operand_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to second image to perform operation with. Mutually exclusive with inputs: operand_value.",  # noqa: E501
     },
     "operand_value": {
@@ -71,7 +71,7 @@ BINARY_MATHS_INPUT_SPECIFICATION = {
 #: *BinaryMaths* input specification dictionary.
 BINARY_MATHS_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path to image containing calculation's result.",
     }
 }

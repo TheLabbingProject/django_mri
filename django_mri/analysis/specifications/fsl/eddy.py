@@ -5,20 +5,19 @@ Input and output specification dictionaries for FSL's eddy_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *eddy* input specification dictionary.
 EDDY_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "File containing all the images to estimate distortions for.",  # noqa: E501
         "is_configuration": False,
@@ -44,7 +43,7 @@ EDDY_INPUT_SPECIFICATION = {
         "description": "File containing indices for all volumes in –imain into –acqp and –topup.",  # noqa: E501
     },
     "in_mask": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Mask to indicate brain.",
     },
@@ -74,7 +73,7 @@ EDDY_INPUT_SPECIFICATION = {
         "default": False,
     },
     "field": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Non-topup derived fieldmap scaled in Hz.",
     },
     "field_mat": {
@@ -97,7 +96,7 @@ EDDY_INPUT_SPECIFICATION = {
         "description": "FWHM for conditioning filter when estimating the parameters.",  # noqa: E501
     },
     "in_topup_fieldcoef": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "opup results file containing the field coefficients.",
     },
     "in_topup_movpar": {
@@ -200,7 +199,10 @@ EDDY_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "description": "Detect and replace outlier slices.",
     },
-    "residuals": {"type": BooleanInputDefinition, "description": "Output Residuals.",},
+    "residuals": {
+        "type": BooleanInputDefinition,
+        "description": "Output Residuals.",
+    },
     "session": {
         "type": StringInputDefinition,
         "description": "File containing session indices for all volumes in –imain.",  # noqa: E501
@@ -237,11 +239,11 @@ EDDY_INPUT_SPECIFICATION = {
 #: *eddy* input specification dictionary.
 EDDY_OUTPUT_SPECIFICATION = {
     "out_cnr_maps": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path/name of file with the cnr_maps.",
     },
     "out_corrected": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "4D image file containing all the corrected volumes.",
     },
     "out_movement_over_time": {
@@ -249,11 +251,11 @@ EDDY_OUTPUT_SPECIFICATION = {
         "description": "Text file containing translations (mm) and rotations (radians) for each excitation.",  # noqa: E501
     },
     "out_movement_rms": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Summary of the ‘total movement’ in each volume.",
     },
     "out_outlier_free": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "4D image file not corrected for susceptibility or eddy-current distortions or subject movement but with outlier slices replaced.",  # noqa: E501
     },
     "out_outlier_map": {
@@ -277,11 +279,11 @@ EDDY_OUTPUT_SPECIFICATION = {
         "description": "Text file with parameters defining the field and movement for each scan.",  # noqa: E501
     },
     "out_residuals": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path/name of file with the residuals.",
     },
     "out_restricted_movement_rms": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Summary of the ‘total movement’ in each volume disregarding translation in the PE direction.",  # noqa: E501
     },
     "out_rotated_bvecs": {

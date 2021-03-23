@@ -14,19 +14,16 @@ For more information, see MRtrix3's `dwifslpreproc reference`_.
    https://mrtrix.readthedocs.io/en/latest/reference/commands/dwifslpreproc.html
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      DirectoryInputDefinition,
-                                                      FileInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    DirectoryInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *DwiFslPreproc* input specification dictionary.
 DWIFSLPREPROC_INPUT_SPECIFICATION = {
@@ -95,7 +92,6 @@ DWIFSLPREPROC_INPUT_SPECIFICATION = {
     "eddy_mask": {
         "type": FileInputDefinition,
         "description": "Provide a processing mask to use for eddy, instead of having dwifslpreproc generate one internally using dwi2mask",  # noqa: E501
-        "db_value_preprocessing": "path",
     },
     "eddy_slspec": {
         "type": FileInputDefinition,
@@ -172,7 +168,7 @@ DWIFSLPREPROC_OUTPUT_SPECIFICATION = {
         "description": "Summary of the ‘total movement’ in each volume",
     },
     "eddy_mask": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Brain mask used durring eddy currents correction.",
     },
     "out_outlier_map": {
