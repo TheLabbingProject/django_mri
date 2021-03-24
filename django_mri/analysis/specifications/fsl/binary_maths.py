@@ -23,7 +23,6 @@ BINARY_MATHS_INPUT_SPECIFICATION = {
         "description": "Path to image to operate on.",
         "required": True,
         "is_configuration": False,
-        "value_attribute": "path.__str__",
     },
     "operand_file": {
         "type": FileInputDefinition,

@@ -8,6 +8,7 @@ from pygments.lexers import JsonLexer
 
 ADMIN_VIEW_NAMES = {
     "AnalysisVersion": "admin:django_analyses_analysisversion_change",
+    "Node": "admin:django_analyses_node_change",
     "MeasurementDefinition": "admin:research_measurementdefinition_change",
     "Series": "admin:django_dicom_series_change",
     "Subject": "admin:research_subject_change",
