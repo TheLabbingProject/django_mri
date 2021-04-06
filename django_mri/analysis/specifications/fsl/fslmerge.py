@@ -5,11 +5,12 @@ Input and output specification dictionaries for FSL's fslmerge_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fslmerge
 """
 
-from django_analyses.models.input.definitions import (FloatInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    FloatInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *fslmerge* input specification dictionary.
 FSLMERGE_INPUT_SPECIFICATION = {
@@ -19,7 +20,6 @@ FSLMERGE_INPUT_SPECIFICATION = {
         "description": "A list of (at least 2) NIfTI format files to merge.",
         "is_configuration": False,
         "element_type": "FIL",
-        "db_value_preprocessing": "path.__str__",
     },
     "dimension": {
         "type": StringInputDefinition,
@@ -49,7 +49,7 @@ FSLMERGE_INPUT_SPECIFICATION = {
 #: *fslmerge* output specification dictionary.
 FSLMERGE_OUTPUT_SPECIFICATION = {
     "merged_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path of merged file",
     }
 }

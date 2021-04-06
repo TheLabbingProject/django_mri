@@ -16,12 +16,13 @@ For more information, see MRtrix3's `dwibiascorrect reference`_.
    https://nipype.readthedocs.io/en/1.4.1/api/generated/nipype.interfaces.mrtrix3.preprocess.html#dwibiascorrect
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FileInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    IntegerInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 #: *DWIBiasCorrect* input specification dictionary.
 BIAS_CORRECT_INPUT_SPECIFICATION = {
@@ -61,11 +62,7 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
         "type": StringInputDefinition,
         "description": "Bvecs file in FSL format.",
     },
-    "in_mask": {
-        "type": FileInputDefinition,
-        "description": "Mask image.",
-        "db_value_preprocessing": "path",
-    },
+    "in_mask": {"type": FileInputDefinition, "description": "Mask image.",},
     "nthreads": {
         "type": IntegerInputDefinition,
         "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
@@ -80,7 +77,10 @@ BIAS_CORRECT_INPUT_SPECIFICATION = {
 
 #: *DWIBiasCorrect* output specification dictionary.
 BIAS_CORRECT_OUTPUT_SPECIFICATION = {
-    "bias": {"type": FileOutputDefinition, "description": "The output bias field.",},
+    "bias": {
+        "type": FileOutputDefinition,
+        "description": "The output bias field.",
+    },
     "out_file": {
         "type": FileOutputDefinition,
         "description": "The output denoised DWI image.",

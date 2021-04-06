@@ -14,12 +14,13 @@ For more information, see MRtrix3's `dwi2fod reference`_.
 .. _nipype.interfaces.mrtrix3.preprocess.ConstrainedSphericalDeconvolution:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.reconst.html#constrainedsphericaldeconvolution
 """
-from django_analyses.models.input.definitions import (FileInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 DWI2FOD_INPUT_SPECIFICATION = {
     "algorithm": {
@@ -110,15 +111,9 @@ DWI2FOD_INPUT_SPECIFICATION = {
 
 DWI2FOD_OUTPUT_SPECIFICATION = {
     "csf_odf": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Output CSF ODF.",
     },
-    "gm_odf": {
-        "type": NiftiOutputDefinition,
-        "description": "Output WM ODF.",
-    },
-    "wm_odf": {
-        "type": NiftiOutputDefinition,
-        "description": "Output WM ODF.",
-    },
+    "gm_odf": {"type": FileOutputDefinition, "description": "Output GM ODF."},
+    "wm_odf": {"type": FileOutputDefinition, "description": "Output WM ODF."},
 }

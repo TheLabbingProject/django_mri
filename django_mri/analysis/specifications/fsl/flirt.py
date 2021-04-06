@@ -5,17 +5,15 @@ Input and output specification dictionaries for FSL's FLIRT_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FileInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *FLIRT* input specification dictionary.
 FLIRT_INPUT_SPECIFICATION = {
@@ -238,13 +236,16 @@ FLIRT_INPUT_SPECIFICATION = {
         "description": "Type of BBR cost function.",
         "choices": ["signed", "global_abs", "local_abs"],
     },
-    "bbr_slope": {"type": FloatInputDefinition, "description": "Value of BBR slope.",},
+    "bbr_slope": {
+        "type": FloatInputDefinition,
+        "description": "Value of BBR slope.",
+    },
 }
 
 #: *FLIRT* output specification dictionary.
 FLIRT_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path to registered file (if generated).",
     },
     "out_matrix_file": {

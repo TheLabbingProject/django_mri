@@ -8,18 +8,17 @@ interface, wrapping FSL's fslreorient2std_.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.utils.html#reorient2std
 """
 
-from django_analyses.models.input.definitions import StringInputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *Reorient2Std* input specification dictionary.
 REORIENT2STD_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to NIfTI format image file to reorient.",
-        "value_attribute": "path.__str__",
         "required": True,
         "is_configuration": False,
     },
@@ -47,5 +46,8 @@ REORIENT2STD_INPUT_SPECIFICATION = {
 
 #: *Reorient2Std* output specification dictionary.
 REORIENT2STD_OUTPUT_SPECIFICATION = {
-    "out_file": {"type": NiftiOutputDefinition, "description": "Reorient output file.",}
+    "out_file": {
+        "type": FileOutputDefinition,
+        "description": "Reorient output file.",
+    }
 }

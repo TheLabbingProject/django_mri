@@ -6,13 +6,18 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 """
 
 from django.conf import settings
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      DirectoryInputDefinition,
-                                                      FileInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_analyses.models.output.definitions import FileOutputDefinition
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    DirectoryInputDefinition,
+    FileInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import (
+    FileOutputDefinition,
+    ListOutputDefinition,
+)
 
 #: *recon_all* input specification.
 RECON_ALL_INPUT_SPECIFICATION = {
@@ -302,7 +307,10 @@ RECON_ALL_INPUT_SPECIFICATION = {
 #: *recon_all* output specification.
 RECON_ALL_OUTPUT_SPECIFICATION = {
     # mri/T1.mgz
-    "T1": {"type": FileOutputDefinition, "description": ""},
+    "T1": {
+        "type": FileOutputDefinition,
+        "description": "Intensity normalized whole-head volume.",
+    },
     # mri/rawavg.mgz
     "rawavg": {
         "type": FileOutputDefinition,
@@ -311,7 +319,7 @@ RECON_ALL_OUTPUT_SPECIFICATION = {
     # mri/orig.mgz
     "orig": {
         "type": FileOutputDefinition,
-        "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",  # noqa: E501
+        "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",
     },
     # mri/nu.mgz
     "nu": {
@@ -319,21 +327,171 @@ RECON_ALL_OUTPUT_SPECIFICATION = {
         "description": "This is an intensity normalized volume generated after correcting for non-uniformity in conformed raw average (saved as 'mri/orig.mgz'). If there are any errors in later steps, it sometimes helps to check if the intensity values don't look normal in this file. If the values are too high, then scaling down the intensity a little bit and re-running recon-all usually corrects that error. In some cases, this scaling down can also be done for the orig.mgz volume.",  # noqa: E501
     },
     # mri/norm.mgz
-    "norm": {"type": FileOutputDefinition, "description": ""},
+    "norm": {
+        "type": FileOutputDefinition,
+        "description": "Normalized skull-stripped volume.",
+    },
     # mri/aseg.mgz
-    "aseg": {"type": FileOutputDefinition, "description": ""},
+    "aseg": {
+        "type": FileOutputDefinition,
+        "description": "Volumetric map of regions from automatic segmentation.",
+    },
     # stats/aseg.stats
-    "aseg_stats": {"type": FileOutputDefinition, "description": ""},
+    "aseg_stats": {
+        "type": FileOutputDefinition,
+        "description": "Automated segmentation statistics file.",
+    },
     # mri/brain.mgz
-    "brain": {"type": FileOutputDefinition, "description": ""},
+    "brain": {
+        "type": FileOutputDefinition,
+        "description": "Intensity normalized brain-only volume.",
+    },
     # mri/brainmask.mgz
-    "brainmask": {"type": FileOutputDefinition, "description": ""},
+    "brainmask": {
+        "type": FileOutputDefinition,
+        "description": "Skull-stripped (brain-only) volume.",
+    },
     # mri/filled.mgz
-    "filled": {"type": FileOutputDefinition, "description": ""},
+    "filled": {
+        "type": FileOutputDefinition,
+        "description": "Subcortical mass volume.",
+    },
     # mri/wm.mgz
-    "wm": {"type": FileOutputDefinition, "description": ""},
+    "wm": {
+        "type": FileOutputDefinition,
+        "description": "Segmented white-matter volume.",
+    },
     # mri/wmparc.mgz
-    "wmparc": {"type": FileOutputDefinition, "description": ""},
+    "wmparc": {
+        "type": FileOutputDefinition,
+        "description": "Aparc parcellation projected into subcortical white matter.",
+    },
     # mri/wmparc_stats.mgz
-    "wmparc_stats": {"type": FileOutputDefinition, "description": ""},
+    "wmparc_stats": {
+        "type": FileOutputDefinition,
+        "description": "White matter parcellation statistics file.",
+    },
+    "BA_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Brodmann Area statistics files.",
+    },
+    "annot": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Surface annotation files.",
+    },
+    "aparc_a2009s_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Aparc a2009s parcellation statistics files.",
+    },
+    "aparc_aseg": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Aparc parcellation projected into aseg volume.",
+    },
+    "aparc_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Aparc parcellation statistics files.",
+    },
+    "area_pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Mean area of triangles each vertex on the pial surface is associated with.",
+    },
+    "avg_curv": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Average atlas curvature, sampled to subject.",
+    },
+    "curv": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Maps of surface curvature.",
+    },
+    "curv_pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Curvature of pial surface.",
+    },
+    "curv_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Curvature statistics files.",
+    },
+    "entorhinal_exvivo_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Entorhinal exvivo statistics files.",
+    },
+    "graymid": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Graymid/midthickness surface meshes.",
+    },
+    "inflated": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Inflated surface meshes.",
+    },
+    "jacobian_white": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Distortion required to register to spherical atlas.",
+    },
+    "label": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Volume and surface label files.",
+    },
+    "pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Gray matter/pia mater surface meshes.",
+    },
+    "ribbon": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Volumetric maps of cortical ribbons.",
+    },
+    "smoothwm": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Smoothed original surface meshes.",
+    },
+    "sphere": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Spherical surface meshes.",
+    },
+    "sphere_reg": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Spherical registration file.",
+    },
+    "sulc": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Surface maps of sulcal depth.",
+    },
+    "thickness": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Surface maps of cortical thickness.",
+    },
+    "volume": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Surface maps of cortical volume.",
+    },
+    "white": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "White/gray matter surface meshes.",
+    },
 }
+
+
+# flake8: noqa: E501

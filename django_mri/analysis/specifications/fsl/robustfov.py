@@ -6,20 +6,18 @@ interface, wrapping FSL's *robustfov*.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.utils.html#robustfov
 """
 
-from django_analyses.models.input.definitions import (IntegerInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    IntegerInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *RobustFOV* input specification dictionary.
 ROBUSTFOV_INPUT_SPECIFICATION = {
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to NIfTI format image file to crop.",
-        "value_attribute": "path.__str__",
         "required": True,
         "is_configuration": False,
     },
@@ -60,7 +58,7 @@ ROBUSTFOV_INPUT_SPECIFICATION = {
 
 #: *RobustFOV* output specification dictionary.
 ROBUSTFOV_OUTPUT_SPECIFICATION = {
-    "out_roi": {"type": NiftiOutputDefinition, "description": "ROI volume."},
+    "out_roi": {"type": FileOutputDefinition, "description": "ROI volume."},
     "out_transform": {
         "type": FileOutputDefinition,
         "description": "Transformation matrix in_file to out_roi output name.",

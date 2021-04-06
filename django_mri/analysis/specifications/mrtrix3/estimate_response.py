@@ -14,13 +14,13 @@ For more information, see MRtrix3's `dwi2response reference`_.
 .. _nipype.interfaces.mrtrix3.preprocess.ConstrainedSphericalDeconvolution:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.preprocess.html#responsesd
 """
-from django_analyses.models.input.definitions import (IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
 
 DWI2RESPONSE_INPUT_SPECIFICATION = {
     "algorithm": {
@@ -30,11 +30,10 @@ DWI2RESPONSE_INPUT_SPECIFICATION = {
         "choices": ["msmt_5tt", "dhollander", "tournier", "tax"],
     },
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "description": "Input DWI image.",
         "required": True,
         "is_configuration": False,
-        "value_attribute": "nifti.path",
     },
     "bval_scale": {
         "type": StringInputDefinition,
@@ -87,7 +86,7 @@ DWI2RESPONSE_INPUT_SPECIFICATION = {
         "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
     },
     "mtt_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Input 5tt image.",
     },
 }

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 
@@ -36,6 +37,13 @@ class ReconAllStats:
     def __init__(self, path: Path) -> None:
         self.path = Path(path)
 
+    @staticmethod
+    def read_col_headers(path: Path) -> List[str]:
+        with open(path, "r") as f:
+            for line in f:
+                if "ColHeaders" in line:
+                    return line.strip().split()[2:]
+
     def to_dataframe(self) -> pd.DataFrame:
         stats = pd.DataFrame(columns=START_COLUMNS)
         for atlas_name, atlas_code in ATLASES.items():
@@ -47,7 +55,7 @@ class ReconAllStats:
                 if partial_stats_path.is_file():
                     data = pd.read_csv(
                         partial_stats_path,
-                        skiprows=60,
+                        comment="#",
                         names=COLUMN_NAMES,
                         delim_whitespace=True,
                     )
@@ -59,4 +67,3 @@ class ReconAllStats:
         for column_name in COLUMNS_TO_INT:
             stats[column_name] = stats[column_name].astype("int64")
         return stats
-    

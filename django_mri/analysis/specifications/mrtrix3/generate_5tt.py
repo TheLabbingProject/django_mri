@@ -14,11 +14,12 @@ For more information, see MRtrix3's `5ttgen reference`_.
 .. _nipype.interfaces.mrtrix3.preprocess.ConstrainedSphericalDeconvolution:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.utils.html#generate5tt
 """
-from django_analyses.models.input.definitions import (IntegerInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.inputs.scan_input_definition import ScanInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    IntegerInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 GENERATE_5TT_INPUT_SPECIFICATION = {
     "algorithm": {
@@ -29,11 +30,10 @@ GENERATE_5TT_INPUT_SPECIFICATION = {
         "default": "fsl",
     },
     "in_file": {
-        "type": ScanInputDefinition,
+        "type": FileInputDefinition,
         "description": "Input image.",
         "required": True,
         "is_configuration": False,
-        "value_attribute": "nifti.path",
     },
     "out_file": {
         "type": StringInputDefinition,
@@ -71,7 +71,7 @@ GENERATE_5TT_INPUT_SPECIFICATION = {
 
 GENERATE_5TT_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Output image.",
     },
 }

@@ -15,10 +15,6 @@ from django_analyses.models.input.definitions import (FileInputDefinition,
                                                       StringInputDefinition)
 from django_analyses.models.output.definitions import (FileOutputDefinition,
                                                        ListOutputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 try:
     FSLDIR = os.environ["FSLDIR"]
@@ -28,23 +24,22 @@ except KeyError:
 #: *topup* input specification.
 TOPUP_INPUT_SPECIFICATION = {
     "dwi_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Raw DWI image with corresponding json file.",
         "is_configuration": False,
     },
     "phasediff_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "Raw opposite-encoded (phasediff) image with corresponding json file.",  # noqa: E501
         "is_configuration": False,
     },
     "in_file": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "required": True,
         "description": "A 4D NIfTI file containing images of dual-phase encoded images.",  # noqa: E501
         "is_configuration": False,
-        "value_attribute": "path.__str__",
     },
     "encoding_direction": {
         "type": ListInputDefinition,
@@ -163,7 +158,10 @@ TOPUP_INPUT_SPECIFICATION = {
         "min_value": 0,
         "max_value": 1,
     },
-    "subsamp": {"type": IntegerInputDefinition, "description": "Sub-sampling scheme.",},
+    "subsamp": {
+        "type": IntegerInputDefinition,
+        "description": "Sub-sampling scheme.",
+    },
     "warp_res": {
         "type": FloatInputDefinition,
         "description": "(approximate) resolution (in mm) of warp basis for the different sub-sampling levels.",  # noqa: E501
@@ -173,7 +171,7 @@ TOPUP_INPUT_SPECIFICATION = {
 #: *topup*  output specification.
 TOPUP_OUTPUT_SPECIFICATION = {
     "out_corrected": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path to 4D image file with unwarped images.",
     },
     "out_enc_file": {
@@ -181,7 +179,7 @@ TOPUP_OUTPUT_SPECIFICATION = {
         "description": "Encoding directions file output for applytopup.",
     },
     "out_field": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path to image file containing field (Hz).",
     },
     "out_fieldcoef": {

@@ -8,13 +8,12 @@ wrapping FSL's fslmaths_.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.maths.html#meanimage
 """
 
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      FileInputDefinition,
-                                                      StringInputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    FileInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *MeanImage* input specification dictionary.
 MEAN_IMAGE_INPUT_SPECIFICATION = {
@@ -61,7 +60,7 @@ MEAN_IMAGE_INPUT_SPECIFICATION = {
 #: *MeanImage* output specification dictionary.
 MEAN_IMAGE_OUTPUT_SPECIFICATION = {
     "out_file": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path to image containing calculation's result.",
     }
 }

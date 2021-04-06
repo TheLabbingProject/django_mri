@@ -46,10 +46,30 @@ def custom_titled_filter(title: str):
 
 class ScanRunInline(NonrelatedStackedInline):
     model = Run
-    fields = "run_link", "analysis_version_link", "status"
-    readonly_fields = "run_link", "analysis_version_link", "status"
+    fields = (
+        "run_link",
+        "analysis_version_link",
+        "start_time",
+        "end_time",
+        "duration",
+        "_status",
+        "download",
+    )
+    readonly_fields = (
+        "run_link",
+        "analysis_version_link",
+        "start_time",
+        "end_time",
+        "duration",
+        "_status",
+        "download",
+    )
     can_delete = False
     extra = 0
+    template = "admin/django_mri/scan/edit_inline/tabular.html"
+
+    class Media:
+        css = {"all": ("django_mri/css/hide_admin_original.css",)}
 
     def has_add_permission(self, request, instance: Scan):
         return False
@@ -68,8 +88,24 @@ class ScanRunInline(NonrelatedStackedInline):
         text = str(instance.analysis_version)
         return Html.admin_link(model_name, pk, text)
 
+    def _status(self, instance: Run) -> bool:
+        if instance.status == "SUCCESS":
+            return True
+        elif instance.status == "FAILURE":
+            return False
+
+    def download(self, instance: Run) -> str:
+        if instance.status == "SUCCESS" and instance.path.exists():
+            url = reverse("analyses:run_to_zip", args=(instance.id,))
+            button = DOWNLOAD_BUTTON.format(
+                url=url, file_format=f"run-{instance.id}", text="ZIP"
+            )
+            return mark_safe(button)
+        return ""
+
     analysis_version_link.short_description = "Anaylsis Version"
     run_link.short_description = "Run"
+    _status.boolean = True
 
 
 class ScanAdmin(admin.ModelAdmin):
@@ -132,7 +168,7 @@ class ScanAdmin(admin.ModelAdmin):
         "mif",
         "download",
     )
-    search_fields = ("session__id", "description", "comments")
+    search_fields = ("id", "session__id", "description", "comments")
     inlines = (ScanRunInline,)
 
     class Media:

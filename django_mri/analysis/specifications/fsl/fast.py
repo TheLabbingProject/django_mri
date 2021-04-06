@@ -10,17 +10,13 @@ from django_analyses.models.input.definitions import (BooleanInputDefinition,
                                                       FloatInputDefinition,
                                                       IntegerInputDefinition,
                                                       StringInputDefinition)
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
+from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *FAST* input specification dictionary.
 FAST_INPUT_SPECIFICATION = {
     "in_files": {
-        "type": NiftiInputDefinition,
+        "type": FileInputDefinition,
         "description": "Path to NIfTI format image file to be segmented.",
-        "value_attribute": "path.__str__",
         "required": True,
     },
     "args": {
@@ -155,14 +151,14 @@ FAST_INPUT_SPECIFICATION = {
 #: *FAST* output specification dictionary.
 FAST_OUTPUT_SPECIFICATION = {
     "tissue_class_map": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "An image of all tissue classes represented as 1, 2, and 3.",  # noqa: E501
     },
     "mixeltype": {
-        "type": NiftiOutputDefinition,
+        "type": FileOutputDefinition,
         "description": "Path/name of mixeltype volume file _mixeltype.",
     },
-    "partial_volume_0": {"type": NiftiOutputDefinition, "description": ""},
-    "partial_volume_1": {"type": NiftiOutputDefinition, "description": ""},
-    "partial_volume_2": {"type": NiftiOutputDefinition, "description": ""},
+    "partial_volume_0": {"type": FileOutputDefinition, "description": ""},
+    "partial_volume_1": {"type": FileOutputDefinition, "description": ""},
+    "partial_volume_2": {"type": FileOutputDefinition, "description": ""},
 }

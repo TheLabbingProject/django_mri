@@ -15,15 +15,13 @@ For more information, see MRtrix3's `mrconvert reference`_.
    https://nipype.readthedocs.io/en/1.5.0/api/generated/nipype.interfaces.mrtrix3.utils.html#mrconvert
 """
 
-from django_analyses.models.input.definitions import (FileInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
+from django_analyses.models.input.definitions import (
+    FileInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
 from django_analyses.models.output.definitions import FileOutputDefinition
-from django_mri.models.inputs.nifti_input_definition import \
-    NiftiInputDefinition
-from django_mri.models.outputs.nifti_output_definition import \
-    NiftiOutputDefinition
 
 #: *MRConvert* input specification dictionary.
 MRCONVERT_INPUT_SPECIFICATION = {
@@ -56,7 +54,7 @@ MRCONVERT_INPUT_SPECIFICATION = {
     "scaling": {
         "type": ListInputDefinition,
         "element_type": "FLT",
-        "description": "specify the data scaling parameters used to rescale the intensity values.",  # noqa: E501
+        "description": "specify the data scaling parameters used to rescale the intensity values.",
     },
     "json_import": {
         "type": FileInputDefinition,
@@ -127,16 +125,16 @@ MRCONVERT_INPUT_SPECIFICATION = {
     },
     "grad": {
         "type": FileInputDefinition,
-        "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",  # noqa: E501
+        "description": "Dw gradient scheme (MRTrix format). Mutually exclusive with inputs: grad_fsl.",
     },
     "fslgrad": {
         "type": ListInputDefinition,
         "element_type": "STR",
-        "description": "(bvec, bval) DW gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",  # noqa: E501
+        "description": "(bvec, bval) DW gradient scheme (FSL format). Mutually exclusive with inputs: grad_file.",
     },
     "bvalue_scaling": {
         "type": StringInputDefinition,
-        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",  # noqa: E501
+        "description": "Specifies whether the b - values should be scaled by the square of the corresponding DW gradient norm, as often required for multishell or DSI DW acquisition schemes.",
         "choices": ["yes", "no"],
     },
     "export_grad_mrtrix": {
@@ -170,7 +168,7 @@ MRCONVERT_INPUT_SPECIFICATION = {
     },
     "nthreads": {
         "type": IntegerInputDefinition,
-        "description": "Number of threads. if zero, the number of available cpus will be used.",  # noqa: E501
+        "description": "Number of threads. if zero, the number of available cpus will be used.",
     },
 }
 
@@ -181,3 +179,6 @@ MRCONVERT_OUTPUT_SPECIFICATION = {
         "description": "The output converted image.",
     },
 }
+
+
+# flake8: noqa: E501
