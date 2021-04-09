@@ -10,8 +10,11 @@ from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
-from tests.fixtures import (DICOM_MPRAGE_PATH, SIEMENS_DWI_SERIES,
-                            SIEMENS_DWI_SERIES_PATH)
+from tests.fixtures import (
+    DICOM_MPRAGE_PATH,
+    SIEMENS_DWI_SERIES,
+    SIEMENS_DWI_SERIES_PATH,
+)
 from tests.models import Subject
 from tests.utils import load_common_sequences
 
@@ -23,7 +26,9 @@ class NIfTIModelTestCase(TestCase):
         load_common_sequences()
 
         # MPRAGE scan
-        Image.objects.import_path(DICOM_MPRAGE_PATH, progressbar=False, report=False)
+        Image.objects.import_path(
+            DICOM_MPRAGE_PATH, progressbar=False, report=False
+        )
         series = Image.objects.first().series
         subject, _ = Subject.objects.from_dicom_patient(series.patient)
         header = series.image_set.first().header.instance
