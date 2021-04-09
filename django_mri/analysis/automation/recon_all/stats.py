@@ -37,13 +37,6 @@ class ReconAllStats:
     def __init__(self, path: Path) -> None:
         self.path = Path(path)
 
-    @staticmethod
-    def read_col_headers(path: Path) -> List[str]:
-        with open(path, "r") as f:
-            for line in f:
-                if "ColHeaders" in line:
-                    return line.strip().split()[2:]
-
     def to_dataframe(self) -> pd.DataFrame:
         stats = pd.DataFrame(columns=START_COLUMNS)
         for atlas_name, atlas_code in ATLASES.items():
