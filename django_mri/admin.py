@@ -357,10 +357,24 @@ class SessionAdmin(admin.ModelAdmin):
     interface.
     """
 
-    #: List the associated scan instances.
     inlines = (ScanInline,)
-
-    #: Fields displayed on the change list page of the admin.
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": [
+                    "subject",
+                    "measurement",
+                    "time",
+                    "comments",
+                    "irb",
+                    "created",
+                    "modified",
+                    "download",
+                ]
+            },
+        ),
+    )
     list_display = (
         "id",
         "time",
@@ -368,6 +382,7 @@ class SessionAdmin(admin.ModelAdmin):
         "measurement_link",
         "scan_count",
         "irb",
+        "created",
         "comments",
         "download",
     )
@@ -375,8 +390,13 @@ class SessionAdmin(admin.ModelAdmin):
         "time",
         ("measurement__title", custom_titled_filter("measurement definition")),
         ("irb", custom_titled_filter("IRB approval")),
+        "created",
     )
-    readonly_fields = ("download",)
+    readonly_fields = (
+        "created",
+        "download",
+        "modified",
+    )
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
