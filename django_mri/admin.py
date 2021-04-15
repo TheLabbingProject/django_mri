@@ -149,6 +149,7 @@ class ScanAdmin(admin.ModelAdmin):
     #: Fields displayed on the change list page of the admin.
     list_display = (
         "id",
+        "subject_link",
         "session_link",
         "number",
         "time",
@@ -186,6 +187,11 @@ class ScanAdmin(admin.ModelAdmin):
     def session_link(self, instance: Scan) -> str:
         model_name = instance.session.__class__.__name__
         pk = instance.session.id
+        return Html.admin_link(model_name, pk)
+
+    def subject_link(self, instance: Scan) -> str:
+        model_name = instance.session.subject.__class__.__name__
+        pk = instance.session.subject.id
         return Html.admin_link(model_name, pk)
 
     def dicom_link(self, instance: Scan) -> str:
@@ -255,6 +261,7 @@ class ScanAdmin(admin.ModelAdmin):
             return ""
 
     session_link.short_description = "Session"
+    subject_link.short_description = "Subject"
     dicom_link.short_description = "DICOM"
 
 

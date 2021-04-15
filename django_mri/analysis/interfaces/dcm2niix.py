@@ -131,8 +131,6 @@ class Dcm2niix:
         else:
             stdout, stderr = process.communicate()
             returned_path = self.extract_output_path(str(stdout), compressed)
-            # TODO: This logic should be changed to be more flexible and allow
-            # for non-BIDS-compatible conversions.
             expected_path = destination.with_suffix(".nii.gz")
             if returned_path != expected_path:
                 message = messages.DCM2NIIX_PATH_MISMATCH.format(
@@ -141,6 +139,8 @@ class Dcm2niix:
                 warnings.warn(message)
             if Path(str(returned_path)).is_file():
                 return returned_path
+            elif expected_path.is_file():
+                return expected_path
             else:
                 message = messages.DCM2NIIX_FAILURE.format(
                     path=path,

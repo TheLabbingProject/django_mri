@@ -116,28 +116,43 @@ def get_session_by_series(series):
     image = series.image_set.first()
     if image:
         header = image.header.instance
-        study_date, study_time = (
-            header.get("StudyDate"),
-            header.get("StudyTime", datetime.time()),
-        )
-        session_time = datetime.datetime.combine(
-            study_date, study_time
-        ).replace(tzinfo=pytz.UTC)
-        try:
-            subject = Subject.objects.get(id_number=series.patient.uid)
-        # If the subject doesn't exist in the database, create a new session
-        # without an associated subject.
-        except ObjectDoesNotExist:
-            session = Session.objects.create(time=session_time)
-        # If the subject does exist, look for an existing session by time.
-        else:
-            session = subject.mri_session_set.filter(time=session_time).first()
-            # If no existing session exists, create one.
-            if not session:
-                session = Session.objects.create(
-                    time=session_time, subject=subject
-                )
-        return session
+        acquisition_date = header.get("AcquisitionDate")
+        instance_date = header.get("InstanceCreationDate", acquisition_date)
+        series_date = header.get("SeriesDate", instance_date)
+        study_date = header.get("StudyDate", series_date)
+        if study_date is not None:
+            study_time = header.get("StudyTime", datetime.time())
+            session_time = datetime.datetime.combine(
+                study_date, study_time
+            ).replace(tzinfo=pytz.UTC)
+            try:
+                subject = Subject.objects.get(id_number=series.patient.uid)
+            # If the subject doesn't exist in the database, create a new
+            # session without an associated subject.
+            except ObjectDoesNotExist:
+                session = Session.objects.create(time=session_time)
+            # If the subject does exist, look for an existing session by time.
+            else:
+                session = subject.mri_session_set.filter(
+                    time=session_time
+                ).first()
+                # If no existing session exists, create one.
+                if not session:
+                    session = Session.objects.create(
+                        time=session_time, subject=subject
+                    )
+                # If a series with the provided number already exists within
+                # the session, create a new one (this is mostly relevant when
+                # adding multiple subject sessions with no time data).
+                else:
+                    number_exists = session.scan_set.filter(
+                        number=series.number
+                    ).exists()
+                    if number_exists:
+                        session = Session.objects.create(
+                            time=session_time, subject=subject
+                        )
+            return session
 
 
 def get_data_share_root() -> Path:

@@ -353,24 +353,26 @@ class Scan(TimeStampedModel):
         """
 
         if self.sequence_type and self.sequence_type.title == "Localizer":
-            warnings.warn("Localizer scans may not converted to NIfTI.")
-            return None
-        if self.dicom:
-            dcm2niix = Dcm2niix()
+            warnings.warn(messages.NO_LOCALIZER_NIFTI)
+        elif self.dicom:
+            bids = False
             if destination is None:
                 destination = self.get_bids_destination()
                 if destination is None:
                     destination = self.get_default_nifti_destination()
+                else:
+                    bids = True
             elif not isinstance(destination, Path):
                 destination = Path(destination)
             destination.parent.mkdir(exist_ok=True, parents=True)
-            nifti_path = dcm2niix.convert(
-                self.dicom.get_path(),
+            nifti_path = Dcm2niix().convert(
+                self.dicom.path,
                 destination,
                 compressed=compressed,
                 generate_json=generate_json,
             )
-            self.compile_to_bids(destination)
+            if bids:
+                self.compile_to_bids(destination)
             nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
             return nifti
         else:
@@ -535,6 +537,17 @@ class Scan(TimeStampedModel):
         return {run: run.output_configuration for run in self.run_set.all()}
 
     def html_plot(self):
+        # First make sure an associated NIfTI instance exists or create it.
+        if not self._nifti:
+            try:
+                self.nifti
+            except RuntimeError as e:
+                # In case NIfTI conversion fails, return exception message.
+                message = messages.NIFTI_CONVERSION_FAILURE_HTML.format(
+                    scan_id=self.id, exception=e
+                )
+                return message
+        # Determine the number of dimensions.
         has_3d_flag = any(
             [flag in self.description.lower() for flag in FLAG_3D]
         )
@@ -542,17 +555,15 @@ class Scan(TimeStampedModel):
             [flag in self.description.lower() for flag in FLAG_4D]
         )
         if not (has_3d_flag or has_4d_flag):
-            try:
-                data = self.nifti.get_data()
-            except RuntimeError:
-                return
-            else:
-                ndim = data.ndim
+            data = self.nifti.get_data()
+            ndim = data.ndim
         else:
             ndim = 3 if has_3d_flag else 4
+        # 3D parameters.
         if ndim == 3:
             image = str(self.nifti.path)
             title = self.description
+        # 4D parameters.
         elif ndim == 4:
             image = mean_img(str(self.nifti.path))
             title = f"{self.description} (Mean Image)"
