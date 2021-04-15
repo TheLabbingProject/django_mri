@@ -58,6 +58,11 @@ urlpatterns = [
         name="nilearn_plot",
     ),
     path(
+        "mri/scan/<int:scan_id>/nifti_zip/",
+        views.ScanViewSet.as_view({"get": "nifti_zip"}),
+        name="nifti_zip",
+    ),
+    path(
         "mri/nifti/<int:nifti_id>/to_zip/",
         views.NiftiViewSet.as_view({"get": "to_zip"}),
         name="nifti_to_zip",

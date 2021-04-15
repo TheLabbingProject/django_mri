@@ -1,3 +1,7 @@
+import io
+import zipfile
+from pathlib import Path
+
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from django.conf import settings
@@ -20,6 +24,8 @@ from rest_framework.response import Response
 
 HOST_NAME = getattr(settings, "APP_IP", "localhost")
 BOKEH_URL = f"http://{HOST_NAME}:5006/series_viewer"
+CONTENT_DISPOSITION = "attachment; filename={instance_id}.zip"
+ZIP_CONTENT_TYPE = "application/x-zip-compressed"
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -185,3 +191,26 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         else:
             content = "No preview available :("
         return JsonResponse({"content": content})
+
+    @action(detail=True, methods=["get"])
+    def nifti_zip(self, request: Request, pk: int) -> HttpResponse:
+        instance = Scan.objects.get(id=pk)
+        try:
+            nii_path = Path(instance.nifti.path)
+        except (AttributeError, RuntimeError):
+            return HttpResponse(
+                f"Could not create NIfTI format version of scan #{pk}"
+            )
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as zip_file:
+            nii_name = nii_path.name
+            zip_file.write(nii_path, nii_name)
+            json_file = Path(instance.nifti.json_file)
+            if json_file.exists():
+                zip_file.write(json_file, json_file.name)
+        response = HttpResponse(
+            buffer.getvalue(), content_type=ZIP_CONTENT_TYPE
+        )
+        content_disposition = CONTENT_DISPOSITION.format(instance_id=pk)
+        response["Content-Disposition"] = content_disposition
+        return response
