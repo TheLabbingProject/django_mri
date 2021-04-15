@@ -46,18 +46,18 @@ def custom_titled_filter(title: str):
 
 def create_scan_download_links(instance: Scan) -> str:
     links = ""
-    # NIfTI download link for non-localizer scans.
-    if "loc" not in instance.description.lower():
-        url = reverse("mri:nifti_zip", args=(instance.id,))
-        button = DOWNLOAD_BUTTON.format(
-            url=url, file_format="nifti", text="NIfTI"
-        )
-        links += button
     # DICOM download link if associated Series instance exists.
     if instance.dicom:
         url = reverse("dicom:to_zip", args=(instance.dicom.id,))
         button = DOWNLOAD_BUTTON.format(
             url=url, file_format="dicom", text="DICOM"
+        )
+        links += button
+    # NIfTI download link for non-localizer scans.
+    if "loc" not in instance.description.lower():
+        url = reverse("mri:nifti_zip", args=(instance.id,))
+        button = DOWNLOAD_BUTTON.format(
+            url=url, file_format="nifti", text="NIfTI"
         )
         links += button
     return mark_safe(links)
