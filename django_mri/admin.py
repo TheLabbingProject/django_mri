@@ -149,6 +149,7 @@ class ScanAdmin(admin.ModelAdmin):
     #: Fields displayed on the change list page of the admin.
     list_display = (
         "id",
+        "subject_link",
         "session_link",
         "number",
         "time",
@@ -186,6 +187,11 @@ class ScanAdmin(admin.ModelAdmin):
     def session_link(self, instance: Scan) -> str:
         model_name = instance.session.__class__.__name__
         pk = instance.session.id
+        return Html.admin_link(model_name, pk)
+
+    def subject_link(self, instance: Scan) -> str:
+        model_name = instance.session.subject.__class__.__name__
+        pk = instance.session.subject.id
         return Html.admin_link(model_name, pk)
 
     def dicom_link(self, instance: Scan) -> str:
@@ -255,6 +261,7 @@ class ScanAdmin(admin.ModelAdmin):
             return ""
 
     session_link.short_description = "Session"
+    subject_link.short_description = "Subject"
     dicom_link.short_description = "DICOM"
 
 
@@ -357,10 +364,24 @@ class SessionAdmin(admin.ModelAdmin):
     interface.
     """
 
-    #: List the associated scan instances.
     inlines = (ScanInline,)
-
-    #: Fields displayed on the change list page of the admin.
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": [
+                    "subject",
+                    "measurement",
+                    "time",
+                    "comments",
+                    "irb",
+                    "created",
+                    "modified",
+                    "download",
+                ]
+            },
+        ),
+    )
     list_display = (
         "id",
         "time",
@@ -368,6 +389,7 @@ class SessionAdmin(admin.ModelAdmin):
         "measurement_link",
         "scan_count",
         "irb",
+        "created",
         "comments",
         "download",
     )
@@ -375,8 +397,13 @@ class SessionAdmin(admin.ModelAdmin):
         "time",
         ("measurement__title", custom_titled_filter("measurement definition")),
         ("irb", custom_titled_filter("IRB approval")),
+        "created",
     )
-    readonly_fields = ("download",)
+    readonly_fields = (
+        "created",
+        "download",
+        "modified",
+    )
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}

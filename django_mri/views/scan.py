@@ -12,6 +12,7 @@ from django_mri.serializers import ScanSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import fix_bokeh_script
+from nilearn.plotting.html_document import HTMLDocument
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -177,8 +178,10 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     def nilearn_plot(self, request: Request, pk: int = None) -> Response:
         scan = Scan.objects.get(id=pk)
         html_doc = scan.html_plot()
-        if html_doc:
+        if isinstance(html_doc, HTMLDocument):
             content = html_doc.get_iframe(width=1000, height=500)
+        elif isinstance(html_doc, str):
+            content = html_doc
         else:
             content = "No preview available :("
         return JsonResponse({"content": content})
