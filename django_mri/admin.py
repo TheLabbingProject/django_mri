@@ -44,6 +44,25 @@ def custom_titled_filter(title: str):
     return Wrapper
 
 
+def create_scan_download_links(instance: Scan) -> str:
+    links = ""
+    # NIfTI download link for non-localizer scans.
+    if "loc" not in instance.description.lower():
+        url = reverse("mri:nifti_zip", args=(instance.id,))
+        button = DOWNLOAD_BUTTON.format(
+            url=url, file_format="nifti", text="NIfTI"
+        )
+        links += button
+    # DICOM download link if associated Series instance exists.
+    if instance.dicom:
+        url = reverse("dicom:to_zip", args=(instance.dicom.id,))
+        button = DOWNLOAD_BUTTON.format(
+            url=url, file_format="dicom", text="DICOM"
+        )
+        links += button
+    return mark_safe(links)
+
+
 class ScanRunInline(NonrelatedStackedInline):
     model = Run
     fields = (
@@ -222,20 +241,7 @@ class ScanAdmin(admin.ModelAdmin):
             return str(expected)
 
     def download(self, instance: Scan) -> str:
-        links = ""
-        if instance.dicom:
-            url = reverse("dicom:to_zip", args=(instance.dicom.id,))
-            button = DOWNLOAD_BUTTON.format(
-                url=url, file_format="dicom", text="DICOM"
-            )
-            links += button
-        if instance._nifti:
-            url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
-            button = DOWNLOAD_BUTTON.format(
-                url=url, file_format="nifti", text="NIfTI"
-            )
-            links += button
-        return mark_safe(links)
+        return create_scan_download_links(instance)
 
     def spatial_resolution_(self, scan: Scan) -> str:
         """
@@ -297,20 +303,7 @@ class ScanInline(admin.TabularInline):
     can_delete = False
 
     def download(self, instance: Scan) -> str:
-        links = ""
-        if instance.dicom:
-            url = reverse("dicom:to_zip", args=(instance.dicom.id,))
-            button = DOWNLOAD_BUTTON.format(
-                url=url, file_format="dicom", text="DICOM"
-            )
-            links += button
-        if instance._nifti:
-            url = reverse("mri:nifti_to_zip", args=(instance.nifti.id,))
-            button = DOWNLOAD_BUTTON.format(
-                url=url, file_format="nifti", text="NIfTI"
-            )
-            links += button
-        return mark_safe(links)
+        return create_scan_download_links(instance)
 
     def has_add_permission(self, request, instance: Scan):
         return False
