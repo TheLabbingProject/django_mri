@@ -64,6 +64,20 @@ class Session(TimeStampedModel):
     class Meta:
         ordering = ("-time",)
 
+    def __str__(self) -> str:
+        """
+        Returns the string representation of this instance.
+
+        Returns
+        -------
+        str
+            String representation
+        """
+        date = self.time.date()
+        if self.subject:
+            return f"Subject #{self.subject.id} MRI session from {date}"
+        return f"Unclaimed MRI session from {date}"
+
     @property
     def study_groups(self) -> QuerySet:
         """
