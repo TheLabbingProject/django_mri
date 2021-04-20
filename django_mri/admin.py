@@ -12,6 +12,7 @@ References
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -354,6 +355,30 @@ class ScanInline(admin.TabularInline):
         return mark_safe(link_html)
 
 
+class MeasurementDefinitionFilter(SimpleListFilter):
+    title = "measurement definition"
+    parameter_name = "measurement definition"
+
+    def get_content_type(self) -> ContentType:
+        return ContentType.objects.get(app_label="django_mri", model="session")
+
+    def lookups(self, request, model_admin):
+        definitions = {
+            session.measurement for session in model_admin.model.objects.all()
+        }
+        return [(d.id, d.title) for d in definitions if d]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value:
+            return queryset.filter(measurement=value)
+        return queryset
+
+    @property
+    def content_type(self) -> ContentType:
+        return self.get_content_type()
+
+
 class SessionAdmin(admin.ModelAdmin):
     """
     Adds the :class:`~django_mri.models.session.Session` model to the admin
@@ -391,7 +416,8 @@ class SessionAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "time",
-        ("measurement__title", custom_titled_filter("measurement definition")),
+        # ("measurement__title", custom_titled_filter("measurement definition")),
+        MeasurementDefinitionFilter,
         ("irb", custom_titled_filter("IRB approval")),
         "created",
     )
