@@ -10,7 +10,9 @@ References
    https://docs.djangoproject.com/en/3.0/ref/contrib/admin/
 """
 
+from django import forms
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_analyses.models.run import Run
@@ -21,6 +23,7 @@ from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
+from django_mri.utils import get_measurement_model
 from django_mri.utils.html import Html
 
 DOWNLOAD_BUTTON = '<span style="padding-left:20px;"><a href={url} type="button" class="button" id="{file_format}-download-button">{text}</a></span>'  # noqa: E501
@@ -407,6 +410,20 @@ class SessionAdmin(admin.ModelAdmin):
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
+
+    def get_form(self, request, instance, **kwargs):
+        # Show only measurement definitions with the content_type set to
+        # Session.
+        form = super().get_form(request, instance, **kwargs)
+        content_type = ContentType.objects.get_for_model(Session)
+        MeasurementDefinition = get_measurement_model()
+        queryset = MeasurementDefinition.objects.filter(
+            content_type=content_type
+        )
+        form.base_fields["measurement"] = forms.ModelChoiceField(
+            queryset=queryset
+        )
+        return form
 
     def download(self, instance: Session) -> str:
         links = ""
