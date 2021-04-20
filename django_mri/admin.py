@@ -397,6 +397,13 @@ class SessionAdmin(admin.ModelAdmin):
         "download",
         "modified",
     )
+    search_fields = (
+        "id",
+        "subject__id_number",
+        "subject__id",
+        "irb__number",
+        "comments",
+    )
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
