@@ -1,11 +1,14 @@
 """
 Definition of the :class:`SessionReadSerializer` class.
 """
+from django.urls import reverse
 from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.session import Session
 from django_mri.serializers.irb_approval import IrbApprovalSerializer
-from django_mri.serializers.utils import (MiniMeasurementSerializer,
-                                          MiniSubjectSerializer)
+from django_mri.serializers.utils import (
+    MiniMeasurementSerializer,
+    MiniSubjectSerializer,
+)
 from django_mri.utils import get_measurement_model, get_subject_model
 from rest_framework import serializers
 
@@ -25,6 +28,8 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     measurement = MiniMeasurementSerializer()
     subject = MiniSubjectSerializer()
     irb = IrbApprovalSerializer()
+    dicom_zip = serializers.SerializerMethodField()
+    nifti_zip = serializers.SerializerMethodField()
 
     class Meta:
         model = Session
@@ -35,7 +40,15 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
             "time",
             "measurement",
             "irb",
+            "dicom_zip",
+            "nifti_zip",
         )
+
+    def get_dicom_zip(self, instance: Session) -> str:
+        return reverse("mri:session_dicom_zip", args=(instance.id,))
+
+    def get_nifti_zip(self, instance: Session) -> str:
+        return reverse("mri:session_nifti_zip", args=(instance.id,))
 
 
 class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
@@ -57,7 +70,7 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
     )
     irb = IrbApprovalSerializer()
     irb_id = serializers.PrimaryKeyRelatedField(
-        queryset=IrbApproval.objects.all()
+        queryset=IrbApproval.objects.all(), allow_null=True
     )
 
     class Meta:

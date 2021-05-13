@@ -9,11 +9,14 @@ References
 .. _The Django admin site:
    https://docs.djangoproject.com/en/3.0/ref/contrib/admin/
 """
-
+from bokeh.embed import autoload_static
+from bokeh.layouts import layout
+from bokeh.resources import CDN
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_analyses.models.run import Run
@@ -98,7 +101,7 @@ class ScanRunInline(NonrelatedStackedInline):
         return False
 
     def get_form_queryset(self, instance: Scan):
-        return instance.run_set.all()
+        return instance.query_run_set()
 
     def run_link(self, instance: Run) -> str:
         model_name = instance.__class__.__name__
@@ -359,24 +362,22 @@ class MeasurementDefinitionFilter(SimpleListFilter):
     title = "measurement definition"
     parameter_name = "measurement definition"
 
-    def get_content_type(self) -> ContentType:
-        return ContentType.objects.get(app_label="django_mri", model="session")
-
     def lookups(self, request, model_admin):
-        definitions = {
-            session.measurement for session in model_admin.model.objects.all()
-        }
-        return [(d.id, d.title) for d in definitions if d]
+        sessions = (
+            model_admin.model.objects.filter(measurement__isnull=False)
+            .order_by("measurement__title")
+            .distinct("measurement__title")
+        )
+        return [
+            (session.measurement.id, session.measurement.title)
+            for session in sessions
+        ]
 
     def queryset(self, request, queryset):
         value = self.value()
         if value:
             return queryset.filter(measurement=value)
         return queryset
-
-    @property
-    def content_type(self) -> ContentType:
-        return self.get_content_type()
 
 
 class SessionAdmin(admin.ModelAdmin):
@@ -416,7 +417,6 @@ class SessionAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "time",
-        # ("measurement__title", custom_titled_filter("measurement definition")),
         MeasurementDefinitionFilter,
         ("irb", custom_titled_filter("IRB approval")),
         "created",
@@ -433,9 +433,37 @@ class SessionAdmin(admin.ModelAdmin):
         "irb__number",
         "comments",
     )
+    actions = ("export_csv",)
 
     class Media:
         css = {"all": ("django_mri/css/hide_admin_original.css",)}
+
+    @admin.action(description="Export CSV")
+    def export_csv(self, request, queryset):
+        df = queryset.to_dataframe()
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={
+                "Content-Disposition": "attachment; filename=sessions.csv"
+            },
+        )
+        df.to_csv(path_or_buf=response)
+        return response
+
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(
+            request, extra_context=extra_context
+        )
+        if hasattr(response, "context_data"):
+            queryset = response.context_data["cl"].queryset
+            if queryset.count() > 10:
+                month_distribution_plot = queryset.plot_measurement_by_month()
+                figure_layout = [month_distribution_plot]
+                figure = layout(figure_layout)
+                js, tag = autoload_static(figure, CDN, "tmp_bokeh_figure")
+                extra_context = {"bokeh_tag": tag, "bokeh_js": js}
+                response.context_data.update(extra_context)
+        return response
 
     def get_form(self, request, instance, **kwargs):
         # Show only measurement definitions with the content_type set to

@@ -123,7 +123,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": True,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "lpba40": {
@@ -131,7 +131,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "cobra": {
@@ -139,7 +139,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "hammers": {
@@ -147,7 +147,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "native_grey_matter": {
@@ -155,7 +155,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "modulated_grey_matter": {
@@ -163,7 +163,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": True,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "dartel_grey_matter": {
@@ -171,7 +171,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "native_white_matter": {
@@ -179,7 +179,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "modulated_white_matter": {
@@ -187,7 +187,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": True,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "dartel_white_matter": {
@@ -195,7 +195,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "native_pve": {
@@ -203,7 +203,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": True,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "warped_image": {
@@ -211,7 +211,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": True,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "jacobian_determinant": {
@@ -219,7 +219,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "required": False,
         "description": "",
         "default": False,
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     "deformation_fields": {
@@ -228,7 +228,7 @@ CAT12_SEGMENTATION_INPUT_SPECIFICATION = {
         "description": "",
         "choices": ["none", "forward", "inverse", "both"],
         "default": "none",
-        "is_configuration": False,
+        "is_configuration": True,
         "is_output_switch": True,
     },
     # Added in version 12.7

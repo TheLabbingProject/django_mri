@@ -21,7 +21,7 @@ INPUT_GENERATION = (
 #: NIfTI conversion failure message.
 NIFTI_CONVERSION_FAILURE = (
     bcolors.WARNING
-    + "Failed to convert scan #{scan_id} to NIfTI."
+    + "Failed to convert scan #{instance_id} to NIfTI."
     + bcolors.ENDC
 )
 
