@@ -10,6 +10,7 @@ import nibabel as nib
 import numpy as np
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
+from django_mri.models.messages import NIFTI_FILE_MISSING
 from django_mri.utils.compression import compress, uncompress
 
 
@@ -257,6 +258,35 @@ class NIfTI(TimeStampedModel):
             self.save()
         return Path(self.path)
 
+    def _resolve_compression_state(self) -> None:
+        """
+        Fixed the instance's path in case it's out of sync with compression
+        state. This method is used for testing and Should not be required
+        under normal circumstances.
+
+        Raises
+        ------
+        FileNotFoundError
+            No associated file found in the file system
+        """
+        path = Path(self.path)
+        is_compressed = path.suffix == ".gz"
+        compressed_path = path if is_compressed else path.with_suffix(".gz")
+        uncompressed_path = path if not is_compressed else path.with_suffix("")
+        valid_compressed = is_compressed and compressed_path.exists()
+        valid_uncompressed = uncompressed_path.exists() and not is_compressed
+        if not valid_compressed and uncompressed_path.exists():
+            self.path = str(path.with_suffix(""))
+            self.save()
+        elif not valid_uncompressed and compressed_path.exists():
+            self.path = str(path.with_suffix(".gz"))
+            self.save()
+        elif valid_compressed or valid_uncompressed:
+            return
+        else:
+            message = NIFTI_FILE_MISSING.format(pk=self.id, path=self.path)
+            raise FileNotFoundError(message)
+
     @property
     def json_file(self) -> Path:
         """
@@ -371,7 +401,7 @@ class NIfTI(TimeStampedModel):
             Associated *.nii* file gzip compression state
         """
 
-        return Path(self.path).name.endswith(".gz")
+        return Path(self.path).suffix == ".gz"
 
     @property
     def compressed(self) -> Path:
