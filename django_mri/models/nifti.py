@@ -34,7 +34,7 @@ class NIfTI(TimeStampedModel):
         verbose_name = "NIfTI"
         ordering = ("-id",)
 
-    def get_data(self) -> np.ndarray:
+    def get_data(self, dtype: np.dtype = np.float64) -> np.ndarray:
         """
         Uses NiBabel_ to return the underlying pixel data as a NumPy_ array.
 
@@ -47,7 +47,7 @@ class NIfTI(TimeStampedModel):
             Pixel data.
         """
 
-        return nib.load(str(self.path)).get_fdata()
+        return nib.load(str(self.path)).get_fdata(dtype=dtype)
 
     def get_b_value(self) -> List[int]:
         """

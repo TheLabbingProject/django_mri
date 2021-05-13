@@ -88,7 +88,7 @@ def get_run_set() -> QuerySet:
     QuerySet
         Existing CAT12 segmentation runs
     """
-    return get_node().run_set.filter(status="SUCCESS")
+    return get_node().get_run_set().filter(status="SUCCESS")
 
 
 def read_nifti(path: Path) -> np.ndarray:

@@ -11,7 +11,7 @@ SEGMENTATION_DEFAULTS = {
     "local_adaptive_segmentation_strength": "medium",
     "skull_stripping": "aprg",
     "normalized_image_voxel_size": 1.5,
-    "internal_resampling": 1,
+    "internal_resampling": 1.5,
     "surface_estimation": False,
     "neuromorphometrics": True,
     "lpba40": False,

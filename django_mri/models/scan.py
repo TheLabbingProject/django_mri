@@ -131,7 +131,7 @@ class Scan(TimeStampedModel):
     #: The `Group` model is expected to be specified as `STUDY_GROUP_MODEL` in
     #: the project's settings.
     study_groups = models.ManyToManyField(
-        get_group_model(), related_name="mri_scans", blank=True
+        get_group_model(), related_name="mri_scan_set", blank=True
     )
 
     #: Keeps a record of the user that added this scan.
@@ -230,13 +230,18 @@ class Scan(TimeStampedModel):
         """
 
         try:
+            sequence = self.dicom.scanning_sequence or []
+            variant = self.dicom.sequence_variant or []
             sequence_definition = SequenceTypeDefinition.objects.get(
-                scanning_sequence=self.dicom.scanning_sequence,
-                sequence_variant=self.dicom.sequence_variant,
+                scanning_sequence__contains=sequence,
+                sequence_variant__contains=variant,
+                scanning_sequence__contained_by=sequence,
+                sequence_variant__contained_by=variant,
             )
-            return sequence_definition.sequence_type
         except models.ObjectDoesNotExist:
-            return None
+            pass
+        else:
+            return sequence_definition.sequence_type
 
     def infer_sequence_type(self) -> SequenceType:
         """
@@ -534,19 +539,27 @@ class Scan(TimeStampedModel):
         Dict[Run, Dict[str, Any]]
             Derivatives
         """
-        return {run: run.output_configuration for run in self.run_set.all()}
+        return {run: run.output_configuration for run in self.query_run_set()}
 
     def html_plot(self):
         # First make sure an associated NIfTI instance exists or create it.
-        if not self._nifti:
+        nii = self._nifti
+        if not nii:
             try:
-                self.nifti
+                nii = self.nifti
             except RuntimeError as e:
                 # In case NIfTI conversion fails, return exception message.
                 message = messages.NIFTI_CONVERSION_FAILURE_HTML.format(
                     scan_id=self.id, exception=e
                 )
                 return message
+            else:
+                if not isinstance(nii, NIfTI):
+                    e = "NIfTI format generation failure"
+                    message = messages.NIFTI_CONVERSION_FAILURE_HTML.format(
+                        scan_id=self.id, exception=e
+                    )
+                    return message
         # Determine the number of dimensions.
         has_3d_flag = any(
             [flag in self.description.lower() for flag in FLAG_3D]
@@ -555,17 +568,17 @@ class Scan(TimeStampedModel):
             [flag in self.description.lower() for flag in FLAG_4D]
         )
         if not (has_3d_flag or has_4d_flag):
-            data = self.nifti.get_data()
+            data = nii.get_data()
             ndim = data.ndim
         else:
             ndim = 3 if has_3d_flag else 4
         # 3D parameters.
         if ndim == 3:
-            image = str(self.nifti.path)
+            image = str(nii.path)
             title = self.description
         # 4D parameters.
         elif ndim == 4:
-            image = mean_img(str(self.nifti.path))
+            image = mean_img(str(nii.path))
             title = f"{self.description} (Mean Image)"
         return view_img(
             image,
@@ -723,19 +736,19 @@ class Scan(TimeStampedModel):
         """
         return self.query_input_set()
 
-    @property
-    def run_set(self) -> models.QuerySet:
-        """
-        Returns a queryset of :class:`~django_analyses.models.run.Run`
-        instances in which this scan was included in the inputs.
+    # @property
+    # def run_set(self) -> models.QuerySet:
+    #     """
+    #     Returns a queryset of :class:`~django_analyses.models.run.Run`
+    #     instances in which this scan was included in the inputs.
 
-        Returns
-        -------
-        models.QuerySet
-            Input queryset
+    #     Returns
+    #     -------
+    #     models.QuerySet
+    #         Input queryset
 
-        See Also
-        --------
-        :func:`query_run_set`
-        """
-        return self.query_run_set()
+    #     See Also
+    #     --------
+    #     :func:`query_run_set`
+    #     """
+    #     return self.query_run_set()

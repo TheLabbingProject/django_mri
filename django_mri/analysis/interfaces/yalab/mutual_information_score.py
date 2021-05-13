@@ -101,7 +101,7 @@ class MutualInformationScore:
 
     def run(self, runs: QuerySet = None) -> pd.DataFrame:
         node = get_cat12_segmentation_node()
-        runs = runs or node.run_set.filter(status="SUCCESS")
+        runs = runs or node.get_run_set().filter(status="SUCCESS")
         indices = pd.MultiIndex.from_tuples(
             combinations(range(runs.count()), 2)
         )

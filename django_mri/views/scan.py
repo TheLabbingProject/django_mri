@@ -183,13 +183,13 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=["GET"])
     def nilearn_plot(self, request: Request, pk: int = None) -> Response:
         scan = Scan.objects.get(id=pk)
-        html_doc = scan.html_plot()
-        if isinstance(html_doc, HTMLDocument):
-            content = html_doc.get_iframe(width=1000, height=500)
-        elif isinstance(html_doc, str):
-            content = html_doc
+        try:
+            content = scan.html_plot()
+        except RuntimeError as e:
+            content = f"Failed to generate scan preview with the following exception:\n{e}"
         else:
-            content = "No preview available :("
+            if isinstance(content, HTMLDocument):
+                content = content.get_iframe(width=1000, height=500)
         return JsonResponse({"content": content})
 
     @action(detail=True, methods=["get"])
@@ -212,5 +212,32 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
             buffer.getvalue(), content_type=ZIP_CONTENT_TYPE
         )
         content_disposition = CONTENT_DISPOSITION.format(instance_id=pk)
+        response["Content-Disposition"] = content_disposition
+        return response
+
+    @action(detail=False, methods=["get"])
+    def listed_nifti_zip(
+        self, request: Request, scan_ids: str
+    ) -> HttpResponse:
+        scan_ids = [int(pk) for pk in scan_ids.split(",")]
+        queryset = Scan.objects.filter(id__in=scan_ids)
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as zip_file:
+            for instance in queryset:
+                try:
+                    nii_path = Path(instance.nifti.path)
+                except (AttributeError, RuntimeError):
+                    return HttpResponse(
+                        f"Could not create NIfTI format version of scan #{instance.id}"
+                    )
+                nii_name = nii_path.name
+                zip_file.write(nii_path, nii_name)
+                json_file = Path(instance.nifti.json_file)
+                if json_file.exists():
+                    zip_file.write(json_file, json_file.name)
+        response = HttpResponse(
+            buffer.getvalue(), content_type=ZIP_CONTENT_TYPE
+        )
+        content_disposition = CONTENT_DISPOSITION.format(instance_id="scans")
         response["Content-Disposition"] = content_disposition
         return response
