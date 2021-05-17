@@ -62,7 +62,7 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
 
     measurement = MiniMeasurementSerializer()
     measurement_id = serializers.PrimaryKeyRelatedField(
-        queryset=Measurement.objects.all()
+        queryset=Measurement.objects.all(), allow_null=True
     )
     subject = MiniSubjectSerializer()
     subject_id = serializers.PrimaryKeyRelatedField(
@@ -72,6 +72,8 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
     irb_id = serializers.PrimaryKeyRelatedField(
         queryset=IrbApproval.objects.all(), allow_null=True
     )
+    dicom_zip = serializers.SerializerMethodField()
+    nifti_zip = serializers.SerializerMethodField()
 
     class Meta:
         model = Session
@@ -85,6 +87,8 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
             "measurement_id",
             "irb",
             "irb_id",
+            "dicom_zip",
+            "nifti_zip",
         )
 
     def update(self, instance, validated_data):
@@ -96,3 +100,9 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
             validated_data["irb_id"] = irb_approval.id
         super().update(instance, validated_data)
         return instance
+
+    def get_dicom_zip(self, instance: Session) -> str:
+        return reverse("mri:session_dicom_zip", args=(instance.id,))
+
+    def get_nifti_zip(self, instance: Session) -> str:
+        return reverse("mri:session_nifti_zip", args=(instance.id,))
