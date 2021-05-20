@@ -53,6 +53,11 @@ urlpatterns = [
         name="plot",
     ),
     path(
+        "mri/scan/<int:scan_id>/runs/",
+        views.ScanViewSet.as_view({"get": "query_scan_run_set"}),
+        name="query_scan_run_set",
+    ),
+    path(
         "mri/scan/nifti_zip/<str:scan_ids>/",
         views.ScanViewSet.as_view({"get": "listed_nifti_zip"}),
         name="listed_nifti_zip",

@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
+from django_analyses.serializers.run import RunSerializer
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
 from django_mri.models import Scan
@@ -241,3 +242,14 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         content_disposition = CONTENT_DISPOSITION.format(instance_id="scans")
         response["Content-Disposition"] = content_disposition
         return response
+
+    @action(detail=True, methods=["GET"])
+    def query_scan_run_set(
+        self, request: Request, scan_id: int = None
+    ) -> Response:
+        instance = Scan.objects.get(id=scan_id)
+        runs = instance.query_run_set()
+        serializer = RunSerializer(
+            runs, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
