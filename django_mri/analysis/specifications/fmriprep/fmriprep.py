@@ -286,257 +286,353 @@ FMRIPREP_OUTPUT_SPECIFICATION = {
     # anat/*desc-preproc_T1w.nii.gz
     "native_T1w": {
         "type": FileOutputDefinition,
-        "description": "Preprocessed anatomical image in native space",
+        "description": "Preprocessed anatomical image in native space.",
     },
     # anat/*desc-brain_mask.nii.gz
     "native_brain_mask": {
         "type": FileOutputDefinition,
-        "description": "Preprocessed anatomical brain mask in native space",
+        "description": "Preprocessed anatomical brain mask in native space.",
     },
     # anat/*dseg.nii.gz
     "native_parcellation": {
         "type": FileOutputDefinition,
-        "description": "Preprocessed anatomical brain parcellation in native space",
+        "description": "Preprocessed anatomical brain parcellation in native space.",
     },
     # anat/*CSF_probseg.nii.gz
     "native_csf": {
         "type": FileOutputDefinition,
-        "description": "CSF mask in native space",
+        "description": "CSF mask in native space.",
     },
     # anat/*GM_probseg.nii.gz
     "native_gm": {
         "type": FileOutputDefinition,
-        "description": "GM mask in native space",
+        "description": "GM mask in native space.",
     },
     # anat/*WM_probseg.nii.gz
     "native_wm": {
         "type": FileOutputDefinition,
-        "description": "WM mask in native space",
+        "description": "WM mask in native space.",
     },
     ## standard
     # anat/*desc-preproc_T1w.nii.gz
     "standard_T1w": {
         "type": FileOutputDefinition,
-        "description": "Preprocessed anatomical image in standard space",
+        "description": "Preprocessed anatomical image in standard space.",
     },
     # anat/*desc-brain_mask.nii.gz
     "standard_brain_mask": {
         "type": FileOutputDefinition,
-        "description": "Preprocessed anatomical brain mask in standard space",
+        "description": "Preprocessed anatomical brain mask in standard space.",
     },
     # anat/*dseg.nii.gz
     "standard_parcellation": {
         "type": FileOutputDefinition,
-        "description": "Preprocessed anatomical brain parcellation in standard space",
+        "description": "Preprocessed anatomical brain parcellation in standard space.",
     },
     # anat/*CSF_probseg.nii.gz
     "standard_csf": {
         "type": FileOutputDefinition,
-        "description": "CSF mask in standard space",
+        "description": "CSF mask in standard space.",
     },
     # anat/*GM_probseg.nii.gz
     "standard_gm": {
         "type": FileOutputDefinition,
-        "description": "GM mask in standard space",
+        "description": "GM mask in standard space.",
     },
     # anat/*WM_probseg.nii.gz
     "standard_wm": {
         "type": FileOutputDefinition,
-        "description": "WM mask in standard space",
+        "description": "WM mask in standard space.",
     },
     # anat/*from-T1wto-MNI..._mode-image_xfm.h5
     "native_to_mni_transform": {
         "type": FileOutputDefinition,
-        "description": "Transformation file from native to standard space",
+        "description": "Transformation file from native to standard space.",
     },
     # anat/*from-MNI...to-T1w_mode-image_xfm.h5
     "mni_to_native_transform": {
         "type": FileOutputDefinition,
-        "description": "Transformation file from standard to native space",
+        "description": "Transformation file from standard to native space.",
     },
-    
-    # freesurfer/
-    # mri/T1.mgz
-    "T1": {
+    # anat/*from-fsnative...to-T1w_mode-image_xfm.txt
+    "native_to_fsnative_transform": {
         "type": FileOutputDefinition,
-        "description": "Intensity normalized whole-head volume.",
+        "description": "Transformation file from native to freesurfer's standard space.",
     },
-    # mri/rawavg.mgz
-    "rawavg": {
+    # anat/*from-fsnative...to-T1w_mode-image_xfm.txt
+    "fsnative_to_native_transform": {
         "type": FileOutputDefinition,
-        "description": "An average volume of the raw input data (if there is only one input volume, they will be identical). This volume is unconformed (i.e. to 256^3, 1mm isotropic)",  # noqa: E501
+        "description": "Transformation file from freesurfer's  standard to native space.",
     },
-    # mri/orig.mgz
-    "orig": {
-        "type": FileOutputDefinition,
-        "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",
-    },
-    # mri/nu.mgz
-    "nu": {
-        "type": FileOutputDefinition,
-        "description": "This is an intensity normalized volume generated after correcting for non-uniformity in conformed raw average (saved as 'mri/orig.mgz'). If there are any errors in later steps, it sometimes helps to check if the intensity values don't look normal in this file. If the values are too high, then scaling down the intensity a little bit and re-running recon-all usually corrects that error. In some cases, this scaling down can also be done for the orig.mgz volume.",  # noqa: E501
-    },
-    # mri/norm.mgz
-    "norm": {
-        "type": FileOutputDefinition,
-        "description": "Normalized skull-stripped volume.",
-    },
-    # mri/aseg.mgz
-    "aseg": {
-        "type": FileOutputDefinition,
-        "description": "Volumetric map of regions from automatic segmentation.",
-    },
-    # stats/aseg.stats
-    "aseg_stats": {
-        "type": FileOutputDefinition,
-        "description": "Automated segmentation statistics file.",
-    },
-    # mri/brain.mgz
-    "brain": {
-        "type": FileOutputDefinition,
-        "description": "Intensity normalized brain-only volume.",
-    },
-    # mri/brainmask.mgz
-    "brainmask": {
-        "type": FileOutputDefinition,
-        "description": "Skull-stripped (brain-only) volume.",
-    },
-    # mri/filled.mgz
-    "filled": {
-        "type": FileOutputDefinition,
-        "description": "Subcortical mass volume.",
-    },
-    # mri/wm.mgz
-    "wm": {
-        "type": FileOutputDefinition,
-        "description": "Segmented white-matter volume.",
-    },
-    # mri/wmparc.mgz
-    "wmparc": {
-        "type": FileOutputDefinition,
-        "description": "Aparc parcellation projected into subcortical white matter.",
-    },
-    # mri/wmparc_stats.mgz
-    "wmparc_stats": {
-        "type": FileOutputDefinition,
-        "description": "White matter parcellation statistics file.",
-    },
-    "BA_stats": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Brodmann Area statistics files.",
-    },
-    "annot": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Surface annotation files.",
-    },
-    "aparc_a2009s_stats": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Aparc a2009s parcellation statistics files.",
-    },
-    "aparc_aseg": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Aparc parcellation projected into aseg volume.",
-    },
-    "aparc_stats": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Aparc parcellation statistics files.",
-    },
-    "area_pial": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Mean area of triangles each vertex on the pial surface is associated with.",
-    },
-    "avg_curv": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Average atlas curvature, sampled to subject.",
-    },
-    "curv": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Maps of surface curvature.",
-    },
-    "curv_pial": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Curvature of pial surface.",
-    },
-    "curv_stats": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Curvature statistics files.",
-    },
-    "entorhinal_exvivo_stats": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Entorhinal exvivo statistics files.",
-    },
-    "graymid": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Graymid/midthickness surface meshes.",
-    },
-    "inflated": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Inflated surface meshes.",
-    },
-    "jacobian_white": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Distortion required to register to spherical atlas.",
-    },
-    "label": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Volume and surface label files.",
-    },
-    "pial": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Gray matter/pia mater surface meshes.",
-    },
-    "ribbon": {
-        "type": ListOutputDefinition,
-        "element_type": "FIL",
-        "description": "Volumetric maps of cortical ribbons.",
-    },
+    ## surfaces
+    # anat/*smoothwm.surf.gii
     "smoothwm": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "Smoothed original surface meshes.",
     },
-    "sphere": {
+    # anat/*pial.surf.gii
+    "pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Gray matter/pia mater surface meshes.",
+    },
+    # anat/*midthickness.surf.gii
+    "midthickness": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Graymid/midthickness surface meshes.",
+    },
+    # anat/*inflated.surf.gii
+    "inflated": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Inflated surface meshes.",
+    },
+    ## functionals
+    # native
+    # boldref
+    "native_boldref": {
+        "type": FileOutputDefinition,
+        "description": "Single volume BOLD reference in native space.",
+    },
+    # brain_mask
+    "native_func_brain_mask": {
+        "type": FileOutputDefinition,
+        "description": "Functional image's brain mask in native space.",
+    },
+    # preproc_bold
+    "native_preproc_bold": {
+        "type": FileOutputDefinition,
+        "description": "Preprocessed functional image in native space.",
+    },
+    # aparcaseg_dseg
+    "native_aparc_bold": {
+        "type": FileOutputDefinition,
+        "description": "Aparc parcellation in functional image space.",
+    },
+    # aparcaseg_dseg
+    "native_aseg_bold": {
+        "type": FileOutputDefinition,
+        "description": "Aseg parcellation in functional image space.",
+    },
+    # standard
+    # boldref
+    "standard_boldref": {
+        "type": FileOutputDefinition,
+        "description": "Single volume BOLD reference in standard space.",
+    },
+    # brain_mask
+    "standard_func_brain_mask": {
+        "type": FileOutputDefinition,
+        "description": "Functional image's brain mask in standard space.",
+    },
+    # preproc_bold
+    "standard_preproc_bold": {
+        "type": FileOutputDefinition,
+        "description": "Preprocessed functional image in standard space.",
+    },
+    # aparcaseg_dseg
+    "standard_aparc_bold": {
+        "type": FileOutputDefinition,
+        "description": "Aparc parcellation in standard space.",
+    },
+    # aparcaseg_dseg
+    "standard_aseg_bold": {
+        "type": FileOutputDefinition,
+        "description": "Aseg parcellation in standard space.",
+    },
+    ### Confounds ###
+    "confounds_tsv": {
+        "type": FileOutputDefinition,
+        "description": "Extracted confounding time series in a .tsv format.",
+    },
+    "confounds_json": {
+        "type": FileOutputDefinition,
+        "description": "Extracted confounding time series in a .json format.",
+    },
+    # freesurfer/
+    # mri/T1.mgz
+    "freesurfer_T1": {
+        "type": FileOutputDefinition,
+        "description": "Intensity normalized whole-head volume.",
+    },
+    # mri/rawavg.mgz
+    "freesurfer_rawavg": {
+        "type": FileOutputDefinition,
+        "description": "An average volume of the raw input data (if there is only one input volume, they will be identical). This volume is unconformed (i.e. to 256^3, 1mm isotropic)",  # noqa: E501
+    },
+    # mri/orig.mgz
+    "freesurfer_orig": {
+        "type": FileOutputDefinition,
+        "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",
+    },
+    # mri/nu.mgz
+    "freesurfer_nu": {
+        "type": FileOutputDefinition,
+        "description": "This is an intensity normalized volume generated after correcting for non-uniformity in conformed raw average (saved as 'mri/orig.mgz'). If there are any errors in later steps, it sometimes helps to check if the intensity values don't look normal in this file. If the values are too high, then scaling down the intensity a little bit and re-running recon-all usually corrects that error. In some cases, this scaling down can also be done for the orig.mgz volume.",  # noqa: E501
+    },
+    # mri/norm.mgz
+    "freesurfer_norm": {
+        "type": FileOutputDefinition,
+        "description": "Normalized skull-stripped volume.",
+    },
+    # mri/aseg.mgz
+    "freesurfer_aseg": {
+        "type": FileOutputDefinition,
+        "description": "Volumetric map of regions from automatic segmentation.",
+    },
+    # stats/aseg.stats
+    "freesurfer_aseg_stats": {
+        "type": FileOutputDefinition,
+        "description": "Automated segmentation statistics file.",
+    },
+    # mri/brain.mgz
+    "freesurfer_brain": {
+        "type": FileOutputDefinition,
+        "description": "Intensity normalized brain-only volume.",
+    },
+    # mri/brainmask.mgz
+    "freesurfer_brainmask": {
+        "type": FileOutputDefinition,
+        "description": "Skull-stripped (brain-only) volume.",
+    },
+    # mri/filled.mgz
+    "freesurfer_filled": {
+        "type": FileOutputDefinition,
+        "description": "Subcortical mass volume.",
+    },
+    # mri/wm.mgz
+    "freesurfer_wm": {
+        "type": FileOutputDefinition,
+        "description": "Segmented white-matter volume.",
+    },
+    # mri/wmparc.mgz
+    "freesurfer_wmparc": {
+        "type": FileOutputDefinition,
+        "description": "Aparc parcellation projected into subcortical white matter.",
+    },
+    # mri/wmparc_stats.mgz
+    "freesurfer_wmparc_stats": {
+        "type": FileOutputDefinition,
+        "description": "White matter parcellation statistics file.",
+    },
+    "freesurfer_BA_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Brodmann Area statistics files.",
+    },
+    "freesurfer_annot": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Surface annotation files.",
+    },
+    "freesurfer_aparc_a2009s_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Aparc a2009s parcellation statistics files.",
+    },
+    "freesurfer_aparc_aseg": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Aparc parcellation projected into aseg volume.",
+    },
+    "freesurfer_aparc_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Aparc parcellation statistics files.",
+    },
+    "freesurfer_area_pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Mean area of triangles each vertex on the pial surface is associated with.",
+    },
+    "freesurfer_avg_curv": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Average atlas curvature, sampled to subject.",
+    },
+    "freesurfer_curv": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Maps of surface curvature.",
+    },
+    "freesurfer_curv_pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Curvature of pial surface.",
+    },
+    "freesurfer_curv_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Curvature statistics files.",
+    },
+    "freesurfer_entorhinal_exvivo_stats": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Entorhinal exvivo statistics files.",
+    },
+    "freesurfer_graymid": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Graymid/midthickness surface meshes.",
+    },
+    "freesurfer_inflated": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Inflated surface meshes.",
+    },
+    "freesurfer_jacobian_white": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Distortion required to register to spherical atlas.",
+    },
+    "freesurfer_label": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Volume and surface label files.",
+    },
+    "freesurfer_pial": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Gray matter/pia mater surface meshes.",
+    },
+    "freesurfer_ribbon": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Volumetric maps of cortical ribbons.",
+    },
+    "freesurfer_smoothwm": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Smoothed original surface meshes.",
+    },
+    "freesurfer_sphere": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "Spherical surface meshes.",
     },
-    "sphere_reg": {
+    "freesurfer_sphere_reg": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "Spherical registration file.",
     },
-    "sulc": {
+    "freesurfer_sulc": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "Surface maps of sulcal depth.",
     },
-    "thickness": {
+    "freesurfer_thickness": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "Surface maps of cortical thickness.",
     },
-    "volume": {
+    "freesurfer_volume": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "Surface maps of cortical volume.",
     },
-    "white": {
+    "freesurfer_white": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
         "description": "White/gray matter surface meshes.",
