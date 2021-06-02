@@ -6,12 +6,18 @@ from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.session import Session
 from django_mri.serializers.irb_approval import IrbApprovalSerializer
 from django_mri.serializers.utils import (
+    MiniLaboratorySerializer,
     MiniMeasurementSerializer,
     MiniSubjectSerializer,
 )
-from django_mri.utils import get_measurement_model, get_subject_model
+from django_mri.utils import (
+    get_measurement_model,
+    get_subject_model,
+    get_laboratory_model,
+)
 from rest_framework import serializers
 
+Laboratory = get_laboratory_model()
 Measurement = get_measurement_model()
 Subject = get_subject_model()
 
@@ -25,6 +31,7 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
+    laboratory = MiniLaboratorySerializer()
     measurement = MiniMeasurementSerializer()
     subject = MiniSubjectSerializer()
     irb = IrbApprovalSerializer()
@@ -42,6 +49,7 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
             "irb",
             "dicom_zip",
             "nifti_zip",
+            "laboratory",
         )
 
     def get_dicom_zip(self, instance: Session) -> str:
@@ -60,6 +68,10 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
+    laboratory = MiniLaboratorySerializer()
+    laboratory_id = serializers.PrimaryKeyRelatedField(
+        queryset=Laboratory.objects.all(), allow_null=True
+    )
     measurement = MiniMeasurementSerializer()
     measurement_id = serializers.PrimaryKeyRelatedField(
         queryset=Measurement.objects.all(), allow_null=True
@@ -85,6 +97,8 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
             "time",
             "measurement",
             "measurement_id",
+            "laboratory",
+            "laboratory_id",
             "irb",
             "irb_id",
             "dicom_zip",

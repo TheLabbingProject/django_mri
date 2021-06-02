@@ -1,7 +1,6 @@
 """
 Definition of the :class:`Session` class.
 """
-
 from django.db import models
 from django.db.models import QuerySet
 from django_extensions.db.models import TimeStampedModel
@@ -11,6 +10,7 @@ from django_mri.utils import (
     get_group_model,
     get_measurement_model,
     get_subject_model,
+    get_laboratory_model,
 )
 
 Group = get_group_model()
@@ -41,6 +41,15 @@ class Session(TimeStampedModel):
     #: The associated `Measurement` model (optional).
     measurement = models.ForeignKey(
         get_measurement_model(),
+        related_name="mri_session_set",
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+    )
+
+    #: The associated `Laboratory` model (optional).
+    laboratory = models.ForeignKey(
+        get_laboratory_model(),
         related_name="mri_session_set",
         blank=True,
         null=True,

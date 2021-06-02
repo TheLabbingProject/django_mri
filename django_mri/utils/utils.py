@@ -27,6 +27,9 @@ DEFAULT_STUDY_GROUP_MODEL = "research.Group"
 #: Default identifier for a measurement model sessions should be related to.
 DEFAULT_MEASUREMENT_MODEL = "research.MeasurementDefinition"
 
+#: Default identifier for a laboratory model sessions may be related to.
+DEFAULT_LABORATORY_MODEL = "accounts.Laboratory"
+
 #: Default value for an MRI data share root directory
 DATA_SHARE_ROOT_DEFAULT = "/mnt/"
 
@@ -74,6 +77,19 @@ def get_measurement_model():
         settings, "MEASUREMENT_MODEL", DEFAULT_MEASUREMENT_MODEL
     )
     return apps.get_model(measurement_model, require_ready=False)
+
+
+def get_laboratory_model():
+    """
+    Returns the laboratory model MRI sessions may be related to.
+
+    Returns
+    -------
+    django.db.models.Model
+        Laboratory model
+    """
+    model = getattr(settings, "LABORATORY_MODEL", DEFAULT_LABORATORY_MODEL)
+    return apps.get_model(model, require_ready=False)
 
 
 def get_mri_root() -> Path:

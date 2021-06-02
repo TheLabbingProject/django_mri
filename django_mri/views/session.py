@@ -6,8 +6,10 @@ from django.http import HttpResponse
 from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
 from django_mri.filters.session_filter import SessionFilter
 from django_mri.models.session import Session
-from django_mri.serializers import (SessionReadSerializer,
-                                    SessionWriteSerializer)
+from django_mri.serializers import (
+    SessionReadSerializer,
+    SessionWriteSerializer,
+)
 from django_mri.utils.utils import get_mri_root
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
