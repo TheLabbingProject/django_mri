@@ -14,6 +14,8 @@ from django_mri.utils import (
 )
 
 Group = get_group_model()
+Measurement = get_measurement_model()
+Laboratory = get_laboratory_model()
 
 
 class Session(TimeStampedModel):
@@ -40,7 +42,7 @@ class Session(TimeStampedModel):
 
     #: The associated `Measurement` model (optional).
     measurement = models.ForeignKey(
-        get_measurement_model(),
+        Measurement,
         related_name="mri_session_set",
         blank=True,
         null=True,
@@ -49,7 +51,7 @@ class Session(TimeStampedModel):
 
     #: The associated `Laboratory` model (optional).
     laboratory = models.ForeignKey(
-        get_laboratory_model(),
+        Laboratory,
         related_name="mri_session_set",
         blank=True,
         null=True,
