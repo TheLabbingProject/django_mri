@@ -117,3 +117,5 @@ KEEP_ORIGINAL_DICOM = True
 DICOM_IMPORT_MODE = "minimal"
 TESTING_MODE = True
 APP_IP = env("APP_IP")
+
+# flake8: noqa: E501
