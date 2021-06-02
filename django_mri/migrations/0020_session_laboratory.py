@@ -4,11 +4,13 @@ from django.db import migrations, models
 from django.conf import settings
 import django.db.models.deletion
 
+Laboratory = getattr(settings, "LABORATORY_MODEL", "accounts.Laboratory")
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.LABORATORY_MODEL),
+        migrations.swappable_dependency(Laboratory),
         ("django_mri", "0019_alter_scan_study_groups"),
     ]
 
