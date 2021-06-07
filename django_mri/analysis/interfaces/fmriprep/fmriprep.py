@@ -22,42 +22,110 @@ class fMRIprep:
     #: "Flags" indicate parameters that are specified without any arguments,
     #: i.e. they are a switch for some binary configuration.
     FLAGS = (
-        "align_seepi",
-        "rpe_none",
-        "rpe_pair",
-        "rpe_all",
-        "rpe_header",
-        "force",
-        "quiet",
-        "info",
-        "nocleanup",
+        "skip_bids_validation",
+        "low-mem",
+        "anat-only",
+        "boilerplate_only",
+        "md-only-boilerplate",
+        "error-on-aroma-warnings",
+        "longitudinal",
+        "force-bbr",
+        "force-no-bbr",
+        "medial-surface-nan",
+        "use-aroma",
+        "return-all-components",
+        "skull-strip-fixed-seed",
+        "fmap-bspline",
+        "fmap-no-demean",
+        "use-syn-sdc",
+        "force-syn",
+        "no-submm-recon",
+        "fs-no-reconall",
+        "clean-workdir",
+        "resource-monitor",
+        "reports-only",
+        "write-graph",
+        "stop-on-first-crash",
+        "notrack",
+        "sloppy",
     )
 
-    #: Non-default output configuration.
-    SUPPLEMENTARY_OUTPUTS = ["eddyqc_all"]
-    DEFAULT_INPUTS = ["json_import", "fslgrad"]
-    #: Default name for primary output file.
-    DEFAULT_OUTPUT_NAME = "preprocessed_dwi.mif"
-
-    #: *eddy* output files by key.
-    #:
-    #: References
-    #: ----------
-    #: * eddy_
-    #:
-    #: .. _eddy:
-    #:    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
-    EDDY_OUTPUTS = {
-        "out_movement_rms": "eddy_movement_rms",
-        "eddy_mask": "eddy_mask.mif",
-        "out_outlier_map": "eddy_outlier_map",
-        "out_outlier_n_sqr_stdev_map": "eddy_outlier_n_sqr_stdev_map",
-        "out_outlier_n_stdev_map": "eddy_outlier_n_stdev_map",
-        "out_outlier_report": "eddy_outlier_report",
-        "out_parameter": "eddy_parameters",
-        "out_restricted_movement_rms": "eddy_restricted_movement_rms",
-        "out_shell_alignment_parameters": "eddy_post_eddy_shell_alignment_parameters",  # noqa: E501
-        "out_shell_pe_translation_parameters": "eddy_post_eddy_shell_PE_translation_parameters",  # noqa: E501
+    # Outputs
+    DEFAULT_OUTPUTS = {
+        ## Anatomicals ##
+        "native_T1w": ["anat", "desc-preproc_T1w.nii.gz"],
+        "native_brain_mask": ["anat", "desc-brain_mask.nii.gz"],
+        "native_parcellation": ["anat", "dseg.nii.gz"],
+        "native_csf": ["anat", "CSF_probseg.nii.gz"],
+        "native_gm": ["anat", "GM_probseg.nii.gz"],
+        "native_wm": ["anat", "WM_probseg.nii.gz"],
+        "standard_T1w": [
+            "anat",
+            "space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz",
+        ],
+        "standard_brain_mask": [
+            "anat",
+            "space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz",
+        ],
+        "standard_parcellation": ["anat", "space-MNI152NLin*dseg.nii.gz"],
+        "standard_csf": [
+            "anat",
+            "space-MNI152NLin2009cAsym_label-CSF_probseg.nii.gz",
+        ],
+        "standard_gm": [
+            "anat",
+            "space-MNI152NLin2009cAsym_label-GM_probseg.nii.gz",
+        ],
+        "standard_wm": [
+            "anat",
+            "space-MNI152NLin2009cAsym_label-WM_probseg.nii.gz",
+        ],
+        "native_to_mni_transform": [
+            "anat",
+            "from-T1w_to-MNI152NLin2009cAsym__mode-image_xfm.h5",
+        ],
+        "mni_to_native_transform": [
+            "anat",
+            "from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5",
+        ],
+        "native_to_fsnative_transform": [
+            "anat",
+            "from-T1w_to-fsnative_mode-image_xfm.h5",
+        ],
+        "fsnative_to_native_transform": [
+            "anat",
+            "from-fsnative_to-T1w_mode-image_xfm.h5",
+        ],
+        "smoothwm": ["anat", "smoowthwm.surf.gii"],
+        "pial": ["anat", "pial.surf.gii"],
+        "midthickness": ["anat", "midthickness.surf.gii"],
+        "inflated": ["anat", "inflated.surf.gii"],
+        ## Functionals ##
+        "native_boldref": ["func", "space-T1w_desc-boldref.nii.gz"],
+        "native_func_brain_mask": ["func", "space-T1w_desc-brain_mask.nii.gz"],
+        "native_preproc_bold": ["func", "space-T1w_desc-preproc_bold.nii.gz"],
+        "native_aparc_bold": ["func", "space-T1w_desc-aparcaseg_dseg.nii.gz"],
+        "native_aseg_bold": ["func", "space-T1w_desc-aseg_dseg.nii.gz"],
+        "standard_boldref": [
+            "func",
+            "space-MNI152NLin2009cAsym_desc-boldref.nii.gz",
+        ],
+        "standard_func_brain_mask": [
+            "func",
+            "space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz",
+        ],
+        "standard_preproc_bold": [
+            "func",
+            "space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz",
+        ],
+        "standard_aparc_bold": [
+            "func",
+            "space-MNI152NLin2009cAsym_desc-aparcaseg_dseg.nii.gz",
+        ],
+        "standard_aseg_bold": [
+            "func",
+            "space-MNI152NLin2009cAsym_desc-aseg_dseg.nii.gz",
+        ],
     }
 
     __version__ = "BETA"
@@ -65,39 +133,10 @@ class fMRIprep:
     def __init__(self, **kwargs):
         self.configuration = kwargs
 
-    def add_supplementary_outputs(self, destination: Path) -> dict:
-        """
-        Adds the *eddy* output files to the interface's configuration before
-        generating the command to run.
-
-        References
-        ----------
-        * eddy_
-
-        .. _eddy:
-            https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/eddy
-
-        Parameters
-        ----------
-        destination : Path
-            Output directory
-
-        Returns
-        -------
-        dict
-            Updated configuration dictionary
-        """
-
-        config = self.configuration.copy()
-        for key in self.SUPPLEMENTARY_OUTPUTS:
-            if key not in config.keys():
-                config[key] = destination
-        return config
-
-    def set_configuration_by_keys(self, config: dict):
+    def set_configuration_by_keys(self):
         key_command = ""
-        for key, value in config.items():
-            key_addition = f" -{key}"
+        for key, value in self.configuration.items():
+            key_addition = f" --{key}"
             if isinstance(value, list):
                 for val in value:
                     key_addition += f" {val}"
@@ -108,16 +147,15 @@ class fMRIprep:
             key_command += key_addition
         return key_command
 
-    def generate_command(self, destination: Path, config: dict) -> str:
+    def generate_command(self, bids_dir: Path, destination: Path) -> str:
         """
         Returns the command to be executed in order to run the analysis.
-
         Parameters
         ----------
+        bids_dir : Path
+            Path to BIDS-appropriate directory
         destination : Path
-            Output files destination direcotry
-        config : dict
-            Configuration arguments for the command
+            Path to output directory
 
         Returns
         -------
@@ -125,10 +163,23 @@ class fMRIprep:
             Complete execution command
         """
 
-        output_path = destination / self.DEFAULT_OUTPUT_NAME
-        scan = config.pop("scan")
-        command = f"dwifslpreproc {scan} {output_path}"
-        return command + self.set_configuration_by_keys(config)
+        # output_path = destination / self.DEFAULT_OUTPUT_NAME
+        analysis_level = self.configuration.pop("analysis_level")
+        command = f"singularity run --cleanenv -B {bids_dir.parent}:/work -B {destination.parent}:/output /my_images/fmriprep-latest.simg /work/{bids_dir.name} /output/{destination.name} {analysis_level}"
+        return command + self.set_configuration_by_keys()
+
+    def find_output(self, destination: Path, partial_output: str):
+        """
+        uses the destination and some default dictionary to locate specific output files of *fmriprep*
+        Parameters
+        ----------
+        destination : Path
+            Output files destination directory
+        partial_output : str
+            A string that identifies a specific output
+        """
+        sub_dir, output_id = partial_output.split("/")
+        output = [f for f in destination.rglob(f"{sub_dir}/*{output_id}")]
 
     def generate_output_dict(self, destination: Path) -> dict:
         """
@@ -152,36 +203,39 @@ class fMRIprep:
             output_dict[key] = destination / value
         return output_dict
 
-    def run(self, destination: Path = None) -> dict:
+    def run(self, bids_dir: Path, destination: Path = None) -> dict:
         """
-        Runs *dwifslpreproc* with the provided *scan* as input.
+        Runs *fmriprep* with the provided *bids_dir* as input.
         If *destination* is not specified, output files will be created within
-        *scan*\'s directory.
+        *bids_dir*\'s parent directory.
 
         Parameters
         ----------
-        scan : ~django_mri.models.scan.Scan
-            Input scan
+        bids_dir : Path,
+            Path to BIDS-appropriate directory
         destination : Path, optional
-            Output files destination directory, by default None
+            Path to output directory, by default None
 
         Returns
         -------
         dict
-            Output files by key
+            [Dictionary with keys and values corresponding to descriptions and files of *fmriprep*\'s outputs accordingly]
 
         Raises
         ------
         RuntimeError
-            Run failure
+            [In case of failed execution, raises an appropriate error.]
         """
 
-        destination = Path(destination) if destination else scan.path.parent
-        config = self.add_supplementary_outputs(destination)
-        command = self.generate_command(destination, config)
+        destination = (
+            Path(destination)
+            if destination
+            else Path(bids_dir).parent / "derivatives"
+        )
+        command = self.generate_command(bids_dir, destination)
         raise_exception = os.system(command)
         if raise_exception:
             raise RuntimeError(
-                f"Failed to run dwifslpreproc!\nExecuted command: {command}"
+                f"Failed to run fmriprep!\nExecuted command: {command}"
             )
         return self.generate_output_dict(destination)
