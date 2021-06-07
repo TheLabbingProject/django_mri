@@ -19,20 +19,17 @@ from django_analyses.models.output.definitions import (
     FileOutputDefinition,
     ListOutputDefinition,
 )
+from traits.trait_types import String
+
 
 #: *fmriprep* input specification.
 FMRIPREP_INPUT_SPECIFICATION = {
-    "bids_dir": {
-        "type": DirectoryInputDefinition,
-        "required": True,
-        "description": "the root folder of a BIDS valid dataset (sub-XXXXX folders should be found at the top level in this folder).",  # noqa: E501
-        "is_configuration": False,
-    },
-    "output_dir": {
+    "destination": {
         "type": StringInputDefinition,
+        "dynamic_default": "{run_id}",
+        "run_method_input": True,
         "required": True,
-        "description": "the output path for the outcomes of preprocessing and visual reports",  # noqa: E501
-        "is_configuration": False,
+        "description": "Path to output directory",
     },
     "analysis_level": {
         "type": StringInputDefinition,
@@ -49,7 +46,7 @@ FMRIPREP_INPUT_SPECIFICATION = {
     },
     "participant_label": {
         "type": ListInputDefinition,
-        "dynamic_default": "{run_id}",
+        "element_type": "STR",
         "required": True,
         "description": "a space delimited list of participant identifiers or a single identifier (the sub- prefix can be removed)",  # noqa: E501
         "is_configuration": False,

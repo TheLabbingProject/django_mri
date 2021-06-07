@@ -6,6 +6,13 @@ Definition of the
 import os
 from pathlib import Path
 
+from django_mri.models.scan import Scan
+from django_mri.utils import get_mri_root
+from django.conf import settings
+
+NIFTI_ROOT = get_mri_root() / "NIfTI"
+ANALYSIS_ROOT = Path(getattr(settings, "ANALYSIS_BASE_PATH"))
+
 
 class fMRIprep:
     """
@@ -206,7 +213,7 @@ class fMRIprep:
             key_command += key_addition
         return key_command
 
-    def generate_command(self, bids_dir: Path, destination: Path) -> str:
+    def generate_command(self, destination: Path) -> str:
         """
         Returns the command to be executed in order to run the analysis.
         Parameters
@@ -222,7 +229,7 @@ class fMRIprep:
             Complete execution command
         """
 
-        # output_path = destination / self.DEFAULT_OUTPUT_NAME
+        bids_dir = Path(NIFTI_ROOT)
         analysis_level = self.configuration.pop("analysis_level")
         command = f"singularity run --cleanenv -B {bids_dir.parent}:/work -B {destination.parent}:/output /my_images/fmriprep-latest.simg /work/{bids_dir.name} /output/{destination.name} {analysis_level}"
         return command + self.set_configuration_by_keys()
@@ -239,8 +246,28 @@ class fMRIprep:
         partial_output : str
             A string that identifies a specific output
         """
-        sub_dir, output_id = self.DEFAULT_OUTPUTS.get(partial_output)
-        output = [f for f in destination.rglob(f"{sub_dir}/*{output_id}")]
+        main_dir, sub_dir, output_id = self.DEFAULT_OUTPUTS.get(partial_output)
+        if main_dir == "freesurfer":
+            output = [
+                f
+                for f in destination.rglob(
+                    f"{main_dir}/{sub_dir}/*{output_id}"
+                )
+            ]
+        elif main_dir == "fmriprep":
+            output = [
+                f
+                for f in destination.rglob(
+                    f"{main_dir}/{sub_dir}/{subj_id}*{output_id}"
+                )
+            ]
+        if output:
+            if len(output) == 1:
+                return output[0]
+            else:
+                return output
+        else:
+            return None
 
     def generate_output_dict(self, destination: Path) -> dict:
         """
@@ -256,15 +283,14 @@ class fMRIprep:
         dict
             Output files by key
         """
-
-        output_dict = {
-            "preprocessed_dwi": destination / self.DEFAULT_OUTPUT_NAME,
-        }
-        for key, value in self.EDDY_OUTPUTS.items():
-            output_dict[key] = destination / value
+        output_dict = {}
+        for subj in self.configuration.get("participant_label"):
+            output_dict[subj] = {}
+            for key in self.DEFAULT_OUTPUTS:
+                output_dict[key] = self.find_output(destination, key, subj)
         return output_dict
 
-    def run(self, bids_dir: Path, destination: Path = None) -> dict:
+    def run(self, destination: str) -> dict:
         """
         Runs *fmriprep* with the provided *bids_dir* as input.
         If *destination* is not specified, output files will be created within
@@ -287,13 +313,8 @@ class fMRIprep:
         RuntimeError
             [In case of failed execution, raises an appropriate error.]
         """
-
-        destination = (
-            Path(destination)
-            if destination
-            else Path(bids_dir).parent / "derivatives"
-        )
-        command = self.generate_command(bids_dir, destination)
+        destination = ANALYSIS_ROOT / destination
+        command = self.generate_command(destination)
         raise_exception = os.system(command)
         if raise_exception:
             raise RuntimeError(
