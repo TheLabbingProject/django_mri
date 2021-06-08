@@ -6,12 +6,7 @@ Definition of the
 import os
 from pathlib import Path
 
-from django_mri.models.scan import Scan
 from django_mri.utils import get_mri_root
-from django.conf import settings
-
-NIFTI_ROOT = get_mri_root() / "NIfTI"
-ANALYSIS_ROOT = Path(getattr(settings, "ANALYSIS_BASE_PATH"))
 
 
 class fMRIprep:
@@ -198,6 +193,7 @@ class fMRIprep:
 
     def __init__(self, **kwargs):
         self.configuration = kwargs
+        self.get_analysis_root()
 
     def set_configuration_by_keys(self):
         key_command = ""
@@ -212,6 +208,12 @@ class fMRIprep:
                 key_addition += f" {value}"
             key_command += key_addition
         return key_command
+
+    def get_analysis_root(self):
+        from django.conf import settings
+
+        self.NIFTI_ROOT = get_mri_root() / "NIfTI"
+        self.ANALYSIS_ROOT = Path(getattr(settings, "ANALYSIS_BASE_PATH"))
 
     def generate_command(self, destination: Path) -> str:
         """
@@ -229,7 +231,7 @@ class fMRIprep:
             Complete execution command
         """
 
-        bids_dir = Path(NIFTI_ROOT)
+        bids_dir = Path(self.NIFTI_ROOT)
         analysis_level = self.configuration.pop("analysis_level")
         command = f"singularity run --cleanenv -B {bids_dir.parent}:/work -B {destination.parent}:/output /my_images/fmriprep-latest.simg /work/{bids_dir.name} /output/{destination.name} {analysis_level}"
         return command + self.set_configuration_by_keys()
@@ -313,7 +315,7 @@ class fMRIprep:
         RuntimeError
             [In case of failed execution, raises an appropriate error.]
         """
-        destination = ANALYSIS_ROOT / destination
+        destination = self.ANALYSIS_ROOT / destination
         command = self.generate_command(destination)
         raise_exception = os.system(command)
         if raise_exception:

@@ -25,6 +25,7 @@ from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
+from django_mri.analysis.interfaces.fmriprep.fmriprep import fMRIprep
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -136,6 +137,10 @@ from django_mri.analysis.specifications.mrtrix3.mrcat import (
 from django_mri.analysis.specifications.mrtrix3.mrconvert import (
     MRCONVERT_INPUT_SPECIFICATION,
     MRCONVERT_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.fmriprep.fmriprep import (
+    FMRIPREP_INPUT_SPECIFICATION,
+    FMRIPREP_OUTPUT_SPECIFICATION,
 )
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
@@ -561,6 +566,18 @@ analysis_definitions = [
                 "description": "Calculates mutual information using the example from this SO post: https://stackoverflow.com/a/20505476/4416932",  # noqa: E501,
                 "input": MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION,
                 "output": MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION,
+            }
+        ],
+    },
+    {
+        "title": "fMRIPrep",
+        "description": "A robust preprocessing pipeline for fMRI data.",  # noqa: E501
+        "versions": [
+            {
+                "title": fMRIprep.__version__ or "1.0",
+                "description": "Conducts a robust preprocessing pipeline for fMRI data as described in: https://fmriprep.org/en/stable/",  # noqa: E501,
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
             }
         ],
     },

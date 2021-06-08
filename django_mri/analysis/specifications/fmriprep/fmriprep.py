@@ -109,7 +109,7 @@ FMRIPREP_INPUT_SPECIFICATION = {
     },
     ### Workflow configuration ###
     "ignore": {
-        "type": ListInputDefinition,
+        "type": StringInputDefinition,
         "choices": ["fieldmaps", "slicetiming", "sbref", "t2w", "flair"],
         "description": "ignore selected aspects of the input dataset to disable corresponding parts of the workflow (a space delimited list)",
     },
@@ -128,7 +128,7 @@ FMRIPREP_INPUT_SPECIFICATION = {
     },
     "bold2t1w-dof": {
         "type": IntegerInputDefinition,
-        "choices": [6, 9, 12],
+        # "choices": [6, 9, 12],
         "description": "Degrees of freedom when registering BOLD to T1w images. 6 degrees (rotation and translation) are used by default.",
     },
     "force-bbr": {
