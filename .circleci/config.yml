@@ -24,10 +24,13 @@ jobs:
       - python/load-cache
       - python/install-deps
       - python/save-cache
+      - run:
+          name: Upgrade pip
+          command: pip install --upgrade pip setuptools wheel
       - run: pip install tox
       - run:
-          command: tox
           name: Test using tox
+          command: tox
       - codecov/upload:
           file: coverage.xml
           flags: unittests
