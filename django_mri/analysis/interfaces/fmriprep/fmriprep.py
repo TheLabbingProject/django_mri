@@ -5,8 +5,13 @@ Definition of the
 
 import os
 from pathlib import Path
-
 from django_mri.utils import get_mri_root
+from django.conf import settings
+
+COMMAND = "singularity run --cleanenv -B {bids_parent}:/work -B {destination_parent}:/output -B {freesurfer_license}:/fs_license /my_images/fmriprep-latest.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"
+NIFTI_ROOT = get_mri_root() / "NIfTI"
+# ANALYSIS_ROOT = Path(getattr(settings, "ANALYSIS_BASE_PATH"))
+ANALYSIS_ROOT = get_mri_root().parent / "analysis"
 
 
 class fMRIprep:
@@ -192,10 +197,39 @@ class fMRIprep:
     __version__ = "BETA"
 
     def __init__(self, **kwargs):
+        # self.bids_dir = NIFTI_ROOT.absolute()
+        # self.destination = ANALYSIS_ROOT.absolute() / kwargs.pop("destination")
+        self.bids_dir, self.destination = self.get_root_dirs()
+        self.destination = self.destination / kwargs.pop("destination")
         self.configuration = kwargs
-        self.get_analysis_root()
+
+    def get_root_dirs(self) -> list:
+        """
+
+        Returns
+        -------
+        list
+            [description]
+        """
+        from django_mri.utils import get_mri_root
+        from django.conf import settings
+
+        return get_mri_root() / "NIfTI", Path(settings.MEDIA_ROOT) / "analysis"
+
+    def find_fs_license(self):
+        """
+        Return default freesurfer license's path
+        """
+        return Path(os.getenv("FREESURFER_HOME")) / "license.txt"
 
     def set_configuration_by_keys(self):
+        """
+        Builds CLI for fmriprep (via singularity) based on user's specifications
+        Returns
+        -------
+        str
+            CLI-compatible command
+        """
         key_command = ""
         for key, value in self.configuration.items():
             key_addition = f" --{key}"
@@ -209,13 +243,7 @@ class fMRIprep:
             key_command += key_addition
         return key_command
 
-    def get_analysis_root(self):
-        from django.conf import settings
-
-        self.NIFTI_ROOT = get_mri_root() / "NIfTI"
-        self.ANALYSIS_ROOT = Path(getattr(settings, "ANALYSIS_BASE_PATH"))
-
-    def generate_command(self, destination: Path) -> str:
+    def generate_command(self) -> str:
         """
         Returns the command to be executed in order to run the analysis.
         Parameters
@@ -230,10 +258,19 @@ class fMRIprep:
         str
             Complete execution command
         """
-
-        bids_dir = Path(self.NIFTI_ROOT)
+        if not "fs-license-file" in self.configuration.keys():
+            fs_license = self.find_fs_license()
+        else:
+            fs_license = self.configuration.pop("fs-license-file")
         analysis_level = self.configuration.pop("analysis_level")
-        command = f"singularity run --cleanenv -B {bids_dir.parent}:/work -B {destination.parent}:/output /my_images/fmriprep-latest.simg /work/{bids_dir.name} /output/{destination.name} {analysis_level}"
+        command = COMMAND.format(
+            bids_parent=self.bids_dir.parent,
+            destination_parent=self.destination.parent,
+            bids_name=self.bids_dir.name,
+            destination_name=self.destination.name,
+            analysis_level=analysis_level,
+            freesurfer_license=fs_license,
+        )
         return command + self.set_configuration_by_keys()
 
     def find_output(
@@ -292,7 +329,7 @@ class fMRIprep:
                 output_dict[key] = self.find_output(destination, key, subj)
         return output_dict
 
-    def run(self, destination: str) -> dict:
+    def run(self) -> dict:
         """
         Runs *fmriprep* with the provided *bids_dir* as input.
         If *destination* is not specified, output files will be created within
@@ -315,11 +352,11 @@ class fMRIprep:
         RuntimeError
             [In case of failed execution, raises an appropriate error.]
         """
-        destination = self.ANALYSIS_ROOT / destination
-        command = self.generate_command(destination)
+        command = self.generate_command()
+        print(command)
         raise_exception = os.system(command)
         if raise_exception:
             raise RuntimeError(
                 f"Failed to run fmriprep!\nExecuted command: {command}"
             )
-        return self.generate_output_dict(destination)
+        return self.generate_output_dict(self.destination)

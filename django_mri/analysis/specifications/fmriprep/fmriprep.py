@@ -27,14 +27,13 @@ FMRIPREP_INPUT_SPECIFICATION = {
     "destination": {
         "type": StringInputDefinition,
         "dynamic_default": "{run_id}",
-        "run_method_input": True,
         "required": True,
         "description": "Path to output directory",
     },
     "analysis_level": {
         "type": StringInputDefinition,
         "choices": ["participant"],
-        "required": True,
+        "required": False,
         "default": "participant",
         "description": "processing stage to be run, only “participant” in the case of fMRIPrep (see BIDS-Apps specification).",  # noqa: E501
     },
@@ -124,7 +123,7 @@ FMRIPREP_INPUT_SPECIFICATION = {
     "bold2t1w-init": {
         "type": StringInputDefinition,
         "choices": ["register", "header"],
-        "default": "register",
+        # "default": "register",
     },
     "bold2t1w-dof": {
         "type": IntegerInputDefinition,

@@ -204,15 +204,16 @@ class Bids:
 
         subject_dict = self.get_subject_data(scan)
         subject_id = subject_dict["participant_id"]
+        session = self.get_session_timestamp(scan)
         parent, data_type, modality_label, acq, task, pe_dir = self.get_data(
             scan
         )
         bids_path = Path(
             parent,
             f"sub-{subject_id}",
-            f"ses-{self.get_session_timestamp(scan)}",
+            f"ses-{session}",
             data_type,
-            f"sub-{subject_id}",
+            f"sub-{subject_id}_ses-{session}",
         )
         if task:
             bids_path = Path(f"{bids_path}_task-{task}")
@@ -276,6 +277,40 @@ class Bids:
                 json.dump(data, f, indent=4)
                 f.truncate()
 
+    def modify_fieldmaps(self, bids_path: Path):
+        """
+        Add required "IntendedFor" field to fieldmaps, as stated in BIDS
+        stucture.
+
+        Parameters
+        ----------
+        bids_path : Path
+            Path to the BIDS-compatible directory
+
+        References
+        ----------
+        * `BIDS MRI specification`_
+
+        .. _BIDS MRI specification:
+            https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
+        """
+        name, session = bids_path.name, bids_path.parents[1]
+        modality = name.split("_")[2].split("-")[-1]
+        if "func" in modality:
+            modality = "func"
+        elif "dwi" in modality:
+            modality = "dwi"
+        targets = [p for p in session.glob(f"{modality}/*.nii.gz")]
+        fin = open(bids_path, "r")
+        data = json.load(fin)
+        fin.close()
+        data["IntendedFor"] = [
+            os.sep.join(target.parts[-3:]) for target in targets
+        ]
+        fout = open(bids_path, "w")
+        json.dump(data, fout, indent=4)
+        fout.close()
+
     def set_description_json(self, parent: Path):
         """
         Generates required "dataset_description.json" file, as stated by BIDS
@@ -300,6 +335,31 @@ class Bids:
             description_template = TEMPLATES_DIR / description_file.name
             description_file.parent.mkdir(exist_ok=True)
             shutil.copy(str(description_template), str(description_file))
+
+    def fix_sbref(self, bids_path: Path):
+        """[summary]
+
+        Parameters
+        ----------
+        bids_path : Path
+            [description]
+        """
+        modality = bids_path.name.split("_")[-1]
+        if "sbref" in modality:
+            target = [f for f in bids_path.parent.glob("*_bold.nii*")]
+            sbrefs = [f for f in bids_path.parent.glob("*_sbref*")]
+            if target:
+                acq = target[0].name.split("_")[3]
+                for sbref in sbrefs:
+                    parts = sbref.name.split("_")
+                    new_sbref = sbref.parent / "_".join(
+                        parts[:3] + [acq] + parts[4:]
+                    )
+                    os.rename(sbref, new_sbref)
+        else:
+            sbref = [f for f in bids_path.parent.glob("*_sbref.json")]
+            if sbref:
+                self.fix_sbref(sbref[0].parent / sbref.stem)
 
     def set_participant_tsv_and_json(self, parent: Path, subject_dict: dict):
         """

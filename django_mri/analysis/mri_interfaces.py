@@ -90,5 +90,5 @@ interfaces = {
     "mrcat": {MRCat.__version__: MRCat},
     "dwigradcheck": {DwiGradCheck.__version__: DwiGradCheck},
     "Mutual Information Score": {"1.0": MutualInformationScore},
-    "fmriprep": {fMRIprep.__version__: fMRIprep},
+    "fMRIPrep": {fMRIprep.__version__: fMRIprep},
 }
