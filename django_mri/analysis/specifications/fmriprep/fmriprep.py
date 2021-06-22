@@ -118,6 +118,7 @@ FMRIPREP_INPUT_SPECIFICATION = {
     },
     "output-spaces": {
         "type": ListInputDefinition,
+        "element_type": "STR",
         "description": "Standard and non-standard spaces to resample anatomical and functional images to.",
     },
     "bold2t1w-init": {

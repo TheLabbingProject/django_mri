@@ -62,10 +62,10 @@ class fMRIprep:
         ## Anatomicals ##
         "native_T1w": ["fmriprep", "anat", "desc-preproc_T1w.nii.gz"],
         "native_brain_mask": ["fmriprep", "anat", "desc-brain_mask.nii.gz"],
-        "native_parcellation": ["fmriprep", "anat", "dseg.nii.gz"],
-        "native_csf": ["fmriprep", "anat", "CSF_probseg.nii.gz"],
-        "native_gm": ["fmriprep", "anat", "GM_probseg.nii.gz"],
-        "native_wm": ["fmriprep", "anat", "WM_probseg.nii.gz"],
+        "native_parcellation": ["fmriprep", "anat", "*dseg.nii.gz",],
+        "native_csf": ["fmriprep", "anat", "label-CSF_probseg.nii.gz"],
+        "native_gm": ["fmriprep", "anat", "label-GM_probseg.nii.gz"],
+        "native_wm": ["fmriprep", "anat", "label-WM_probseg.nii.gz"],
         "standard_T1w": [
             "fmriprep",
             "anat",
@@ -79,7 +79,7 @@ class fMRIprep:
         "standard_parcellation": [
             "fmriprep",
             "anat",
-            "space-MNI152NLin*dseg.nii.gz",
+            "space-MNI152NLin2009cAsym_dseg.nii.gz",
         ],
         "standard_csf": [
             "fmriprep",
@@ -99,7 +99,7 @@ class fMRIprep:
         "native_to_mni_transform": [
             "fmriprep",
             "anat",
-            "from-T1w_to-MNI152NLin2009cAsym__mode-image_xfm.h5",
+            "from-T1w_to-MNI152NLin2009cAsym_mode-image_xfm.h5",
         ],
         "mni_to_native_transform": [
             "fmriprep",
@@ -109,73 +109,73 @@ class fMRIprep:
         "native_to_fsnative_transform": [
             "fmriprep",
             "anat",
-            "from-T1w_to-fsnative_mode-image_xfm.h5",
+            "from-T1w_to-fsnative_mode-image_xfm.txt",
         ],
         "fsnative_to_native_transform": [
             "fmriprep",
             "anat",
-            "from-fsnative_to-T1w_mode-image_xfm.h5",
+            "from-fsnative_to-T1w_mode-image_xfm.txt",
         ],
-        "smoothwm": ["fmriprep", "anat", "smoowthwm.surf.gii"],
-        "pial": ["fmriprep", "anat", "pial.surf.gii"],
-        "midthickness": ["fmriprep", "anat", "midthickness.surf.gii"],
-        "inflated": ["fmriprep", "anat", "inflated.surf.gii"],
+        "smoothwm": ["fmriprep", "anat", "hemi-*_smoothwm.surf.gii"],
+        "pial": ["fmriprep", "anat", "hemi-*_pial.surf.gii"],
+        "midthickness": ["fmriprep", "anat", "hemi-*_midthickness.surf.gii"],
+        "inflated": ["fmriprep", "anat", "hemi-*_inflated.surf.gii"],
         ## Functionals ##
         "native_boldref": [
             "fmriprep",
             "func",
-            "space-T1w_desc-boldref.nii.gz",
+            "*space-T1w_desc-boldref.nii.gz",
         ],
         "native_func_brain_mask": [
             "fmriprep",
             "func",
-            "space-T1w_desc-brain_mask.nii.gz",
+            "*space-T1w_desc-brain_mask.nii.gz",
         ],
         "native_preproc_bold": [
             "fmriprep",
             "func",
-            "space-T1w_desc-preproc_bold.nii.gz",
+            "*space-T1w_desc-preproc_bold.nii.gz",
         ],
         "native_aparc_bold": [
             "fmriprep",
             "func",
-            "space-T1w_desc-aparcaseg_dseg.nii.gz",
+            "*space-T1w_desc-aparcaseg_dseg.nii.gz",
         ],
         "native_aseg_bold": [
             "fmriprep",
             "func",
-            "space-T1w_desc-aseg_dseg.nii.gz",
+            "*space-T1w_desc-aseg_dseg.nii.gz",
         ],
         "standard_boldref": [
             "fmriprep",
             "func",
-            "space-MNI152NLin2009cAsym_desc-boldref.nii.gz",
+            "*space-MNI152NLin2009cAsym_desc-boldref.nii.gz",
         ],
         "standard_func_brain_mask": [
             "fmriprep",
             "func",
-            "space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz",
+            "*space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz",
         ],
         "standard_preproc_bold": [
             "fmriprep",
             "func",
-            "space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz",
+            "*space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz",
         ],
         "standard_aparc_bold": [
             "fmriprep",
             "func",
-            "space-MNI152NLin2009cAsym_desc-aparcaseg_dseg.nii.gz",
+            "*space-MNI152NLin2009cAsym_desc-aparcaseg_dseg.nii.gz",
         ],
         "standard_aseg_bold": [
             "fmriprep",
             "func",
-            "space-MNI152NLin2009cAsym_desc-aseg_dseg.nii.gz",
+            "*space-MNI152NLin2009cAsym_desc-aseg_dseg.nii.gz",
         ],
-        "confounds_tsv": ["fmriprep", "func", "desc-confound_timeseries.tsv"],
+        "confounds_tsv": ["fmriprep", "func", "*desc-confound_timeseries.tsv"],
         "confounds_json": [
             "fmriprep",
             "func",
-            "desc-confound_timeseries.json",
+            "*desc-confound_timeseries.json",
         ],
         "freesurfer_T1": ["freesurfer", "mri", "T1.mgz"],
         "freesurfer_rawavg": ["freesurfer", "mri", "rawavg.mgz"],
@@ -190,7 +190,7 @@ class fMRIprep:
         "freesurfer_wm": ["freesurfer", "mri", "wm.mgz"],
         "freesurfer_wmparc": ["freesurfer", "mri", "wmparc.mgz"],
         "freesurfer_wmparc_stats": ["freesurfer", "stats", "wmparc.stats"],
-        "freesurfer_BA_stats": ["freesurfer", "stats", "*.BA_exvivo*.stats"],
+        "freesurfer_BA_stats": ["freesurfer", "stats", ".BA_exvivo*.stats"],
         ### NEEDS COMPLETION ###
     }
 
@@ -274,7 +274,7 @@ class fMRIprep:
         return command + self.set_configuration_by_keys()
 
     def find_output(
-        self, destination: Path, partial_output: str, subj_id: str
+        self, destination: Path, partial_output: str, subj_id: str, ses_id: str
     ):
         """
         uses the destination and some default dictionary to locate specific output files of *fmriprep*
@@ -288,22 +288,21 @@ class fMRIprep:
         main_dir, sub_dir, output_id = self.DEFAULT_OUTPUTS.get(partial_output)
         if main_dir == "freesurfer":
             output = [
-                f
-                for f in destination.rglob(
-                    f"{main_dir}/{sub_dir}/*{output_id}"
-                )
+                f for f in destination.rglob(f"{main_dir}/**/*{output_id}")
             ]
         elif main_dir == "fmriprep":
             output = [
                 f
                 for f in destination.rglob(
-                    f"{main_dir}/{sub_dir}/{subj_id}*{output_id}"
+                    f"{main_dir}/**/{sub_dir}/sub-{subj_id}_{ses_id}_{output_id}"
                 )
             ]
         if output:
             if len(output) == 1:
                 return output[0]
             else:
+                if "native" in partial_output:
+                    output = [f for f in output if ("MNI" not in f.name)]
                 return output
         else:
             return None
@@ -325,8 +324,15 @@ class fMRIprep:
         output_dict = {}
         for subj in self.configuration.get("participant_label"):
             output_dict[subj] = {}
-            for key in self.DEFAULT_OUTPUTS:
-                output_dict[key] = self.find_output(destination, key, subj)
+            for session in self.destination.glob(f"fmriprep/sub-{subj}/ses-*"):
+                ses_id = session.name
+                output_dict[subj][ses_id] = {}
+                for key in self.DEFAULT_OUTPUTS:
+                    output_dict[subj][ses_id][key] = self.find_output(
+                        destination, key, subj, ses_id
+                    )
+        if len(output_dict) == 1:
+            return output_dict.get(subj)
         return output_dict
 
     def run(self) -> dict:

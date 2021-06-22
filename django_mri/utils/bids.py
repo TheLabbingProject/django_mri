@@ -359,7 +359,7 @@ class Bids:
         else:
             sbref = [f for f in bids_path.parent.glob("*_sbref.json")]
             if sbref:
-                self.fix_sbref(sbref[0].parent / sbref.stem)
+                self.fix_sbref(sbref[0].parent / sbref[0].stem)
 
     def set_participant_tsv_and_json(self, parent: Path, subject_dict: dict):
         """
