@@ -41,7 +41,7 @@ NAME_TO_LOC = {
         "data_type": "anat",
         "modality": "FLAIR",
     },
-    "rsfMRI_AP": {"data_type": "func", "task": "rest", "modality": "bold",},
+    "rsfMRI_AP": {"data_type": "func", "task": "rest", "modality": "bold"},
     "rsfMRI_AP_SBRef": {
         "data_type": "func",
         "task": "rest",

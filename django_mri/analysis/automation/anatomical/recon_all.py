@@ -2,7 +2,7 @@
 Definition of the :class:`ReconAllRunner` class.
 """
 from typing import List
-
+from nipype.interfaces.freesurfer import ReconAll
 from django_mri.analysis.automation.anatomical.preprocessing import (
     AnatomicalPreprocessing,
 )
@@ -20,7 +20,7 @@ class ReconAllRunner(AnatomicalPreprocessing):
 
     #: :class:`~django_analyses.models.analysis_version.AnalysisVersion`
     #: instance title.
-    ANALYSIS_VERSION_TITLE = "6.0.0"
+    ANALYSIS_VERSION_TITLE = ReconAll().version
 
     #: :class:`~django_analyses.models.pipeline.node.Node` instance
     #: configuration.

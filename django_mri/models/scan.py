@@ -327,6 +327,10 @@ class Scan(TimeStampedModel):
         bids = Bids()
         bids.clean_unwanted_files(bids_path)
         bids.fix_functional_json(bids_path)
+        if "fmap" in bids_path.parent.name:
+            bids.modify_fieldmaps(bids_path.with_suffix(".json"))
+        if "func" in bids_path.parent.name:
+            bids.fix_sbref(bids_path)
 
     def dicom_to_nifti(
         self,
