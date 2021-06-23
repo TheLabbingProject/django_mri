@@ -14,7 +14,7 @@ from django_mri.analysis.interfaces.fmriprep.utils import (
     FLAGS,
     OUTPUTS,
 )
-from typing import Generator
+from typing import Iterable
 
 NIFTI_ROOT = get_mri_root() / "NIfTI"
 ANALYSIS_ROOT = get_mri_root().parent / "analysis"
@@ -133,7 +133,7 @@ class fMRIprep:
 
     def generate_fs_outputs(
         self, main_dir: str, output_id: str
-    ) -> Generator[Path]:
+    ) -> Iterable[Path]:
         """
         Generate FreeSurfer output paths.
 
@@ -146,7 +146,7 @@ class fMRIprep:
 
         Yields
         -------
-        Generator[Path]
+        Path
             Output paths
         """
         pattern = self.FS_OUTPUT_PATTERN.format(
@@ -161,7 +161,7 @@ class fMRIprep:
         subject_id: str,
         session_id: str,
         output_id: str,
-    ) -> Generator[Path]:
+    ) -> Iterable[Path]:
         """
         Generate fMRIPrep output paths.
 
@@ -180,7 +180,7 @@ class fMRIprep:
 
         Yields
         -------
-        Generator[Path]
+        Path
             Output paths
         """
         pattern = self.FMRIPREP_OUTPUT_PATTERN.format(
