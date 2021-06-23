@@ -1,16 +1,22 @@
 """
-Definition of the
-:class:`~django_mri.analysis.interfaces.fmriprep.fmriprep` interface.
+Definition of the :class:`fMRIPrep` interface.
 """
-
 import os
 from pathlib import Path
 from django_mri.utils import get_mri_root
-from django.conf import settings
+from django_mri.analysis.interfaces.fmriprep.messages import (
+    FS_LICENSE_MISSING,
+    RUN_FAILURE,
+)
+from django_mri.analysis.interfaces.fmriprep.utils import (
+    COMMAND,
+    FREESURFER_HOME,
+    FLAGS,
+    OUTPUTS,
+)
+from typing import Generator
 
-COMMAND = "singularity run --cleanenv -B {bids_parent}:/work -B {destination_parent}:/output -B {freesurfer_license}:/fs_license /my_images/fmriprep-latest.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"
 NIFTI_ROOT = get_mri_root() / "NIfTI"
-# ANALYSIS_ROOT = Path(getattr(settings, "ANALYSIS_BASE_PATH"))
 ANALYSIS_ROOT = get_mri_root().parent / "analysis"
 
 
@@ -26,205 +32,66 @@ class fMRIprep:
        https://fmriprep.org/en/stable/index.html
     """
 
-    #: "Flags" indicate parameters that are specified without any arguments,
-    #: i.e. they are a switch for some binary configuration.
-    FLAGS = (
-        "skip_bids_validation",
-        "low-mem",
-        "anat-only",
-        "boilerplate_only",
-        "md-only-boilerplate",
-        "error-on-aroma-warnings",
-        "longitudinal",
-        "force-bbr",
-        "force-no-bbr",
-        "medial-surface-nan",
-        "use-aroma",
-        "return-all-components",
-        "skull-strip-fixed-seed",
-        "fmap-bspline",
-        "fmap-no-demean",
-        "use-syn-sdc",
-        "force-syn",
-        "no-submm-recon",
-        "fs-no-reconall",
-        "clean-workdir",
-        "resource-monitor",
-        "reports-only",
-        "write-graph",
-        "stop-on-first-crash",
-        "notrack",
-        "sloppy",
+    #: Binary configurations.
+    FLAGS = FLAGS
+
+    #: Expected outputs.
+    OUTPUTS = OUTPUTS
+
+    #: Default FreeSurfer home directory.
+    DEFAULT_FREESURFER_HOME: Path = Path(FREESURFER_HOME)
+
+    #: fMRIPrep output pattern.
+    FMRIPREP_OUTPUT_PATTERN: str = (
+        "{main_dir}/**/{sub_dir}/sub-{subject_id}_{session_id}_{output_id}"
     )
 
-    # Outputs
-    DEFAULT_OUTPUTS = {
-        ## Anatomicals ##
-        "native_T1w": ["fmriprep", "anat", "desc-preproc_T1w.nii.gz"],
-        "native_brain_mask": ["fmriprep", "anat", "desc-brain_mask.nii.gz"],
-        "native_parcellation": ["fmriprep", "anat", "*dseg.nii.gz",],
-        "native_csf": ["fmriprep", "anat", "label-CSF_probseg.nii.gz"],
-        "native_gm": ["fmriprep", "anat", "label-GM_probseg.nii.gz"],
-        "native_wm": ["fmriprep", "anat", "label-WM_probseg.nii.gz"],
-        "standard_T1w": [
-            "fmriprep",
-            "anat",
-            "space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz",
-        ],
-        "standard_brain_mask": [
-            "fmriprep",
-            "anat",
-            "space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz",
-        ],
-        "standard_parcellation": [
-            "fmriprep",
-            "anat",
-            "space-MNI152NLin2009cAsym_dseg.nii.gz",
-        ],
-        "standard_csf": [
-            "fmriprep",
-            "anat",
-            "space-MNI152NLin2009cAsym_label-CSF_probseg.nii.gz",
-        ],
-        "standard_gm": [
-            "fmriprep",
-            "anat",
-            "space-MNI152NLin2009cAsym_label-GM_probseg.nii.gz",
-        ],
-        "standard_wm": [
-            "fmriprep",
-            "anat",
-            "space-MNI152NLin2009cAsym_label-WM_probseg.nii.gz",
-        ],
-        "native_to_mni_transform": [
-            "fmriprep",
-            "anat",
-            "from-T1w_to-MNI152NLin2009cAsym_mode-image_xfm.h5",
-        ],
-        "mni_to_native_transform": [
-            "fmriprep",
-            "anat",
-            "from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5",
-        ],
-        "native_to_fsnative_transform": [
-            "fmriprep",
-            "anat",
-            "from-T1w_to-fsnative_mode-image_xfm.txt",
-        ],
-        "fsnative_to_native_transform": [
-            "fmriprep",
-            "anat",
-            "from-fsnative_to-T1w_mode-image_xfm.txt",
-        ],
-        "smoothwm": ["fmriprep", "anat", "hemi-*_smoothwm.surf.gii"],
-        "pial": ["fmriprep", "anat", "hemi-*_pial.surf.gii"],
-        "midthickness": ["fmriprep", "anat", "hemi-*_midthickness.surf.gii"],
-        "inflated": ["fmriprep", "anat", "hemi-*_inflated.surf.gii"],
-        ## Functionals ##
-        "native_boldref": [
-            "fmriprep",
-            "func",
-            "*space-T1w_desc-boldref.nii.gz",
-        ],
-        "native_func_brain_mask": [
-            "fmriprep",
-            "func",
-            "*space-T1w_desc-brain_mask.nii.gz",
-        ],
-        "native_preproc_bold": [
-            "fmriprep",
-            "func",
-            "*space-T1w_desc-preproc_bold.nii.gz",
-        ],
-        "native_aparc_bold": [
-            "fmriprep",
-            "func",
-            "*space-T1w_desc-aparcaseg_dseg.nii.gz",
-        ],
-        "native_aseg_bold": [
-            "fmriprep",
-            "func",
-            "*space-T1w_desc-aseg_dseg.nii.gz",
-        ],
-        "standard_boldref": [
-            "fmriprep",
-            "func",
-            "*space-MNI152NLin2009cAsym_desc-boldref.nii.gz",
-        ],
-        "standard_func_brain_mask": [
-            "fmriprep",
-            "func",
-            "*space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz",
-        ],
-        "standard_preproc_bold": [
-            "fmriprep",
-            "func",
-            "*space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz",
-        ],
-        "standard_aparc_bold": [
-            "fmriprep",
-            "func",
-            "*space-MNI152NLin2009cAsym_desc-aparcaseg_dseg.nii.gz",
-        ],
-        "standard_aseg_bold": [
-            "fmriprep",
-            "func",
-            "*space-MNI152NLin2009cAsym_desc-aseg_dseg.nii.gz",
-        ],
-        "confounds_tsv": ["fmriprep", "func", "*desc-confound_timeseries.tsv"],
-        "confounds_json": [
-            "fmriprep",
-            "func",
-            "*desc-confound_timeseries.json",
-        ],
-        "freesurfer_T1": ["freesurfer", "mri", "T1.mgz"],
-        "freesurfer_rawavg": ["freesurfer", "mri", "rawavg.mgz"],
-        "freesurfer_orig": ["freesurfer", "mri", "orig.mgz"],
-        "freesurfer_nu": ["freesurfer", "mri", "nu.mgz"],
-        "freesurfer_norm": ["freesurfer", "mri", "norm.mgz"],
-        "freesurfer_aseg": ["freesurfer", "mri", "aseg.mgz"],
-        "freesurfer_aseg_stats": ["freesurfer", "stats", "aseg.stats"],
-        "freesurfer_brain": ["freesurfer", "mri", "brain.mgz"],
-        "freesurfer_brainmask": ["freesurfer", "mri", "brainmask.mgz"],
-        "freesurfer_filled": ["freesurfer", "mri", "filled.mgz"],
-        "freesurfer_wm": ["freesurfer", "mri", "wm.mgz"],
-        "freesurfer_wmparc": ["freesurfer", "mri", "wmparc.mgz"],
-        "freesurfer_wmparc_stats": ["freesurfer", "stats", "wmparc.stats"],
-        "freesurfer_BA_stats": ["freesurfer", "stats", ".BA_exvivo*.stats"],
-        ### NEEDS COMPLETION ###
-    }
+    #: FreeSurfer output pattern.
+    FS_OUTPUT_PATTERN: str = "{main_dir}/**/*{output_id}"
+
+    #: Session results pattern.
+    SESSION_PATTERN: str = "fmriprep/sub-{subject_id}/ses-*"
 
     __version__ = "BETA"
 
     def __init__(self, **kwargs):
-        # self.bids_dir = NIFTI_ROOT.absolute()
-        # self.destination = ANALYSIS_ROOT.absolute() / kwargs.pop("destination")
-        self.bids_dir, self.destination = self.get_root_dirs()
-        self.destination = self.destination / kwargs.pop("destination")
+        """
+        Initializes a new :class:`fMRIPrep` interface instance.
+        """
+        self.destination = ANALYSIS_ROOT / kwargs.pop("destination")
         self.configuration = kwargs
 
-    def get_root_dirs(self) -> list:
+    def find_fs_license(self) -> Path:
         """
+        Returns the provided or located FreeSurfer license path.
 
         Returns
         -------
-        list
-            [description]
-        """
-        from django_mri.utils import get_mri_root
-        from django.conf import settings
+        Path
+            Path to FreeSurfer license file
 
-        return get_mri_root() / "NIfTI", Path(settings.MEDIA_ROOT) / "analysis"
-
-    def find_fs_license(self):
+        Raises
+        ------
+        FileNotFoundError
+            No FreeSurfer license file could be found
         """
-        Return default freesurfer license's path
-        """
-        return Path(os.getenv("FREESURFER_HOME")) / "license.txt"
+        try:
+            return self.configuration.pop("fs-license-file")
+        except KeyError:
+            fs_home = os.getenv(
+                "FREESURFER_HOME", self.DEFAULT_FREESURFER_HOME
+            )
+            license_file = Path(fs_home) / "license.txt"
+            if license_file.exists():
+                return license_file
+            else:
+                raise FileNotFoundError(FS_LICENSE_MISSING)
 
     def set_configuration_by_keys(self):
         """
-        Builds CLI for fmriprep (via singularity) based on user's specifications
+        Builds command for fmriprep CLI (via singularity) based on user's
+        specifications.
+
         Returns
         -------
         str
@@ -246,75 +113,120 @@ class fMRIprep:
     def generate_command(self) -> str:
         """
         Returns the command to be executed in order to run the analysis.
-        Parameters
-        ----------
-        bids_dir : Path
-            Path to BIDS-appropriate directory
-        destination : Path
-            Path to output directory
 
         Returns
         -------
         str
             Complete execution command
         """
-        if not "fs-license-file" in self.configuration.keys():
-            fs_license = self.find_fs_license()
-        else:
-            fs_license = self.configuration.pop("fs-license-file")
+        fs_license = self.find_fs_license()
         analysis_level = self.configuration.pop("analysis_level")
         command = COMMAND.format(
-            bids_parent=self.bids_dir.parent,
+            bids_parent=NIFTI_ROOT.parent,
             destination_parent=self.destination.parent,
-            bids_name=self.bids_dir.name,
+            bids_name=NIFTI_ROOT.name,
             destination_name=self.destination.name,
             analysis_level=analysis_level,
             freesurfer_license=fs_license,
         )
         return command + self.set_configuration_by_keys()
 
+    def generate_fs_outputs(
+        self, main_dir: str, output_id: str
+    ) -> Generator[Path]:
+        """
+        Generate FreeSurfer output paths.
+
+        Parameters
+        ----------
+        main_dir : str
+            Main output directory
+        output_id : str
+            Output file name pattern
+
+        Yields
+        -------
+        Generator[Path]
+            Output paths
+        """
+        pattern = self.FS_OUTPUT_PATTERN.format(
+            main_dir=main_dir, output_id=output_id
+        )
+        return self.destination.rglob(pattern)
+
+    def generate_fmriprep_outputs(
+        self,
+        main_dir: str,
+        sub_dir: str,
+        subject_id: str,
+        session_id: str,
+        output_id: str,
+    ) -> Generator[Path]:
+        """
+        Generate fMRIPrep output paths.
+
+        Parameters
+        ----------
+        main_dir : str
+            Main output directory
+        sub_dir : str
+            Results sub-directory name
+        subject_id : str
+            String subject ID
+        session_id : str
+            String session ID
+        output_id : str
+            Output file name pattern
+
+        Yields
+        -------
+        Generator[Path]
+            Output paths
+        """
+        pattern = self.FMRIPREP_OUTPUT_PATTERN.format(
+            main_dir=main_dir,
+            sub_dir=sub_dir,
+            subject_id=subject_id,
+            session_id=session_id,
+            output_id=output_id,
+        )
+        return self.destination.rglob(pattern)
+
     def find_output(
-        self, destination: Path, partial_output: str, subj_id: str, ses_id: str
+        self, partial_output: str, subject_id: str, session_id: str
     ):
         """
-        uses the destination and some default dictionary to locate specific output files of *fmriprep*
+        uses the destination and some default dictionary to locate specific
+        output files of *fmriprep*.
+
         Parameters
         ----------
-        destination : Path
-            Output files destination directory
         partial_output : str
             A string that identifies a specific output
+        subject_id : str
+            Subject string ID
+        session_id : str
+            Session string ID
         """
-        main_dir, sub_dir, output_id = self.DEFAULT_OUTPUTS.get(partial_output)
+        main_dir, sub_dir, output_id = self.OUTPUTS.get(partial_output)
         if main_dir == "freesurfer":
-            output = [
-                f for f in destination.rglob(f"{main_dir}/**/*{output_id}")
-            ]
+            outputs = list(self.generate_fs_outputs(main_dir, output_id))
         elif main_dir == "fmriprep":
-            output = [
-                f
-                for f in destination.rglob(
-                    f"{main_dir}/**/{sub_dir}/sub-{subj_id}_{ses_id}_{output_id}"
+            outputs = list(
+                self.generate_fmriprep_outputs(
+                    main_dir, sub_dir, subject_id, session_id, output_id
                 )
-            ]
-        if output:
-            if len(output) == 1:
-                return output[0]
-            else:
-                if "native" in partial_output:
-                    output = [f for f in output if ("MNI" not in f.name)]
-                return output
-        else:
-            return None
+            )
+        if len(outputs) == 1:
+            return outputs[0]
+        elif len(outputs) > 1:
+            if "native" in partial_output:
+                return [f for f in outputs if ("MNI" not in f.name)]
+            return outputs
 
-    def generate_output_dict(self, destination: Path) -> dict:
+    def generate_output_dict(self) -> dict:
         """
         Generates a dictionary of the expected output file paths by key.
-
-        Parameters
-        ----------
-        destination : Path
-            Output files destination directory
 
         Returns
         -------
@@ -322,17 +234,21 @@ class fMRIprep:
             Output files by key
         """
         output_dict = {}
-        for subj in self.configuration.get("participant_label"):
-            output_dict[subj] = {}
-            for session in self.destination.glob(f"fmriprep/sub-{subj}/ses-*"):
-                ses_id = session.name
-                output_dict[subj][ses_id] = {}
-                for key in self.DEFAULT_OUTPUTS:
-                    output_dict[subj][ses_id][key] = self.find_output(
-                        destination, key, subj, ses_id
-                    )
+        subject_ids = self.configuration.get("participant_label")
+        for subject_id in subject_ids:
+            output_dict[subject_id] = {}
+            session_pattern = self.SESSION_PATTERN.format(
+                subject_id=subject_id
+            )
+            for session_dir in self.destination.glob(session_pattern):
+                session_id = session_dir.name
+                output_dict[subject_id][session_id] = {}
+                for key in self.OUTPUTS:
+                    output_dict[subject_id][session_id][
+                        key
+                    ] = self.find_output(key, subject_id, session_id)
         if len(output_dict) == 1:
-            return output_dict.get(subj)
+            return output_dict.get(subject_id)
         return output_dict
 
     def run(self) -> dict:
@@ -341,28 +257,22 @@ class fMRIprep:
         If *destination* is not specified, output files will be created within
         *bids_dir*\'s parent directory.
 
-        Parameters
-        ----------
-        bids_dir : Path,
-            Path to BIDS-appropriate directory
-        destination : Path, optional
-            Path to output directory, by default None
-
         Returns
         -------
         dict
-            [Dictionary with keys and values corresponding to descriptions and files of *fmriprep*\'s outputs accordingly]
+            Dictionary with keys and values corresponding to descriptions and
+            files of *fmriprep*\'s outputs accordingly
 
         Raises
         ------
         RuntimeError
-            [In case of failed execution, raises an appropriate error.]
+            In case of failed execution, raises an appropriate error
         """
         command = self.generate_command()
-        print(command)
-        raise_exception = os.system(command)
-        if raise_exception:
-            raise RuntimeError(
-                f"Failed to run fmriprep!\nExecuted command: {command}"
+        raised_exception = os.system(command)
+        if raised_exception:
+            message = RUN_FAILURE.format(
+                command=command, exception=raised_exception
             )
-        return self.generate_output_dict(self.destination)
+            raise RuntimeError(message)
+        return self.generate_output_dict()
