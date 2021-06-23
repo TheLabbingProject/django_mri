@@ -1,22 +1,19 @@
 """
-Definition of the :class:`AnatomicalPreprocessing` base class.
+Definition of the :class:`fMRIPrep` interface.
 """
-import logging
-
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.utils.utils import get_subject_model
 from django_mri.analysis.interfaces.fmriprep.fmriprep import fMRIprep
+from typing import List
 
+#: Associated subject model.
 Subject = get_subject_model()
 
 
 class fMRIPrepRunner(QuerySetRunner):
     """
-    Base class for anatomical MRI preprocessing over a queryset of
-    :class:`~django_mri.models.scan.Scan` instances. If no queryset is
-    provided, call the :func:`get_default_queryset` method to generate a
-    default execution queryset.
+    Automates the execution of fMRIPrep over a queryset of subjects.
     """
 
     #: :class:`~django_analyses.models.analysis.Analysis` instance title.
@@ -45,21 +42,27 @@ class fMRIPrepRunner(QuerySetRunner):
         "desc": "Converting MRI scans to NIfTI",
     }
 
-    def get_instance_representation(self, instance: Subject) -> str:
+    #: Subject scan filtering to apply before running NIfTI conversion.
+    SCAN_QUERY: Q = Q(_nifti__isnull=True) & ~(
+        Q(description__icontains="IR-EPI")
+        | Q(description__icontains="IREPI")
+        | Q(description__icontains="localizer")
+        | Q(description__icontains="cmrr")
+    )
+
+    def get_instance_representation(self, instance: Subject) -> List[str]:
         """
-        The most common input format for anatomical preprocessing scripts is
-        NIfTI, so by default this method returns the path of the scan
-        instance's NIfTI-format file.
+        Returns the expected :attr:`INPUT_KEY` value for the given subject.
 
         Parameters
         ----------
-        instance : Scan
-            Scan instance
+        instance : Subject
+            Subject instance
 
         Returns
         -------
-        str
-            Path of the scan's NIfTI-format file
+        List[str]
+            List containing subject ID string
         """
         return [str(instance.id)]
 
@@ -82,18 +85,10 @@ class fMRIPrepRunner(QuerySetRunner):
         --------
         :func:`create_inputs`
         """
-        q = Q(_nifti__isnull=True) & ~(
-            Q(description__icontains="IR-EPI")
-            | Q(description__icontains="IREPI")
-            | Q(description__icontains="localizer")
-            | Q(description__icontains="cmrr")
-        )
         scans = instance.mri_session_set.get_scan_set()
-        for scan in scans.filter(q):
+        for scan in scans.filter(self.SCAN_QUERY):
             bids_destination = scan.get_bids_destination()
             if bids_destination:
-                print(scan.description)
-                print(instance.id)
                 try:
                     scan.nifti
                 except RuntimeError:
