@@ -278,87 +278,103 @@ FMRIPREP_INPUT_SPECIFICATION = {
 }
 #: *fMRIprep* output specification.
 FMRIPREP_OUTPUT_SPECIFICATION = {
-    ### fmriprep
-    ## native
+    # fmriprep
+    # native
     # anat/*desc-preproc_T1w.nii.gz
     "native_T1w": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed anatomical image in native space.",
     },
     # anat/*desc-brain_mask.nii.gz
     "native_brain_mask": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed anatomical brain mask in native space.",
     },
     # anat/*dseg.nii.gz
     "native_parcellation": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed anatomical brain parcellation in native space.",
     },
     # anat/*CSF_probseg.nii.gz
     "native_csf": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "CSF mask in native space.",
     },
     # anat/*GM_probseg.nii.gz
     "native_gm": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "GM mask in native space.",
     },
     # anat/*WM_probseg.nii.gz
     "native_wm": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "WM mask in native space.",
     },
     ## standard
     # anat/*desc-preproc_T1w.nii.gz
     "standard_T1w": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed anatomical image in standard space.",
     },
     # anat/*desc-brain_mask.nii.gz
     "standard_brain_mask": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed anatomical brain mask in standard space.",
     },
     # anat/*dseg.nii.gz
     "standard_parcellation": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed anatomical brain parcellation in standard space.",
     },
     # anat/*CSF_probseg.nii.gz
     "standard_csf": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "CSF mask in standard space.",
     },
     # anat/*GM_probseg.nii.gz
     "standard_gm": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "GM mask in standard space.",
     },
     # anat/*WM_probseg.nii.gz
     "standard_wm": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "WM mask in standard space.",
     },
     # anat/*from-T1wto-MNI..._mode-image_xfm.h5
     "native_to_mni_transform": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Transformation file from native to standard space.",
     },
     # anat/*from-MNI...to-T1w_mode-image_xfm.h5
     "mni_to_native_transform": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Transformation file from standard to native space.",
     },
     # anat/*from-fsnative...to-T1w_mode-image_xfm.txt
     "native_to_fsnative_transform": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Transformation file from native to freesurfer's standard space.",
     },
     # anat/*from-fsnative...to-T1w_mode-image_xfm.txt
     "fsnative_to_native_transform": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Transformation file from freesurfer's  standard to native space.",
     },
     ## surfaces
@@ -390,128 +406,153 @@ FMRIPREP_OUTPUT_SPECIFICATION = {
     # native
     # boldref
     "native_boldref": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Single volume BOLD reference in native space.",
     },
     # brain_mask
     "native_func_brain_mask": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Functional image's brain mask in native space.",
     },
     # preproc_bold
     "native_preproc_bold": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed functional image in native space.",
     },
     # aparcaseg_dseg
     "native_aparc_bold": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Aparc parcellation in functional image space.",
     },
     # aparcaseg_dseg
     "native_aseg_bold": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Aseg parcellation in functional image space.",
     },
     # standard
     # boldref
     "standard_boldref": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Single volume BOLD reference in standard space.",
     },
     # brain_mask
     "standard_func_brain_mask": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Functional image's brain mask in standard space.",
     },
     # preproc_bold
     "standard_preproc_bold": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Preprocessed functional image in standard space.",
     },
     # aparcaseg_dseg
     "standard_aparc_bold": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Aparc parcellation in standard space.",
     },
     # aparcaseg_dseg
     "standard_aseg_bold": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Aseg parcellation in standard space.",
     },
     ### Confounds ###
     "confounds_tsv": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Extracted confounding time series in a .tsv format.",
     },
     "confounds_json": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Extracted confounding time series in a .json format.",
     },
     # freesurfer/
     # mri/T1.mgz
     "freesurfer_T1": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Intensity normalized whole-head volume.",
     },
     # mri/rawavg.mgz
     "freesurfer_rawavg": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "An average volume of the raw input data (if there is only one input volume, they will be identical). This volume is unconformed (i.e. to 256^3, 1mm isotropic)",  # noqa: E501
     },
     # mri/orig.mgz
     "freesurfer_orig": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "A conformed (i.e. to 256^3, 1mm isotropic) average volume of the raw input data.",
     },
     # mri/nu.mgz
     "freesurfer_nu": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "This is an intensity normalized volume generated after correcting for non-uniformity in conformed raw average (saved as 'mri/orig.mgz'). If there are any errors in later steps, it sometimes helps to check if the intensity values don't look normal in this file. If the values are too high, then scaling down the intensity a little bit and re-running recon-all usually corrects that error. In some cases, this scaling down can also be done for the orig.mgz volume.",  # noqa: E501
     },
     # mri/norm.mgz
     "freesurfer_norm": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Normalized skull-stripped volume.",
     },
     # mri/aseg.mgz
     "freesurfer_aseg": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Volumetric map of regions from automatic segmentation.",
     },
     # stats/aseg.stats
     "freesurfer_aseg_stats": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Automated segmentation statistics file.",
     },
     # mri/brain.mgz
     "freesurfer_brain": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Intensity normalized brain-only volume.",
     },
     # mri/brainmask.mgz
     "freesurfer_brainmask": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Skull-stripped (brain-only) volume.",
     },
     # mri/filled.mgz
     "freesurfer_filled": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Subcortical mass volume.",
     },
     # mri/wm.mgz
     "freesurfer_wm": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Segmented white-matter volume.",
     },
     # mri/wmparc.mgz
     "freesurfer_wmparc": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "Aparc parcellation projected into subcortical white matter.",
     },
     # mri/wmparc_stats.mgz
     "freesurfer_wmparc_stats": {
-        "type": FileOutputDefinition,
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
         "description": "White matter parcellation statistics file.",
     },
     "freesurfer_BA_stats": {

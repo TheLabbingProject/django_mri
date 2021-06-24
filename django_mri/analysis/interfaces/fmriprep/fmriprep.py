@@ -3,7 +3,6 @@ Definition of the :class:`fMRIPrep` interface.
 """
 import os
 from pathlib import Path
-from django_mri.utils import get_mri_root
 from django_mri.analysis.interfaces.fmriprep.messages import (
     FS_LICENSE_MISSING,
     RUN_FAILURE,
@@ -14,10 +13,10 @@ from django_mri.analysis.interfaces.fmriprep.utils import (
     FLAGS,
     OUTPUTS,
 )
-from typing import Iterable
+from typing import Iterable, Tuple
 
-NIFTI_ROOT = get_mri_root() / "NIfTI"
-ANALYSIS_ROOT = get_mri_root().parent / "analysis"
+# NIFTI_ROOT = get_mri_root() / "NIfTI"
+# ANALYSIS_ROOT = get_mri_root().parent / "analysis"
 
 
 class fMRIprep:
@@ -58,8 +57,23 @@ class fMRIprep:
         """
         Initializes a new :class:`fMRIPrep` interface instance.
         """
-        self.destination = ANALYSIS_ROOT / kwargs.pop("destination")
+        self.nifti_root, self.analysis_root = self.set_input_and_output_roots()
+        self.destination = self.analysis_root / kwargs.pop("destination")
         self.configuration = kwargs
+
+    def set_input_and_output_roots(self) -> Tuple[Path, Path]:
+        """
+        Sets the input and output directories to be mounted by singularity
+        
+        Returns
+        -------
+        Tuple[Path, Path]
+            Paths to input and output directories, accordingly
+        """
+        from django_mri.utils import get_mri_root
+
+        mri_root = get_mri_root()
+        return mri_root / "NIfTI", mri_root.parent / "analysis"
 
     def find_fs_license(self) -> Path:
         """
@@ -122,9 +136,9 @@ class fMRIprep:
         fs_license = self.find_fs_license()
         analysis_level = self.configuration.pop("analysis_level")
         command = COMMAND.format(
-            bids_parent=NIFTI_ROOT.parent,
+            bids_parent=self.nifti_root.parent,
             destination_parent=self.destination.parent,
-            bids_name=NIFTI_ROOT.name,
+            bids_name=self.nifti_root.name,
             destination_name=self.destination.name,
             analysis_level=analysis_level,
             freesurfer_license=fs_license,
@@ -217,12 +231,12 @@ class fMRIprep:
                     main_dir, sub_dir, subject_id, session_id, output_id
                 )
             )
-        if len(outputs) == 1:
-            return outputs[0]
-        elif len(outputs) > 1:
-            if "native" in partial_output:
-                return [f for f in outputs if ("MNI" not in f.name)]
-            return outputs
+        # if len(outputs) == 1:
+        #     return str(outputs[0])
+        # elif len(outputs) > 1:
+        if "native" in partial_output:
+            return [str(f) for f in outputs if ("MNI" not in f.name)]
+        return [str(f) for f in outputs]
 
     def generate_output_dict(self) -> dict:
         """
@@ -237,16 +251,13 @@ class fMRIprep:
         subject_ids = self.configuration.get("participant_label")
         for subject_id in subject_ids:
             output_dict[subject_id] = {}
-            session_pattern = self.SESSION_PATTERN.format(
-                subject_id=subject_id
-            )
-            for session_dir in self.destination.glob(session_pattern):
-                session_id = session_dir.name
-                output_dict[subject_id][session_id] = {}
-                for key in self.OUTPUTS:
-                    output_dict[subject_id][session_id][
-                        key
-                    ] = self.find_output(key, subject_id, session_id)
+            # session_pattern = self.SESSION_PATTERN.format(
+            #     subject_id=subject_id
+            # )
+            for key in self.OUTPUTS:
+                output_dict[subject_id][key] = self.find_output(
+                    key, subject_id, "*"
+                )
         if len(output_dict) == 1:
             return output_dict.get(subject_id)
         return output_dict
