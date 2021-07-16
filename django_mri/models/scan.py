@@ -1,7 +1,6 @@
 """
 Definition of the :class:`Scan` model.
 """
-
 import warnings
 from pathlib import Path
 from typing import Any, Dict
