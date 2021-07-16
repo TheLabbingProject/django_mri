@@ -1,7 +1,6 @@
 """
 Definition of the :class:`Session` class.
 """
-
 from django.db import models
 from django.db.models import QuerySet
 from django_extensions.db.models import TimeStampedModel
