@@ -51,6 +51,25 @@ class fMRIPrepRunner(QuerySetRunner):
         | Q(description__icontains="cmrr")
     )
 
+    def get_base_queryset(self) -> QuerySet:
+        """
+        Overrides
+        :func:`~django_analyses.runner.queryset_runner.QuerySetRunner.get_base_queryset`
+        to return only subjects with functional MRI data.
+
+        Returns
+        -------
+        QuerySet
+            Subjects with fMRI data
+        """
+        queryset = super().get_base_queryset()
+        subject_ids = set(
+            Scan.objects.filter_by_sequence_type("fMRI")
+            .exclude(description__icontains="dmri")
+            .values_list("session__subject", flat=True)
+        )
+        return queryset.filter(id__in=subject_ids)
+
     def get_instance_representation(self, instance: Subject) -> List[str]:
         """
         Returns the expected :attr:`INPUT_KEY` value for the given subject.
@@ -81,10 +100,6 @@ class fMRIPrepRunner(QuerySetRunner):
         -------
         dict
             Input specification dictionary
-
-        See Also
-        --------
-        :func:`create_inputs`
         """
         scans = instance.mri_session_set.get_scan_set()
         for scan in scans.filter(self.SCAN_QUERY):
