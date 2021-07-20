@@ -14,10 +14,12 @@ Example
     Analysis.objects.from_list(analysis_definitions)
 
 """
+import warnings
 
 import nipype
 from django.conf import settings
 from django_mri.analysis import messages
+from django_mri.analysis.interfaces.fmriprep.fmriprep import fMRIprep
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
@@ -25,7 +27,10 @@ from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
-from django_mri.analysis.interfaces.fmriprep.fmriprep import fMRIprep
+from django_mri.analysis.specifications.fmriprep.fmriprep import (
+    FMRIPREP_INPUT_SPECIFICATION,
+    FMRIPREP_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -138,10 +143,6 @@ from django_mri.analysis.specifications.mrtrix3.mrconvert import (
     MRCONVERT_INPUT_SPECIFICATION,
     MRCONVERT_OUTPUT_SPECIFICATION,
 )
-from django_mri.analysis.specifications.fmriprep.fmriprep import (
-    FMRIPREP_INPUT_SPECIFICATION,
-    FMRIPREP_OUTPUT_SPECIFICATION,
-)
 from django_mri.analysis.specifications.spm.cat12.segmentation import (
     CAT12_SEGMENTATION_INPUT_SPECIFICATION,
     CAT12_SEGMENTATION_OUTPUT_SPECIFICATION,
@@ -177,10 +178,10 @@ from nipype.interfaces.mrtrix3 import (
     ResponseSD,
 )
 
-#: Raise ImportError if FSL is not accessible.
+#: Warn if FSL is not accessible.
 test_mode = getattr(settings, "TESTING_MODE", False)
 if no_fsl() and not test_mode:
-    raise ImportError(messages.NO_FSL)
+    warnings.warn(messages.NO_FSL)
 
 
 _NIPYPE_VERSION = nipype.__version__
