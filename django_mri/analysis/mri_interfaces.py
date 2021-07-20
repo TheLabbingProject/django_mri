@@ -14,7 +14,10 @@ References
 .. _Simplified Analysis Integration Example:
    https://django-analyses.readthedocs.io/en/latest/user_guide/analysis_integration/simplified_example.html
 """
-
+from django_mri.analysis.interfaces.fmriprep.fmriprep import (
+    FmriPrep2021,
+    FmriPrep2022,
+)
 from django_mri.analysis.interfaces.fsl.fast import FastWrapper
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.fsl.topup import TopupWrapper
@@ -30,7 +33,6 @@ from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.yalab.mutual_information_score import (
     MutualInformationScore,
 )
-from django_mri.analysis.interfaces.fmriprep.fmriprep import fMRIprep
 from nipype.interfaces.freesurfer import ReconAll
 from nipype.interfaces.fsl import (
     BET,
@@ -90,5 +92,8 @@ interfaces = {
     "mrcat": {MRCat.__version__: MRCat},
     "dwigradcheck": {DwiGradCheck.__version__: DwiGradCheck},
     "Mutual Information Score": {"1.0": MutualInformationScore},
-    "fMRIPrep": {fMRIprep.__version__: fMRIprep},
+    "fMRIPrep": {
+        FmriPrep2021.__version__: FmriPrep2021,
+        FmriPrep2022.__version__: FmriPrep2022,
+    },
 }

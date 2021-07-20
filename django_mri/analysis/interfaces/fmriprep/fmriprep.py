@@ -1,5 +1,5 @@
 """
-Definition of the :class:`fMRIPrep` interface.
+Definition of the :class:`FmriPrep` interface.
 """
 import os
 from pathlib import Path
@@ -17,9 +17,9 @@ from django_mri.analysis.interfaces.fmriprep.utils import (
 )
 
 
-class fMRIprep:
+class FmriPrep:
     """
-    An interface for the *fMRIPrep* preprocessing pipeline.
+    An interface for the *fmriprep* preprocessing pipeline.
 
     References
     ----------
@@ -38,7 +38,7 @@ class fMRIprep:
     #: Default FreeSurfer home directory.
     DEFAULT_FREESURFER_HOME: Path = Path(FREESURFER_HOME)
 
-    #: fMRIPrep output pattern.
+    #: FmriPrep output pattern.
     FMRIPREP_OUTPUT_PATTERN: str = (
         "{main_dir}/**/{sub_dir}/sub-{subject_id}_{session_id}_{output_id}"
     )
@@ -49,11 +49,11 @@ class fMRIprep:
     #: Session results pattern.
     SESSION_PATTERN: str = "fmriprep/sub-{subject_id}/ses-*"
 
-    __version__ = "BETA"
+    __version__ = None
 
     def __init__(self, **kwargs):
         """
-        Initializes a new :class:`fMRIPrep` interface instance.
+        Initializes a new :class:`FmriPrep` interface instance.
         """
         self.nifti_root, self.analysis_root = self.set_input_and_output_roots()
         self.destination = self.analysis_root / kwargs.pop("destination")
@@ -175,7 +175,7 @@ class fMRIprep:
         output_id: str,
     ) -> Iterable[Path]:
         """
-        Generate fMRIPrep output paths.
+        Generate fmriprep output paths.
 
         Parameters
         ----------
@@ -285,3 +285,11 @@ class fMRIprep:
             )
             raise RuntimeError(message)
         return self.generate_output_dict()
+
+
+class FmriPrep2021(FmriPrep):
+    __version__ = "20.2.1"
+
+
+class FmriPrep2022(FmriPrep):
+    __version__ = "20.2.2"
