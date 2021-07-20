@@ -3,20 +3,18 @@ Definition of the :class:`fMRIPrep` interface.
 """
 import os
 from pathlib import Path
+from typing import Iterable, Tuple
+
 from django_mri.analysis.interfaces.fmriprep.messages import (
     FS_LICENSE_MISSING,
     RUN_FAILURE,
 )
 from django_mri.analysis.interfaces.fmriprep.utils import (
     COMMAND,
-    FREESURFER_HOME,
     FLAGS,
+    FREESURFER_HOME,
     OUTPUTS,
 )
-from typing import Iterable, Tuple
-
-# NIFTI_ROOT = get_mri_root() / "NIfTI"
-# ANALYSIS_ROOT = get_mri_root().parent / "analysis"
 
 
 class fMRIprep:

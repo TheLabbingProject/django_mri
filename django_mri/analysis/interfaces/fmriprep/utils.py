@@ -4,7 +4,7 @@ Utilities for the
 """
 
 #: Command line template to format for execution.
-COMMAND = "singularity run --cleanenv -B {bids_parent}:/work -B {destination_parent}:/output -B {freesurfer_license}:/fs_license /my_images/fmriprep-latest.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
+COMMAND = "singularity run -e -B {bids_parent}:/work,{destination_parent}:/output,{freesurfer_license}:/fs_license /my_images/fmriprep-latest.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
 
 #: Default FreeSurfer home directory.
 FREESURFER_HOME: str = "/usr/local/freesurfer"
