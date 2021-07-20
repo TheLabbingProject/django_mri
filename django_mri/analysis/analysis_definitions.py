@@ -19,7 +19,10 @@ import warnings
 import nipype
 from django.conf import settings
 from django_mri.analysis import messages
-from django_mri.analysis.interfaces.fmriprep.fmriprep import fMRIprep
+from django_mri.analysis.interfaces.fmriprep.fmriprep import (
+    FmriPrep2021,
+    FmriPrep2022,
+)
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
@@ -575,11 +578,17 @@ analysis_definitions = [
         "description": "A robust preprocessing pipeline for fMRI data.",  # noqa: E501
         "versions": [
             {
-                "title": fMRIprep.__version__ or "1.0",
-                "description": "Conducts a robust preprocessing pipeline for fMRI data as described in: https://fmriprep.org/en/stable/",  # noqa: E501,
+                "title": FmriPrep2021.__version__,
+                "description": "Flagged version!",  # noqa: E501,
                 "input": FMRIPREP_INPUT_SPECIFICATION,
                 "output": FMRIPREP_OUTPUT_SPECIFICATION,
-            }
+            },
+            {
+                "title": FmriPrep2022.__version__,
+                "description": "fMRIprep v20.2.2.",  # noqa: E501,
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
         ],
     },
 ]
