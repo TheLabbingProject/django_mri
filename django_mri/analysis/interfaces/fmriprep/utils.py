@@ -1,6 +1,6 @@
 """
 Utilities for the
-:class:`~django_mri.analysis.interfaces.fmriprep.fmriprep.fMRIPrep` interface.
+:class:`~django_mri.analysis.interfaces.fmriprep.fmriprep.FmriPrep` interface.
 """
 
 #: Command line template to format for execution.
