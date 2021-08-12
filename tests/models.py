@@ -24,3 +24,7 @@ class Group(TitleDescriptionModel, TimeStampedModel):
 
 class MeasurementDefinition(TitleDescriptionModel):
     pass
+
+
+class Study(TitleDescriptionModel):
+    pass
