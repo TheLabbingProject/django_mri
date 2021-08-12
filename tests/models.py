@@ -18,13 +18,13 @@ class Subject(TimeStampedModel):
     objects = SubjectQuerySet.as_manager()
 
 
-class Group(TitleDescriptionModel, TimeStampedModel):
-    pass
-
-
 class MeasurementDefinition(TitleDescriptionModel):
     pass
 
 
 class Study(TitleDescriptionModel):
     pass
+
+
+class Group(TitleDescriptionModel, TimeStampedModel):
+    study = models.ForeignKey(Study, on_delete=models.CASCADE)
