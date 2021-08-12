@@ -1,3 +1,6 @@
+"""
+Definition of the :class:`ScanViewSet` class.
+"""
 import io
 import zipfile
 from pathlib import Path
@@ -23,10 +26,10 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-HOST_NAME = getattr(settings, "APP_IP", "localhost")
-BOKEH_URL = f"http://{HOST_NAME}:5006/series_viewer"
-CONTENT_DISPOSITION = "attachment; filename={instance_id}.zip"
-ZIP_CONTENT_TYPE = "application/x-zip-compressed"
+HOST_NAME: str = getattr(settings, "APP_IP", "localhost")
+BOKEH_URL: str = f"http://{HOST_NAME}:5006/series_viewer"
+CONTENT_DISPOSITION: str = "attachment; filename={instance_id}.zip"
+ZIP_CONTENT_TYPE: str = "application/x-zip-compressed"
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -67,21 +70,25 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         "institution_name",
     )
 
-    def get_queryset(self) -> QuerySet:
+    def filter_queryset(self, queryset) -> QuerySet:
         """
         Filter the returned scans according to the studies the requesting
         user is a collaborator in, unless the user is staff, in which case
         return all scans.
 
+        Parameters
+        ----------
+        queryset : QuerySet
+            Base queryset
+
         Returns
         -------
         QuerySet
-            Scan instances.
+            Scan instances
         """
-
-        user = get_user_model().objects.get(username=self.request.user)
-        queryset = super().get_queryset()
-        if user.is_staff:
+        user = self.request.user
+        queryset = super().filter_queryset(queryset)
+        if user.is_staff or user.is_superuser:
             return queryset
         return queryset.filter(study_groups__study__collaborators=user)
 

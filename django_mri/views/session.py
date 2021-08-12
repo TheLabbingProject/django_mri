@@ -1,3 +1,6 @@
+"""
+Definition of the :class:`SessionViewSet` class.
+"""
 import io
 import zipfile
 from pathlib import Path
@@ -6,8 +9,10 @@ from django.http import HttpResponse
 from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
 from django_mri.filters.session_filter import SessionFilter
 from django_mri.models.session import Session
-from django_mri.serializers import (SessionReadSerializer,
-                                    SessionWriteSerializer)
+from django_mri.serializers import (
+    SessionReadSerializer,
+    SessionWriteSerializer,
+)
 from django_mri.utils.utils import get_mri_root
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
@@ -36,6 +41,24 @@ class SessionViewSet(
         "time__date",
         "time__time",
     )
+
+    def filter_queryset(self, queryset):
+        user = self.request.user
+        queryset = super().filter_queryset(queryset)
+        if user.is_superuser:
+            return queryset
+        user_collaborations = set(user.study_set.values_list("id", flat=True))
+        ids = [
+            session.id
+            for session in queryset
+            if any(
+                [
+                    study_id in user_collaborations
+                    for study_id in session.query_studies(id_only=True)
+                ]
+            )
+        ]
+        return queryset.filter(id__in=ids)
 
     @action(detail=True, methods=["get"])
     def dicom_zip(self, request: Request, pk: int) -> HttpResponse:
