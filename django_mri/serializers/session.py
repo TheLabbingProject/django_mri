@@ -6,6 +6,7 @@ from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.session import Session
 from django_mri.serializers.irb_approval import IrbApprovalSerializer
 from django_mri.serializers.utils import (
+    MiniGroupSerializer,
     MiniMeasurementSerializer,
     MiniSubjectSerializer,
 )
@@ -25,6 +26,7 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
+    study_groups = MiniGroupSerializer(many=True)
     measurement = MiniMeasurementSerializer()
     subject = MiniSubjectSerializer()
     irb = IrbApprovalSerializer()
@@ -42,6 +44,8 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
             "irb",
             "dicom_zip",
             "nifti_zip",
+            "n_scans",
+            "study_groups",
         )
 
     def get_dicom_zip(self, instance: Session) -> str:

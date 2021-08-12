@@ -25,6 +25,9 @@ DEFAULT_DICOM_DIR_NAME = "DICOM"
 #: Default identifier for a subject model scans should be related to.
 DEFAULT_SUBJECT_MODEL = "research.Subject"
 
+#: Default identifier for a study model sessions could be related to.
+DEFAULT_STUDY_MODEL = "research.Study"
+
 #: Default identifier for a study group model scans should be related to.
 DEFAULT_STUDY_GROUP_MODEL = "research.Group"
 
@@ -47,6 +50,20 @@ def get_subject_model():
 
     subject_model = getattr(settings, "SUBJECT_MODEL", DEFAULT_SUBJECT_MODEL)
     return apps.get_model(subject_model, require_ready=False)
+
+
+def get_study_model():
+    """
+    Returns the study model MRI sessions could be related to.
+
+    Returns
+    -------
+    django.db.models.Model
+        Study model
+    """
+
+    study_model = getattr(settings, "STUDY_MODEL", DEFAULT_STUDY_MODEL)
+    return apps.get_model(study_model, require_ready=False)
 
 
 def get_group_model():

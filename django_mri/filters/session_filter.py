@@ -1,7 +1,6 @@
 """
 Definition of the :class:`SessionFilter` class.
 """
-
 from django_filters import rest_framework as filters
 from django_mri.filters.scan_filter import NumberInFilter
 from django_mri.models.session import Session
@@ -11,7 +10,6 @@ class SessionFilter(filters.FilterSet):
     """
     Provides useful filtering options for the
     :class:`~django_dicom.models.session.Session` class.
-
     """
 
     comments = filters.LookupChoiceFilter(
