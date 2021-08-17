@@ -32,6 +32,7 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     irb = IrbApprovalSerializer()
     dicom_zip = serializers.SerializerMethodField()
     nifti_zip = serializers.SerializerMethodField()
+    n_scans = serializers.SerializerMethodField()
 
     class Meta:
         model = Session
@@ -53,6 +54,9 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_nifti_zip(self, instance: Session) -> str:
         return reverse("mri:session_nifti_zip", args=(instance.id,))
+
+    def get_n_scans(self, instance: Session) -> int:
+        return instance.scan_set.count()
 
 
 class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
