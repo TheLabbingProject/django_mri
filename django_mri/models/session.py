@@ -1,14 +1,16 @@
 """
 Definition of the :class:`Session` class.
 """
-from typing import List
-
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django_mri.models import help_text
-from django_mri.models.managers.session import SessionQueryList
-from django_mri.utils import (get_group_model, get_measurement_model,
-                              get_study_model, get_subject_model)
+from django_mri.models.managers.session import SessionQuerySet
+from django_mri.utils import (
+    get_group_model,
+    get_measurement_model,
+    get_study_model,
+    get_subject_model,
+)
 
 Group = get_group_model()
 MeasurementDefinition = get_measurement_model()
@@ -59,7 +61,7 @@ class Session(TimeStampedModel):
         verbose_name="IRB approval",
     )
 
-    objects = SessionQueryList.as_manager()
+    objects = SessionQuerySet.as_manager()
 
     class Meta:
         ordering = ("-time",)
