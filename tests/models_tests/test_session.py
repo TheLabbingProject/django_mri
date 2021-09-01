@@ -61,3 +61,12 @@ class SessionModelTestCase(TestCase):
         field = Session._meta.get_field("subject_id")
         self.assertTrue(field.blank)
         self.assertTrue(field.null)
+
+    ##############
+    # Properties #
+    ##############
+
+    def test_study_groups(self):
+        result = self.session.study_groups
+        self.assertEqual(len(result), 0)
+        self.assertIsNone(result.first())

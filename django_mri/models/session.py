@@ -97,3 +97,9 @@ class Session(TimeStampedModel):
         if conditions:
             delta = self.time.date() - self.subject.date_of_birth
             return delta.total_seconds() / (60 * 60 * 24 * 365)
+
+    @property
+    def study_groups(self) -> models.QuerySet:
+        return Group.objects.filter(
+            id__in=self.scan_set.values("study_groups")
+        )

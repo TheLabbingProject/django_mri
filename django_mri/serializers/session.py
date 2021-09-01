@@ -26,13 +26,13 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
     * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    study_groups = MiniGroupSerializer(many=True)
     measurement = MiniMeasurementSerializer()
     subject = MiniSubjectSerializer()
     irb = IrbApprovalSerializer()
     dicom_zip = serializers.SerializerMethodField()
     nifti_zip = serializers.SerializerMethodField()
     n_scans = serializers.SerializerMethodField()
+    study_groups = MiniGroupSerializer(many=True)
 
     class Meta:
         model = Session
