@@ -1,8 +1,6 @@
 """
-Definition of the :class:`~django_mri.analysis.interfaces.dcm2niix.Dcm2niix`
-class.
+Definition of the :class:`Dcm2niix` class.
 """
-
 import re
 import subprocess
 import warnings
