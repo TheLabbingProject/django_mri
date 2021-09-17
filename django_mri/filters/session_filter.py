@@ -21,9 +21,16 @@ class SessionFilter(filters.FilterSet):
         ],
     )
     session_date = filters.DateTimeFromToRangeFilter("time__date")
-    subject_id_in = NumberInFilter(field_name="subject__id", lookup_expr="in")
+    subject_id_in = NumberInFilter(
+        field_name="subject__id", lookup_expr="in", label="Subject ID is in"
+    )
     scan_set = NumberInFilter(field_name="scan_set", method="in")
     id_in = NumberInFilter(field_name="id", lookup_expr="in")
+    study_id_in = NumberInFilter(
+        field_name="scan__study_groups__study__id",
+        lookup_expr="in",
+        label="Study ID is in",
+    )
 
     class Meta:
         model = Session
