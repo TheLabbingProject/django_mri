@@ -4,6 +4,7 @@ Definition of the :class:`SessionViewSet` class.
 import io
 import zipfile
 from pathlib import Path
+from typing import Tuple
 
 from django.http import HttpResponse
 from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
@@ -21,12 +22,24 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 
+ORDERING_FIELDS: Tuple[str] = (
+    "id",
+    "subject",
+    "subject__id_number",
+    "subject__first_name",
+    "subject__last_name",
+    "time__date",
+    "time__time",
+)
+SEARCH_FIELDS: Tuple[str] = ("id", "subject", "comments", "time", "scan_set")
+
 
 class SessionViewSet(
     DefaultsMixin, ReadWriteSerializerMixin, viewsets.ModelViewSet
 ):
     """
-    API endpoint that allows scans to be viewed or edited.
+    API endpoint that allows :class:`~django_mri.models.session.Session`
+    instances to be viewed and edited.
     """
 
     pagination_class = StandardResultsSetPagination
@@ -34,13 +47,8 @@ class SessionViewSet(
     read_serializer_class = SessionReadSerializer
     write_serializer_class = SessionWriteSerializer
     filter_class = SessionFilter
-    search_fields = ("id", "subject", "comments", "time", "scan_set")
-    ordering_fields = (
-        "id",
-        "subject",
-        "time__date",
-        "time__time",
-    )
+    search_fields = SEARCH_FIELDS
+    ordering_fields = ORDERING_FIELDS
 
     def filter_queryset(self, queryset):
         user = self.request.user

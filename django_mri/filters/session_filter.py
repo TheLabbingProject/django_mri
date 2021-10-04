@@ -3,6 +3,7 @@ Definition of the :class:`SessionFilter` class.
 """
 from django_filters import rest_framework as filters
 from django_mri.filters.scan_filter import NumberInFilter
+from django_mri.filters.utils import LOOKUP_CHOICES
 from django_mri.models.session import Session
 
 
@@ -13,23 +14,31 @@ class SessionFilter(filters.FilterSet):
     """
 
     comments = filters.LookupChoiceFilter(
-        "comments",
-        lookup_choices=[
-            ("contains", "Contains (case-sensitive)"),
-            ("icontains", "Contains (case-insensitive)"),
-            ("exact", "Exact"),
-        ],
+        "comments", lookup_choices=LOOKUP_CHOICES,
     )
     session_date = filters.DateTimeFromToRangeFilter("time__date")
-    subject_id_in = NumberInFilter(
-        field_name="subject__id", lookup_expr="in", label="Subject ID is in"
+    id_in = NumberInFilter(
+        field_name="id", lookup_expr="in", label="Session ID is in"
     )
-    scan_set = NumberInFilter(field_name="scan_set", method="in")
-    id_in = NumberInFilter(field_name="id", lookup_expr="in")
     study_id_in = NumberInFilter(
         field_name="scan__study_groups__study__id",
         lookup_expr="in",
         label="Study ID is in",
+    )
+    subject_id_in = NumberInFilter(
+        field_name="subject__id", lookup_expr="in", label="Subject ID is in"
+    )
+    scan_set = NumberInFilter(
+        field_name="scan_set", method="in", label="Contains scan IDs"
+    )
+    subject_id_number = filters.LookupChoiceFilter(
+        "subject__id_number", lookup_choices=LOOKUP_CHOICES,
+    )
+    subject_first_name = filters.LookupChoiceFilter(
+        "subject__first_name", lookup_choices=LOOKUP_CHOICES,
+    )
+    subject_last_name = filters.LookupChoiceFilter(
+        "subject__last_name", lookup_choices=LOOKUP_CHOICES,
     )
 
     class Meta:
