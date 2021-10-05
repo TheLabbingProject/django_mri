@@ -1,5 +1,6 @@
 """
-Definition of the :class:`SessionReadSerializer` class.
+Definition of the :class:`SessionReadSerializer` and `SessionWriteSerializer`
+classes.
 """
 from django.urls import reverse
 from django_mri.models.irb_approval import IrbApproval

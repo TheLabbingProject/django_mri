@@ -114,12 +114,36 @@ class Session(TimeStampedModel):
             return delta.total_seconds() / SECONDS_IN_YEAR
 
     def list_dicom_files(self) -> List[Path]:
+        """
+        Returns a list of the *.dcm* paths that make up the entire raw session
+        data.
+
+        Returns
+        -------
+        List[Path]
+            *.dcm* files
+        """
         return [
             Path(p)
             for p in self.scan_set.values_list(DICOM_FILES_KEY, flat=True)
         ]
 
     def list_nifti_files(self, include_json: bool = True) -> List[Path]:
+        """
+        Returns a list of *.nii* files (and by default also JSON sidecars)
+        included in this session.
+
+        Parameters
+        ----------
+        include_json : bool, optional
+            Whether to include the JSON sidecar with scan metadata, by default
+            True
+
+        Returns
+        -------
+        List[Path]
+            *.nii* files
+        """
         associated_niis = self.scan_set.filter(
             _nifti__isnull=False
         ).values_list(NIFTI_FILES_KEY, flat=True)
