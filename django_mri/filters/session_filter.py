@@ -61,5 +61,4 @@ class SessionFilter(filters.FilterSet):
         query = Q(scan__study_groups__study__id__in=value) | Q(
             measurement__procedure__study__id__in=value
         )
-        print(f"Filtering by studies: {value}")
         return queryset.filter(query).distinct()
