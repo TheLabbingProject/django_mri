@@ -1,13 +1,9 @@
 """
-Definition of the :class:`~django_mri.filters.scan_filter.ScanFilter` class.
+Definition of the :class:`ScanFilter` class.
 """
-
 from django_filters import rest_framework as filters
+from django_mri.filters.utils import LOOKUP_CHOICES, NumberInFilter
 from django_mri.models.scan import Scan
-
-
-class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
-    pass
 
 
 def filter_by_sequence_type(queryset, field_name, value):
@@ -32,12 +28,7 @@ class ScanFilter(filters.FilterSet):
     """
 
     description = filters.LookupChoiceFilter(
-        "description",
-        lookup_choices=[
-            ("contains", "Contains (case-sensitive)"),
-            ("icontains", "Contains (case-insensitive)"),
-            ("exact", "Exact"),
-        ],
+        "description", lookup_choices=LOOKUP_CHOICES,
     )
     number = filters.NumberFilter("number")
     scan_time = filters.DateTimeFromToRangeFilter("time")
@@ -46,6 +37,15 @@ class ScanFilter(filters.FilterSet):
     dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
     sequence_type = NumberInFilter(
         method=filter_by_sequence_type, label="Sequence Type is in"
+    )
+    subject_id_number = filters.LookupChoiceFilter(
+        "session__subject__id_number", lookup_choices=LOOKUP_CHOICES,
+    )
+    subject_first_name = filters.LookupChoiceFilter(
+        "session__subject__first_name", lookup_choices=LOOKUP_CHOICES,
+    )
+    subject_last_name = filters.LookupChoiceFilter(
+        "session__subject__last_name", lookup_choices=LOOKUP_CHOICES,
     )
 
     class Meta:

@@ -4,11 +4,11 @@ Definition of the :class:`ScanViewSet` class.
 import io
 import zipfile
 from pathlib import Path
+from typing import Tuple
 
 from bokeh.client import pull_session
 from bokeh.embed import server_session
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
@@ -30,6 +30,37 @@ HOST_NAME: str = getattr(settings, "APP_IP", "localhost")
 BOKEH_URL: str = f"http://{HOST_NAME}:5006/series_viewer"
 CONTENT_DISPOSITION: str = "attachment; filename={instance_id}.zip"
 ZIP_CONTENT_TYPE: str = "application/x-zip-compressed"
+SCAN_SEARCH_FIELDS: Tuple[str] = (
+    "id",
+    "description",
+    "number",
+    "created",
+    "scan_time",
+    "echo_time",
+    "inversion_time",
+    "repetition_time",
+    "sequence_type",
+    "spatial_resolution",
+    "institution_name",
+    "is_updated_from_dicom",
+)
+SCAN_ORDERING_FIELDS: Tuple[str] = (
+    "id",
+    "time__date",
+    "time__time",
+    "description",
+    "number",
+    "created",
+    "echo_time",
+    "inversion_time",
+    "repetition_time",
+    "sequence_type",
+    "spatial_resolution",
+    "institution_name",
+    "session__subject__id_number",
+    "session__subject__first_name",
+    "session__subject__last_name",
+)
 
 
 class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
@@ -41,34 +72,8 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     queryset = Scan.objects.order_by("-time__date", "time__time")
     serializer_class = ScanSerializer
     filter_class = ScanFilter
-    search_fields = (
-        "id",
-        "description",
-        "number",
-        "created",
-        "scan_time",
-        "echo_time",
-        "inversion_time",
-        "repetition_time",
-        "sequence_type",
-        "spatial_resolution",
-        "institution_name",
-        "is_updated_from_dicom",
-    )
-    ordering_fields = (
-        "id",
-        "time__date",
-        "time__time",
-        "description",
-        "number",
-        "created",
-        "echo_time",
-        "inversion_time",
-        "repetition_time",
-        "sequence_type",
-        "spatial_resolution",
-        "institution_name",
-    )
+    search_fields = SCAN_SEARCH_FIELDS
+    ordering_fields = SCAN_ORDERING_FIELDS
 
     def filter_queryset(self, queryset) -> QuerySet:
         """
