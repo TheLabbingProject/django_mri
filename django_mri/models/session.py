@@ -8,8 +8,12 @@ from django.db import models
 from django_extensions.db.models import TimeStampedModel
 from django_mri.models import help_text
 from django_mri.models.managers.session import SessionQuerySet
-from django_mri.utils import (get_group_model, get_measurement_model,
-                              get_study_model, get_subject_model)
+from django_mri.utils import (
+    get_group_model,
+    get_measurement_model,
+    get_study_model,
+    get_subject_model,
+)
 
 Group = get_group_model()
 MeasurementDefinition = get_measurement_model()
@@ -154,13 +158,20 @@ class Session(TimeStampedModel):
         return paths
 
     def query_measurement_studies(self) -> models.QuerySet:
-        return Study.objects.filter(
-            id__in=self.measurement.procedure_set.values_list("study")
-        )
+        if self.measurement:
+            return Study.objects.filter(
+                id__in=self.measurement.procedure_set.values("study")
+            )
+        return Study.objects.none()
 
     def query_study_groups(self) -> models.QuerySet:
         return Group.objects.filter(
             id__in=self.scan_set.values("study_groups")
+        )
+
+    def query_studies(self) -> models.QuerySet:
+        return self.query_measurement_studies() | Study.objects.filter(
+            id__in=self.study_groups.values("study__id")
         )
 
     @property

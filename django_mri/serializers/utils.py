@@ -12,7 +12,7 @@ Subject = get_subject_model()
 Study = get_study_model()
 
 
-class MiniStudySerializer(serializers.HyperlinkedModelSerializer):
+class MiniStudySerializer(serializers.ModelSerializer):
     """
     Minified serializer class for the :class:`Study` model.
     """
@@ -22,7 +22,7 @@ class MiniStudySerializer(serializers.HyperlinkedModelSerializer):
         fields = "id", "title", "description"
 
 
-class MiniGroupSerializer(serializers.HyperlinkedModelSerializer):
+class MiniGroupSerializer(serializers.ModelSerializer):
     """
     Minified serializer class for the :class:`Group` model.
     """
@@ -34,7 +34,7 @@ class MiniGroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = "id", "title", "study"
 
 
-class MiniSubjectSerializer(serializers.HyperlinkedModelSerializer):
+class MiniSubjectSerializer(serializers.ModelSerializer):
     """
     Minified serializer class for the :class:`Subject` model.
     """
@@ -44,7 +44,7 @@ class MiniSubjectSerializer(serializers.HyperlinkedModelSerializer):
         fields = "id", "id_number", "first_name", "last_name"
 
 
-class MiniMeasurementSerializer(serializers.HyperlinkedModelSerializer):
+class MiniMeasurementSerializer(serializers.ModelSerializer):
     """
     Minified serializer class for the :class:`Measurement` model.
     """

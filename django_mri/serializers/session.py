@@ -2,6 +2,8 @@
 Definition of the :class:`SessionReadSerializer` and `SessionWriteSerializer`
 classes.
 """
+from typing import Tuple
+
 from django.urls import reverse
 from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.session import Session
@@ -17,19 +19,42 @@ from rest_framework import serializers
 Measurement = get_measurement_model()
 Subject = get_subject_model()
 
+SESSION_SERIALIZER_FIELDS: Tuple[str] = (
+    "id",
+    "subject",
+    "comments",
+    "time",
+    "measurement",
+    "irb",
+)
+SESSION_READ_FIELDS: Tuple[str] = (
+    "dicom_zip",
+    "nifti_zip",
+    "n_scans",
+    "study_groups",
+)
+SESSION_WRITE_FIELDS: Tuple[str] = (
+    "subject_id",
+    "measurement_id",
+    "irb_id",
+)
 
-class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
+
+class SessionSerializer(serializers.ModelSerializer):
+    measurement = MiniMeasurementSerializer()
+    subject = serializers.PrimaryKeyRelatedField(read_only=True)
+    irb = IrbApprovalSerializer()
+
+    class Meta:
+        model = Session
+        fields = SESSION_SERIALIZER_FIELDS
+
+
+class SessionReadSerializer(SessionSerializer):
     """
     Serializer class for the :class:`~django_mri.models.session.Session` model.
-
-    References
-    ----------
-    * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    measurement = MiniMeasurementSerializer()
-    subject = MiniSubjectSerializer()
-    irb = IrbApprovalSerializer()
     dicom_zip = serializers.SerializerMethodField()
     nifti_zip = serializers.SerializerMethodField()
     n_scans = serializers.SerializerMethodField()
@@ -37,17 +62,8 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Session
-        fields = (
-            "id",
-            "subject",
-            "comments",
-            "time",
-            "measurement",
-            "irb",
-            "dicom_zip",
-            "nifti_zip",
-            "n_scans",
-            "study_groups",
+        fields = tuple(
+            list(SESSION_SERIALIZER_FIELDS) + list(SESSION_READ_FIELDS)
         )
 
     def get_dicom_zip(self, instance: Session) -> str:
@@ -60,44 +76,29 @@ class SessionReadSerializer(serializers.HyperlinkedModelSerializer):
         return instance.scan_set.count()
 
 
-class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
+class AdminSessionReadSerializer(SessionReadSerializer):
+    subject = MiniSubjectSerializer()
+
+
+class SessionWriteSerializer(serializers.ModelSerializer):
     """
     Serializer class for the :class:`~django_mri.models.session.Session` model.
-
-    References
-    ----------
-    * https://www.django-rest-framework.org/api-guide/serializers/
     """
 
-    measurement = MiniMeasurementSerializer()
     measurement_id = serializers.PrimaryKeyRelatedField(
         queryset=Measurement.objects.all(), allow_null=True
     )
-    subject = MiniSubjectSerializer()
     subject_id = serializers.PrimaryKeyRelatedField(
         queryset=Subject.objects.all()
     )
-    irb = IrbApprovalSerializer()
     irb_id = serializers.PrimaryKeyRelatedField(
         queryset=IrbApproval.objects.all(), allow_null=True
     )
-    dicom_zip = serializers.SerializerMethodField()
-    nifti_zip = serializers.SerializerMethodField()
 
     class Meta:
         model = Session
-        fields = (
-            "id",
-            "subject",
-            "subject_id",
-            "comments",
-            "time",
-            "measurement",
-            "measurement_id",
-            "irb",
-            "irb_id",
-            "dicom_zip",
-            "nifti_zip",
+        fields = tuple(
+            list(SESSION_SERIALIZER_FIELDS) + list(SESSION_WRITE_FIELDS)
         )
 
     def update(self, instance, validated_data):
@@ -109,9 +110,3 @@ class SessionWriteSerializer(serializers.HyperlinkedModelSerializer):
             validated_data["irb_id"] = irb_approval.id
         super().update(instance, validated_data)
         return instance
-
-    def get_dicom_zip(self, instance: Session) -> str:
-        return reverse("mri:session_dicom_zip", args=(instance.id,))
-
-    def get_nifti_zip(self, instance: Session) -> str:
-        return reverse("mri:session_nifti_zip", args=(instance.id,))

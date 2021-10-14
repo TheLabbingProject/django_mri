@@ -11,6 +11,7 @@ from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
 from django_mri.filters.session_filter import SessionFilter
 from django_mri.models.session import Session
 from django_mri.serializers import (
+    AdminSessionReadSerializer,
     SessionReadSerializer,
     SessionWriteSerializer,
 )
@@ -44,11 +45,15 @@ class SessionViewSet(
 
     pagination_class = StandardResultsSetPagination
     queryset = Session.objects.order_by("-time__date", "-time__time")
-    read_serializer_class = SessionReadSerializer
     write_serializer_class = SessionWriteSerializer
     filter_class = SessionFilter
     search_fields = SEARCH_FIELDS
     ordering_fields = ORDERING_FIELDS
+
+    def get_read_serializer_class(self):
+        if self.request.user.is_superuser:
+            return AdminSessionReadSerializer
+        return SessionReadSerializer
 
     def filter_queryset(self, queryset):
         user = self.request.user
@@ -56,17 +61,13 @@ class SessionViewSet(
         if user.is_superuser:
             return queryset
         user_collaborations = set(user.study_set.values_list("id", flat=True))
-        ids = [
-            session.id
-            for session in queryset
-            if any(
-                [
-                    study_id in user_collaborations
-                    for study_id in session.query_studies(id_only=True)
-                ]
-            )
-        ]
-        return queryset.filter(id__in=ids)
+        by_procedure = queryset.filter(
+            measurement__procedure__study__id__in=user_collaborations
+        )
+        by_scan_association = queryset.filter(
+            scan__study_groups__study__id__in=user_collaborations
+        )
+        return (by_procedure | by_scan_association).distinct()
 
     @action(detail=True, methods=["get"])
     def dicom_zip(self, request: Request, pk: int) -> HttpResponse:
