@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import Iterable, Tuple
 
+from django.conf import settings
 from django_mri.analysis.interfaces.fmriprep.messages import (
     FS_LICENSE_MISSING,
     RUN_FAILURE,
@@ -141,8 +142,15 @@ class FmriPrep:
             analysis_level=analysis_level,
             freesurfer_license=fs_license,
             version=self.__version__,
+            security_options=self.security_options,
         )
         return command + self.set_configuration_by_keys()
+
+    def get_security_options(self) -> str:
+        options = getattr(settings, "SINGULARITY_SECURITY_OPTIONS", "")
+        if options:
+            return f"--security={options}"
+        return ""
 
     def generate_fs_outputs(
         self, main_dir: str, output_id: str
@@ -286,6 +294,10 @@ class FmriPrep:
             )
             raise RuntimeError(message)
         return self.generate_output_dict()
+
+    @property
+    def security_options(self) -> str:
+        return self.get_security_options()
 
 
 class FmriPrep2021(FmriPrep):
