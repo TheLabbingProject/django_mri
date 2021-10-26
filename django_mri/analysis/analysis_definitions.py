@@ -22,6 +22,9 @@ from django_mri.analysis import messages
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
     FmriPrep2022,
+    FmriPrep2023,
+    FmriPrep2024,
+    FmriPrep2025,
 )
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
@@ -579,13 +582,31 @@ analysis_definitions = [
         "versions": [
             {
                 "title": FmriPrep2021.__version__,
-                "description": "Flagged version!",  # noqa: E501,
+                "description": "Flagged version!",
                 "input": FMRIPREP_INPUT_SPECIFICATION,
                 "output": FMRIPREP_OUTPUT_SPECIFICATION,
             },
             {
                 "title": FmriPrep2022.__version__,
-                "description": "fMRIprep v20.2.2.",  # noqa: E501,
+                "description": "fMRIprep v20.2.2.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2023.__version__,
+                "description": "fMRIprep v20.2.3.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2024.__version__,
+                "description": "fMRIprep v20.2.4.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2025.__version__,
+                "description": "fMRIprep v20.2.5.",
                 "input": FMRIPREP_INPUT_SPECIFICATION,
                 "output": FMRIPREP_OUTPUT_SPECIFICATION,
             },
