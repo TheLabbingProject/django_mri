@@ -149,7 +149,7 @@ class FmriPrep:
     def get_security_options(self) -> str:
         options = getattr(settings, "SINGULARITY_SECURITY_OPTIONS", "")
         if options:
-            return f"--security={options}"
+            return f'--security="{options}"'
         return ""
 
     def generate_fs_outputs(
