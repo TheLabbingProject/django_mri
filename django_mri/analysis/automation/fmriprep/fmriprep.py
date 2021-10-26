@@ -23,7 +23,7 @@ class fMRIPrepRunner(QuerySetRunner):
 
     #: :class:`~django_analyses.models.analysis_version.AnalysisVersion`
     #: instance title.
-    ANALYSIS_VERSION_TITLE = FmriPrep2022.__version__
+    ANALYSIS_VERSION_TITLE = FmriPrep2025.__version__
 
     #: :class:`~django_analyses.models.pipeline.node.Node` instance
     #: configuration.
