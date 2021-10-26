@@ -17,6 +17,9 @@ References
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
     FmriPrep2022,
+    FmriPrep2023,
+    FmriPrep2024,
+    FmriPrep2025,
 )
 from django_mri.analysis.interfaces.fsl.fast import FastWrapper
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
@@ -95,5 +98,8 @@ interfaces = {
     "fMRIPrep": {
         FmriPrep2021.__version__: FmriPrep2021,
         FmriPrep2022.__version__: FmriPrep2022,
+        FmriPrep2023.__version__: FmriPrep2023,
+        FmriPrep2024.__version__: FmriPrep2024,
+        FmriPrep2025.__version__: FmriPrep2025,
     },
 }
