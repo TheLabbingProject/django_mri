@@ -62,7 +62,7 @@ class FmriPrep:
     def set_input_and_output_roots(self) -> Tuple[Path, Path]:
         """
         Sets the input and output directories to be mounted by singularity
-        
+
         Returns
         -------
         Tuple[Path, Path]
@@ -140,6 +140,7 @@ class FmriPrep:
             destination_name=self.destination.name,
             analysis_level=analysis_level,
             freesurfer_license=fs_license,
+            version=self.__version__,
         )
         return command + self.set_configuration_by_keys()
 
@@ -293,3 +294,15 @@ class FmriPrep2021(FmriPrep):
 
 class FmriPrep2022(FmriPrep):
     __version__ = "20.2.2"
+
+
+class FmriPrep2023(FmriPrep):
+    __version__ = "20.2.3"
+
+
+class FmriPrep2024(FmriPrep):
+    __version__ = "20.2.4"
+
+
+class FmriPrep2025(FmriPrep):
+    __version__ = "20.2.5"
