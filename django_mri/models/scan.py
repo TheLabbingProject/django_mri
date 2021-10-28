@@ -18,11 +18,9 @@ from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.utils.bids import BidsManager
 from django_mri.utils.utils import (
     get_group_model,
     get_mri_root,
-    get_bids_dir,
     get_bids_manager,
 )
 from nilearn.image import mean_img
@@ -303,9 +301,7 @@ class Scan(TimeStampedModel):
             BIDS-compatible NIfTI file destination
         """
         try:
-            bids_path = get_bids_dir() / self.bids_manager.build_bids_path(
-                self
-            )
+            bids_path = self.bids_manager.build_bids_path(self)
         except ValueError as e:
             print(e.args)
             return None
@@ -588,7 +584,7 @@ class Scan(TimeStampedModel):
         )
 
     @property
-    def bids_manager(self) -> BidsManager:
+    def bids_manager(self):
         """
         Returns the initialized instance of *BidsManger*
         Returns

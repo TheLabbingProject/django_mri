@@ -2,16 +2,14 @@
 Definition of the :class:`Bids` class.
 """
 
-import glob
 import json
 import os
 import shutil
 from datetime import date
-from enum import Enum
 from pathlib import Path
 
 import pandas as pd
-from django_mri.utils import messages, the_base, get_bids_dir
+from django_mri.utils.utils import get_bids_dir
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"
@@ -97,12 +95,16 @@ class BidsManager:
         """
 
         subject_id = scan.session.subject.id
-        sample_image = scan.series.image_set.first()
+        sample_image = scan.dicom.image_set.first()
         sample_header = sample_image.header.instance
-        default_bids_path = sample_header.bids_path
+        default_bids_path = sample_header.build_bids_path()
         default_subject_id = sample_header.get("PatientID")
-        return default_bids_path.replace(
-            f"sub-{default_subject_id}", f"sub-{subject_id}"
+        if default_bids_path is None:
+            raise ValueError
+        return get_bids_dir() / Path(
+            default_bids_path.replace(
+                f"sub-{default_subject_id}", f"sub-{subject_id}"
+            )
         )
 
     def fix_functional_json(self, bids_path: Path):
@@ -124,7 +126,7 @@ class BidsManager:
         """
         bids_path = Path(bids_path)
         task = str(bids_path).split("task-")[-1].split("_")[0]
-        json_file = bids_path.parent / f"{bids_path.name.split('.')}.json"
+        json_file = bids_path.parent / f"{bids_path.name.split('.')[0]}.json"
         with open(json_file, "r+") as f:
             data = json.load(f)
             data["TaskName"] = task
@@ -254,8 +256,7 @@ class BidsManager:
         bids_dir.mkdir(exist_ok=True, parents=True)
         bidsignore = bids_dir / ".bidsignore"
         with open(bidsignore, "w+") as in_file:
-            in_file.write("**/*ignore-bids*")
-            in_file.write("**/*IREPI*")
+            in_file.write("**/*ignore-bids*\n")
 
     def generate_readme(self):
         """
@@ -273,6 +274,6 @@ class BidsManager:
         """
         Initiate necessery BIDS directory files
         """
-        self.bids_manager.set_description_json()
-        self.bids_manager.generate_bidsignore()
-        self.bids_manager.generate_readme()
+        self.set_description_json()
+        self.generate_bidsignore()
+        self.generate_readme()

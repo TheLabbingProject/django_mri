@@ -10,5 +10,4 @@ from django_mri.utils.utils import (
     get_session_by_series,
     get_study_model,
     get_subject_model,
-    get_bids_dir,
 )
