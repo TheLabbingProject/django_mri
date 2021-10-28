@@ -19,7 +19,7 @@ from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.bids import Bids
-from django_mri.utils.utils import get_group_model, get_mri_root
+from django_mri.utils.utils import get_group_model, get_mri_root, get_bids_dir
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
 
@@ -296,18 +296,18 @@ class Scan(TimeStampedModel):
         name = self.get_default_nifti_name()
         return directory / name
 
-    def get_bids_destination(self) -> Path:
+    def get_bids_destination(self) -> str:
         """
         Returns the BIDS-compatible destination of this scan's associated
         :class:`~django_mri.models.nifti.NIfTI` file.
 
         Returns
         -------
-        pathlib.Path
+        str
             BIDS-compatible NIfTI file destination
         """
         try:
-            bids_path = Bids().compose_bids_path(self)
+            bids_path = get_bids_dir() / Bids().build_bids_path(self)
         except ValueError as e:
             print(e.args)
             return None

@@ -11,38 +11,13 @@ from enum import Enum
 from pathlib import Path
 
 import pandas as pd
-from django_mri.utils import messages
-from django_mri.utils import the_base
+from django_mri.utils import messages, the_base
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"
 
 
-class DATA_TYPES(Enum):
-    dwi = "dwi"
-    AP = "dwi"
-    PA = "fmap"
-    mprage = "anat"
-    flair = "anat"
-    fmri = "func"
-    ir_epi = "anat"
-    ir_epi2 = "anat"
-    localizer = "anat"
-
-
-class MODALITY_LABELS(Enum):
-    dwi = "dwi"
-    AP = "dwi"
-    PA = "epi"
-    mprage = "T1w"
-    ir_epi = "T1w"
-    ir_epi2 = "T1w"
-    flair = "FLAIR"
-    fmri = "bold"
-    localizer = "localizer"
-
-
-class Bids:
+class BidsManager:
     """
     A class to compose BIDS-appropriate paths for usage by dcm2niix
     In short, standard template for BIDS-appropriate path is:
@@ -58,12 +33,6 @@ class Bids:
 
     DATASET_DESCRIPTION_FILE_NAME = "dataset_description.json"
     PARTICIPANTS_FILE_NAME = "participants.tsv"
-
-    def get_session_timestamp(self, scan):
-        """
-        Extracts session from scan and convert it to timestamp representation
-        """
-        return scan.session.time.strftime("%Y%m%d%H%M")
 
     def calculate_age(self, born: date) -> float:
         """
@@ -115,138 +84,26 @@ class Bids:
         }
         return subject_dict
 
-    def get_data(self, scan):
+    def build_bids_path(self, scan):
         """
-        Extracts relevant parameters for BIDS-compatible naming.
-
-        Todo
-        ----
-        * Update to handle several tasks.
-        * Update to handle multiple sessions. - Perhaps add "session" property
-            to Scan.
-
-        Returns
-        -------
-        parent : Path
-            Parent BIDS directory, under which there will be "sub-x"
-            directories
-        data_type : str
-            sub-directory under "sub-x". either "anat","func","fmap" or "dwi"
-        modality_label : str
-            modality label as described in BIDS specifications. either "dwi",
-            "epi","T1w","FLAIR","bold" or "localizer"
-        task : Union[str, None]
-            task name for functional scans. "rest" or None
-        pe_dir : Union[str, None]
-            PhaseEncodingDirection for DWI-related images or fieldmap-related
-            images. Either "AP","PA" or None
-        """
-        parent = scan.get_default_nifti_destination().parent.parent.parent
-        dicom_image = scan.dicom.image_set.first()
-        header = dicom_image.header.instance
-        acq = scan.id
-        task = None
-        pe_dir = None
-
-        thebase = the_base.get_modality_and_data_type(scan, header, acq)
-        if thebase:
-            data_type = thebase.get("data_type")
-            modality_label = thebase.get("modality")
-            acq = thebase.get("acq")
-            task = thebase.get("task")
-            pe_dir = thebase.get("pe_dir")
-            return parent, data_type, modality_label, acq, task, pe_dir
-
-        sequence_type = scan.sequence_type
-        if sequence_type is None:
-            if "spgr" in scan.description.lower():
-                sequence_type = "mprage"
-            else:
-                raise ValueError(messages.BIDS_NO_SEQUENCE_TYPE)
-        sequence_type = str(sequence_type).lower().replace("-", "_")
-        data_type = DATA_TYPES[sequence_type].value
-        modality_label = MODALITY_LABELS[sequence_type].value
-        if "dwi" in data_type:
-            image_type = header["ImageType"]
-            pe_dir = "AP" if "MOSAIC" in image_type else "PA"
-            data_type = DATA_TYPES[pe_dir].value
-            modality_label = MODALITY_LABELS[pe_dir].value
-        if "anat" in data_type and "T1w" in modality_label:
-            image_type = header["ImageType"]
-            if sequence_type == "mprage":
-                if "NORM" in image_type:
-                    acq = f"{acq}corrected"
-                else:
-                    acq = f"{acq}uncorrected"
-            elif "ir_epi" in sequence_type:
-                ti = int(header["InversionTime"])
-                acq = f"{acq}TI{ti}"
-        if "localizer" in modality_label:
-            acq = f"{acq}ignore-bids"
-        if "func" in data_type:
-            image_type = header["ImageType"]
-            task = "rest"
-            if "MB" not in image_type:
-                modality_label = "sbref"
-        return parent, data_type, modality_label, acq, task, pe_dir
-
-    def compose_bids_path(self, scan):
-        """
-        Uses parameters extracted by {self.get_data} to compose a BIDS-
-        compatible file path
+        Uses parameters extracted by {self.get_subject_data} to update BIDS-
+        compatible file path derived from *dicom_parser*
 
         Returns
         -------
         pathlib.Path
-            Full path to a BIDS-compatible file, according to scan's
+            Full path to an updated BIDS-compatible file, according to scan's
             parameters.
         """
 
-        subject_dict = self.get_subject_data(scan)
-        subject_id = subject_dict["participant_id"]
-        session = self.get_session_timestamp(scan)
-        parent, data_type, modality_label, acq, task, pe_dir = self.get_data(
-            scan
+        subject_id = scan.session.subject.id
+        sample_image = scan.series.image_set.first()
+        sample_header = sample_image.header.instance
+        default_bids_path = sample_header.bids_path
+        default_subject_id = sample_header.get("PatientID")
+        return default_bids_path.replace(
+            f"sub-{default_subject_id}", f"sub-{subject_id}"
         )
-        bids_path = Path(
-            parent,
-            f"sub-{subject_id}",
-            f"ses-{session}",
-            data_type,
-            f"sub-{subject_id}_ses-{session}",
-        )
-        if task:
-            bids_path = Path(f"{bids_path}_task-{task}")
-        if acq:
-            bids_path = Path(f"{bids_path}_acq-{acq}")
-        if pe_dir:
-            bids_path = Path(f"{bids_path}_dir-{pe_dir}")
-        bids_path = Path(f"{bids_path}_{modality_label}")
-
-        self.set_description_json(parent)
-        self.set_participant_tsv_and_json(parent, subject_dict)
-        self.generate_bidsignore(parent)
-        self.generate_readme(parent)
-        return bids_path
-
-    def clean_unwanted_files(self, bids_path: Path):
-        """
-        Clean irrelevant .bvec and .bval files;
-        Some versions of dcm2niix produce .bvec and .bval for fieldmap images
-        as well as dwi images.
-        Since BIDS specifications do now allow such files under "fmap"
-        data-type, this method deletes them from the relevant directory.
-
-        Parameters
-        ----------
-        bids_path : Path
-            Path to the BIDS-compatible directory
-        """
-
-        if "fmap" in str(bids_path):
-            unwanted = glob.glob(f"{str(bids_path.parent)}/*.bv*")
-            for fname in unwanted:
-                os.remove(fname)
 
     def fix_functional_json(self, bids_path: Path):
         """
@@ -265,7 +122,9 @@ class Bids:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
-        if "func" in str(bids_path):
+        bids_path = Path(bids_path)
+        data_type = bids_path.parent.name
+        if data_type == "func":
             task = str(bids_path).split("task-")[-1].split("_")[0]
             json_file = bids_path.parent / Path(bids_path.stem).with_suffix(
                 ".json"
@@ -277,7 +136,7 @@ class Bids:
                 json.dump(data, f, indent=4)
                 f.truncate()
 
-    def modify_fieldmaps(self, bids_path: Path):
+    def modify_fieldmaps(self, scan):
         """
         Add required "IntendedFor" field to fieldmaps, as stated in BIDS
         stucture.
@@ -294,13 +153,18 @@ class Bids:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
-        name, session = bids_path.name, bids_path.parents[1]
-        modality = name.split("_")[2].split("-")[-1]
-        if "func" in modality:
-            modality = "func"
-        elif "dwi" in modality:
-            modality = "dwi"
-        targets = [p for p in session.glob(f"{modality}/*.nii.gz")]
+
+        session = scan.session
+        session_id = session.time.strftime("%Y%M%d%H%m")
+        bids_path = Path(scan.get_bids_destination())
+        parts = bids_path.name.split("_")
+        data_type_target = [
+            part.split("-")[-1] for part in parts if "acq-" in part
+        ]
+        targets = [
+            p for p in bids_path.parent.glob(f"{data_type_target[0]}/*.nii*")
+        ]
+
         fin = open(bids_path, "r")
         data = json.load(fin)
         fin.close()

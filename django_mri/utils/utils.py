@@ -18,6 +18,10 @@ DEFAULT_MRI_DIR_NAME = "MRI"
 DEFAULT_ANALYSIS_DIR_NAME = "ANALYSIS"
 DEFAULT_ANALYSIS_PATH = Path(settings.MEDIA_ROOT) / DEFAULT_ANALYSIS_DIR_NAME
 
+#: The name of the subdirectory under MEDIA_ROOT in which BIDS dataset will be saved
+DEFAULT_BIDS_DIR_NAME = "rawdata"
+DEFAULT_BIDS_PATH = Path(settings.MEDIA_ROOT) / DEFAULT_BIDS_DIR_NAME
+
 #: The name of the subdirectory under the MRI data root in which DICOM files
 #: will be saved.
 DEFAULT_DICOM_DIR_NAME = "DICOM"
@@ -104,6 +108,14 @@ def get_mri_root() -> Path:
 
     default = Path(settings.MEDIA_ROOT, DEFAULT_MRI_DIR_NAME)
     path = getattr(settings, "MRI_ROOT", default)
+    return Path(path)
+
+
+def get_bids_dir() -> Path:
+    """
+    Returns the path of the directory in which BIDS dataset should be saved.
+    """
+    path = getattr(settings, "BIDS_BASE_PATH", DEFAULT_BIDS_PATH)
     return Path(path)
 
 
