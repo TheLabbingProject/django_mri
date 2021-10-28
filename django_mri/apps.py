@@ -10,6 +10,7 @@ References
 """
 
 from django.apps import AppConfig
+from django_mri.utils.bids import BidsManager
 
 
 class DjangoMriConfig(AppConfig):
@@ -26,6 +27,7 @@ class DjangoMriConfig(AppConfig):
 
     #: Full Python path to the application.
     name = "django_mri"
+    bids_manager: BidsManager = None
 
     def ready(self):
         """
@@ -35,5 +37,7 @@ class DjangoMriConfig(AppConfig):
         ----------
         * :meth:`~django.apps.AppConfig.ready`
         """
-
         import django_mri.signals  # noqa: F401
+
+        self.bids_manager = BidsManager()
+        self.bids_manager.initiate_bids_directory()

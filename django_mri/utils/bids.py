@@ -11,7 +11,7 @@ from enum import Enum
 from pathlib import Path
 
 import pandas as pd
-from django_mri.utils import messages, the_base
+from django_mri.utils import messages, the_base, get_bids_dir
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"
@@ -123,18 +123,14 @@ class BidsManager:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
         bids_path = Path(bids_path)
-        data_type = bids_path.parent.name
-        if data_type == "func":
-            task = str(bids_path).split("task-")[-1].split("_")[0]
-            json_file = bids_path.parent / Path(bids_path.stem).with_suffix(
-                ".json"
-            )
-            with open(json_file, "r+") as f:
-                data = json.load(f)
-                data["TaskName"] = task
-                f.seek(0)
-                json.dump(data, f, indent=4)
-                f.truncate()
+        task = str(bids_path).split("task-")[-1].split("_")[0]
+        json_file = bids_path.parent / f"{bids_path.name.split('.')}.json"
+        with open(json_file, "r+") as f:
+            data = json.load(f)
+            data["TaskName"] = task
+            f.seek(0)
+            json.dump(data, f, indent=4)
+            f.truncate()
 
     def modify_fieldmaps(self, scan):
         """
@@ -143,8 +139,8 @@ class BidsManager:
 
         Parameters
         ----------
-        bids_path : Path
-            Path to the BIDS-compatible directory
+        scan : Scan object
+            *django_mri*`s Scan object
 
         References
         ----------
@@ -154,15 +150,15 @@ class BidsManager:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
 
-        session = scan.session
-        session_id = session.time.strftime("%Y%M%d%H%m")
         bids_path = Path(scan.get_bids_destination())
+        bids_path = bids_path.parent / f"{bids_path.name.split('.')[0]}.json"
         parts = bids_path.name.split("_")
         data_type_target = [
             part.split("-")[-1] for part in parts if "acq-" in part
         ]
         targets = [
-            p for p in bids_path.parent.glob(f"{data_type_target[0]}/*.nii*")
+            p
+            for p in bids_path.parents[1].glob(f"{data_type_target[0]}/*.nii*")
         ]
 
         fin = open(bids_path, "r")
@@ -175,57 +171,7 @@ class BidsManager:
         json.dump(data, fout, indent=4)
         fout.close()
 
-    def set_description_json(self, parent: Path):
-        """
-        Generates required "dataset_description.json" file, as stated by BIDS
-        structure.
-
-        Parameters
-        ----------
-        parent : Path
-            BIDS-compatible directory, underwhich there are "sub-x"
-            directories
-
-        References
-        ----------
-        * `BIDS complementary files`_
-
-        .. _BIDS complementary files:
-            https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
-        """
-
-        description_file = parent / self.DATASET_DESCRIPTION_FILE_NAME
-        if not description_file.is_file():
-            description_template = TEMPLATES_DIR / description_file.name
-            description_file.parent.mkdir(exist_ok=True)
-            shutil.copy(str(description_template), str(description_file))
-
-    def fix_sbref(self, bids_path: Path):
-        """[summary]
-
-        Parameters
-        ----------
-        bids_path : Path
-            [description]
-        """
-        modality = bids_path.name.split("_")[-1]
-        if "sbref" in modality:
-            target = [f for f in bids_path.parent.glob("*_bold.nii*")]
-            sbrefs = [f for f in bids_path.parent.glob("*_sbref*")]
-            if target:
-                acq = target[0].name.split("_")[3]
-                for sbref in sbrefs:
-                    parts = sbref.name.split("_")
-                    new_sbref = sbref.parent / "_".join(
-                        parts[:3] + [acq] + parts[4:]
-                    )
-                    os.rename(sbref, new_sbref)
-        else:
-            sbref = [f for f in bids_path.parent.glob("*_sbref.json")]
-            if sbref:
-                self.fix_sbref(sbref[0].parent / sbref[0].stem)
-
-    def set_participant_tsv_and_json(self, parent: Path, subject_dict: dict):
+    def set_participant_tsv_and_json(self, scan):
         """
         Generates recommended "participants.tsv" by either copying the
         template from TEMPLATES_DiR or editing an existing one under {parent}
@@ -246,8 +192,12 @@ class BidsManager:
         .. _BIDS complementary files:
             https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
+        bids_dir = get_bids_dir()
+        bids_dir.mkdir(exist_ok=True, parents=True)
 
-        participants_tsv = parent / self.PARTICIPANTS_FILE_NAME
+        subject_dict = self.get_subject_data(scan)
+
+        participants_tsv = bids_dir / self.PARTICIPANTS_FILE_NAME
         participants_json = participants_tsv.with_suffix(".json")
         for participants_file in [participants_tsv, participants_json]:
             if not participants_file.is_file():
@@ -268,15 +218,30 @@ class BidsManager:
         else:
             pass
 
-    def generate_bidsignore(self, parent: Path):
+    def set_description_json(self):
+        """
+        Generates required "dataset_description.json" file, as stated by BIDS
+        structure.
+
+        References
+        ----------
+        * `BIDS complementary files`_
+
+        .. _BIDS complementary files:
+            https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
+        """
+        bids_dir = get_bids_dir()
+        bids_dir.mkdir(exist_ok=True, parents=True)
+        description_file = bids_dir / self.DATASET_DESCRIPTION_FILE_NAME
+        if not description_file.is_file():
+            description_template = TEMPLATES_DIR / description_file.name
+            description_file.parent.mkdir(exist_ok=True)
+            shutil.copy(str(description_template), str(description_file))
+
+    def generate_bidsignore(self):
         """
         Some acquisitions do not conform to BIDS specification (mainly
         localizers), so we generate a .bidsignore file, pointing to them.
-
-        Parameters
-        ----------
-        parent : Path
-            BIDS-compatible directory, underwhich there are "sub-x" directories
 
         References
         ----------
@@ -285,24 +250,29 @@ class BidsManager:
         .. _BIDS validator specifications:
             https://neuroimaging-core-docs.readthedocs.io/en/latest/pages/bids-validator.html
         """
-
-        bidsignore = parent / ".bidsignore"
+        bids_dir = get_bids_dir()
+        bids_dir.mkdir(exist_ok=True, parents=True)
+        bidsignore = bids_dir / ".bidsignore"
         with open(bidsignore, "w+") as in_file:
             in_file.write("**/*ignore-bids*")
             in_file.write("**/*IREPI*")
 
-    def generate_readme(self, parent: Path):
+    def generate_readme(self):
         """
         It is recommended by BIDS specifications to have a README file at the
         base of our project, so we create a blank one for further usage.
-
-        Parameters
-        ----------
-        parent : Path
-            BIDS-compatible directory, underwhich there are "sub-x" directories
         """
-
-        readme = parent / "README"
+        bids_dir = get_bids_dir()
+        bids_dir.mkdir(exist_ok=True, parents=True)
+        readme = bids_dir / "README"
         if not readme.is_file():
             readme_template = TEMPLATES_DIR / "README"
             shutil.copy(str(readme_template), str(readme))
+
+    def initiate_bids_directory(self):
+        """
+        Initiate necessery BIDS directory files
+        """
+        self.bids_manager.set_description_json()
+        self.bids_manager.generate_bidsignore()
+        self.bids_manager.generate_readme()

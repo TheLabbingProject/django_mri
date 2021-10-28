@@ -4,11 +4,14 @@ General app utilites.
 
 import datetime
 from pathlib import Path
+from django_mri.utils.bids import BidsManager
 
 import pytz
 from django.apps import apps
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
+from django.apps import apps
+from django_mri.apps import DjangoMriConfig
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.
@@ -99,6 +102,18 @@ def get_measurement_model():
         settings, "MEASUREMENT_MODEL", DEFAULT_MEASUREMENT_MODEL
     )
     return apps.get_model(measurement_model, require_ready=False)
+
+
+def get_bids_manager() -> BidsManager:
+    """[summary]
+
+    Returns
+    -------
+    BidsManager
+        [description]
+    """
+    app_config = apps.get_app_config(DjangoMriConfig.name)
+    return app_config.BidsManager
 
 
 def get_mri_root() -> Path:

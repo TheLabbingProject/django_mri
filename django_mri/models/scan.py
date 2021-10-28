@@ -18,10 +18,16 @@ from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.utils.bids import Bids
-from django_mri.utils.utils import get_group_model, get_mri_root, get_bids_dir
+from django_mri.utils.bids import BidsManager
+from django_mri.utils.utils import (
+    get_group_model,
+    get_mri_root,
+    get_bids_dir,
+    get_bids_manager,
+)
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
+
 
 FLAG_3D = "mprage", "spgr", "flair", "t1", "t2"
 FLAG_4D = "fmri", "dmri"
@@ -228,19 +234,9 @@ class Scan(TimeStampedModel):
             The inferred sequence type
         """
 
-        try:
-            sequence = self.dicom.scanning_sequence or []
-            variant = self.dicom.sequence_variant or []
-            sequence_definition = SequenceTypeDefinition.objects.get(
-                scanning_sequence__contains=sequence,
-                sequence_variant__contains=variant,
-                scanning_sequence__contained_by=sequence,
-                sequence_variant__contained_by=variant,
-            )
-        except models.ObjectDoesNotExist:
-            pass
-        else:
-            return sequence_definition.sequence_type
+        sample_image = self.dicom.image_set.first()
+        sample_header = sample_image.header.instance
+        return sample_header.detected_sequence
 
     def infer_sequence_type(self) -> SequenceType:
         """
@@ -307,7 +303,9 @@ class Scan(TimeStampedModel):
             BIDS-compatible NIfTI file destination
         """
         try:
-            bids_path = get_bids_dir() / Bids().build_bids_path(self)
+            bids_path = get_bids_dir() / self.bids_manager.build_bids_path(
+                self
+            )
         except ValueError as e:
             print(e.args)
             return None
@@ -315,7 +313,7 @@ class Scan(TimeStampedModel):
 
     def compile_to_bids(self, bids_path: Path):
         """
-        Fix some BIDS related issues after NIfTI coversion.
+        Fixes some BIDS related issues after NIfTI coversion.
 
         Parameters
         ----------
@@ -323,13 +321,11 @@ class Scan(TimeStampedModel):
             Scan's BIDS path
         """
 
-        bids = Bids()
-        bids.clean_unwanted_files(bids_path)
-        bids.fix_functional_json(bids_path)
-        if "fmap" in bids_path.parent.name:
-            bids.modify_fieldmaps(bids_path.with_suffix(".json"))
-        if "func" in bids_path.parent.name:
-            bids.fix_sbref(bids_path)
+        if self.sequence_type in ["bold", "func_sbref"]:
+            self.bids_manager.fix_functional_json(bids_path)
+        if self.sequence_type in ["func_fieldmap", "dwi_fieldmap"]:
+            self.bids_manager.modify_fieldmaps(self)
+        self.bids_manager.set_participant_tsv_and_json(self)
 
     def dicom_to_nifti(
         self,
@@ -360,7 +356,7 @@ class Scan(TimeStampedModel):
             output
         """
 
-        if self.sequence_type and self.sequence_type.title == "Localizer":
+        if self.sequence_type == "localizer":
             warnings.warn(messages.NO_LOCALIZER_NIFTI)
         elif self.dicom:
             bids = False
@@ -590,6 +586,17 @@ class Scan(TimeStampedModel):
             symmetric_cmap=False,
             title=title,
         )
+
+    @property
+    def bids_manager(self) -> BidsManager:
+        """
+        Returns the initialized instance of *BidsManger*
+        Returns
+        -------
+        BidsManager
+            A class aimed at maintaining BIDS-specific properties of scans and datasets
+        """
+        return get_bids_manager()
 
     @property
     def mif(self) -> Path:
