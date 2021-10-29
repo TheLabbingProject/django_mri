@@ -168,6 +168,8 @@ class Scan(TimeStampedModel):
 
     objects = ScanQuerySet.as_manager()
 
+    _bids_manager: BidsManager = None
+
     class Meta:
         unique_together = ("number", "session")
         ordering = ("-time",)
@@ -228,15 +230,13 @@ class Scan(TimeStampedModel):
                 f"No DICOM data associated with MRI scan {self.id}!"
             )
 
-    def infer_sequence_type_from_dicom(self) -> SequenceType:
+    def infer_sequence_type_from_dicom(self) -> str:
         """
-        Returns the appropriate :class:`django_mri.SequenceType` instance
-        according to the scan's "*ScanningSequence*" and "*SequenceVariant*"
-        header values.
+        Returns the sequence type detected by *dicom_parser*.
 
         Returns
         -------
-        SequenceType
+        str
             The inferred sequence type
         """
 
@@ -244,13 +244,13 @@ class Scan(TimeStampedModel):
         sample_header = sample_image.header.instance
         return sample_header.detected_sequence
 
-    def infer_sequence_type(self) -> SequenceType:
+    def infer_sequence_type(self) -> str:
         """
         Tries to infer the sequence type using associated data.
 
         Returns
         -------
-        SequenceType
+        str
             The inferred sequence type
         """
 
@@ -598,9 +598,11 @@ class Scan(TimeStampedModel):
         Returns
         -------
         BidsManager
-            A class aimed at maintaining BIDS-specific properties of scans and datasets
+            A app-level BIDS data manager
         """
-        return get_bids_manager()
+        if self._bids_manager is None:
+            self._bids_manager = get_bids_manager()
+        return self._bids_manager
 
     @property
     def mif(self) -> Path:
