@@ -270,7 +270,7 @@ class BidsManager:
             readme_template = TEMPLATES_DIR / "README"
             shutil.copy(str(readme_template), str(readme))
 
-    def initiate_bids_directory(self):
+    def scaffold_bids_directory(self):
         """
         Initiate necessery BIDS directory files
         """

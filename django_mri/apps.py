@@ -40,4 +40,4 @@ class DjangoMriConfig(AppConfig):
         from django_mri.utils.bids import BidsManager
 
         self.bids_manager = BidsManager()
-        self.bids_manager.initiate_bids_directory()
+        self.bids_manager.scaffold_bids_directory()
