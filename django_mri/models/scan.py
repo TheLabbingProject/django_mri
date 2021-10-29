@@ -9,7 +9,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django_analyses.models.input import FileInput, Input, ListInput
+from django_analyses.models.input import (
+    DirectoryInput,
+    FileInput,
+    Input,
+    ListInput,
+)
 from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
@@ -19,13 +24,12 @@ from django_mri.models.nifti import NIfTI
 from django_mri.models.sequence_type import SequenceType
 from django_mri.models.sequence_type_definition import SequenceTypeDefinition
 from django_mri.utils.utils import (
+    get_bids_manager,
     get_group_model,
     get_mri_root,
-    get_bids_manager,
 )
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
-
 
 FLAG_3D = "mprage", "spgr", "flair", "t1", "t2"
 FLAG_4D = "fmri", "dmri"
@@ -156,7 +160,11 @@ class Scan(TimeStampedModel):
         "nifti_representation",
         "mif_representation",
     )
-    DERIVATIVE_QUERY = {FileInput: "value", ListInput: "value__contains"}
+    DERIVATIVE_QUERY = {
+        FileInput: "value",
+        ListInput: "value__contains",
+        DirectoryInput: "value",
+    }
 
     objects = ScanQuerySet.as_manager()
 
