@@ -20,9 +20,9 @@ from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
 from django_mri.models.managers.scan import ScanQuerySet
+from django_mri.models.messages import SCAN_UPDATE_NO_DICOM
 from django_mri.models.nifti import NIfTI
-from django_mri.models.sequence_type import SequenceType
-from django_mri.models.sequence_type_definition import SequenceTypeDefinition
+from django_mri.utils.bids import BidsManager
 from django_mri.utils.utils import (
     get_bids_manager,
     get_group_model,
@@ -41,7 +41,6 @@ class Scan(TimeStampedModel):
     which it is saved. This model handles any conversions between formats in
     case they are required, and allows for easy querying of MRI scans based on
     universal attributes.
-
     """
 
     #: The institution in which this scan was acquired.
@@ -183,7 +182,6 @@ class Scan(TimeStampedModel):
         str
             String representation of this instance
         """
-
         formatted_time = self.time.strftime("%Y-%m-%d %H:%M:%S")
         return f"{self.description} from {formatted_time}"
 
@@ -200,7 +198,6 @@ class Scan(TimeStampedModel):
         .. _overriding model methods:
            https://docs.djangoproject.com/en/3.0/topics/db/models/#overriding-model-methods
         """
-
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
         super().save(*args, **kwargs)
@@ -214,7 +211,6 @@ class Scan(TimeStampedModel):
         AttributeError
             If not DICOM series is related to this scan
         """
-
         if self.dicom:
             self.institution_name = self.dicom.institution_name
             self.number = self.dicom.number
@@ -226,23 +222,8 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
-            raise AttributeError(
-                f"No DICOM data associated with MRI scan {self.id}!"
-            )
-
-    def infer_sequence_type_from_dicom(self) -> str:
-        """
-        Returns the sequence type detected by *dicom_parser*.
-
-        Returns
-        -------
-        str
-            The inferred sequence type
-        """
-
-        sample_image = self.dicom.image_set.first()
-        sample_header = sample_image.header.instance
-        return sample_header.detected_sequence
+            message = SCAN_UPDATE_NO_DICOM.format(pk=self.id)
+            raise AttributeError(message)
 
     def infer_sequence_type(self) -> str:
         """
@@ -253,9 +234,8 @@ class Scan(TimeStampedModel):
         str
             The inferred sequence type
         """
-
         if self.dicom:
-            return self.infer_sequence_type_from_dicom()
+            return self.dicom.sequence_type
 
     def get_default_nifti_dir(self) -> Path:
         """
@@ -267,7 +247,6 @@ class Scan(TimeStampedModel):
         str
             Default location for conversion output
         """
-
         if self.dicom:
             path = str(self.dicom.path).replace("DICOM", "NIfTI")
             return Path(path)
@@ -281,7 +260,6 @@ class Scan(TimeStampedModel):
         str
             Default file name
         """
-
         return str(self.id)
 
     def get_default_nifti_destination(self) -> Path:
@@ -293,7 +271,6 @@ class Scan(TimeStampedModel):
         str
             Default path for NIfTI file
         """
-
         directory = self.get_default_nifti_dir()
         name = self.get_default_nifti_name()
         return directory / name
@@ -324,7 +301,6 @@ class Scan(TimeStampedModel):
         bids_path : Path
             Scan's BIDS path
         """
-
         if self.sequence_type in ["bold", "func_sbref"]:
             self.bids_manager.fix_functional_json(bids_path)
         if self.sequence_type in ["func_fieldmap", "dwi_fieldmap"]:
@@ -396,7 +372,6 @@ class Scan(TimeStampedModel):
         subject : django.db.models.Model
             Suggested subject identity
         """
-
         message = messages.SUBJECT_MISMATCH.format(
             scan_id=self.id,
             existing_subject_id=self.session.subject.id,
@@ -442,7 +417,6 @@ class Scan(TimeStampedModel):
         Path
             Default *.mif* path
         """
-
         return get_mri_root() / "mif" / f"{self.id}.mif"
 
     def get_dicom_representation(self) -> str:
@@ -643,21 +617,19 @@ class Scan(TimeStampedModel):
         return self.get_mif_representation()
 
     @property
-    def sequence_type(self) -> SequenceType:
+    def sequence_type(self) -> str:
         """
         Returns the sequence type instance fitting this scan if one exists.
 
         See Also
         --------
         * :meth:`infer_sequence_type`
-        * :class:`django_mri.models.sequence_type.SequenceType`
 
         Returns
         -------
-        SequenceType
+        str
             Inferred sequence type
         """
-
         return self.infer_sequence_type()
 
     @property
@@ -671,7 +643,6 @@ class Scan(TimeStampedModel):
         NIfTI
             Associated NIfTI instance
         """
-
         if not isinstance(self._nifti, NIfTI):
             self._nifti = self.dicom_to_nifti()
             self.save()
@@ -723,7 +694,6 @@ class Scan(TimeStampedModel):
         float
             Subject age in years at the time of the scan's acquisition
         """
-
         conditions = (
             self.time
             and self.session

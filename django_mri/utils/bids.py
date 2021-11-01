@@ -1,7 +1,6 @@
 """
 Definition of the :class:`Bids` class.
 """
-
 import json
 import os
 import shutil
@@ -205,7 +204,7 @@ class BidsManager:
             if not participants_file.is_file():
                 participants_template = TEMPLATES_DIR / participants_file.name
                 shutil.copy(str(participants_template), str(participants_file))
-        participants_df = pd.read_csv(participants_tsv, "\t")
+        participants_df = pd.read_csv(participants_tsv, sep="\t")
         subject_dict[
             "participant_id"
         ] = f"sub-{subject_dict['participant_id']}"

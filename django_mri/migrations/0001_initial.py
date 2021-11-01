@@ -136,7 +136,9 @@ class Migration(migrations.Migration):
                         blank=True,
                         help_text="The number of this scan relative to the session in which it was acquired.",
                         null=True,
-                        validators=[django.core.validators.MinValueValidator(0)],
+                        validators=[
+                            django.core.validators.MinValueValidator(0)
+                        ],
                     ),
                 ),
                 (
@@ -145,7 +147,9 @@ class Migration(migrations.Migration):
                         blank=True,
                         help_text="The time between the application of the radiofrequency excitation pulse and the peak of the signal induced in the coil (in milliseconds).",
                         null=True,
-                        validators=[django.core.validators.MinValueValidator(0)],
+                        validators=[
+                            django.core.validators.MinValueValidator(0)
+                        ],
                     ),
                 ),
                 (
@@ -154,7 +158,9 @@ class Migration(migrations.Migration):
                         blank=True,
                         help_text="The time between two successive RF pulses (in milliseconds).",
                         null=True,
-                        validators=[django.core.validators.MinValueValidator(0)],
+                        validators=[
+                            django.core.validators.MinValueValidator(0)
+                        ],
                     ),
                 ),
                 (
@@ -163,13 +169,18 @@ class Migration(migrations.Migration):
                         blank=True,
                         help_text="The time between the 180-degree inversion pulse and the following spin-echo (SE) sequence (in milliseconds).",
                         null=True,
-                        validators=[django.core.validators.MinValueValidator(0)],
+                        validators=[
+                            django.core.validators.MinValueValidator(0)
+                        ],
                     ),
                 ),
                 (
                     "spatial_resolution",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=models.FloatField(), blank=True, null=True, size=3,
+                        base_field=models.FloatField(),
+                        blank=True,
+                        null=True,
+                        size=3,
                     ),
                 ),
                 (
@@ -262,10 +273,15 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("title", models.CharField(max_length=255, verbose_name="title"),),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="title"),
+                ),
                 (
                     "description",
-                    models.TextField(blank=True, null=True, verbose_name="description"),
+                    models.TextField(
+                        blank=True, null=True, verbose_name="description"
+                    ),
                 ),
                 (
                     "scanning_sequence",

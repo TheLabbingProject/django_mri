@@ -45,21 +45,15 @@ Installation
 
             $ python manage.py migrate
 
-    5. *\[Optional\]* Load preconfigured sequence types and analyses:
+    5. *\[Optional\]* Load preconfigured analyses:
 
         .. code-block:: python
             :caption: Django shell
 
             >>> from django_mri.analysis.utils import load_mri_analyses
-            >>> from django_mri.models import SequenceType
-            >>> from django_mri.models.common_sequences import sequences
 
             # Create analyses and pipelines
             >>> load_mri_analyses()
-
-            # Create common MRI sequence definitions
-            >>> for sequence in sequences:
-            >>>     SequenceType.objects.create(**sequence)
 
     6. Start the development server and visit http://127.0.0.1:8000/admin/.
 

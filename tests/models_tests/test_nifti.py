@@ -16,15 +16,12 @@ from tests.fixtures import (
     SIEMENS_DWI_SERIES_PATH,
 )
 from tests.models import Subject
-from tests.utils import load_common_sequences
 
 
 class NIfTIModelTestCase(TestCase):
     @classmethod
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
-        load_common_sequences()
-
         # MPRAGE scan
         Image.objects.import_path(
             DICOM_MPRAGE_PATH, progressbar=False, report=False

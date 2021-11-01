@@ -3,8 +3,6 @@ from pathlib import Path
 import pydicom
 from django.db import models
 from django_dicom.models import Image
-from django_mri.models.common_sequences import sequences
-from django_mri.models.sequence_type import SequenceType
 
 
 def restore_image_path(id: str, old_path: Path) -> None:
@@ -16,13 +14,11 @@ def restore_image_path(id: str, old_path: Path) -> None:
 
 def restore_path(curr_path: str, old_path: str) -> None:
     for image in Path(curr_path).rglob("*.dcm"):
-        str_path = str(image.absolute())  # Stringify the absolute path of the image
+        str_path = str(
+            image.absolute()
+        )  # Stringify the absolute path of the image
         id = pydicom.dcmread(str_path).get("SOPInstanceUID")
         restore_image_path(id, Path(old_path))
-
-
-def load_common_sequences() -> list:
-    return SequenceType.objects.from_list(sequences)
 
 
 class CharNullField(models.CharField):
@@ -36,7 +32,6 @@ class CharNullField(models.CharField):
         """
         Gets value right out of the db and changes it if its ``None``.
         """
-
         if value is None:
             return ""
         else:
@@ -44,9 +39,9 @@ class CharNullField(models.CharField):
 
     def to_python(self, value):
         """
-        Gets value right out of the db or an instance, and changes it if its ``None``.
+        Gets value right out of the db or an instance, and changes it if its
+        `None`.
         """
-
         if isinstance(value, models.CharField):
             # If an instance, just return the instance.
             return value
@@ -61,7 +56,6 @@ class CharNullField(models.CharField):
         """
         Catches value right before sending to db.
         """
-
         if value == "":
             # If Django tries to save an empty string, send the db None (NULL).
             return None
