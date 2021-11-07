@@ -1,7 +1,6 @@
 bokeh~=2.0
 bs4~=0.0
 celery~=5.0
-dicom_parser==0.1.5
 django-nonrelated-inlines~=0.1
 Django~=3.1
 django-celery-beat~=2.1
@@ -18,3 +17,4 @@ scikit-learn~=0.22
 git+https://github.com/celery/django-celery-results.git@master#egg=django-celery-results
 git+https://github.com/TheLabbingProject/django_analyses.git@master#egg=django_analyses
 git+https://github.com/TheLabbingProject/django_dicom.git@master#egg=django_dicom
+git+https://github.com/open-dicom/dicom_parser.git@master#egg=dicom_parser
