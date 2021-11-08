@@ -1,12 +1,10 @@
 """
 Definition of the :class:`ScanSerializer` class.
 """
-
 from django_dicom.models import Series
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
-from django_mri.serializers.sequence_type import SequenceTypeSerializer
 from django_mri.serializers.utils import MiniSubjectSerializer
 from django_mri.utils.utils import get_group_model
 from rest_framework import serializers
@@ -38,9 +36,7 @@ class ScanSerializer(serializers.HyperlinkedModelSerializer):
     study_groups = serializers.PrimaryKeyRelatedField(
         queryset=Group.objects.all(), many=True, allow_null=True,
     )
-    sequence_type = SequenceTypeSerializer(
-        source="infer_sequence_type_from_dicom", read_only=True
-    )
+    sequence_type = serializers.CharField(read_only=True)
     subject = MiniSubjectSerializer(source="session.subject")
 
     class Meta:

@@ -8,7 +8,6 @@ References
 .. _URL dispatcher:
    https://docs.djangoproject.com/en/3.0/topics/http/urls/#url-dispatcher
 """
-
 from django.urls import include, path
 from rest_framework import routers
 
@@ -27,10 +26,6 @@ app_name = "mri"
 router = routers.DefaultRouter()
 router.register(r"scan", views.ScanViewSet)
 router.register(r"nifti", views.NiftiViewSet)
-router.register(r"sequence_type", views.SequenceTypeViewSet)
-router.register(
-    r"sequence_type_definition", views.SequenceTypeDefinitionViewSet
-)
 router.register(r"session", views.SessionViewSet)
 router.register(r"irb_approval", views.IrbApprovalViewSet)
 

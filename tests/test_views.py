@@ -12,9 +12,9 @@ from django_dicom.models.utils.utils import get_group_model
 from django_mri.models import Scan, Session
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject
-from tests.utils import load_common_sequences
 
 User = get_user_model()
 Group = get_group_model()
@@ -35,10 +35,11 @@ class LoggedOutScanViewTestCase(TestCase):
         .. _Django's TestCase documentation:
            https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-
-        load_common_sequences()
         Image.objects.import_path(
-            SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
+            SIEMENS_DWI_SERIES_PATH,
+            progressbar=False,
+            report=False,
+            autoremove=False,
         )
         series = Series.objects.first()
         cls.subject, _ = Subject.objects.from_dicom_patient(series.patient)
@@ -46,7 +47,9 @@ class LoggedOutScanViewTestCase(TestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(subject=cls.subject, time=session_time)
+        session = Session.objects.create(
+            subject=cls.subject, time=session_time
+        )
         cls.test_instance = Scan.objects.create(dicom=series, session=session)
 
     def test_scan_list_unautherized(self):
@@ -82,8 +85,6 @@ class LoggedInScanViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-
-        load_common_sequences()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
@@ -93,7 +94,9 @@ class LoggedInScanViewTestCase(APITestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(subject=cls.subject, time=session_time)
+        session = Session.objects.create(
+            subject=cls.subject, time=session_time
+        )
         cls.test_scan = Scan.objects.create(dicom=series, session=session)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True
@@ -173,8 +176,6 @@ class LoggedOutNIfTIViewTestCase(TestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-
-        load_common_sequences()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
@@ -184,7 +185,9 @@ class LoggedOutNIfTIViewTestCase(TestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(subject=cls.subject, time=session_time)
+        session = Session.objects.create(
+            subject=cls.subject, time=session_time
+        )
         scan = Scan.objects.create(dicom=series, session=session)
         cls.test_nifti = scan.nifti
 
@@ -209,8 +212,6 @@ class LoggedInNIfTIViewTestCase(APITestCase):
 
         .. _documentation: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#testcase
         """
-
-        load_common_sequences()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )
@@ -220,7 +221,9 @@ class LoggedInNIfTIViewTestCase(APITestCase):
         session_time = datetime.combine(
             header.get("StudyDate"), header.get("StudyTime")
         ).replace(tzinfo=pytz.UTC)
-        session = Session.objects.create(subject=cls.subject, time=session_time)
+        session = Session.objects.create(
+            subject=cls.subject, time=session_time
+        )
         scan = Scan.objects.create(dicom=series, session=session)
         cls.user = User.objects.create_user(
             username="test", password="pass", is_staff=True

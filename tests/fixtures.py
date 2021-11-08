@@ -51,10 +51,6 @@ NIFTI_FILES_PATH = os.path.join(TEST_FILES_PATH, "NIfTI")
 # NIfTI test file
 NIFTI_TEST_FILE_PATH = os.path.join(NIFTI_FILES_PATH, "001.nii.gz")
 
-# DWI
-# ~~~
-DICOM_DWI_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "DWI")
-
 # Siemens
 SIEMENS_DWI_SERIES_PATH = os.path.join(DICOM_FILES_PATH, "DWI", "Siemens")
 SIEMENS_DWI_SERIES = {

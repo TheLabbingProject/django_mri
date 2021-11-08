@@ -1,7 +1,6 @@
 """
 Definition of the :class:`NIfTI` model.
 """
-
 import json
 from pathlib import Path
 from typing import List
@@ -79,7 +78,6 @@ class NIfTI(TimeStampedModel):
         List[int]
             b-value for each diffusion direction.
         """
-
         file_name = self.b_value_file
         if file_name:
             with open(file_name, "r") as file_object:
@@ -117,7 +115,6 @@ class NIfTI(TimeStampedModel):
         List[List[float]]
             b-value for each diffusion direction
         """
-
         file_name = self.b_vector_file
         if file_name:
             with open(file_name, "r") as file_object:
@@ -126,7 +123,6 @@ class NIfTI(TimeStampedModel):
                 [float(value) for value in vector.rstrip().split(" ")]
                 for vector in content.rstrip().split("\n")
             ]
-        return None
 
     def read_json(self) -> dict:
         """
@@ -153,7 +149,6 @@ class NIfTI(TimeStampedModel):
             BIDS sidecar information stored in a JSON file, or *{}* if the file
             doesn't exist
         """
-
         if self.json_file.is_file():
             with open(self.json_file, "r") as f:
                 return json.load(f)
@@ -175,7 +170,6 @@ class NIfTI(TimeStampedModel):
         float
             Total readout time
         """
-
         return self.json_data.get("TotalReadoutTime")
 
     def get_effective_spacing(self) -> float:
@@ -190,7 +184,6 @@ class NIfTI(TimeStampedModel):
         float
             Effective echo spacing
         """
-
         return self.json_data.get("EffectiveEchoSpacing")
 
     def get_phase_encoding_direction(self) -> float:
@@ -205,7 +198,6 @@ class NIfTI(TimeStampedModel):
         float
             Phase encoding direction
         """
-
         return self.json_data.get("PhaseEncodingDirection")
 
     def compress(self, keep_source: bool = False) -> Path:
@@ -223,7 +215,6 @@ class NIfTI(TimeStampedModel):
         Path
             Path of the compressed (*.nii.gz*) file
         """
-
         if not self.is_compressed:
             uncompressed_path = Path(self.path)
             compressed_path = compress(
@@ -248,7 +239,6 @@ class NIfTI(TimeStampedModel):
         Path
             Path of the uncompressed (*.nii*) file
         """
-
         if self.is_compressed:
             compressed_path = Path(self.path)
             uncompressed_path = uncompress(
@@ -296,7 +286,6 @@ class NIfTI(TimeStampedModel):
         Path
             Corresponding json file
         """
-
         base_name = Path(self.path).name.split(".")[0]
         return (Path(self.path).parent / base_name).with_suffix(".json")
 
@@ -315,7 +304,6 @@ class NIfTI(TimeStampedModel):
         dict
             "BIDS sidecar" JSON data
         """
-
         if self._json_data is None:
             self._json_data = self.read_json()
         return self._json_data
@@ -330,7 +318,6 @@ class NIfTI(TimeStampedModel):
         Path
             FSL format b-value file path
         """
-
         p = Path(self.path)
         bval_file = p.parent / Path(p.stem).with_suffix(".bval")
         if bval_file.is_file():
@@ -346,7 +333,6 @@ class NIfTI(TimeStampedModel):
         Path
             FSL format b-vector file path
         """
-
         p = Path(self.path)
         bvec_file = p.parent / Path(p.stem).with_suffix(".bvec")
         if bvec_file.is_file():
@@ -368,7 +354,6 @@ class NIfTI(TimeStampedModel):
         List[int]
             B-value
         """
-
         return self.get_b_value()
 
     @property
@@ -387,7 +372,6 @@ class NIfTI(TimeStampedModel):
         List[List[float]]
             B-vector
         """
-
         return self.get_b_vector()
 
     @property
@@ -414,7 +398,6 @@ class NIfTI(TimeStampedModel):
         Path
             Compressed *.nii.gz* file associated with this instance
         """
-
         return self.compress()
 
     @property
@@ -428,5 +411,4 @@ class NIfTI(TimeStampedModel):
         Path
             Uncompressed *.nii* file associated with this instance
         """
-
         return self.uncompress()

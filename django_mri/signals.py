@@ -8,9 +8,9 @@ References
 .. _Signals:
    https://docs.djangoproject.com/en/3.0/ref/signals/
 """
-
 import logging
 
+from django.db import IntegrityError
 from django.db.models import Model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -45,7 +45,6 @@ def session_post_save_receiver(
     created : bool
         Whether the session instance was created or not
     """
-
     if not instance.subject:
         Subject = get_subject_model()
         scan = instance.scan_set.first()
@@ -73,13 +72,15 @@ def series_post_save_receiver(
     created : bool
         Whether the series instance was created or not
     """
-
     session = get_session_by_series(instance)
     if session:
         try:
             scan, created = Scan.objects.get_or_create(
                 dicom=instance, session=session
             )
+        except IntegrityError:
+            # Scan instance already exists in the DB.
+            pass
         except Exception as exception:
             message = _SCAN_FROM_SERIES_FAILURE.format(
                 series_id=instance.id, exception=exception

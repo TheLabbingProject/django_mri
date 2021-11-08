@@ -6,9 +6,14 @@ from django.db import migrations
 class Migration(migrations.Migration):
     def sequence_type_to_definition(apps, schema_editor):
         SequenceType = apps.get_model("django_mri", "SequenceType")
-        SequenceTypeDefinition = apps.get_model("django_mri", "SequenceTypeDefinition")
+        SequenceTypeDefinition = apps.get_model(
+            "django_mri", "SequenceTypeDefinition"
+        )
         for seq in SequenceType.objects.all():
-            sequence_definition, _ = SequenceTypeDefinition.objects.get_or_create(
+            (
+                sequence_definition,
+                _,
+            ) = SequenceTypeDefinition.objects.get_or_create(
                 sequence_variant=seq.sequence_variant,
                 scanning_sequence=seq.scanning_sequence,
             )
@@ -39,9 +44,16 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(
-            sequence_type_to_definition, reverse_code=definition_to_sequence_type
+            sequence_type_to_definition,
+            reverse_code=definition_to_sequence_type,
         ),
-        migrations.AlterUniqueTogether(name="sequencetype", unique_together=set(),),
-        migrations.RemoveField(model_name="sequencetype", name="scanning_sequence",),
-        migrations.RemoveField(model_name="sequencetype", name="sequence_variant",),
+        migrations.AlterUniqueTogether(
+            name="sequencetype", unique_together=set(),
+        ),
+        migrations.RemoveField(
+            model_name="sequencetype", name="scanning_sequence",
+        ),
+        migrations.RemoveField(
+            model_name="sequencetype", name="sequence_variant",
+        ),
     ]

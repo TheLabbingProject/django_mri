@@ -8,10 +8,8 @@ from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
 from django_mri.models import NIfTI, Scan, Session
-from django_mri.models.sequence_type import SequenceType
 from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject
-from tests.utils import load_common_sequences
 
 
 class ScanModelTestCase(TestCase):
@@ -229,10 +227,6 @@ class ScanModelTestCase(TestCase):
     #     expected = TWO_DIM_TEST_SERIES["spatial_resolution"]
     #     self.assertListEqual(result, expected)
 
-    def test_infer_sequence_type_from_dicom_returns_none(self):
-        result = self.scan.infer_sequence_type_from_dicom()
-        self.assertIsNone(result)
-
     def test_get_default_nifti_dir(self):
         result = self.scan.get_default_nifti_dir()
         scan_dir = str(self.scan.dicom.path)
@@ -272,13 +266,9 @@ class ScanModelTestCase(TestCase):
     ##############
 
     def test_sequence_type(self):
-        load_common_sequences()
-        dwi = SequenceType.objects.get(title="DWI")
-        self.assertEqual(self.scan.sequence_type, dwi)
-        SequenceType.objects.all().delete()
+        self.assertEqual(self.scan.sequence_type, "dwi")
 
     def test_nifti_returns_nifti(self):
         self.scan.dicom = self.series
-        load_common_sequences()
         result = self.scan.nifti
         self.assertIsInstance(result, NIfTI)

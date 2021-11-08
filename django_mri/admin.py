@@ -180,6 +180,7 @@ class ScanAdmin(admin.ModelAdmin):
         "number",
         "time",
         "description",
+        "sequence_type",
         "echo_time",
         "inversion_time",
         "repetition_time",
@@ -194,7 +195,9 @@ class ScanAdmin(admin.ModelAdmin):
         "nifti",
         "mif",
         "download",
+        "sequence_type",
     )
+    list_filter = (("dicom__sequence_type", admin.AllValuesFieldListFilter),)
     search_fields = ("id", "session__id", "description", "comments")
     inlines = (ScanRunInline,)
 

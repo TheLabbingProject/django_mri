@@ -9,14 +9,20 @@ import pytz
 from django.apps import apps
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
+from django.apps import apps
+from django_mri.apps import DjangoMriConfig
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
 #: saved.
 DEFAULT_MRI_DIR_NAME = "MRI"
 
+#: The name of the subdirectory under MEDIA_ROOT in which BIDS dataset will be saved
+DEFAULT_BIDS_DIR_NAME = "rawdata"
+
 #: The name of the subdirectory under MEDIA_ROOT in which analyses results will be saved
 DEFAULT_ANALYSIS_DIR_NAME = "ANALYSIS"
 DEFAULT_ANALYSIS_PATH = Path(settings.MEDIA_ROOT) / DEFAULT_ANALYSIS_DIR_NAME
+
 
 #: The name of the subdirectory under the MRI data root in which DICOM files
 #: will be saved.
@@ -97,6 +103,18 @@ def get_measurement_model():
     return apps.get_model(measurement_model, require_ready=False)
 
 
+def get_bids_manager():
+    """[summary]
+
+    Returns
+    -------
+    BidsManager
+        [description]
+    """
+    app_config = apps.get_app_config(DjangoMriConfig.name)
+    return app_config.bids_manager
+
+
 def get_mri_root() -> Path:
     """
     Returns the path of the directory in which MRI data should be saved.
@@ -104,6 +122,14 @@ def get_mri_root() -> Path:
 
     default = Path(settings.MEDIA_ROOT, DEFAULT_MRI_DIR_NAME)
     path = getattr(settings, "MRI_ROOT", default)
+    return Path(path)
+
+
+def get_bids_dir() -> Path:
+    """
+    Returns the path of the directory in which BIDS dataset should be saved.
+    """
+    path = get_mri_root() / DEFAULT_BIDS_DIR_NAME
     return Path(path)
 
 

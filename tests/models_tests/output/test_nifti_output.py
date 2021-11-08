@@ -11,20 +11,19 @@ from django_mri.models import NIfTI, Scan, Session
 from django_mri.models.outputs import NiftiOutput, NiftiOutputDefinition
 from django_mri.models.outputs.output_definitions import OutputDefinitions
 from django_mri.serializers.output import NiftiOutputSerializer
-from django_mri.serializers.output.nifti_output_definition import \
-    NiftiOutputDefinitionSerializer
+from django_mri.serializers.output.nifti_output_definition import (
+    NiftiOutputDefinitionSerializer,
+)
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from tests.fixtures import NIFTI_TEST_FILE_PATH, SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject
-from tests.utils import load_common_sequences
 
 
 class NiftiOutputModelTestCase(TestCase):
     @classmethod
     @factory.django.mute_signals(signals.post_save)
     def setUpTestData(cls):
-        load_common_sequences()
         Image.objects.import_path(
             SIEMENS_DWI_SERIES_PATH, progressbar=False, report=False
         )

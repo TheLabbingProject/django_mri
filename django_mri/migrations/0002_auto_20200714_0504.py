@@ -15,7 +15,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="nifti", options={"ordering": ("-id",), "verbose_name": "NIfTI"},
+            name="nifti",
+            options={"ordering": ("-id",), "verbose_name": "NIfTI"},
         ),
         migrations.AddField(
             model_name="sequencetype",
@@ -58,10 +59,15 @@ class Migration(migrations.Migration):
                         auto_now=True, verbose_name="modified"
                     ),
                 ),
-                ("title", models.CharField(max_length=255, verbose_name="title")),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="title"),
+                ),
                 (
                     "description",
-                    models.TextField(blank=True, null=True, verbose_name="description"),
+                    models.TextField(
+                        blank=True, null=True, verbose_name="description"
+                    ),
                 ),
                 (
                     "scanning_sequence",

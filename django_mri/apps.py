@@ -26,6 +26,7 @@ class DjangoMriConfig(AppConfig):
 
     #: Full Python path to the application.
     name = "django_mri"
+    bids_manager = None
 
     def ready(self):
         """
@@ -35,5 +36,8 @@ class DjangoMriConfig(AppConfig):
         ----------
         * :meth:`~django.apps.AppConfig.ready`
         """
-
         import django_mri.signals  # noqa: F401
+        from django_mri.utils.bids import BidsManager
+
+        self.bids_manager = BidsManager()
+        self.bids_manager.scaffold_bids_directory()

@@ -9,17 +9,25 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django_analyses.models.input import FileInput, Input, ListInput
+from django_analyses.models.input import (
+    DirectoryInput,
+    FileInput,
+    Input,
+    ListInput,
+)
 from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
 from django_mri.models.managers.scan import ScanQuerySet
+from django_mri.models.messages import SCAN_UPDATE_NO_DICOM
 from django_mri.models.nifti import NIfTI
-from django_mri.models.sequence_type import SequenceType
-from django_mri.models.sequence_type_definition import SequenceTypeDefinition
-from django_mri.utils.bids import Bids
-from django_mri.utils.utils import get_group_model, get_mri_root
+from django_mri.utils.bids import BidsManager
+from django_mri.utils.utils import (
+    get_bids_manager,
+    get_group_model,
+    get_mri_root,
+)
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
 
@@ -33,7 +41,6 @@ class Scan(TimeStampedModel):
     which it is saved. This model handles any conversions between formats in
     case they are required, and allows for easy querying of MRI scans based on
     universal attributes.
-
     """
 
     #: The institution in which this scan was acquired.
@@ -152,9 +159,15 @@ class Scan(TimeStampedModel):
         "nifti_representation",
         "mif_representation",
     )
-    DERIVATIVE_QUERY = {FileInput: "value", ListInput: "value__contains"}
+    DERIVATIVE_QUERY = {
+        FileInput: "value",
+        ListInput: "value__contains",
+        DirectoryInput: "value",
+    }
 
     objects = ScanQuerySet.as_manager()
+
+    _bids_manager: BidsManager = None
 
     class Meta:
         unique_together = ("number", "session")
@@ -169,7 +182,6 @@ class Scan(TimeStampedModel):
         str
             String representation of this instance
         """
-
         formatted_time = self.time.strftime("%Y-%m-%d %H:%M:%S")
         return f"{self.description} from {formatted_time}"
 
@@ -186,7 +198,6 @@ class Scan(TimeStampedModel):
         .. _overriding model methods:
            https://docs.djangoproject.com/en/3.0/topics/db/models/#overriding-model-methods
         """
-
         if self.dicom and not self.is_updated_from_dicom:
             self.update_fields_from_dicom()
         super().save(*args, **kwargs)
@@ -200,7 +211,6 @@ class Scan(TimeStampedModel):
         AttributeError
             If not DICOM series is related to this scan
         """
-
         if self.dicom:
             self.institution_name = self.dicom.institution_name
             self.number = self.dicom.number
@@ -212,48 +222,20 @@ class Scan(TimeStampedModel):
             self.spatial_resolution = self.dicom.spatial_resolution
             self.is_updated_from_dicom = True
         else:
-            raise AttributeError(
-                f"No DICOM data associated with MRI scan {self.id}!"
-            )
+            message = SCAN_UPDATE_NO_DICOM.format(pk=self.id)
+            raise AttributeError(message)
 
-    def infer_sequence_type_from_dicom(self) -> SequenceType:
-        """
-        Returns the appropriate :class:`django_mri.SequenceType` instance
-        according to the scan's "*ScanningSequence*" and "*SequenceVariant*"
-        header values.
-
-        Returns
-        -------
-        SequenceType
-            The inferred sequence type
-        """
-
-        try:
-            sequence = self.dicom.scanning_sequence or []
-            variant = self.dicom.sequence_variant or []
-            sequence_definition = SequenceTypeDefinition.objects.get(
-                scanning_sequence__contains=sequence,
-                sequence_variant__contains=variant,
-                scanning_sequence__contained_by=sequence,
-                sequence_variant__contained_by=variant,
-            )
-        except models.ObjectDoesNotExist:
-            pass
-        else:
-            return sequence_definition.sequence_type
-
-    def infer_sequence_type(self) -> SequenceType:
+    def infer_sequence_type(self) -> str:
         """
         Tries to infer the sequence type using associated data.
 
         Returns
         -------
-        SequenceType
+        str
             The inferred sequence type
         """
-
         if self.dicom:
-            return self.infer_sequence_type_from_dicom()
+            return self.dicom.sequence_type
 
     def get_default_nifti_dir(self) -> Path:
         """
@@ -265,7 +247,6 @@ class Scan(TimeStampedModel):
         str
             Default location for conversion output
         """
-
         if self.dicom:
             path = str(self.dicom.path).replace("DICOM", "NIfTI")
             return Path(path)
@@ -279,7 +260,6 @@ class Scan(TimeStampedModel):
         str
             Default file name
         """
-
         return str(self.id)
 
     def get_default_nifti_destination(self) -> Path:
@@ -291,23 +271,22 @@ class Scan(TimeStampedModel):
         str
             Default path for NIfTI file
         """
-
         directory = self.get_default_nifti_dir()
         name = self.get_default_nifti_name()
         return directory / name
 
-    def get_bids_destination(self) -> Path:
+    def get_bids_destination(self) -> str:
         """
         Returns the BIDS-compatible destination of this scan's associated
         :class:`~django_mri.models.nifti.NIfTI` file.
 
         Returns
         -------
-        pathlib.Path
+        str
             BIDS-compatible NIfTI file destination
         """
         try:
-            bids_path = Bids().compose_bids_path(self)
+            bids_path = self.bids_manager.build_bids_path(self)
         except ValueError as e:
             print(e.args)
             return None
@@ -315,21 +294,18 @@ class Scan(TimeStampedModel):
 
     def compile_to_bids(self, bids_path: Path):
         """
-        Fix some BIDS related issues after NIfTI coversion.
+        Fixes some BIDS related issues after NIfTI coversion.
 
         Parameters
         ----------
         bids_path : Path
             Scan's BIDS path
         """
-
-        bids = Bids()
-        bids.clean_unwanted_files(bids_path)
-        bids.fix_functional_json(bids_path)
-        if "fmap" in bids_path.parent.name:
-            bids.modify_fieldmaps(bids_path.with_suffix(".json"))
-        if "func" in bids_path.parent.name:
-            bids.fix_sbref(bids_path)
+        if self.sequence_type in ["bold", "func_sbref"]:
+            self.bids_manager.fix_functional_json(bids_path)
+        if self.sequence_type in ["func_fieldmap", "dwi_fieldmap"]:
+            self.bids_manager.modify_fieldmaps(self)
+        self.bids_manager.set_participant_tsv_and_json(self)
 
     def dicom_to_nifti(
         self,
@@ -360,7 +336,7 @@ class Scan(TimeStampedModel):
             output
         """
 
-        if self.sequence_type and self.sequence_type.title == "Localizer":
+        if self.sequence_type == "localizer":
             warnings.warn(messages.NO_LOCALIZER_NIFTI)
         elif self.dicom:
             bids = False
@@ -396,7 +372,6 @@ class Scan(TimeStampedModel):
         subject : django.db.models.Model
             Suggested subject identity
         """
-
         message = messages.SUBJECT_MISMATCH.format(
             scan_id=self.id,
             existing_subject_id=self.session.subject.id,
@@ -442,7 +417,6 @@ class Scan(TimeStampedModel):
         Path
             Default *.mif* path
         """
-
         return get_mri_root() / "mif" / f"{self.id}.mif"
 
     def get_dicom_representation(self) -> str:
@@ -592,6 +566,19 @@ class Scan(TimeStampedModel):
         )
 
     @property
+    def bids_manager(self):
+        """
+        Returns the initialized instance of *BidsManger*
+        Returns
+        -------
+        BidsManager
+            A app-level BIDS data manager
+        """
+        if self._bids_manager is None:
+            self._bids_manager = get_bids_manager()
+        return self._bids_manager
+
+    @property
     def mif(self) -> Path:
         """
         Returns the *.mif* version of this scan, creating it if it doesn't
@@ -630,21 +617,19 @@ class Scan(TimeStampedModel):
         return self.get_mif_representation()
 
     @property
-    def sequence_type(self) -> SequenceType:
+    def sequence_type(self) -> str:
         """
         Returns the sequence type instance fitting this scan if one exists.
 
         See Also
         --------
         * :meth:`infer_sequence_type`
-        * :class:`django_mri.models.sequence_type.SequenceType`
 
         Returns
         -------
-        SequenceType
+        str
             Inferred sequence type
         """
-
         return self.infer_sequence_type()
 
     @property
@@ -658,7 +643,6 @@ class Scan(TimeStampedModel):
         NIfTI
             Associated NIfTI instance
         """
-
         if not isinstance(self._nifti, NIfTI):
             self._nifti = self.dicom_to_nifti()
             self.save()
@@ -710,7 +694,6 @@ class Scan(TimeStampedModel):
         float
             Subject age in years at the time of the scan's acquisition
         """
-
         conditions = (
             self.time
             and self.session

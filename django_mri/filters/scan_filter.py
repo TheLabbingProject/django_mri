@@ -1,30 +1,16 @@
 """
 Definition of the :class:`ScanFilter` class.
 """
+from django_dicom.models.utils.sequence_type import SEQUENCE_TYPE_CHOICES
 from django_filters import rest_framework as filters
 from django_mri.filters.utils import LOOKUP_CHOICES, NumberInFilter
 from django_mri.models.scan import Scan
-
-
-def filter_by_sequence_type(queryset, field_name, value):
-    value = [int(pk) for pk in value]
-    filtered_scan_ids = [
-        scan.id
-        for scan in queryset
-        if scan.sequence_type and scan.sequence_type.id in value
-    ]
-    if -1 in value:
-        filtered_scan_ids += [
-            scan.id for scan in queryset if not scan.sequence_type
-        ]
-    return queryset.filter(id__in=filtered_scan_ids)
 
 
 class ScanFilter(filters.FilterSet):
     """
     Provides useful filtering options for the
     :class:`~django_dicom.models.scan.Scan` class.
-
     """
 
     description = filters.LookupChoiceFilter(
@@ -35,8 +21,14 @@ class ScanFilter(filters.FilterSet):
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
     dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
-    sequence_type = NumberInFilter(
-        method=filter_by_sequence_type, label="Sequence Type is in"
+    sequence_type = filters.MultipleChoiceFilter(
+        field_name="dicom__sequence_type",
+        # Exclude the null value choices because it doesn't seem to integrate
+        # well with DRF.
+        choices=SEQUENCE_TYPE_CHOICES[:-1],
+        # Create DRF compatible null filter.
+        null_value=None,
+        null_label="Unknown",
     )
     subject_id_number = filters.LookupChoiceFilter(
         "session__subject__id_number", lookup_choices=LOOKUP_CHOICES,
