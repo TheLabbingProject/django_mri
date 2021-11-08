@@ -1,7 +1,6 @@
 """
 General app utilites.
 """
-
 import datetime
 from pathlib import Path
 
@@ -9,7 +8,6 @@ import pytz
 from django.apps import apps
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
-from django.apps import apps
 from django_mri.apps import DjangoMriConfig
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
@@ -53,9 +51,12 @@ def get_subject_model():
     django.db.models.Model
         Subject model
     """
-
     subject_model = getattr(settings, "SUBJECT_MODEL", DEFAULT_SUBJECT_MODEL)
     return apps.get_model(subject_model, require_ready=False)
+
+
+def get_session_model():
+    return apps.get_model("django_mri", "Session")
 
 
 def get_study_model():
@@ -67,7 +68,6 @@ def get_study_model():
     django.db.models.Model
         Study model
     """
-
     study_model = getattr(settings, "STUDY_MODEL", DEFAULT_STUDY_MODEL)
     return apps.get_model(study_model, require_ready=False)
 
@@ -81,7 +81,6 @@ def get_group_model():
     django.db.models.Model
         Study group model
     """
-
     study_group_model = getattr(
         settings, "STUDY_GROUP_MODEL", DEFAULT_STUDY_GROUP_MODEL
     )
@@ -119,7 +118,6 @@ def get_mri_root() -> Path:
     """
     Returns the path of the directory in which MRI data should be saved.
     """
-
     default = Path(settings.MEDIA_ROOT, DEFAULT_MRI_DIR_NAME)
     path = getattr(settings, "MRI_ROOT", default)
     return Path(path)
@@ -145,8 +143,10 @@ def get_dicom_root() -> Path:
     """
     Returns the path of the directory in which DICOM data should be saved.
     """
-
     return get_mri_root() / DEFAULT_DICOM_DIR_NAME
+
+
+EMPTY_SESSION_TIME: datetime.time = datetime.time()
 
 
 def get_session_by_series(series):
@@ -164,50 +164,49 @@ def get_session_by_series(series):
     :class:`~django_mri.models.session.Session`
         The appropriate session
     """
-
-    Session = apps.get_model("django_mri", "Session")
+    Session = get_session_model()
     Subject = get_subject_model()
-
-    image = series.image_set.first()
-    if image:
-        header = image.header.instance
-        acquisition_date = header.get("AcquisitionDate")
-        instance_date = header.get("InstanceCreationDate", acquisition_date)
-        series_date = header.get("SeriesDate", instance_date)
-        study_date = header.get("StudyDate", series_date)
-        if study_date is not None:
-            study_time = header.get("StudyTime", datetime.time())
-            session_time = datetime.datetime.combine(
-                study_date, study_time
-            ).replace(tzinfo=pytz.UTC)
-            try:
-                subject = Subject.objects.get(id_number=series.patient.uid)
-            # If the subject doesn't exist in the database, create a new
-            # session without an associated subject.
-            except ObjectDoesNotExist:
-                session = Session.objects.create(time=session_time)
-            # If the subject does exist, look for an existing session by time.
-            else:
-                session = subject.mri_session_set.filter(
-                    time=session_time
-                ).first()
-                # If no existing session exists, create one.
-                if not session:
-                    session = Session.objects.create(
-                        time=session_time, subject=subject
-                    )
-                # If a series with the provided number already exists within
-                # the session, create a new one (this is mostly relevant when
-                # adding multiple subject sessions with no time data).
-                else:
-                    number_exists = session.scan_set.filter(
-                        number=series.number
-                    ).exists()
-                    if number_exists:
-                        session = Session.objects.create(
-                            time=session_time, subject=subject
-                        )
-            return session
+    sample_image = series.image_set.first()
+    if not sample_image:
+        return
+    header = sample_image.header.instance
+    # Query date fallbacks by order of preference (ascending).
+    acquisition_date = header.get("AcquisitionDate")
+    instance_date = header.get("InstanceCreationDate", acquisition_date)
+    series_date = header.get("SeriesDate", instance_date)
+    study_date = header.get("StudyDate", series_date)
+    if study_date is not None:
+        study_time = header.get("StudyTime", EMPTY_SESSION_TIME)
+        session_time = datetime.datetime.combine(
+            study_date, study_time
+        ).replace(tzinfo=pytz.UTC)
+        try:
+            subject = Subject.objects.get(id_number=series.patient.uid)
+        # If the subject doesn't exist in the database, create a new
+        # session without an associated subject.
+        except ObjectDoesNotExist:
+            session = Session.objects.create(time=session_time)
+        # If the subject does exist, look for an existing session by time.
+        else:
+            session = subject.mri_session_set.filter(time=session_time).first()
+            # If no existing session exists, create one.
+            if not session:
+                session = Session.objects.create(
+                    time=session_time, subject=subject
+                )
+            # If a series with the provided number already exists within
+            # the session, create a new one (this is mostly relevant when
+            # adding multiple subject sessions with no time data).
+            # TODO: This implementation causes issue #132.
+            # else:
+            #     number_exists = session.scan_set.filter(
+            #         number=series.number
+            #     ).exists()
+            #     if number_exists:
+            #         session = Session.objects.create(
+            #             time=session_time, subject=subject
+            #         )
+        return session
 
 
 def get_data_share_root() -> Path:
