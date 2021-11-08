@@ -92,7 +92,6 @@ class BidsManager:
             Full path to an updated BIDS-compatible file, according to scan's
             parameters.
         """
-
         subject_id = scan.session.subject.id
         sample_image = scan.dicom.image_set.first()
         sample_header = sample_image.header.instance
@@ -150,7 +149,6 @@ class BidsManager:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
-
         bids_path = Path(scan.get_bids_destination())
         bids_path = bids_path.parent / f"{bids_path.name.split('.')[0]}.json"
         parts = bids_path.name.split("_")

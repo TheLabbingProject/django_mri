@@ -289,7 +289,7 @@ class Scan(TimeStampedModel):
             bids_path = self.bids_manager.build_bids_path(self)
         except ValueError as e:
             print(e.args)
-            return None
+            return
         return bids_path
 
     def compile_to_bids(self, bids_path: Path):
@@ -335,7 +335,6 @@ class Scan(TimeStampedModel):
             A :class:`django_mri.NIfTI` instance referencing the conversion
             output
         """
-
         if self.sequence_type == "localizer":
             warnings.warn(messages.NO_LOCALIZER_NIFTI)
         elif self.dicom:
