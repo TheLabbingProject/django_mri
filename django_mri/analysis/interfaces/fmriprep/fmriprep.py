@@ -72,7 +72,7 @@ class FmriPrep:
         from django_mri.utils import get_mri_root
 
         mri_root = get_mri_root()
-        return mri_root / "NIfTI", mri_root.parent / "analysis"
+        return mri_root / "rawdata", mri_root.parent / "analysis"
 
     def find_fs_license(self) -> Path:
         """
