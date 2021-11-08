@@ -3,7 +3,9 @@ Definition of the :class:`Bids` class.
 """
 import json
 import os
+import re
 import shutil
+import warnings
 from datetime import date
 from pathlib import Path
 
@@ -30,6 +32,7 @@ class BidsManager:
 
     DATASET_DESCRIPTION_FILE_NAME = "dataset_description.json"
     PARTICIPANTS_FILE_NAME = "participants.tsv"
+    ACQUISITION_PATTERN: str = "acq-([a-zA-Z0-9]*)"
 
     def calculate_age(self, born: date) -> float:
         """
@@ -151,24 +154,29 @@ class BidsManager:
         """
         base_name = bids_path.name.split(".")[0]
         json_path = bids_path.parent / f"{base_name}.json"
-        parts = json_path.name.split("_")
-        data_type_target = [
-            part.split("-")[-1] for part in parts if "acq-" in part
-        ]
-        targets = [
-            p
-            for p in json_path.parents[1].glob(f"{data_type_target[0]}/*.nii*")
-        ]
+        data_type_target = re.findall(self.ACQUISITION_PATTERN, base_name)
+        if data_type_target == []:
+            print(
+                f"Data type target (acq) could not be found in: {base_name}!"
+            )
+        else:
+            data_type_target = data_type_target[0]
+        session_dir = json_path.parents[1]
+        target_pattern = f"{data_type_target}/*.nii*"
+        targets = [p for p in session_dir.glob(target_pattern)]
 
-        fin = open(json_path, "r")
-        data = json.load(fin)
-        fin.close()
-        data["IntendedFor"] = [
-            os.sep.join(target.parts[-3:]) for target in targets
-        ]
-        fout = open(json_path, "w")
-        json.dump(data, fout, indent=4)
-        fout.close()
+        if targets:
+            fin = open(json_path, "r")
+            data = json.load(fin)
+            fin.close()
+            data["IntendedFor"] = [
+                os.sep.join(target.parts[-3:]) for target in targets
+            ]
+            fout = open(json_path, "w")
+            json.dump(data, fout, indent=4)
+            fout.close()
+        else:
+            warnings.warn(f"No target file for {bids_path} could be found!")
 
     def set_participant_tsv_and_json(self, scan):
         """
