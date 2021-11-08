@@ -132,15 +132,15 @@ class BidsManager:
             json.dump(data, f, indent=4)
             f.truncate()
 
-    def modify_fieldmaps(self, scan):
+    def modify_fieldmaps(self, bids_path):
         """
         Add required "IntendedFor" field to fieldmaps, as stated in BIDS
         stucture.
 
         Parameters
         ----------
-        scan : Scan object
-            *django_mri*`s Scan object
+        bids_path : Path
+            Path to the BIDS-compatible directory
 
         References
         ----------
@@ -149,24 +149,24 @@ class BidsManager:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
-        bids_path = Path(scan.get_bids_destination())
-        bids_path = bids_path.parent / f"{bids_path.name.split('.')[0]}.json"
-        parts = bids_path.name.split("_")
+        base_name = bids_path.name.split(".")[0]
+        json_path = bids_path.parent / f"{base_name}.json"
+        parts = json_path.name.split("_")
         data_type_target = [
             part.split("-")[-1] for part in parts if "acq-" in part
         ]
         targets = [
             p
-            for p in bids_path.parents[1].glob(f"{data_type_target[0]}/*.nii*")
+            for p in json_path.parents[1].glob(f"{data_type_target[0]}/*.nii*")
         ]
 
-        fin = open(bids_path, "r")
+        fin = open(json_path, "r")
         data = json.load(fin)
         fin.close()
         data["IntendedFor"] = [
             os.sep.join(target.parts[-3:]) for target in targets
         ]
-        fout = open(bids_path, "w")
+        fout = open(json_path, "w")
         json.dump(data, fout, indent=4)
         fout.close()
 
