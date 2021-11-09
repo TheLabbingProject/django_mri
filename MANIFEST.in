@@ -1,6 +1,9 @@
 include LICENSE
 include requirements.txt
 include requirements-dev.txt
+include django_mri/utils/dcm2niix
 recursive-include docs *
 recursive-include django_mri/static *
 recursive-include django_mri/analysis *
+recursive-include django_mri/utils/atlases *
+recursive-include django_mri/utils/bids_templates *
