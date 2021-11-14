@@ -1,7 +1,6 @@
 """
 Definition of the :class:`ScanQuerySet` class.
 """
-
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Union
@@ -9,6 +8,7 @@ from typing import Iterable, Union
 from django.db.models import QuerySet
 from django_dicom.models.image import Image as DicomImage
 from django_mri.utils.scan_type import ScanType
+from tqdm import tqdm
 
 
 class ScanQuerySet(QuerySet):
@@ -84,3 +84,8 @@ class ScanQuerySet(QuerySet):
                 )
             )
         return {ScanType.DICOM.value: dicom_scans}
+
+    def sync_bids(self, progressbar: bool = True):
+        iterator = tqdm(self.all()) if progressbar else self.all()
+        for scan in iterator:
+            scan.sync_bids()

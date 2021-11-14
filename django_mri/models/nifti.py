@@ -2,12 +2,14 @@
 Definition of the :class:`NIfTI` model.
 """
 import json
+import logging
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import nibabel as nib
 import numpy as np
 from django.db import models
+from django_analyses.models.input import FileInput, ListInput
 from django_extensions.db.models import TimeStampedModel
 from django_mri.models.messages import NIFTI_FILE_MISSING
 from django_mri.utils.compression import compress, uncompress
@@ -29,6 +31,9 @@ class NIfTI(TimeStampedModel):
 
     # Used to cache JSON data to prevent multiple reads.
     _json_data = None
+
+    # Logger instance for this model.
+    _logger = logging.getLogger("data.mri.nifti")
 
     class Meta:
         verbose_name = "NIfTI"
@@ -276,6 +281,53 @@ class NIfTI(TimeStampedModel):
         else:
             message = NIFTI_FILE_MISSING.format(pk=self.id, path=self.path)
             raise FileNotFoundError(message)
+
+    def rename(
+        self, destination: Union[Path, str], log_level: int = logging.DEBUG
+    ):
+        source = Path(self.path)
+        destination = Path(destination)
+        self._logger.log(log_level, f"Moving NIfTI #{self.id}...")
+        self._logger.log(log_level, f"Source:\t{source}")
+        self._logger.log(log_level, f"Destination:\t{destination}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        source.rename(destination)
+        if self.is_raw and self.scan:
+            self._logger.log(
+                log_level, f"Found associated scan (#{self.scan.id})."
+            )
+            self._logger.log(
+                log_level, "Querying scan's input set for changed runs..."
+            )
+            for input_instance in self.scan.input_set.all():
+                is_file_input = isinstance(input_instance, FileInput)
+                is_list_input = isinstance(input_instance, ListInput)
+                if is_file_input and input_instance.value == str(source):
+                    self._logger.log(
+                        log_level,
+                        f"Found changed file input instance:\n{input_instance}",
+                    )
+                    self._logger.log(log_level, "Updating file input value...")
+                    input_instance.value = str(destination)
+                    input_instance.save()
+                    self._logger.log(log_level, "done!")
+                elif is_list_input and str(source) in input_instance.value:
+                    self._logger.log(
+                        log_level,
+                        f"Found changed list input instance:\n{input_instance}",
+                    )
+                    self._logger.log(log_level, "Updating list input value...")
+                    input_instance.value = [
+                        path if path != str(source) else str(destination)
+                        for path in input_instance.value
+                    ]
+                    input_instance.save()
+                    self._logger.log(log_level, "done!")
+        self.path = str(destination)
+        self._logger.log(
+            log_level, f"NIfTI {self.id} file successfully moved."
+        )
+        self.save()
 
     @property
     def json_file(self) -> Path:
