@@ -1,6 +1,7 @@
 """
 Definition of the :class:`Scan` model.
 """
+import logging
 import warnings
 from pathlib import Path
 from typing import Any, Dict
@@ -168,6 +169,7 @@ class Scan(TimeStampedModel):
     objects = ScanQuerySet.as_manager()
 
     _bids_manager: BidsManager = None
+    _logger = logging.getLogger("data.mri.scan")
 
     class Meta:
         unique_together = ("number", "session")
@@ -361,6 +363,22 @@ class Scan(TimeStampedModel):
         else:
             message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
             raise AttributeError(message)
+
+    def sync_bids(self, log_level: int = logging.DEBUG):
+        self._logger.log(log_level, f"Checking scan #{self.id} BIDS status...")
+        if self._nifti:
+            current_path = Path(self.nifti.path)
+            suffix = "".join(current_path.suffixes)
+            expected_path = self.get_bids_destination().with_suffix(suffix)
+            if expected_path is not None and expected_path != current_path:
+                self.nifti.rename(expected_path, log_level=log_level)
+            elif expected_path is None:
+                self._logger.log(
+                    log_level,
+                    f"Scan #{self.id} ({self.description}) has no BIDS compatible path.",  # noqa: E501
+                )
+        else:
+            self._logger.debug(f"No NIfTI instance found for scan #{self.id}.")
 
     def warn_subject_mismatch(self, subject):
         """
