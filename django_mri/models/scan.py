@@ -369,7 +369,8 @@ class Scan(TimeStampedModel):
         if self._nifti:
             current_path = Path(self.nifti.path)
             suffix = "".join(current_path.suffixes)
-            expected_path = self.get_bids_destination().with_suffix(suffix)
+            destination = self.get_bids_destination()
+            expected_path = destination.with_suffix(suffix)
             if expected_path is not None and expected_path != current_path:
                 self.nifti.rename(expected_path, log_level=log_level)
             elif expected_path is None:
