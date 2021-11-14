@@ -5,6 +5,9 @@ from django_dicom.models.utils.sequence_type import SEQUENCE_TYPE_CHOICES
 from django_filters import rest_framework as filters
 from django_mri.filters.utils import LOOKUP_CHOICES, NumberInFilter
 from django_mri.models.scan import Scan
+from django_mri.utils.utils import get_group_model
+
+Group = get_group_model()
 
 
 class ScanFilter(filters.FilterSet):
@@ -39,19 +42,17 @@ class ScanFilter(filters.FilterSet):
     subject_last_name = filters.LookupChoiceFilter(
         "session__subject__last_name", lookup_choices=LOOKUP_CHOICES,
     )
+    study_groups = filters.ModelMultipleChoiceFilter(
+        queryset=Group.objects.all()
+    )
 
     class Meta:
         model = Scan
         fields = (
             "id",
-            "description",
-            "number",
-            "created",
-            "scan_time",
             "echo_time",
             "inversion_time",
             "repetition_time",
-            "institution_name",
             "is_updated_from_dicom",
             "dicom__id",
             "session",
