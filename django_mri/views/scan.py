@@ -261,6 +261,12 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
     ) -> Response:
         instance = Scan.objects.get(id=scan_id)
         runs = instance.query_run_set()
+        page = self.paginate_queryset(runs)
+        if page is not None:
+            serializer = RunSerializer(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(serializer.data)
         serializer = RunSerializer(
             runs, many=True, context={"request": request}
         )
