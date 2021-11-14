@@ -292,6 +292,14 @@ class NIfTI(TimeStampedModel):
         self._logger.log(log_level, f"Destination:\t{destination}")
         destination.parent.mkdir(parents=True, exist_ok=True)
         source.rename(destination)
+        json_sidecar = source.parent / (source.name.split(".")[0] + ".json")
+        if json_sidecar.exists():
+            self._logger.log(log_level, "Moving JSON sidecar...")
+            json_destination = destination.parent / (
+                destination.name.split[0] + ".json"
+            )
+            json_sidecar.rename(json_destination)
+            self._logger.log(log_level, "JSON sidecar moved.")
         if self.is_raw and self.scan:
             self._logger.log(
                 log_level, f"Found associated scan (#{self.scan.id})."
