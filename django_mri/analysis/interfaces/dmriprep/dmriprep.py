@@ -265,11 +265,11 @@ class DmriPrep:
         DmriPrep
             An instanciated *DmriPrepManager*
         """
-        pariticpant_label = self.configuration.get("pariticipant_label")
+        particpant_label = self.configuration.get("participant_label")
         dmriprep = DmriPrepManager(
             bids_dir=self.bids_directory,
             destination=self.destination,
-            pariticipant_label=pariticpant_label,
+            participant_label=particpant_label,
             smriprep_kwargs=self.smriprep_kwargs,
             **self.bids_identifiers,
         )
