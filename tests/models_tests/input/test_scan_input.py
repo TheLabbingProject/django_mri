@@ -4,19 +4,19 @@ import factory
 import pytz
 from django.db.models import signals
 from django.test import TestCase
-from rest_framework.request import Request
-from rest_framework.test import APIRequestFactory
-from tests.fixtures import SIEMENS_DWI_SERIES_PATH
-from tests.models import Subject
-
 from django_analyses.models import AnalysisVersion, Run
 from django_dicom.models import Image, Series
 from django_mri import serializers
 from django_mri.models import Scan, Session
 from django_mri.models.inputs import ScanInput, ScanInputDefinition
 from django_mri.serializers.input import ScanInputSerializer
-from django_mri.serializers.input.scan_input_definition import \
-    ScanInputDefinitionSerializer
+from django_mri.serializers.input.scan_input_definition import (
+    ScanInputDefinitionSerializer,
+)
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
+from tests.fixtures import SIEMENS_DWI_SERIES_PATH
+from tests.models import Subject
 
 
 class ScanInputModelTestCase(TestCase):
