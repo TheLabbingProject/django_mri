@@ -252,6 +252,7 @@ class Scan(TimeStampedModel):
         if self.dicom:
             path = str(self.dicom.path).replace("DICOM", "NIfTI")
             return Path(path)
+        return get_mri_root() / "NIfTI"
 
     def get_default_nifti_name(self) -> str:
         """
@@ -288,11 +289,12 @@ class Scan(TimeStampedModel):
             BIDS-compatible NIfTI file destination
         """
         try:
-            bids_path = self.bids_manager.build_bids_path(self)
+            return self.bids_manager.build_bids_path(self)
         except ValueError as e:
             print(e.args)
-            return
-        return bids_path
+            self._logger.warn(
+                f"BIDS-path generation for scan #{self.id} raised:\n{e}"
+            )
 
     def compile_to_bids(self, bids_path: Path):
         """
