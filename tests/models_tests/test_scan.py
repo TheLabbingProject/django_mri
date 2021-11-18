@@ -6,11 +6,11 @@ import pytz
 from django.core.exceptions import ValidationError
 from django.db.models import signals
 from django.test import TestCase
-from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
-from tests.models import Subject
-
 from django_dicom.models import Image, Series
 from django_mri.models import NIfTI, Scan, Session
+from django_mri.utils import get_mri_root
+from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
+from tests.models import Subject
 
 
 class ScanModelTestCase(TestCase):
@@ -237,7 +237,8 @@ class ScanModelTestCase(TestCase):
     def test_get_default_nifti_dir_without_dicom(self):
         self.scan.dicom = None
         result = self.scan.get_default_nifti_dir()
-        self.assertIsNone(result)
+        expected = get_mri_root() / "NIfTI"
+        self.assertEqual(result, expected)
         self.scan.dicom = self.series
 
     def test_default_nifti_name(self):

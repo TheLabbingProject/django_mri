@@ -10,7 +10,7 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-
+from django_mri.utils.messages import BIDS_NO_ACQ_LABEL
 from django_mri.utils.utils import get_bids_dir
 
 BASE_DIR = Path(__file__).parent
@@ -31,9 +31,10 @@ class BidsManager:
        https://bids-specification.readthedocs.io/en/stable/
     """
 
-    DATASET_DESCRIPTION_FILE_NAME = "dataset_description.json"
-    PARTICIPANTS_FILE_NAME = "participants.tsv"
+    DATASET_DESCRIPTION_FILE_NAME: str = "dataset_description.json"
+    PARTICIPANTS_FILE_NAME: str = "participants.tsv"
     ACQUISITION_PATTERN: str = "acq-([a-zA-Z0-9]*)"
+    NA_LABEL: str = "n/a"
 
     def calculate_age(self, born: date) -> float:
         """
@@ -49,22 +50,20 @@ class BidsManager:
         float
             Subject's age
         """
-
         today = date.today()
         try:
-            age = (
+            return (
                 today.year
                 - born.year
                 - ((today.month, today.day) < (born.month, born.day))
             )
         except AttributeError:
-            age = "n/a"
-        return age
+            return self.NA_LABEL
 
     def get_subject_data(self, scan):
         """
-        Extract relevant Scan-related subject's parameters, as stated by BIDS
-        structure.
+        Extract related subject parameters, as included in the BIDS naming
+        scheme.
 
         Returns
         -------
@@ -72,22 +71,21 @@ class BidsManager:
             subject's relevant parameters, sorted by "participant_id",
             "handedness","age" and "sex" fields
         """
-
         subject = scan.session.subject
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
-            "participant_id": subject.id if subject.id else "n/a",
+            "participant_id": subject.id if subject.id else self.NA_LABEL,
             "handedness": subject.dominant_hand
             if subject.dominant_hand
-            else "n/a",
+            else self.NA_LABEL,
             "age": age,
-            "sex": subject.sex if subject.sex else "n/a",
+            "sex": subject.sex if subject.sex else self.NA_LABEL,
         }
         return subject_dict
 
     def build_bids_path(self, scan):
         """
-        Uses parameters extracted by {self.get_subject_data} to update BIDS-
+        Uses parameters extracted by :func:`get_subject_data` to update BIDS-
         compatible file path derived from *dicom_parser*
 
         Returns
@@ -157,9 +155,8 @@ class BidsManager:
         json_path = bids_path.parent / f"{base_name}.json"
         data_type_target = re.findall(self.ACQUISITION_PATTERN, base_name)
         if data_type_target == []:
-            print(
-                f"Data type target (acq) could not be found in: {base_name}!"
-            )
+            message = BIDS_NO_ACQ_LABEL.format(base_name=base_name)
+            print(message)
         else:
             data_type_target = data_type_target[0]
         session_dir = json_path.parents[1]
