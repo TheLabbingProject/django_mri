@@ -1,9 +1,9 @@
 """
 Definition of the :class:`ScanFilter` class.
 """
-from django_dicom.models.utils.sequence_type import SEQUENCE_TYPE_CHOICES
 from django_filters import rest_framework as filters
 
+from django_dicom.models.utils.sequence_type import SEQUENCE_TYPE_CHOICES
 from django_mri.filters.utils import LOOKUP_CHOICES, NumberInFilter
 from django_mri.models.scan import Scan
 from django_mri.utils.utils import get_group_model

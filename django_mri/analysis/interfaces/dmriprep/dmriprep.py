@@ -7,17 +7,13 @@ from typing import Iterable, Tuple
 
 import bids
 from django.conf import settings
-from django_mri.analysis.interfaces.dmriprep.utils import (
-    OUTPUTS,
-    THE_BASE_BIDS_IDENTIFIERS,
-    THE_BASE_SMRIPREP_KWARGS,
-)
-from django_mri.analysis.interfaces.fmriprep.messages import (
-    FS_LICENSE_MISSING,
-    RUN_FAILURE,
-)
-from django_mri.analysis.interfaces.fmriprep.utils import FREESURFER_HOME
 from dwiprep.dwiprep import DmriPrepManager
+
+from django_mri.analysis.interfaces.dmriprep.utils import (
+    OUTPUTS, THE_BASE_BIDS_IDENTIFIERS, THE_BASE_SMRIPREP_KWARGS)
+from django_mri.analysis.interfaces.fmriprep.messages import (
+    FS_LICENSE_MISSING, RUN_FAILURE)
+from django_mri.analysis.interfaces.fmriprep.utils import FREESURFER_HOME
 
 bids.config.set_option("extension_initial_dot", True)
 

@@ -14,8 +14,8 @@ from django.db import IntegrityError
 from django.db.models import Model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_dicom.models.series import Series
 
+from django_dicom.models.series import Series
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 from django_mri.utils import get_session_by_series, get_subject_model

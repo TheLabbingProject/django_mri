@@ -4,8 +4,8 @@ Definition of the :class:`AnatomicalPreprocessing` base class.
 import logging
 
 from django.db.models import Q, QuerySet
-from django_analyses.runner.queryset_runner import QuerySetRunner
 
+from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.automation.anatomical import messages
 from django_mri.models.scan import Scan
 

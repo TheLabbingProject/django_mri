@@ -14,52 +14,33 @@ References
 .. _Simplified Analysis Integration Example:
    https://django-analyses.readthedocs.io/en/latest/user_guide/analysis_integration/simplified_example.html
 """
+from nipype.interfaces.freesurfer import ReconAll
+from nipype.interfaces.fsl import (BET, FLIRT, FNIRT, SUSAN, ApplyTOPUP,
+                                   BinaryMaths, Eddy, ExtractROI, MeanImage,
+                                   Merge, Reorient2Std, RobustFOV)
+from nipype.interfaces.mrtrix3 import (ConstrainedSphericalDeconvolution,
+                                       DWIBiasCorrect, DWIDenoise, Generate5tt,
+                                       MRDeGibbs, ResponseSD)
+
 from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep010
-from django_mri.analysis.interfaces.fmriprep.fmriprep import (
-    FmriPrep2021,
-    FmriPrep2022,
-    FmriPrep2023,
-    FmriPrep2024,
-    FmriPrep2025,
-)
+from django_mri.analysis.interfaces.fmriprep.fmriprep import (FmriPrep2021,
+                                                              FmriPrep2022,
+                                                              FmriPrep2023,
+                                                              FmriPrep2024,
+                                                              FmriPrep2025)
 from django_mri.analysis.interfaces.fsl.fast import FastWrapper
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.fsl.topup import TopupWrapper
-from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import (
-    Segmentation as Cat12Segmentation,
-)
+from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import \
+    Segmentation as Cat12Segmentation
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
-from django_mri.analysis.interfaces.yalab.mutual_information_score import (
-    MutualInformationScore,
-)
-from nipype.interfaces.freesurfer import ReconAll
-from nipype.interfaces.fsl import (
-    BET,
-    FLIRT,
-    FNIRT,
-    SUSAN,
-    ApplyTOPUP,
-    BinaryMaths,
-    Eddy,
-    ExtractROI,
-    MeanImage,
-    Merge,
-    Reorient2Std,
-    RobustFOV,
-)
-from nipype.interfaces.mrtrix3 import (
-    ConstrainedSphericalDeconvolution,
-    DWIBiasCorrect,
-    DWIDenoise,
-    Generate5tt,
-    MRDeGibbs,
-    ResponseSD,
-)
+from django_mri.analysis.interfaces.yalab.mutual_information_score import \
+    MutualInformationScore
 
 #: A dictionary that should be imported in the project's settings and included
 #: within the *ANALYSIS_INTERFACES* setting.

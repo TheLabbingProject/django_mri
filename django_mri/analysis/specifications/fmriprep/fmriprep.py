@@ -6,6 +6,8 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 """
 
 from django.conf import settings
+from traits.trait_types import String
+
 from django_analyses.models.input.definitions import (BooleanInputDefinition,
                                                       DirectoryInputDefinition,
                                                       FileInputDefinition,
@@ -15,7 +17,6 @@ from django_analyses.models.input.definitions import (BooleanInputDefinition,
                                                       StringInputDefinition)
 from django_analyses.models.output.definitions import (FileOutputDefinition,
                                                        ListOutputDefinition)
-from traits.trait_types import String
 
 #: *fmriprep* input specification.
 FMRIPREP_INPUT_SPECIFICATION = {

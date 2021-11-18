@@ -10,13 +10,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django_analyses.models.input import (DirectoryInput, FileInput, Input,
-                                          ListInput)
-from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
 
+from django_analyses.models.input import (DirectoryInput, FileInput, Input,
+                                          ListInput)
+from django_analyses.models.run import Run
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
 from django_mri.models.managers.scan import ScanQuerySet

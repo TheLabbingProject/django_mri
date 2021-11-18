@@ -4,6 +4,7 @@ Definition of the :class:`fMRIPrepRunner` class.
 from typing import List
 
 from django.db.models import Q, QuerySet
+
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep010
 from django_mri.models.scan import Scan

@@ -7,11 +7,11 @@ from pathlib import Path
 from typing import Tuple
 
 from django.http import HttpResponse
-from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.request import Request
 
+from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
 from django_mri.filters.session_filter import SessionFilter
 from django_mri.models.session import Session
 from django_mri.serializers import (AdminSessionReadSerializer,

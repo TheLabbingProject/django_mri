@@ -8,7 +8,6 @@ Todo
 
 
 import factory
-
 from tests.models import Subject
 
 

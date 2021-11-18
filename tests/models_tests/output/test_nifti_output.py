@@ -4,11 +4,13 @@ import factory
 import pytz
 from django.db.models import signals
 from django.test import TestCase
-from django_analyses.models import AnalysisVersion, Run
-from django_dicom.models import Image, Series
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
+from tests.fixtures import NIFTI_TEST_FILE_PATH, SIEMENS_DWI_SERIES_PATH
+from tests.models import Subject
 
+from django_analyses.models import AnalysisVersion, Run
+from django_dicom.models import Image, Series
 from django_mri import serializers
 from django_mri.models import NIfTI, Scan, Session
 from django_mri.models.outputs import NiftiOutput, NiftiOutputDefinition
@@ -16,8 +18,6 @@ from django_mri.models.outputs.output_definitions import OutputDefinitions
 from django_mri.serializers.output import NiftiOutputSerializer
 from django_mri.serializers.output.nifti_output_definition import \
     NiftiOutputDefinitionSerializer
-from tests.fixtures import NIFTI_TEST_FILE_PATH, SIEMENS_DWI_SERIES_PATH
-from tests.models import Subject
 
 
 class NiftiOutputModelTestCase(TestCase):

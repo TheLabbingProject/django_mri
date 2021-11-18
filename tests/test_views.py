@@ -7,14 +7,14 @@ from django.contrib.auth import get_user_model
 from django.db.models import signals
 from django.test import TestCase
 from django.urls import reverse
-from django_dicom.models import Image, Series
-from django_dicom.models.utils.utils import get_group_model
 from rest_framework import status
 from rest_framework.test import APITestCase
-
-from django_mri.models import Scan, Session
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject
+
+from django_dicom.models import Image, Series
+from django_dicom.models.utils.utils import get_group_model
+from django_mri.models import Scan, Session
 
 User = get_user_model()
 Group = get_group_model()
