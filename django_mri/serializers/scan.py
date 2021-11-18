@@ -2,12 +2,13 @@
 Definition of the :class:`ScanSerializer` class.
 """
 from django_dicom.models import Series
+from rest_framework import serializers
+
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 from django_mri.serializers.utils import MiniSubjectSerializer
 from django_mri.utils.utils import get_group_model
-from rest_framework import serializers
 
 Group = get_group_model()
 

@@ -5,6 +5,7 @@ import pandas as pd
 from bokeh.plotting import Figure
 from django.db.models import Count
 from django.db.models.query import QuerySet
+
 from django_mri.plots.session import plot_measurement_by_month
 
 #: Session fields to include in an exported DataFrame.

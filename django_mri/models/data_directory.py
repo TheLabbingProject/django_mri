@@ -6,6 +6,7 @@ from pathlib import Path
 from django.db import models
 from django.urls import reverse
 from django_extensions.db.models import TimeStampedModel, TitleDescriptionModel
+
 from django_mri.models.scan import Scan
 from django_mri.utils.utils import get_data_share_root
 

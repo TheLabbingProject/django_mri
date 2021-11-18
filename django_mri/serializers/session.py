@@ -5,16 +5,15 @@ classes.
 from typing import Tuple
 
 from django.urls import reverse
+from rest_framework import serializers
+
 from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.session import Session
 from django_mri.serializers.irb_approval import IrbApprovalSerializer
-from django_mri.serializers.utils import (
-    MiniGroupSerializer,
-    MiniMeasurementSerializer,
-    MiniSubjectSerializer,
-)
+from django_mri.serializers.utils import (MiniGroupSerializer,
+                                          MiniMeasurementSerializer,
+                                          MiniSubjectSerializer)
 from django_mri.utils import get_measurement_model, get_subject_model
-from rest_framework import serializers
 
 Measurement = get_measurement_model()
 Subject = get_subject_model()

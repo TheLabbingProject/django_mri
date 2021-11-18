@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+
 from django_mri.analysis.automation.fmriprep.fmriprep import fMRIPrepRunner
 from django_mri.models.scan import Scan
 

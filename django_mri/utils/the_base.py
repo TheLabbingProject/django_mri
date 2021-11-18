@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 NAME_TO_LOC = {
     "dMRI_MB4_6dirs_d15D45_PA": {
         "data_type": "dwi",

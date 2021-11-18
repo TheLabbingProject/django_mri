@@ -6,13 +6,11 @@ Input and output specification dictionaries for FSL's SUSAN_ script.
 """
 
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      FloatInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *SUSAN* input specification dictionary.

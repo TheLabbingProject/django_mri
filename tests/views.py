@@ -1,5 +1,6 @@
-from django_mri.views.defaults import DefaultsMixin
 from rest_framework import viewsets
+
+from django_mri.views.defaults import DefaultsMixin
 
 from .models import Group, Subject
 from .serializers import SubjectSerializer

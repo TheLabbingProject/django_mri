@@ -6,11 +6,9 @@ interface, wrapping FSL's *robustfov*.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.utils.html#robustfov
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *RobustFOV* input specification dictionary.

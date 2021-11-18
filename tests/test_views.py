@@ -9,10 +9,10 @@ from django.test import TestCase
 from django.urls import reverse
 from django_dicom.models import Image, Series
 from django_dicom.models.utils.utils import get_group_model
-from django_mri.models import Scan, Session
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from django_mri.models import Scan, Session
 from tests.fixtures import SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject
 

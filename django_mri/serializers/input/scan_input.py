@@ -4,9 +4,10 @@ Definition of the
 class.
 """
 
+from rest_framework import serializers
+
 from django_mri.models.inputs.scan_input import ScanInput
 from django_mri.models.scan import Scan
-from rest_framework import serializers
 
 
 class ScanInputSerializer(serializers.ModelSerializer):

@@ -14,11 +14,9 @@ For more information, see MRtrix3's `5ttgen reference`_.
 .. _nipype.interfaces.mrtrix3.preprocess.ConstrainedSphericalDeconvolution:
     https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.mrtrix3.utils.html#generate5tt
 """
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 GENERATE_5TT_INPUT_SPECIFICATION = {

@@ -4,9 +4,10 @@ Definition of the
 class.
 """
 
+from rest_framework import serializers
+
 from django_mri.models.inputs.nifti_input import NiftiInput
 from django_mri.models.nifti import NIfTI
-from rest_framework import serializers
 
 
 class NiftiInputSerializer(serializers.ModelSerializer):

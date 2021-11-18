@@ -15,12 +15,10 @@ For more information, see MRtrix3's `mrdegibbs reference`_.
    https://nipype.readthedocs.io/en/1.4.1/api/generated/nipype.interfaces.mrtrix3.preprocess.html#mrdegibbs
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *MRDeGibbs* input specification.

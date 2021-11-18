@@ -4,11 +4,11 @@ from celery.result import AsyncResult
 from django.db.models import QuerySet
 from django_analyses.models.analysis import Analysis
 from django_analyses.models.analysis_version import AnalysisVersion
-from django_analyses.models.input.definitions.input_definition import (
-    InputDefinition,
-)
+from django_analyses.models.input.definitions.input_definition import \
+    InputDefinition
 from django_analyses.models.pipeline.node import Node
 from django_analyses.tasks import execute_node
+
 from django_mri.models.scan import Scan
 
 TITLE = "FSL Anatomical Processing Script"

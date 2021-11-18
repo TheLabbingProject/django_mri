@@ -5,6 +5,7 @@ import sys
 import django
 from django.conf import settings
 from django.test.utils import get_runner
+
 from tests.fixtures import IMPORTED_DIR
 
 if __name__ == "__main__":

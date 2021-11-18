@@ -1,24 +1,23 @@
 """
 Definition of the :class:`DmriPrep` interface.
 """
-import bids
 import os
 from pathlib import Path
 from typing import Iterable, Tuple
 
+import bids
 from django.conf import settings
-from django_mri.analysis.interfaces.fmriprep.messages import (
-    FS_LICENSE_MISSING,
-    RUN_FAILURE,
-)
-from django_mri.analysis.interfaces.fmriprep.utils import FREESURFER_HOME
 from django_mri.analysis.interfaces.dmriprep.utils import (
     OUTPUTS,
     THE_BASE_BIDS_IDENTIFIERS,
     THE_BASE_SMRIPREP_KWARGS,
 )
+from django_mri.analysis.interfaces.fmriprep.messages import (
+    FS_LICENSE_MISSING,
+    RUN_FAILURE,
+)
+from django_mri.analysis.interfaces.fmriprep.utils import FREESURFER_HOME
 from dwiprep.dwiprep import DmriPrepManager
-
 
 bids.config.set_option("extension_initial_dot", True)
 

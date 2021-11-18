@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Union
 
 from celery import shared_task
+
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.scan import Scan
 

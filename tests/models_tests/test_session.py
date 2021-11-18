@@ -5,6 +5,7 @@ import pytz
 from django.db.models import signals
 from django.test import TestCase
 from django_dicom.models import Image, Series
+
 from django_mri.models import Scan, Session
 from tests.fixtures import SIEMENS_DWI_SERIES, SIEMENS_DWI_SERIES_PATH
 from tests.models import Subject

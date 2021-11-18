@@ -14,6 +14,7 @@ References
 .. _Simplified Analysis Integration Example:
    https://django-analyses.readthedocs.io/en/latest/user_guide/analysis_integration/simplified_example.html
 """
+from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep010
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
     FmriPrep2022,
@@ -102,4 +103,5 @@ interfaces = {
         FmriPrep2024.__version__: FmriPrep2024,
         FmriPrep2025.__version__: FmriPrep2025,
     },
+    "dMRIPrep": {DmriPrep010.__version__: DmriPrep010},
 }

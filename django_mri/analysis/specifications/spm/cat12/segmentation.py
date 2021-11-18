@@ -8,14 +8,12 @@ See Also
 
 """
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    DirectoryInputDefinition,
-    FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      DirectoryInputDefinition,
+                                                      FileInputDefinition,
+                                                      FloatInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: CAT12 segmentation interface input specification dictionary.

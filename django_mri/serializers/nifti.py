@@ -2,8 +2,9 @@
 Definition of the :class:`~django_mri.serializers.nifti.NiftiSerializer` class.
 """
 
-from django_mri.models import NIfTI
 from rest_framework import serializers
+
+from django_mri.models import NIfTI
 
 
 class NiftiSerializer(serializers.HyperlinkedModelSerializer):

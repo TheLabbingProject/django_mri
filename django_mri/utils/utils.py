@@ -8,6 +8,7 @@ import pytz
 from django.apps import apps
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
+
 from django_mri.apps import DjangoMriConfig
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be

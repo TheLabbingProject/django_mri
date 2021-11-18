@@ -5,14 +5,12 @@ Input and output specification dictionaries for FSL's FNIRT_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT
 """
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      FloatInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *FNIRT* input specification dictionary.

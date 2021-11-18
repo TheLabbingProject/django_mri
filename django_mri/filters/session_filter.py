@@ -5,6 +5,7 @@ from typing import List
 
 from django.db.models import Q, QuerySet
 from django_filters import rest_framework as filters
+
 from django_mri.filters.scan_filter import NumberInFilter
 from django_mri.filters.utils import LOOKUP_CHOICES
 from django_mri.models.session import Session

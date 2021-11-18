@@ -11,6 +11,7 @@ import numpy as np
 from django.db import models
 from django_analyses.models.input import FileInput, ListInput
 from django_extensions.db.models import TimeStampedModel
+
 from django_mri.models.messages import NIFTI_FILE_MISSING
 from django_mri.utils.compression import compress, uncompress
 

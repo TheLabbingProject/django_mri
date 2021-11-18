@@ -2,9 +2,8 @@
 Definition of the :class:`Cat12SegmentationRunner` class.
 """
 from django_mri.analysis.automation.anatomical import messages
-from django_mri.analysis.automation.anatomical.preprocessing import (
-    AnatomicalPreprocessing,
-)
+from django_mri.analysis.automation.anatomical.preprocessing import \
+    AnatomicalPreprocessing
 
 
 class Cat12SegmentationRunner(AnatomicalPreprocessing):

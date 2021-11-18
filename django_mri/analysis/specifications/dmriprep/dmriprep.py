@@ -17,23 +17,16 @@ from django_analyses.models.output.definitions import (FileOutputDefinition,
                                                        ListOutputDefinition)
 from traits.trait_types import String
 
-#: *fmriprep* input specification.
-FMRIPREP_INPUT_SPECIFICATION = {
+#: *dmriprep* input specification.
+DMRIPREP_INPUT_SPECIFICATION = {
     "destination": {
         "type": StringInputDefinition,
         "dynamic_default": "{run_id}",
         "required": True,
         "description": "Path to output directory",
     },
-    "analysis_level": {
-        "type": StringInputDefinition,
-        "choices": ["participant"],
-        "required": False,
-        "default": "participant",
-        "description": "processing stage to be run, only “participant” in the case of fMRIPrep (see BIDS-Apps specification).",  # noqa: E501
-    },
     ### Options to handle performance ###
-    "skip_bids_validation": {
+    "bids_validate": {
         "type": BooleanInputDefinition,
         "description": "assume the input dataset is BIDS compliant and skip the validation",  # noqa: E501
         "default": True,
@@ -45,234 +38,18 @@ FMRIPREP_INPUT_SPECIFICATION = {
         "description": "a space delimited list of participant identifiers or a single identifier (the sub- prefix can be removed)",  # noqa: E501
         "is_configuration": False,
     },
-    "task-id": {
-        "type": StringInputDefinition,
-        "description": "select a specific task to be processed",
-    },
-    "echo-idx": {
-        "type": StringInputDefinition,
-        "description": "select a specific echo to be processed in a multiecho series",
-    },
-    "bids-filter-file": {
-        "type": FileInputDefinition,
-        "description": "a JSON file describing custom BIDS input filters using PyBIDS.",
-    },
-    "anat-derivatives": {
-        "type": DirectoryInputDefinition,
-        "description": "Reuse the anatomical derivatives from another fMRIPrep run or calculated with an alternative processing tool (NOT RECOMMENDED).",
-    },
-    "bids-database-dir": {
-        "type": DirectoryInputDefinition,
-        "description": "Path to an existing PyBIDS database folder, for faster indexing (especially useful for large datasets).",
-    },
-    "nprocs": {
-        "type": IntegerInputDefinition,
-        "description": "maximum number of threads across all processes",
-    },
-    "omp-nthreads": {
-        "type": IntegerInputDefinition,
-        "description": "maximum number of threads per-process",
-    },
-    "mem": {
-        "type": IntegerInputDefinition,
-        "description": "upper bound memory limit for fMRIPrep processes",
-    },
-    "low-mem": {
-        "type": BooleanInputDefinition,
-        "description": "attempt to reduce memory usage (will increase disk usage in working directory)",
-    },
-    "use-plugin": {
-        "type": FileInputDefinition,
-        "description": "nipype plugin configuration file",
-    },
-    "anat-only": {
-        "type": BooleanInputDefinition,
-        "description": "run anatomical workflows only",
-    },
-    "boilerplate_only": {
-        "type": BooleanInputDefinition,
-        "description": "generate boilerplate only",
-    },
-    "md-only-boilerplate": {
-        "type": BooleanInputDefinition,
-        "description": "skip generation of HTML and LaTeX formatted citation with pandoc",
-    },
-    "error-on-aroma-warnings": {
-        "type": BooleanInputDefinition,
-        "description": "Raise an error if ICA_AROMA does not produce sensible output (e.g., if all the components are classified as signal or noise)",
-    },
-    ### Workflow configuration ###
-    "ignore": {
-        "type": StringInputDefinition,
-        "choices": ["fieldmaps", "slicetiming", "sbref", "t2w", "flair"],
-        "description": "ignore selected aspects of the input dataset to disable corresponding parts of the workflow (a space delimited list)",
-    },
-    "longitudinal": {
-        "type": BooleanInputDefinition,
-        "description": "treat dataset as longitudinal - may increase runtime",
-    },
-    "output-spaces": {
-        "type": ListInputDefinition,
-        "element_type": "STR",
-        "description": "Standard and non-standard spaces to resample anatomical and functional images to.",
-    },
-    "bold2t1w-init": {
-        "type": StringInputDefinition,
-        "choices": ["register", "header"],
-        # "default": "register",
-    },
-    "bold2t1w-dof": {
-        "type": IntegerInputDefinition,
-        # "choices": [6, 9, 12],
-        "description": "Degrees of freedom when registering BOLD to T1w images. 6 degrees (rotation and translation) are used by default.",
-    },
-    "force-bbr": {
-        "type": BooleanInputDefinition,
-        "description": "Always use boundary-based registration (no goodness-of-fit checks)",
-    },
-    "force-no-bbr": {
-        "type": BooleanInputDefinition,
-        "description": "Do not use boundary-based registration (no goodness-of-fit checks)",
-    },
-    "medial-surface-nan": {
-        "type": BooleanInputDefinition,
-        "description": "Replace medial wall values with NaNs on functional GIFTI files. Only performed for GIFTI files mapped to a freesurfer subject (fsaverage or fsnative).",
-    },
-    "dummy-scans": {
-        "type": IntegerInputDefinition,
-        "description": "Number of non steady state volumes.",
-    },
-    "random-seed": {
-        "type": IntegerInputDefinition,
-        "description": "Initialize the random seed for the workflow",
-    },
-    ### Specific options for running ICA_AROMA ###
-    "use-aroma": {
-        "type": BooleanInputDefinition,
-        "description": "add ICA_AROMA to your preprocessing stream",
-    },
-    "aroma-melodic-dimensionality": {
-        "type": IntegerInputDefinition,
-        "description": "Exact or maximum number of MELODIC components to estimate (positive = exact, negative = maximum)",
-    },
-    ### Specific options for estimating confounds ###
-    "return-all-components": {
-        "type": BooleanInputDefinition,
-        "description": "Include all components estimated in CompCor decomposition in the confounds file instead of only the components sufficient to explain 50 percent of BOLD variance in each CompCor mask",
-    },
-    "fd-spike-threshold": {
-        "type": FloatInputDefinition,
-        "description": "Threshold for flagging a frame as an outlier on the basis of framewise displacement",
-    },
-    "dvars-spike-threshold": {
-        "type": FloatInputDefinition,
-        "description": "Threshold for flagging a frame as an outlier on the basis of standardised DVARS",
-    },
-    ### Specific options for ANTs registrations ###
-    "skull-strip-template": {
-        "type": FileInputDefinition,
-        "description": "select a template for skull-stripping with antsBrainExtraction",
-    },
-    "skull-strip-fixed-seed": {
-        "type": BooleanInputDefinition,
-        "description": "do not use a random seed for skull-stripping - will ensure run-to-run replicability when used with –omp-nthreads 1 and matching –random-seed <int>",
-    },
-    "skull-strip-t1w": {
-        "type": StringInputDefinition,
-        "choices": ["auto", "skip", "force"],
-        "description": "determiner for T1-weighted skull stripping (‘force’ ensures skull stripping, ‘skip’ ignores skull stripping, and ‘auto’ applies brain extraction based on the outcome of a heuristic to check whether the brain is already masked).",
-    },
-    ### Specific options for handling fieldmaps ###
-    "fmap-bspline": {
-        "type": BooleanInputDefinition,
-        "description": "fit a B-Spline field using least-squares (experimental)",
-    },
-    "fmap-no-demean": {
-        "type": BooleanInputDefinition,
-        "description": "do not remove median (within mask) from fieldmap",
-    },
-    ### Specific options for SyN distortion correction ###
-    "use-syn-sdc": {
-        "type": BooleanInputDefinition,
-        "description": "EXPERIMENTAL: Use fieldmap-free distortion correction",
-    },
-    "force-syn": {
-        "type": BooleanInputDefinition,
-        "description": "EXPERIMENTAL/TEMPORARY: Use SyN correction in addition to fieldmap correction, if available",
-    },
     ### Specific options for FreeSurfer preprocessing ###
-    "fs-license-file": {
-        "type": FileInputDefinition,
-        "description": "Path to FreeSurfer license key file.",
-    },
-    "fs-subjects-dir": {
+    "fs_subjects_dir": {
         "type": DirectoryInputDefinition,
         "description": "Path to existing FreeSurfer subjects directory to reuse.",
     },
-    ### Surface preprocessing options ###
-    "no-submm-recon": {
-        "type": BooleanInputDefinition,
-        "description": "disable sub-millimeter (hires) reconstruction",
-    },
-    "cifti-output": {
-        "type": StringInputDefinition,
-        "choices": ["91k", "170k"],
-        "description": "output preprocessed BOLD as a CIFTI dense timeseries. Optionally, the number of grayordinate can be specified (default is 91k, which equates to 2mm resolution)",
-    },
-    "fs-no-reconall": {
-        "type": BooleanInputDefinition,
-        "description": "disable FreeSurfer surface preprocessing.",
-    },
-    ### Other options ###
-    "output-layout": {
-        "type": StringInputDefinition,
-        "choices": ["bids", "legacy"],
-        "description": "Organization of outputs.",
-    },
-    "work-dir": {
+    "work_dir": {
         "type": DirectoryInputDefinition,
         "description": "path where intermediate results should be stored",
     },
-    "clean-workdir": {
-        "type": BooleanInputDefinition,
-        "description": "Clears working directory of contents. Use of this flag is notrecommended when running concurrent processes of fMRIPrep.",
-    },
-    "resource-monitor": {
-        "type": BooleanInputDefinition,
-        "description": "enable Nipype’s resource monitoring to keep track of memory and CPU usage",
-    },
-    "reports-only": {
-        "type": BooleanInputDefinition,
-        "description": "only generate reports, don’t run workflows. This will only rerun report aggregation, not reportlet generation for specific nodes.",
-    },
-    "config-file": {
-        "type": FileInputDefinition,
-        "description": "Use pre-generated configuration file. Values in file will be overridden by command-line arguments.",
-    },
-    "write-graph": {
-        "type": BooleanInputDefinition,
-        "description": "Write workflow graph.",
-    },
-    "stop-on-first-crash": {
-        "type": BooleanInputDefinition,
-        "description": "Force stopping on first crash, even if a work directory was specified.",
-    },
-    "notrack": {
-        "type": BooleanInputDefinition,
-        "description": "Opt-out of sending tracking information of this run to the FMRIPREP developers.",
-    },
-    "debug": {
-        "type": StringInputDefinition,
-        "choices": ["compcor", "all"],
-        "description": "Debug mode(s) to enable. ‘all’ is alias for all available modes.",
-    },
-    "sloppy": {
-        "type": BooleanInputDefinition,
-        "description": "Use low-quality tools for speed - TESTING ONLY",
-    },
 }
-#: *fMRIprep* output specification.
-FMRIPREP_OUTPUT_SPECIFICATION = {
+#: *dMRIprep* output specification.
+DMRIPREP_OUTPUT_SPECIFICATION = {
     # fmriprep
     # native
     # anat/*desc-preproc_T1w.nii.gz
@@ -397,79 +174,164 @@ FMRIPREP_OUTPUT_SPECIFICATION = {
         "element_type": "FIL",
         "description": "Inflated surface meshes.",
     },
-    ## functionals
+    ## diffusion
     # native
-    # boldref
-    "native_boldref": {
+    # preproc
+    "native_preproc_dwi_nii": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Single volume BOLD reference in native space.",
+        "description": "Preprocessed dMRI NIfTI series in native space.",
     },
-    # brain_mask
-    "native_func_brain_mask": {
+    "native_preproc_dwi_json": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Functional image's brain mask in native space.",
+        "description": "Preprocessed dMRI's json.",
     },
-    # preproc_bold
-    "native_preproc_bold": {
+    "native_preproc_dwi_bvec": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Preprocessed functional image in native space.",
+        "description": "Preprocessed dMRI's .bvec.",
     },
-    # aparcaseg_dseg
-    "native_aparc_bold": {
+    "native_preproc_dwi_bval": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Aparc parcellation in functional image space.",
+        "description": "Preprocessed dMRI's .bval.",
     },
-    # aparcaseg_dseg
-    "native_aseg_bold": {
+    # epi reference
+    "native_preproc_epi_ref_nii": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Aseg parcellation in functional image space.",
+        "description": "Preprocessed single volume (EPI reference) NIfTI file.",
     },
-    # standard
-    # boldref
-    "standard_boldref": {
+    "native_preproc_epiref_json": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Single volume BOLD reference in standard space.",
+        "description": "Preprocessed EPI-ref's json.",
     },
-    # brain_mask
-    "standard_func_brain_mask": {
+    # Coreg
+    "coreg_preproc_dwi_nii": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Functional image's brain mask in standard space.",
+        "description": "Preprocessed dMRI NIfTI series in anatomical space.",
     },
-    # preproc_bold
-    "standard_preproc_bold": {
+    "coreg_preproc_epiref_nii": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Preprocessed functional image in standard space.",
+        "description": "Preprocessed single volume EPI reference NIfTI in anatomical space.",
     },
-    # aparcaseg_dseg
-    "standard_aparc_bold": {
+    # Transforms
+    "native_to_anat_transform": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Aparc parcellation in standard space.",
+        "description": "dMRI-to-anatomical transformation matrix.",
     },
-    # aparcaseg_dseg
-    "standard_aseg_bold": {
+    "anat_to_native_transform": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Aseg parcellation in standard space.",
+        "description": "Anatomical-to-dMRI transformation matrix.",
     },
-    ### Confounds ###
-    "confounds_tsv": {
+    # phasediff
+    "phasediff_fmap_nii": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Extracted confounding time series in a .tsv format.",
+        "description": "Phase-opposite NIfTI file.",
     },
-    "confounds_json": {
+    "phasediff_fmap_json": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
-        "description": "Extracted confounding time series in a .json format.",
+        "description": "Phase-opposite json file.",
+    },
+    # native tensor-derived metrics
+    "native_fa": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Fractional Anisotropy (FA) in native dMRI space.",
+    },
+    "native_adc": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Apperent Diffusion Coefficient (ADC) in native dMRI space.",
+    },
+    "native_ad": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Axial Diffusivity (AD) in native dMRI space.",
+    },
+    "native_rd": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Radial Diffusivity (RD) in native dMRI space.",
+    },
+    "native_cl": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived linearity metric in native dMRI space.",
+    },
+    "native_cp": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived planarity metric in native dMRI space.",
+    },
+    "native_cs": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived sphericiry metric in native dMRI space.",
+    },
+    "native_evec": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived eigenvector(s) in native dMRI space.",
+    },
+    "native_eval": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived eigenvalue(s) in native dMRI space.",
+    },
+    # coregistered tensor-derived metrics
+    "coreg_fa": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Fractional Anisotropy (FA) in anatomical space.",
+    },
+    "coreg_adc": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Apperent Diffusion Coefficient (ADC) in anatomical space.",
+    },
+    "coreg_ad": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Axial Diffusivity (AD) in anatomical space.",
+    },
+    "coreg_rd": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived Radial Diffusivity (RD) in anatomical space.",
+    },
+    "coreg_cl": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived linearity metric in anatomical space.",
+    },
+    "coreg_cp": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived planarity metric in anatomical space.",
+    },
+    "coreg_cs": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived sphericiry metric in anatomical space.",
+    },
+    "coreg_evec": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived eigenvector(s) in anatomical space.",
+    },
+    "coreg_eval": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Tensor-derived eigenvalue(s) in anatomical space.",
     },
     # freesurfer/
     # mri/T1.mgz

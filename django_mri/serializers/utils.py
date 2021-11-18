@@ -1,10 +1,7 @@
-from django_mri.utils.utils import (
-    get_group_model,
-    get_measurement_model,
-    get_study_model,
-    get_subject_model,
-)
 from rest_framework import serializers
+
+from django_mri.utils.utils import (get_group_model, get_measurement_model,
+                                    get_study_model, get_subject_model)
 
 Group = get_group_model()
 Measurement = get_measurement_model()

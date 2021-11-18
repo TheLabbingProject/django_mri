@@ -8,10 +8,10 @@ import nibabel as nib
 import numpy as np
 from django.db.models import QuerySet
 from django_analyses.models.analysis_version import AnalysisVersion
-from django_analyses.models.input.definitions.input_definition import (
-    InputDefinition,
-)
+from django_analyses.models.input.definitions.input_definition import \
+    InputDefinition
 from django_analyses.models.pipeline.node import Node
+
 from django_mri.analysis.automation.cat12_segmentation import messages
 from django_mri.models.scan import Scan
 

@@ -19,6 +19,7 @@ import warnings
 import nipype
 from django.conf import settings
 from django_mri.analysis import messages
+from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep010
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
     FmriPrep2022,
@@ -33,6 +34,10 @@ from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
+from django_mri.analysis.specifications.dmriprep.dmriprep import (
+    DMRIPREP_INPUT_SPECIFICATION,
+    DMRIPREP_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.fmriprep.fmriprep import (
     FMRIPREP_INPUT_SPECIFICATION,
     FMRIPREP_OUTPUT_SPECIFICATION,
@@ -609,6 +614,18 @@ analysis_definitions = [
                 "description": "fMRIprep v20.2.5.",
                 "input": FMRIPREP_INPUT_SPECIFICATION,
                 "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+        ],
+    },
+    {
+        "title": "dMRIPrep",
+        "description": "A robust preprocessing pipeline for dMRI data.",  # noqa: E501
+        "versions": [
+            {
+                "title": DmriPrep010.__version__,
+                "description": "Beta version",
+                "input": DMRIPREP_INPUT_SPECIFICATION,
+                "output": DMRIPREP_OUTPUT_SPECIFICATION,
             },
         ],
     },

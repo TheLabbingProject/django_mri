@@ -10,6 +10,7 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
+
 from django_mri.utils.utils import get_bids_dir
 
 BASE_DIR = Path(__file__).parent

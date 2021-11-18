@@ -2,7 +2,7 @@
 Utilities for the
 :class:`~django_mri.analysis.interfaces.dmriprep.dmriprep.DmriPrep` interface.
 """
-from niworkflows.utils.spaces import SpatialReferences, Reference
+from niworkflows.utils.spaces import Reference, SpatialReferences
 
 #: TheBase-specific KWARGS
 THE_BASE_BIDS_IDENTIFIERS = dict(
