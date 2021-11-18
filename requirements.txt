@@ -14,6 +14,7 @@ pybids~=0.14
 numpy~=1.20
 tqdm~=4.40
 scikit-learn~=0.22
+smriprep~=0.8
 git+https://github.com/celery/django-celery-results.git@master#egg=django-celery-results
 git+https://github.com/TheLabbingProject/django_analyses.git@master#egg=django_analyses
 git+https://github.com/TheLabbingProject/django_dicom.git@master#egg=django_dicom
