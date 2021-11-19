@@ -296,7 +296,7 @@ class NIfTI(TimeStampedModel):
         if json_sidecar.exists():
             self._logger.log(log_level, "Moving JSON sidecar...")
             json_destination = destination.parent / (
-                destination.name.split[0] + ".json"
+                destination.name.split(".")[0] + ".json"
             )
             json_sidecar.rename(json_destination)
             self._logger.log(log_level, "JSON sidecar moved.")
