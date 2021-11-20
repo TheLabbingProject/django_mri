@@ -251,7 +251,7 @@ class Scan(TimeStampedModel):
         """
         if self.dicom:
             path = str(self.dicom.path).replace("DICOM", "NIfTI")
-            return Path(path)
+            return Path(path).parent
         return get_mri_root() / "NIfTI"
 
     def get_default_nifti_name(self) -> str:
@@ -290,10 +290,9 @@ class Scan(TimeStampedModel):
         """
         try:
             return self.bids_manager.build_bids_path(self)
-        except ValueError as e:
-            print(e.args)
+        except ValueError:
             self._logger.warn(
-                f"BIDS-path generation for scan #{self.id} raised:\n{e}"
+                f"BIDS-compatible path could not be generated for scan #{self.id} ({self.description})"  # noqa: E501
             )
 
     def compile_to_bids(self, bids_path: Path):
