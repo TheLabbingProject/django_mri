@@ -10,11 +10,8 @@ from django_dicom.models import Image
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
-from tests.fixtures import (
-    DICOM_MPRAGE_PATH,
-    SIEMENS_DWI_SERIES,
-    SIEMENS_DWI_SERIES_PATH,
-)
+from tests.fixtures import (DICOM_MPRAGE_PATH, SIEMENS_DWI_SERIES,
+                            SIEMENS_DWI_SERIES_PATH)
 from tests.models import Subject
 
 
@@ -67,9 +64,9 @@ class NIfTIModelTestCase(TestCase):
         self.assertEqual(field.max_length, 1000)
 
     def test_path_value(self):
-        destination = self.dwi_scan.get_bids_destination()
+        destination = self.simple_scan.get_bids_destination()
         expected = str(destination) + ".nii.gz"
-        result = str(self.dwi_nifti.path)
+        result = str(self.simple_nifti.path)
         self.assertEqual(result, expected)
 
     # is_raw

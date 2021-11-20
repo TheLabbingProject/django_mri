@@ -129,10 +129,16 @@ class BidsManager:
         try:
             existing = NIfTI.objects.get(path__in=path_with_suffix)
         except NIfTI.DoesNotExist:
-            self._logger.debug("No existing file found! All done.")
+            self._logger.debug("No existing NIfTI file found! All done.")
             return bids_path
         else:
-            self._logger.debug(f"Existing scan (scan #{existing.id}) found!")
+            self._logger.debug(f"Existing NIfTI (#{existing.id}) found!")
+            if scan._nifti == existing:
+                self._logger.debug(
+                    "Existing NIfTI instance belongs to queried scan!"
+                )
+                path = Path(existing.path)
+                return path.parent / path.name.split(".")[0]
             self._logger.debug(
                 f"Checking for an existing run label in scan #{scan.id}."
             )
