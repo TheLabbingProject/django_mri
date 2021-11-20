@@ -371,14 +371,15 @@ class Scan(TimeStampedModel):
             current_path = Path(self.nifti.path)
             suffix = "".join(current_path.suffixes)
             destination = self.get_bids_destination()
-            expected_path = destination.with_suffix(suffix)
-            if expected_path is not None and expected_path != current_path:
-                self.nifti.rename(expected_path, log_level=log_level)
-            elif expected_path is None:
-                self._logger.log(
-                    log_level,
-                    f"Scan #{self.id} ({self.description}) has no BIDS compatible path.",  # noqa: E501
-                )
+            if destination is not None:
+                expected_path = destination.with_suffix(suffix)
+                if expected_path is not None and expected_path != current_path:
+                    self.nifti.rename(expected_path, log_level=log_level)
+                elif expected_path is None:
+                    self._logger.log(
+                        log_level,
+                        f"Scan #{self.id} ({self.description}) has no BIDS compatible path.",  # noqa: E501
+                    )
         else:
             self._logger.debug(f"No NIfTI instance found for scan #{self.id}.")
 
