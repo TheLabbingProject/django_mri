@@ -91,7 +91,6 @@ class NIfTI(TimeStampedModel):
                 content = file_object.read()
             content = content.splitlines()[0].split(" ")
             return [int(value) for value in content]
-        return None
 
     def get_b_vector(self) -> List[List[float]]:
         """
@@ -290,7 +289,7 @@ class NIfTI(TimeStampedModel):
         source = Path(self.path)
         destination = Path(destination)
         self._logger.log(log_level, f"Moving NIfTI #{self.id}...")
-        self._logger.log(log_level, f"Source:\t{source}")
+        self._logger.log(log_level, f"Source:\t\t{source}")
         self._logger.log(log_level, f"Destination:\t{destination}")
         destination.parent.mkdir(parents=True, exist_ok=True)
         source.rename(destination)

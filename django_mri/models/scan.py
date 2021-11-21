@@ -278,23 +278,6 @@ class Scan(TimeStampedModel):
         name = self.get_default_nifti_name()
         return directory / name
 
-    def get_bids_destination(self) -> str:
-        """
-        Returns the BIDS-compatible destination of this scan's associated
-        :class:`~django_mri.models.nifti.NIfTI` file.
-
-        Returns
-        -------
-        str
-            BIDS-compatible NIfTI file destination
-        """
-        try:
-            return self.bids_manager.build_bids_path(self)
-        except ValueError:
-            self._logger.warn(
-                f"BIDS-compatible path could not be generated for scan #{self.id} ({self.description})"  # noqa: E501
-            )
-
     def compile_to_bids(self, bids_path: Path):
         """
         Fixes some BIDS related issues after NIfTI coversion.
@@ -343,7 +326,7 @@ class Scan(TimeStampedModel):
         elif self.dicom:
             bids = False
             if destination is None:
-                destination = self.get_bids_destination()
+                destination = self.bids_manager.build_bids_path(self)
                 if destination is None:
                     destination = self.get_default_nifti_destination()
                 else:
@@ -370,7 +353,7 @@ class Scan(TimeStampedModel):
         if self._nifti:
             current_path = Path(self.nifti.path)
             suffix = "".join(current_path.suffixes)
-            destination = self.get_bids_destination()
+            destination = self.bids_manager.build_bids_path(self)
             if destination is not None:
                 expected_path = destination.with_suffix(suffix)
                 if expected_path is not None and expected_path != current_path:
