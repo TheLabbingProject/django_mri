@@ -141,9 +141,9 @@ class BidsManager:
 
         # Check for existing runs with the same acquisition parameters.
         parts = str(bids_path).split("_")
-        acquisition_labels = "_".join(parts[:-1])
+        acquisition_labels = "_".join(parts[:-1]) + "_"
         datatype = parts[-1]
-        existing_query = Q(path__contains=acquisition_labels) & Q(
+        existing_query = Q(path__startswith=acquisition_labels) & Q(
             path__contains=datatype
         )
         self._logger.debug(
