@@ -8,6 +8,8 @@
         "LongName": "handedness",
         "Description": "handedness of the participant as reported by the participant",
         "Levels": {
+            "a": "ambidextrous",
+            "ambi": "ambidextrous",        
             "l": "left",
             "left": "left",
             "r": "right",

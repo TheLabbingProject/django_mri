@@ -84,8 +84,8 @@ class BidsManager:
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else self.NA_LABEL,
-            "handedness": subject.dominant_hand
-            if subject.dominant_hand
+            "handedness": subject.dominant_hand.lower()
+            if subject.dominant_hand in ["R", "L", "A"]
             else self.NA_LABEL,
             "age": age,
             "sex": subject.sex if subject.sex else self.NA_LABEL,
