@@ -2,6 +2,7 @@
 Definition of the :class:`ScanQuerySet` class.
 """
 import logging
+import warnings
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Union
@@ -95,11 +96,21 @@ class ScanQuerySet(QuerySet):
             scan.sync_bids(log_level=log_level)
 
     def convert_to_nifti(
-        self, progressbar: bool = True, log_level: int = logging.DEBUG
+        self,
+        progressbar: bool = True,
+        log_level: int = logging.DEBUG,
+        persistent: bool = True,
     ):
         queryset = self.filter(_nifti__isnull=True).order_by("number")
         iterator = tqdm(queryset) if progressbar else queryset
         for scan in iterator:
-            scan._nifti = scan.dicom_to_nifti()
-            if scan._nifti:
-                scan.save()
+            try:
+                scan._nifti = scan.dicom_to_nifti()
+            except RuntimeError as e:
+                if persistent:
+                    warnings.warn(e.args)
+                else:
+                    raise
+            else:
+                if scan._nifti:
+                    scan.save()
