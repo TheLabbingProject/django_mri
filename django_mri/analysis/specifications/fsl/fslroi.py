@@ -5,13 +5,11 @@ Input and output specification dictionaries for FSL's fslroi_ script.
    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/fslroi
 """
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *fslroi* input specification dictionary.

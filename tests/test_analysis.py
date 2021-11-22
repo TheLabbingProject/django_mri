@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from django_analyses.models import Analysis, Pipeline
 from django_mri.analysis.analysis_definitions import analysis_definitions
 from django_mri.models.nifti import NIfTI

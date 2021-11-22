@@ -8,10 +8,8 @@ interface, wrapping FSL's fslreorient2std_.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.utils.html#reorient2std
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *Reorient2Std* input specification dictionary.

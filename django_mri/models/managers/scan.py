@@ -7,9 +7,10 @@ from pathlib import Path
 from typing import Iterable, Union
 
 from django.db.models import QuerySet
+from tqdm import tqdm
+
 from django_dicom.models.image import Image as DicomImage
 from django_mri.utils.scan_type import ScanType
-from tqdm import tqdm
 
 
 class ScanQuerySet(QuerySet):

@@ -1,8 +1,9 @@
 from pathlib import Path
 
-import django_mri.utils.utils as utils
 from django.conf import settings
 from django.test import TestCase
+
+import django_mri.utils.utils as utils
 
 from .models import Group, Subject
 

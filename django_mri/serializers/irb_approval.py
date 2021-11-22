@@ -1,8 +1,9 @@
 """
 Definition of the :class:`IrbApprovalSerializer` class.
 """
-from django_mri.models.irb_approval import IrbApproval
 from rest_framework import serializers
+
+from django_mri.models.irb_approval import IrbApproval
 
 
 class IrbApprovalSerializer(serializers.HyperlinkedModelSerializer):

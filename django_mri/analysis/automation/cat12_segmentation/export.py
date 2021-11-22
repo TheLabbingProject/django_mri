@@ -8,11 +8,9 @@ import nibabel as nib
 import pandas as pd
 import xarray as xr
 from django.db.models import QuerySet
+
 from django_mri.analysis.automation.cat12_segmentation.utils import (
-    get_node,
-    get_run_set,
-    read_nifti,
-)
+    get_node, get_run_set, read_nifti)
 
 OUTPUT_KEYS = "modulated_grey_matter", "modulated_white_matter", "warped_image"
 OUTPUT_DIMS = "Run ID", "x", "y", "z"

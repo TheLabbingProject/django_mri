@@ -19,9 +19,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django_analyses.models.run import Run
 from nonrelated_inlines.admin import NonrelatedStackedInline
 
+from django_analyses.models.run import Run
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.irb_approval import IrbApproval
 from django_mri.models.nifti import NIfTI

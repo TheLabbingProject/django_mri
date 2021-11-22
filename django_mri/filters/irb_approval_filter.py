@@ -3,6 +3,7 @@ Definition of the :class:`IrbApprovalFilter` class.
 """
 
 from django_filters import rest_framework as filters
+
 from django_mri.filters.utils import LOOKUP_CHOICES
 from django_mri.models.irb_approval import IrbApproval
 

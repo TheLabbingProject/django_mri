@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Union
 
 import pandas as pd
+
 from django_mri.analysis.automation.recon_all.stats import ReconAllStats
 
 

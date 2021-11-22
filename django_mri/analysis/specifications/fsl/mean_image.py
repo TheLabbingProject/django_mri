@@ -8,11 +8,9 @@ wrapping FSL's fslmaths_.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.maths.html#meanimage
 """
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FileInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *MeanImage* input specification dictionary.

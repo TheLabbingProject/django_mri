@@ -6,18 +6,15 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 """
 
 from django.conf import settings
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    DirectoryInputDefinition,
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
-)
+
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      DirectoryInputDefinition,
+                                                      FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
+from django_analyses.models.output.definitions import (FileOutputDefinition,
+                                                       ListOutputDefinition)
 
 #: *recon_all* input specification.
 RECON_ALL_INPUT_SPECIFICATION = {

@@ -2,9 +2,10 @@ from typing import Iterable
 
 import nibabel as nib
 import numpy as np
+from nilearn.plotting import view_img
+
 from django_analyses.models.run import Run
 from django_mri.analysis.visualizers.segmentation import SegmentationVisualizer
-from nilearn.plotting import view_img
 
 
 class CatSegmentationVisualizer(SegmentationVisualizer):

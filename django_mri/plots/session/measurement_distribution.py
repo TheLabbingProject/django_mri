@@ -6,16 +6,9 @@ from datetime import datetime
 from typing import List, Tuple
 
 import pandas as pd
-from bokeh.models import (
-    ColumnDataSource,
-    FactorRange,
-    FuncTickFormatter,
-    GlyphRenderer,
-    HoverTool,
-    Legend,
-    LinearAxis,
-    Range1d,
-)
+from bokeh.models import (ColumnDataSource, FactorRange, FuncTickFormatter,
+                          GlyphRenderer, HoverTool, Legend, LinearAxis,
+                          Range1d)
 from bokeh.palettes import Category20_20
 from bokeh.plotting import Figure, figure
 from django.db.models import QuerySet

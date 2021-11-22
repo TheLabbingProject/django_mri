@@ -7,21 +7,20 @@ from pathlib import Path
 from typing import Tuple
 
 from django.http import HttpResponse
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.request import Request
+
 from django_dicom.views.utils import CONTENT_DISPOSITION, ZIP_CONTENT_TYPE
 from django_mri.filters.session_filter import SessionFilter
 from django_mri.models.session import Session
-from django_mri.serializers import (
-    AdminSessionReadSerializer,
-    SessionReadSerializer,
-    SessionWriteSerializer,
-)
+from django_mri.serializers import (AdminSessionReadSerializer,
+                                    SessionReadSerializer,
+                                    SessionWriteSerializer)
 from django_mri.utils.utils import get_mri_root
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import ReadWriteSerializerMixin
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.request import Request
 
 ORDERING_FIELDS: Tuple[str] = (
     "id",

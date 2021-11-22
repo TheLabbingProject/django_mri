@@ -8,12 +8,10 @@ interface, wrapping FSL's fslmaths_.
    https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.fsl.maths.html#binarymaths
 """
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    FileInputDefinition,
-    FloatInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      FileInputDefinition,
+                                                      FloatInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *BinaryMaths* input specification dictionary.

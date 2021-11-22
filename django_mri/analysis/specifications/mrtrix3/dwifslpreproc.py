@@ -14,15 +14,13 @@ For more information, see MRtrix3's `dwifslpreproc reference`_.
    https://mrtrix.readthedocs.io/en/latest/reference/commands/dwifslpreproc.html
 """
 
-from django_analyses.models.input.definitions import (
-    BooleanInputDefinition,
-    DirectoryInputDefinition,
-    FileInputDefinition,
-    FloatInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (BooleanInputDefinition,
+                                                      DirectoryInputDefinition,
+                                                      FileInputDefinition,
+                                                      FloatInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *DwiFslPreproc* input specification dictionary.

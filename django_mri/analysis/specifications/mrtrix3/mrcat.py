@@ -10,11 +10,9 @@ For more information, see MRtrix3's `mrcat reference`_.
    https://mrtrix.readthedocs.io/en/latest/reference/commands/mrcat.html
 """
 
-from django_analyses.models.input.definitions import (
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *MRCat* input specification dictionary.

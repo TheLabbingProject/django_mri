@@ -3,13 +3,14 @@ import zipfile
 from pathlib import Path
 
 from django.http import HttpResponse
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.request import Request
+
 from django_mri.models import NIfTI
 from django_mri.serializers import NiftiSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.request import Request
 
 CONTENT_DISPOSITION = "attachment; filename={instance_id}.zip"
 ZIP_CONTENT_TYPE = "application/x-zip-compressed"

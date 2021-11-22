@@ -4,9 +4,10 @@ import django.contrib.postgres.fields
 import django.core.validators
 import django.db.models.deletion
 import django_extensions.db.fields
-import django_mri.models.fields
 from django.conf import settings
 from django.db import migrations, models
+
+import django_mri.models.fields
 
 
 class Migration(migrations.Migration):

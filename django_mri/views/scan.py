@@ -12,6 +12,12 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
+from nilearn.plotting.html_document import HTMLDocument
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from django_analyses.serializers.run import RunSerializer
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
@@ -20,11 +26,6 @@ from django_mri.serializers import ScanSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import fix_bokeh_script
-from nilearn.plotting.html_document import HTMLDocument
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.request import Request
-from rest_framework.response import Response
 
 HOST_NAME: str = getattr(settings, "APP_IP", "localhost")
 BOKEH_URL: str = f"http://{HOST_NAME}:5006/series_viewer"

@@ -9,12 +9,10 @@ For more information, see MRtrix3's `dwigradcheck reference`_.
    https://mrtrix.readthedocs.io/en/latest/reference/commands/dwigradcheck.html
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    IntegerInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      IntegerInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *dwigradcheck* input specification dictionary.

@@ -289,7 +289,7 @@ class Scan(TimeStampedModel):
         """
         if self.sequence_type in ["bold", "func_sbref"]:
             self.bids_manager.fix_functional_json(bids_path)
-        if self.sequence_type in ["func_fieldmap", "dwi_fieldmap"]:
+        if self.sequence_type in ["func_fieldmap", "dwi_sbref"]:
             self.bids_manager.modify_fieldmaps(bids_path)
         self.bids_manager.set_participant_tsv_and_json(self)
 

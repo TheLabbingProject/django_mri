@@ -8,14 +8,13 @@ from typing import Iterable, Union
 import nibabel as nib
 import numpy as np
 import pandas as pd
-
 # from dask.dataframe import from_pandas
 from django.db.models import QuerySet
-from django_mri.analysis.interfaces.yalab import messages
-from django_mri.analysis.interfaces.yalab.utils import (
-    get_cat12_segmentation_node,
-)
 from sklearn.metrics import mutual_info_score
+
+from django_mri.analysis.interfaces.yalab import messages
+from django_mri.analysis.interfaces.yalab.utils import \
+    get_cat12_segmentation_node
 
 SECONDS_IN_DAY = 60 * 60 * 24
 

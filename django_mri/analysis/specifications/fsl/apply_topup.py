@@ -16,11 +16,9 @@ Guide`_
    https://nipype.readthedocs.io/en/1.1.7/interfaces/generated/interfaces.fsl/epi.html#applytopup
 """
 
-from django_analyses.models.input.definitions import (
-    FileInputDefinition,
-    ListInputDefinition,
-    StringInputDefinition,
-)
+from django_analyses.models.input.definitions import (FileInputDefinition,
+                                                      ListInputDefinition,
+                                                      StringInputDefinition)
 from django_analyses.models.output.definitions import FileOutputDefinition
 
 #: *applytopup* input specification.

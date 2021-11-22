@@ -1,4 +1,5 @@
 from django.db import models
+
 from django_analyses.models.output.output import Output
 
 
