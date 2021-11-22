@@ -9,13 +9,15 @@ References
    https://docs.djangoproject.com/en/3.0/ref/signals/
 """
 import logging
+from pathlib import Path
 
 from django.db import IntegrityError
 from django.db.models import Model
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django_dicom.models.series import Series
 
+from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
 from django_mri.models.session import Session
 from django_mri.utils import get_session_by_series, get_subject_model
@@ -89,3 +91,37 @@ def series_post_save_receiver(
         else:
             if created:
                 session.save()
+
+
+@receiver(post_delete, sender=NIfTI)
+def nifti_post_delete_receiver(
+    sender: Model, instance: NIfTI, *args, **kwargs
+) -> None:
+    """
+    Delete files associated with deleted NIfTI instances.
+
+    Parameters
+    ----------
+    sender : Model
+        NIfTI model
+    instance : NIfTI
+        Deleted NIfTI instance
+    """
+    path = Path(instance.path)
+    if path.exists():
+        base_name = path.name.split(".")[0]
+        files = path.parent.glob(f"{base_name}.*")
+        for f in files:
+            f.unlink()
+        datatype_dir = path.parent
+        session_dir = path.parent.parent
+        subject_dir = path.parent.parent.parent
+        empty_datatype = not any(datatype_dir.iterdir())
+        if empty_datatype:
+            datatype_dir.rmdir()
+        empty_session = not any(session_dir.iterdir())
+        if empty_session:
+            session_dir.rmdir()
+        empty_subject = not any(subject_dir.iterdir())
+        if empty_subject:
+            subject_dir.rmdir()

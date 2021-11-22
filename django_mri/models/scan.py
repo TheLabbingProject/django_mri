@@ -9,7 +9,7 @@ from typing import Any, Dict
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import IntegrityError, models
 from django_analyses.models.input import (
     DirectoryInput,
     FileInput,
@@ -350,19 +350,61 @@ class Scan(TimeStampedModel):
 
     def sync_bids(self, log_level: int = logging.DEBUG):
         self._logger.log(log_level, f"Checking scan #{self.id} BIDS status...")
+        mri_root = get_mri_root()
         if self._nifti:
             current_path = Path(self.nifti.path)
+            relative_path = current_path.relative_to(mri_root)
+            self._logger.log(log_level, f"Current path: {relative_path}")
             suffix = "".join(current_path.suffixes)
-            destination = self.bids_manager.build_bids_path(self)
+            destination = self.bids_manager.build_bids_path(
+                self, log_level=log_level
+            )
             if destination is not None:
                 expected_path = destination.with_suffix(suffix)
-                if expected_path is not None and expected_path != current_path:
-                    self.nifti.rename(expected_path, log_level=log_level)
-                elif expected_path is None:
+                if expected_path != current_path:
+                    expected_relative = expected_path.relative_to(mri_root)
+                    self._logger.log(
+                        log_level, f"Generated BIDS path: {expected_relative}"
+                    )
+                    self._logger.log(
+                        log_level, "Difference found! Renaming file..."
+                    )
+                    try:
+                        self.nifti.rename(expected_path, log_level=log_level)
+                    except IntegrityError:
+                        existing = NIfTI.objects.get(path=expected_path)
+                        if current_path.name.startswith("_"):
+                            raise IntegrityError(
+                                f"Failed to resolve identical paths for NIfTI instances #{self.nifti.id} and #{existing.id}"  # noqa: E501
+                            )
+                        self._logger.log(
+                            log_level,
+                            f"Existing NIfTI instance (#{existing.id}) found at expected path!",  # noqa: E501
+                        )
+                        self._logger.log(
+                            log_level,
+                            "Moving existing NIfTI file to temporary path.",
+                        )
+                        existing_path = Path(existing.path)
+                        tmp_destination = existing_path.parent / (
+                            "_" + existing_path.name
+                        )
+                        existing.rename(tmp_destination)
+                        self._logger.log(
+                            log_level,
+                            f"Existing NIfTI successfully moved to {tmp_destination.name}",  # noqa: E501
+                        )
+                        self.nifti.rename(expected_path, log_level=log_level)
+                        existing.scan.sync_bids(log_level=log_level)
                     self._logger.log(
                         log_level,
-                        f"Scan #{self.id} ({self.description}) has no BIDS compatible path.",  # noqa: E501
+                        f"Associated NIfTI instance (#{self.nifti.id} successfully moved to {expected_relative}",  # noqa: E501
                     )
+            else:
+                self._logger.log(
+                    log_level,
+                    f"Scan #{self.id} ({self.description}) has no BIDS compatible path.",  # noqa: E501
+                )
         else:
             self._logger.debug(f"No NIfTI instance found for scan #{self.id}.")
 

@@ -92,7 +92,7 @@ class BidsManager:
         }
         return subject_dict
 
-    def build_bids_path(self, scan):
+    def build_bids_path(self, scan, log_level: int = logging.DEBUG):
         """
         Uses parameters extracted by :func:`get_subject_data` to update BIDS-
         compatible file path derived from *dicom_parser*
@@ -105,7 +105,7 @@ class BidsManager:
         """
         # Log start.
         start_log = logs.BUILD_BIDS_PATH_START.format(scan_id=scan.id)
-        self._logger.debug(start_log)
+        self._logger.log(log_level, start_log)
 
         # Query naive relative BIDS path, as returned by dicom_parser.
         sample_header = scan.dicom.get_sample_header()
@@ -121,7 +121,7 @@ class BidsManager:
         naive_bids_log = logs.NAIVE_BIDS.format(
             relative_path=default_bids_path
         )
-        self._logger.debug(naive_bids_log)
+        self._logger.log(log_level, naive_bids_log)
 
         # Replace patient ID with subject primary key.
         subject_id = scan.session.subject.id
@@ -129,7 +129,7 @@ class BidsManager:
         subject_fix_log = logs.SUBJECT_FIX.format(
             patient_id=patient_id, subject_id=subject_id
         )
-        self._logger.debug(subject_fix_log)
+        self._logger.log(log_level, subject_fix_log)
         fixed_relative_path = default_bids_path.replace(
             f"sub-{patient_id}", f"sub-{subject_id}"
         )
@@ -137,94 +137,113 @@ class BidsManager:
         single_run_destination_log = logs.SINGLE_RUN_DESTINATION.format(
             scan_id=scan.id, destination=bids_path
         )
-        self._logger.debug(single_run_destination_log)
+        self._logger.log(log_level, single_run_destination_log)
 
         # Check for existing runs with the same acquisition parameters.
-        parts = str(bids_path).split("_")
-        acquisition_labels = "_".join(parts[:-1]) + "_"
-        datatype = parts[-1]
-        existing_query = Q(path__startswith=acquisition_labels) & Q(
-            path__contains=datatype
-        )
-        self._logger.debug(
-            f"Checking for an existing NIfTI files with identical labels ({acquisition_labels})"  # noqa: E501
+        acquisition_labels = bids_path.name.split("_")
+        existing_query = Q()
+        for i, label in enumerate(acquisition_labels):
+            if i == 0:
+                label = label + "_"
+            elif i + 1 == len(acquisition_labels):
+                label = "_" + label
+            else:
+                label = f"_{label}_"
+            existing_query &= Q(path__contains=label)
+        self._logger.log(
+            log_level,
+            f"Checking for an existing NIfTI files with identical labels ({acquisition_labels})",  # noqa: E501
         )
         existing = NIfTI.objects.filter(existing_query)
         if not existing.exists():
-            self._logger.debug("No existing NIfTI file found! All done.")
+            self._logger.log(
+                log_level, "No existing NIfTI file found! All done."
+            )
             return bids_path
         else:
             if existing.count() == 1:
                 existing = existing.first()
-                bids_path = Path(existing.path.split(".")[0])
-                self._logger.debug(
-                    f"Existing NIfTI (#{existing.id}) found at {existing.path}!"  # noqa: E501
+                existing_path = Path(existing.path.split(".")[0])
+                self._logger.log(
+                    log_level,
+                    f"Existing NIfTI (#{existing.id}) found at {existing.path}!",  # noqa: E501
                 )
                 if scan._nifti == existing:
-                    self._logger.debug(
-                        "Existing NIfTI instance belongs to queried scan!"
+                    self._logger.log(
+                        log_level,
+                        "Existing NIfTI instance belongs to queried scan!",
                     )
                     return bids_path
-                self._logger.debug(
-                    f"Checking for an existing run label in scan #{scan.id}."
+                self._logger.log(
+                    log_level,
+                    f"Checking for an existing run label in scan #{scan.id}.",
                 )
                 try:
                     existing_run_label = re.findall(
-                        self.RUN_LABEL_PATTERN, str(bids_path)
+                        self.RUN_LABEL_PATTERN, str(existing_path)
                     )[0]
                 except IndexError:
-                    self._logger.debug("No existing run label found.")
-                    self._logger.debug(
-                        f"Renaming existing NIfTI (#{existing.id}) to include run label."  # noqa: E501
+                    self._logger.log(log_level, "No existing run label found.")
+                    self._logger.log(
+                        log_level,
+                        f"Renaming existing NIfTI (#{existing.id}) to include run label.",  # noqa: E501
                     )
                     existing_run_label = self.RUN_LABEL_TEMPLATE.format(
                         index=1
                     )
                     name_parts = Path(existing.path).name.split("_")
-                    insert_position = -2 if "inv" in bids_path.name else -1
+                    insert_position = -2 if "inv" in existing_path.name else -1
                     name_parts.insert(insert_position, existing_run_label)
                     name_with_run = "_".join(name_parts)
-                    updated_path = bids_path.parent / name_with_run
+                    updated_path = existing_path.parent / name_with_run
                     existing.rename(updated_path)
-                    self._logger.debug(
-                        f"Scan #{scan.id} successfully moved to {bids_path}"
+                    self._logger.log(
+                        log_level,
+                        f"Scan #{scan.id} successfully moved to {updated_path}",  # noqa: E501
                     )
                     new_run_label = self.RUN_LABEL_TEMPLATE.format(index=2)
                     bids_path = (
                         updated_path.parent / updated_path.name.split(".")[0]
                     )
                 else:
-                    self._logger.debug(
-                        f"Existing run label found: {existing_run_label}"
+                    self._logger.log(
+                        log_level,
+                        f"Existing run label found: {existing_run_label}",
                     )
                     existing_run_index = int(existing_run_label.split("-")[-1])
                     index = existing_run_index + 1
                     new_run_label = self.RUN_LABEL_TEMPLATE.format(index=index)
-                    self._logger.debug(f"New run label: {new_run_label}")
+                    self._logger.log(
+                        log_level, f"New run label: {new_run_label}"
+                    )
             else:
-                self._logger.debug(
-                    "Multiple existing NIfTI files found with the queried parameters."  # noqa: E501
+                self._logger.log(
+                    log_level,
+                    "Multiple existing NIfTI files found with the queried parameters.",  # noqa: E501
                 )
-                run_labels = (
-                    re.findall(self.RUN_LABEL_PATTERN, str(nii.path))
-                    for nii in existing
+                scan_numbers = list(
+                    existing.values_list("scan__number", flat=True)
                 )
-                run_indices = [
-                    int(label[0].split("-")[-1])
-                    for label in run_labels
-                    if label != []
-                ]
-                self._logger.debug(
-                    f"Found existing run indices: {run_indices}"
+                self._logger.log(
+                    log_level, f"Found existing scan numbers: {scan_numbers}"
                 )
-                index = max(run_indices) + 1
+                scan_numbers.append(scan.number)
+                scan_numbers = sorted(scan_numbers)
+                self._logger.log(
+                    log_level, f"Current scan's scan number: {scan.number}"
+                )
+                index = scan_numbers.index(scan.number) + 1
+                self._logger.log(
+                    log_level,
+                    f"Scan run index by scan number found to be {index}.",
+                )
                 new_run_label = self.RUN_LABEL_TEMPLATE.format(index=index)
                 name_parts = Path(bids_path).name.split("_")
                 insert_position = -2 if "inv" in Path(bids_path).name else -1
                 name_parts.insert(insert_position, new_run_label)
                 name_with_run = "_".join(name_parts)
-                self._logger.debug(
-                    f"Updated current file name to: {name_with_run}"
+                self._logger.log(
+                    log_level, f"Updated current file name to: {name_with_run}"
                 )
                 return bids_path.parent / name_with_run
             return Path(

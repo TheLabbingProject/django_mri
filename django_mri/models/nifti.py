@@ -8,7 +8,7 @@ from typing import Iterable, List, Union
 
 import nibabel as nib
 import numpy as np
-from django.db import models
+from django.db import IntegrityError, models
 from django_analyses.models.input import FileInput, ListInput
 from django_extensions.db.models import TimeStampedModel
 from django_mri.models.messages import NIFTI_FILE_MISSING
@@ -291,6 +291,10 @@ class NIfTI(TimeStampedModel):
         self._logger.log(log_level, f"Moving NIfTI #{self.id}...")
         self._logger.log(log_level, f"Source:\t\t{source}")
         self._logger.log(log_level, f"Destination:\t{destination}")
+        if destination.exists():
+            raise IntegrityError(
+                f"Existing NIfTI file found at {destination}!"
+            )
         destination.parent.mkdir(parents=True, exist_ok=True)
         source.rename(destination)
         source_base_name = source.name.split(".")[0]
