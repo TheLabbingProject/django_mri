@@ -15,6 +15,7 @@ from django.db import IntegrityError
 from django.db.models import Model
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django_dicom.models.series import Series
 
 from django_mri.models.nifti import NIfTI
 from django_mri.models.scan import Scan
