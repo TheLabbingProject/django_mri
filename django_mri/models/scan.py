@@ -18,20 +18,19 @@ from django_analyses.models.input import (
 )
 from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
-from nilearn.image import mean_img
-from nilearn.plotting import cm, view_img
-
-from django_analyses.models.input import (DirectoryInput, FileInput, Input,
-                                          ListInput)
-from django_analyses.models.run import Run
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
 from django_mri.models import help_text, messages
 from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.messages import SCAN_UPDATE_NO_DICOM
 from django_mri.models.nifti import NIfTI
 from django_mri.utils.bids import BidsManager
-from django_mri.utils.utils import (get_bids_manager, get_group_model,
-                                    get_mri_root)
+from django_mri.utils.utils import (
+    get_bids_manager,
+    get_group_model,
+    get_mri_root,
+)
+from nilearn.image import mean_img
+from nilearn.plotting import cm, view_img
 
 FLAG_3D = "mprage", "spgr", "flair", "t1", "t2"
 FLAG_4D = "fmri", "dmri"
@@ -290,7 +289,7 @@ class Scan(TimeStampedModel):
         """
         if self.sequence_type in ["bold", "func_sbref"]:
             self.bids_manager.fix_functional_json(bids_path)
-        if self.sequence_type in ["func_fieldmap", "dwi_fieldmap"]:
+        if self.sequence_type in ["func_fieldmap", "dwi_sbref"]:
             self.bids_manager.modify_fieldmaps(bids_path)
         self.bids_manager.set_participant_tsv_and_json(self)
 
@@ -445,8 +444,9 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import \
-            get_mrconvert_node
+        from django_mri.analysis.utils.get_mrconvert_node import (
+            get_mrconvert_node,
+        )
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
