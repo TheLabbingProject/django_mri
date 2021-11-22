@@ -2,7 +2,6 @@
 Definition of the :class:`ScanQuerySet` class.
 """
 import logging
-import warnings
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Union
@@ -103,14 +102,15 @@ class ScanQuerySet(QuerySet):
     ):
         queryset = self.filter(_nifti__isnull=True).order_by("number")
         iterator = tqdm(queryset) if progressbar else queryset
+        fieldmaps = []
         for scan in iterator:
-            try:
-                scan._nifti = scan.dicom_to_nifti()
-            except RuntimeError as e:
-                if persistent:
-                    warnings.warn(e.args)
-                else:
-                    raise
-            else:
-                if scan._nifti:
-                    scan.save()
+            if scan.dicom.sequence_type == "func_fieldmap":
+                fieldmaps.append(scan)
+                continue
+            scan._nifti = scan.dicom_to_nifti(persistent=persistent)
+            if scan._nifti:
+                scan.save()
+        for fieldmap in fieldmaps:
+            fieldmap._nifti = fieldmap.dicom_to_nifti(persistent=persistent)
+            if fieldmap._nifti:
+                fieldmap.save()

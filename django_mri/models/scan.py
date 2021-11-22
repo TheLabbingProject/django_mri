@@ -298,6 +298,7 @@ class Scan(TimeStampedModel):
         destination: Path = None,
         compressed: bool = True,
         generate_json: bool = True,
+        persistent: bool = True,
     ) -> NIfTI:
         """
         Convert this scan from DICOM to NIfTI using _dcm2niix.
@@ -334,12 +335,18 @@ class Scan(TimeStampedModel):
             elif not isinstance(destination, Path):
                 destination = Path(destination)
             destination.parent.mkdir(exist_ok=True, parents=True)
-            nifti_path = Dcm2niix().convert(
-                self.dicom.path,
-                destination,
-                compressed=compressed,
-                generate_json=generate_json,
-            )
+            try:
+                nifti_path = Dcm2niix().convert(
+                    self.dicom.path,
+                    destination,
+                    compressed=compressed,
+                    generate_json=generate_json,
+                )
+            except RuntimeError as e:
+                if persistent:
+                    warnings.warn(e.args)
+                else:
+                    raise
             if bids:
                 self.compile_to_bids(destination)
             nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
