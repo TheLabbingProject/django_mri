@@ -347,10 +347,11 @@ class Scan(TimeStampedModel):
                     warnings.warn(str(e))
                 else:
                     raise
-            if bids:
-                self.compile_to_bids(destination)
-            nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
-            return nifti
+            else:
+                if bids:
+                    self.compile_to_bids(destination)
+                nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
+                return nifti
         else:
             message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
             raise AttributeError(message)
