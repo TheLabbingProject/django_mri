@@ -181,7 +181,8 @@ class BidsManager:
                         index=1
                     )
                     name_parts = Path(existing.path).name.split("_")
-                    name_parts.insert(-1, existing_run_label)
+                    insert_position = -2 if "inv" in bids_path else -1
+                    name_parts.insert(insert_position, existing_run_label)
                     name_with_run = "_".join(name_parts)
                     updated_path = bids_path.parent / name_with_run
                     existing.rename(updated_path)
@@ -219,7 +220,8 @@ class BidsManager:
                 index = max(run_indices) + 1
                 new_run_label = self.RUN_LABEL_TEMPLATE.format(index=index)
                 name_parts = Path(bids_path).name.split("_")
-                name_parts.insert(-1, new_run_label)
+                insert_position = -2 if "inv" in bids_path else -1
+                name_parts.insert(insert_position, new_run_label)
                 name_with_run = "_".join(name_parts)
                 self._logger.debug(
                     f"Updated current file name to: {name_with_run}"
