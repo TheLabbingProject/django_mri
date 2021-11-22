@@ -344,7 +344,7 @@ class Scan(TimeStampedModel):
                 )
             except RuntimeError as e:
                 if persistent:
-                    warnings.warn(e.args)
+                    warnings.warn(e)
                 else:
                     raise
             if bids:
