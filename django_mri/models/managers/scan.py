@@ -7,10 +7,9 @@ from pathlib import Path
 from typing import Iterable, Union
 
 from django.db.models import QuerySet
-from tqdm import tqdm
-
 from django_dicom.models.image import Image as DicomImage
 from django_mri.utils.scan_type import ScanType
+from tqdm import tqdm
 
 
 class ScanQuerySet(QuerySet):
@@ -103,15 +102,15 @@ class ScanQuerySet(QuerySet):
     ):
         queryset = self.filter(_nifti__isnull=True).order_by("number")
         iterator = tqdm(queryset) if progressbar else queryset
-        fieldmaps = []
+        appendices = []
         for scan in iterator:
-            if scan.dicom.sequence_type == "func_fieldmap":
-                fieldmaps.append(scan)
+            if scan.dicom.sequence_type in ("func_fieldmap", "dwi_sbref"):
+                appendices.append(scan)
                 continue
             scan._nifti = scan.dicom_to_nifti(persistent=persistent)
             if scan._nifti:
                 scan.save()
-        for fieldmap in fieldmaps:
-            fieldmap._nifti = fieldmap.dicom_to_nifti(persistent=persistent)
-            if fieldmap._nifti:
-                fieldmap.save()
+        for appendix in appendices:
+            appendix._nifti = appendix.dicom_to_nifti(persistent=persistent)
+            if appendix._nifti:
+                appendix.save()
