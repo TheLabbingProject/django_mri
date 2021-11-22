@@ -4,11 +4,12 @@ Definition of the :class:`NIfTI` model.
 import json
 import logging
 from pathlib import Path
-from typing import List, Union
+from typing import Iterable, List, Union
 
 import nibabel as nib
 import numpy as np
-from django.db import models
+from django.db import IntegrityError, models
+from django_analyses.models.input import FileInput, ListInput
 from django_extensions.db.models import TimeStampedModel
 
 from django_analyses.models.input import FileInput, ListInput
@@ -29,6 +30,8 @@ class NIfTI(TimeStampedModel):
     #: Whether the created instance is the product of a direct conversion from
     #: some raw format to NIfTI or of a manipulation of the data.
     is_raw = models.BooleanField(default=False)
+
+    APPENDIX_FILES: Iterable[str] = {".json", ".bval", ".bvec"}
 
     # Used to cache JSON data to prevent multiple reads.
     _json_data = None
@@ -90,7 +93,6 @@ class NIfTI(TimeStampedModel):
                 content = file_object.read()
             content = content.splitlines()[0].split(" ")
             return [int(value) for value in content]
-        return None
 
     def get_b_vector(self) -> List[List[float]]:
         """
@@ -289,18 +291,32 @@ class NIfTI(TimeStampedModel):
         source = Path(self.path)
         destination = Path(destination)
         self._logger.log(log_level, f"Moving NIfTI #{self.id}...")
-        self._logger.log(log_level, f"Source:\t{source}")
+        self._logger.log(log_level, f"Source:\t\t{source}")
         self._logger.log(log_level, f"Destination:\t{destination}")
+        if destination.exists():
+            raise IntegrityError(
+                f"Existing NIfTI file found at {destination}!"
+            )
         destination.parent.mkdir(parents=True, exist_ok=True)
         source.rename(destination)
-        json_sidecar = source.parent / (source.name.split(".")[0] + ".json")
-        if json_sidecar.exists():
-            self._logger.log(log_level, "Moving JSON sidecar...")
-            json_destination = destination.parent / (
-                destination.name.split[0] + ".json"
+        source_base_name = source.name.split(".")[0]
+        destination_base_name = destination.name.split(".")[0]
+        for possible_appendix in self.APPENDIX_FILES:
+            appendix = (source.parent / source_base_name).with_suffix(
+                possible_appendix
             )
-            json_sidecar.rename(json_destination)
-            self._logger.log(log_level, "JSON sidecar moved.")
+            if appendix.exists():
+                self._logger.log(
+                    log_level, f"Moving {possible_appendix} appendix..."
+                )
+                appendix_destination = (
+                    destination.parent / destination_base_name
+                ).with_suffix(possible_appendix)
+                appendix.rename(appendix_destination)
+                self._logger.log(
+                    log_level,
+                    f"Appended {possible_appendix} moved to {appendix_destination}.",  # noqa: E501
+                )
         if self.is_raw and self.scan:
             self._logger.log(
                 log_level, f"Found associated scan (#{self.scan.id})."
@@ -314,7 +330,7 @@ class NIfTI(TimeStampedModel):
                 if is_file_input and input_instance.value == str(source):
                     self._logger.log(
                         log_level,
-                        f"Found changed file input instance:\n{input_instance}",
+                        f"Found changed file input instance:\n{input_instance}",  # noqa: E501
                     )
                     self._logger.log(log_level, "Updating file input value...")
                     input_instance.value = str(destination)
@@ -323,7 +339,7 @@ class NIfTI(TimeStampedModel):
                 elif is_list_input and str(source) in input_instance.value:
                     self._logger.log(
                         log_level,
-                        f"Found changed list input instance:\n{input_instance}",
+                        f"Found changed list input instance:\n{input_instance}",  # noqa: E501
                     )
                     self._logger.log(log_level, "Updating list input value...")
                     input_instance.value = [

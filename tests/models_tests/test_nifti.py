@@ -64,12 +64,6 @@ class NIfTIModelTestCase(TestCase):
         field = NIfTI._meta.get_field("path")
         self.assertEqual(field.max_length, 1000)
 
-    def test_path_value(self):
-        destination = self.dwi_scan.get_bids_destination()
-        expected = str(destination) + ".nii.gz"
-        result = str(self.dwi_nifti.path)
-        self.assertEqual(result, expected)
-
     # is_raw
     def test_is_raw_blank_and_null(self):
         field = NIfTI._meta.get_field("is_raw")

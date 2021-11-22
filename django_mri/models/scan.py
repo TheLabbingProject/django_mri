@@ -9,7 +9,14 @@ from typing import Any, Dict
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import IntegrityError, models
+from django_analyses.models.input import (
+    DirectoryInput,
+    FileInput,
+    Input,
+    ListInput,
+)
+from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
@@ -245,7 +252,7 @@ class Scan(TimeStampedModel):
         """
         if self.dicom:
             path = str(self.dicom.path).replace("DICOM", "NIfTI")
-            return Path(path)
+            return Path(path).parent
         return get_mri_root() / "NIfTI"
 
     def get_default_nifti_name(self) -> str:
@@ -272,24 +279,6 @@ class Scan(TimeStampedModel):
         name = self.get_default_nifti_name()
         return directory / name
 
-    def get_bids_destination(self) -> str:
-        """
-        Returns the BIDS-compatible destination of this scan's associated
-        :class:`~django_mri.models.nifti.NIfTI` file.
-
-        Returns
-        -------
-        str
-            BIDS-compatible NIfTI file destination
-        """
-        try:
-            return self.bids_manager.build_bids_path(self)
-        except ValueError as e:
-            print(e.args)
-            self._logger.warn(
-                f"BIDS-path generation for scan #{self.id} raised:\n{e}"
-            )
-
     def compile_to_bids(self, bids_path: Path):
         """
         Fixes some BIDS related issues after NIfTI coversion.
@@ -310,6 +299,7 @@ class Scan(TimeStampedModel):
         destination: Path = None,
         compressed: bool = True,
         generate_json: bool = True,
+        persistent: bool = True,
     ) -> NIfTI:
         """
         Convert this scan from DICOM to NIfTI using _dcm2niix.
@@ -338,7 +328,7 @@ class Scan(TimeStampedModel):
         elif self.dicom:
             bids = False
             if destination is None:
-                destination = self.get_bids_destination()
+                destination = self.bids_manager.build_bids_path(self)
                 if destination is None:
                     destination = self.get_default_nifti_destination()
                 else:
@@ -346,30 +336,80 @@ class Scan(TimeStampedModel):
             elif not isinstance(destination, Path):
                 destination = Path(destination)
             destination.parent.mkdir(exist_ok=True, parents=True)
-            nifti_path = Dcm2niix().convert(
-                self.dicom.path,
-                destination,
-                compressed=compressed,
-                generate_json=generate_json,
-            )
-            if bids:
-                self.compile_to_bids(destination)
-            nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
-            return nifti
+            try:
+                nifti_path = Dcm2niix().convert(
+                    self.dicom.path,
+                    destination,
+                    compressed=compressed,
+                    generate_json=generate_json,
+                )
+            except RuntimeError as e:
+                if persistent:
+                    warnings.warn(str(e))
+                else:
+                    raise
+            else:
+                if bids:
+                    self.compile_to_bids(destination)
+                nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
+                return nifti
         else:
             message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
             raise AttributeError(message)
 
     def sync_bids(self, log_level: int = logging.DEBUG):
         self._logger.log(log_level, f"Checking scan #{self.id} BIDS status...")
+        mri_root = get_mri_root()
         if self._nifti:
             current_path = Path(self.nifti.path)
+            relative_path = current_path.relative_to(mri_root)
+            self._logger.log(log_level, f"Current path: {relative_path}")
             suffix = "".join(current_path.suffixes)
-            destination = self.get_bids_destination()
-            expected_path = destination.with_suffix(suffix)
-            if expected_path is not None and expected_path != current_path:
-                self.nifti.rename(expected_path, log_level=log_level)
-            elif expected_path is None:
+            destination = self.bids_manager.build_bids_path(
+                self, log_level=log_level
+            )
+            if destination is not None:
+                expected_path = destination.with_suffix(suffix)
+                if expected_path != current_path:
+                    expected_relative = expected_path.relative_to(mri_root)
+                    self._logger.log(
+                        log_level, f"Generated BIDS path: {expected_relative}"
+                    )
+                    self._logger.log(
+                        log_level, "Difference found! Renaming file..."
+                    )
+                    try:
+                        self.nifti.rename(expected_path, log_level=log_level)
+                    except IntegrityError:
+                        existing = NIfTI.objects.get(path=expected_path)
+                        if current_path.name.startswith("_"):
+                            raise IntegrityError(
+                                f"Failed to resolve identical paths for NIfTI instances #{self.nifti.id} and #{existing.id}"  # noqa: E501
+                            )
+                        self._logger.log(
+                            log_level,
+                            f"Existing NIfTI instance (#{existing.id}) found at expected path!",  # noqa: E501
+                        )
+                        self._logger.log(
+                            log_level,
+                            "Moving existing NIfTI file to temporary path.",
+                        )
+                        existing_path = Path(existing.path)
+                        tmp_destination = existing_path.parent / (
+                            "_" + existing_path.name
+                        )
+                        existing.rename(tmp_destination)
+                        self._logger.log(
+                            log_level,
+                            f"Existing NIfTI successfully moved to {tmp_destination.name}",  # noqa: E501
+                        )
+                        self.nifti.rename(expected_path, log_level=log_level)
+                        existing.scan.sync_bids(log_level=log_level)
+                    self._logger.log(
+                        log_level,
+                        f"Associated NIfTI instance (#{self.nifti.id} successfully moved to {expected_relative}",  # noqa: E501
+                    )
+            else:
                 self._logger.log(
                     log_level,
                     f"Scan #{self.id} ({self.description}) has no BIDS compatible path.",  # noqa: E501

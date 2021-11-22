@@ -2,6 +2,7 @@
 Definition of the :class:`Bids` class.
 """
 import json
+import logging
 import os
 import re
 import shutil
@@ -10,11 +11,15 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
+from django.apps import apps
+from django.db.models import Q
+from django_mri.utils import logs
 from django_mri.utils.messages import BIDS_NO_ACQ_LABEL
 from django_mri.utils.utils import get_bids_dir
 
 BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "bids_templates"
+NIfTI = apps.get_model("django_mri", "NIfTI", require_ready=False)
 
 
 class BidsManager:
@@ -34,7 +39,11 @@ class BidsManager:
     DATASET_DESCRIPTION_FILE_NAME: str = "dataset_description.json"
     PARTICIPANTS_FILE_NAME: str = "participants.tsv"
     ACQUISITION_PATTERN: str = "acq-([a-zA-Z0-9]*)"
+    RUN_LABEL_PATTERN: str = "run-[0-9]*"
+    RUN_LABEL_TEMPLATE: str = "run-{index}"
     NA_LABEL: str = "n/a"
+
+    _logger = logging.getLogger("data.mri.bids")
 
     def calculate_age(self, born: date) -> float:
         """
@@ -75,15 +84,15 @@ class BidsManager:
         age = self.calculate_age(subject.date_of_birth)
         subject_dict = {
             "participant_id": subject.id if subject.id else self.NA_LABEL,
-            "handedness": subject.dominant_hand
-            if subject.dominant_hand
+            "handedness": subject.dominant_hand.lower()
+            if subject.dominant_hand in ["R", "L", "A"]
             else self.NA_LABEL,
-            "age": age,
+            "age": age if age < 89 else "89+",
             "sex": subject.sex if subject.sex else self.NA_LABEL,
         }
         return subject_dict
 
-    def build_bids_path(self, scan):
+    def build_bids_path(self, scan, log_level: int = logging.DEBUG):
         """
         Uses parameters extracted by :func:`get_subject_data` to update BIDS-
         compatible file path derived from *dicom_parser*
@@ -94,18 +103,152 @@ class BidsManager:
             Full path to an updated BIDS-compatible file, according to scan's
             parameters.
         """
-        subject_id = scan.session.subject.id
-        sample_image = scan.dicom.image_set.first()
-        sample_header = sample_image.header.instance
+        # Log start.
+        start_log = logs.BUILD_BIDS_PATH_START.format(scan_id=scan.id)
+        self._logger.log(log_level, start_log)
+
+        # Query naive relative BIDS path, as returned by dicom_parser.
+        sample_header = scan.dicom.get_sample_header()
         default_bids_path = sample_header.build_bids_path()
-        default_subject_id = sample_header.get("PatientID")
+        # If no naive BIDS path could be generated, show warning.
         if default_bids_path is None:
-            raise ValueError
-        return get_bids_dir() / Path(
-            default_bids_path.replace(
-                f"sub-{default_subject_id}", f"sub-{subject_id}"
+            no_bids_log = logs.NO_BIDS_PATH.format(
+                scan_id=scan.id, description=scan.description
             )
+            warnings.warn(no_bids_log)
+            return
+        # Log the returned naive BIDS path.
+        naive_bids_log = logs.NAIVE_BIDS.format(
+            relative_path=default_bids_path
         )
+        self._logger.log(log_level, naive_bids_log)
+
+        # Replace patient ID with subject primary key.
+        subject_id = scan.session.subject.id
+        patient_id = sample_header.get("PatientID")
+        subject_fix_log = logs.SUBJECT_FIX.format(
+            patient_id=patient_id, subject_id=subject_id
+        )
+        self._logger.log(log_level, subject_fix_log)
+        fixed_relative_path = default_bids_path.replace(
+            f"sub-{patient_id}", f"sub-{subject_id}"
+        )
+        bids_path = get_bids_dir() / fixed_relative_path
+        single_run_destination_log = logs.SINGLE_RUN_DESTINATION.format(
+            scan_id=scan.id, destination=bids_path
+        )
+        self._logger.log(log_level, single_run_destination_log)
+
+        # Check for existing runs with the same acquisition parameters.
+        acquisition_labels = bids_path.name.split("_")
+        existing_query = Q()
+        for i, label in enumerate(acquisition_labels):
+            if i == 0:
+                label = label + "_"
+            elif i + 1 == len(acquisition_labels):
+                label = "_" + label
+            else:
+                label = f"_{label}_"
+            existing_query &= Q(path__contains=label)
+        self._logger.log(
+            log_level,
+            f"Checking for an existing NIfTI files with identical labels ({acquisition_labels})",  # noqa: E501
+        )
+        existing = NIfTI.objects.filter(existing_query)
+        if not existing.exists():
+            self._logger.log(
+                log_level, "No existing NIfTI file found! All done."
+            )
+            return bids_path
+        else:
+            if existing.count() == 1:
+                existing = existing.first()
+                existing_path = Path(existing.path.split(".")[0])
+                self._logger.log(
+                    log_level,
+                    f"Existing NIfTI (#{existing.id}) found at {existing.path}!",  # noqa: E501
+                )
+                if scan._nifti == existing:
+                    self._logger.log(
+                        log_level,
+                        "Existing NIfTI instance belongs to queried scan!",
+                    )
+                    return bids_path
+                self._logger.log(
+                    log_level,
+                    f"Checking for an existing run label in scan #{scan.id}.",
+                )
+                try:
+                    existing_run_label = re.findall(
+                        self.RUN_LABEL_PATTERN, str(existing_path)
+                    )[0]
+                except IndexError:
+                    self._logger.log(log_level, "No existing run label found.")
+                    self._logger.log(
+                        log_level,
+                        f"Renaming existing NIfTI (#{existing.id}) to include run label.",  # noqa: E501
+                    )
+                    existing_run_label = self.RUN_LABEL_TEMPLATE.format(
+                        index=1
+                    )
+                    name_parts = Path(existing.path).name.split("_")
+                    insert_position = -2 if "inv" in existing_path.name else -1
+                    name_parts.insert(insert_position, existing_run_label)
+                    name_with_run = "_".join(name_parts)
+                    updated_path = existing_path.parent / name_with_run
+                    existing.rename(updated_path)
+                    self._logger.log(
+                        log_level,
+                        f"Scan #{scan.id} successfully moved to {updated_path}",  # noqa: E501
+                    )
+                    new_run_label = self.RUN_LABEL_TEMPLATE.format(index=2)
+                    bids_path = (
+                        updated_path.parent / updated_path.name.split(".")[0]
+                    )
+                else:
+                    self._logger.log(
+                        log_level,
+                        f"Existing run label found: {existing_run_label}",
+                    )
+                    existing_run_index = int(existing_run_label.split("-")[-1])
+                    index = existing_run_index + 1
+                    new_run_label = self.RUN_LABEL_TEMPLATE.format(index=index)
+                    self._logger.log(
+                        log_level, f"New run label: {new_run_label}"
+                    )
+            else:
+                self._logger.log(
+                    log_level,
+                    "Multiple existing NIfTI files found with the queried parameters.",  # noqa: E501
+                )
+                scan_numbers = list(
+                    existing.values_list("scan__number", flat=True)
+                )
+                self._logger.log(
+                    log_level, f"Found existing scan numbers: {scan_numbers}"
+                )
+                scan_numbers.append(scan.number)
+                scan_numbers = sorted(scan_numbers)
+                self._logger.log(
+                    log_level, f"Current scan's scan number: {scan.number}"
+                )
+                index = scan_numbers.index(scan.number) + 1
+                self._logger.log(
+                    log_level,
+                    f"Scan run index by scan number found to be {index}.",
+                )
+                new_run_label = self.RUN_LABEL_TEMPLATE.format(index=index)
+                name_parts = Path(bids_path).name.split("_")
+                insert_position = -2 if "inv" in Path(bids_path).name else -1
+                name_parts.insert(insert_position, new_run_label)
+                name_with_run = "_".join(name_parts)
+                self._logger.log(
+                    log_level, f"Updated current file name to: {name_with_run}"
+                )
+                return bids_path.parent / name_with_run
+            return Path(
+                str(bids_path).replace(existing_run_label, new_run_label)
+            )
 
     def fix_functional_json(self, bids_path: Path):
         """
@@ -159,7 +302,7 @@ class BidsManager:
             print(message)
         else:
             data_type_target = data_type_target[0]
-        session_dir = json_path.parents[1]
+        session_dir = json_path.parent.parent
         target_pattern = f"{data_type_target}/*.nii*"
         targets = [p for p in session_dir.glob(target_pattern)]
 

@@ -1,6 +1,7 @@
 """
 Definition of the :class:`ScanQuerySet` class.
 """
+import logging
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Union
@@ -86,7 +87,31 @@ class ScanQuerySet(QuerySet):
             )
         return {ScanType.DICOM.value: dicom_scans}
 
-    def sync_bids(self, progressbar: bool = True):
-        iterator = tqdm(self.all()) if progressbar else self.all()
+    def sync_bids(
+        self, progressbar: bool = True, log_level: int = logging.DEBUG
+    ):
+        queryset = self.order_by("number")
+        iterator = tqdm(queryset) if progressbar else queryset
         for scan in iterator:
-            scan.sync_bids()
+            scan.sync_bids(log_level=log_level)
+
+    def convert_to_nifti(
+        self,
+        progressbar: bool = True,
+        log_level: int = logging.DEBUG,
+        persistent: bool = True,
+    ):
+        queryset = self.filter(_nifti__isnull=True).order_by("number")
+        iterator = tqdm(queryset) if progressbar else queryset
+        fieldmaps = []
+        for scan in iterator:
+            if scan.dicom.sequence_type == "func_fieldmap":
+                fieldmaps.append(scan)
+                continue
+            scan._nifti = scan.dicom_to_nifti(persistent=persistent)
+            if scan._nifti:
+                scan.save()
+        for fieldmap in fieldmaps:
+            fieldmap._nifti = fieldmap.dicom_to_nifti(persistent=persistent)
+            if fieldmap._nifti:
+                fieldmap.save()

@@ -231,7 +231,7 @@ class ScanModelTestCase(TestCase):
     def test_get_default_nifti_dir(self):
         result = self.scan.get_default_nifti_dir()
         scan_dir = str(self.scan.dicom.path)
-        expected = Path(scan_dir.replace("DICOM", "NIfTI"))
+        expected = Path(scan_dir.replace("DICOM", "NIfTI")).parent
         self.assertEqual(result, expected)
 
     def test_get_default_nifti_dir_without_dicom(self):
