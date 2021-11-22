@@ -87,7 +87,7 @@ class BidsManager:
             "handedness": subject.dominant_hand.lower()
             if subject.dominant_hand in ["R", "L", "A"]
             else self.NA_LABEL,
-            "age": age,
+            "age": age if age < 89 else "89+",
             "sex": subject.sex if subject.sex else self.NA_LABEL,
         }
         return subject_dict
