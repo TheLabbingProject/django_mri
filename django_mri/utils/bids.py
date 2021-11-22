@@ -197,7 +197,7 @@ class BidsManager:
                     self._logger.debug(
                         f"Existing run label found: {existing_run_label}"
                     )
-                    existing_run_index = int(existing_run_label.split("-"))
+                    existing_run_index = int(existing_run_label.split("-")[-1])
                     index = existing_run_index + 1
                     new_run_label = self.RUN_LABEL_TEMPLATE.format(index=index)
                     self._logger.debug(f"New run label: {new_run_label}")
