@@ -96,14 +96,19 @@ class ScanQuerySet(QuerySet):
 
     def convert_to_nifti(
         self,
-        progressbar: bool = True,
+        force: bool = False,
         log_level: int = logging.DEBUG,
         persistent: bool = True,
+        progressbar: bool = True,
     ):
         queryset = self.filter(_nifti__isnull=True).order_by("number")
         iterator = tqdm(queryset) if progressbar else queryset
         appendices = []
         for scan in iterator:
+            if scan._nifti and not force:
+                continue
+            elif scan._nifti:
+                scan._nifti.delete()
             if scan.dicom.sequence_type in ("func_fieldmap", "dwi_sbref"):
                 appendices.append(scan)
                 continue
