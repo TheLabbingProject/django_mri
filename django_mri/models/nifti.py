@@ -11,8 +11,6 @@ import numpy as np
 from django.db import IntegrityError, models
 from django_analyses.models.input import FileInput, ListInput
 from django_extensions.db.models import TimeStampedModel
-
-from django_analyses.models.input import FileInput, ListInput
 from django_mri.models.messages import NIFTI_FILE_MISSING
 from django_mri.utils.compression import compress, uncompress
 
@@ -55,7 +53,6 @@ class NIfTI(TimeStampedModel):
         np.ndarray
             Pixel data.
         """
-
         return nib.load(str(self.path)).get_fdata(dtype=dtype)
 
     def get_b_value(self) -> List[int]:
@@ -353,6 +350,16 @@ class NIfTI(TimeStampedModel):
             log_level, f"NIfTI {self.id} file successfully moved."
         )
         self.save()
+
+    def get_file_paths(self) -> List[Path]:
+        nii_path = Path(self.path)
+        files = [nii_path]
+        base_path = nii_path.parent / nii_path.name.split(".")[0]
+        for appendix in self.APPENDIX_FILES:
+            appendix_path = base_path.with_suffix(appendix)
+            if appendix_path.exists():
+                files.append(appendix_path)
+        return files
 
     @property
     def json_file(self) -> Path:

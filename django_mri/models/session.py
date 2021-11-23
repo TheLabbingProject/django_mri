@@ -6,11 +6,14 @@ from typing import List
 
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-
 from django_mri.models import help_text
 from django_mri.models.managers.session import SessionQuerySet
-from django_mri.utils import (get_group_model, get_measurement_model,
-                              get_study_model, get_subject_model)
+from django_mri.utils import (
+    get_group_model,
+    get_measurement_model,
+    get_study_model,
+    get_subject_model,
+)
 
 Group = get_group_model()
 MeasurementDefinition = get_measurement_model()
@@ -125,33 +128,20 @@ class Session(TimeStampedModel):
             for p in self.scan_set.values_list(DICOM_FILES_KEY, flat=True)
         ]
 
-    def list_nifti_files(self, include_json: bool = True) -> List[Path]:
+    def list_nifti_files(self) -> List[Path]:
         """
         Returns a list of *.nii* files (and by default also JSON sidecars)
         included in this session.
-
-        Parameters
-        ----------
-        include_json : bool, optional
-            Whether to include the JSON sidecar with scan metadata, by default
-            True
 
         Returns
         -------
         List[Path]
             *.nii* files
         """
-        associated_niis = self.scan_set.filter(
-            _nifti__isnull=False
-        ).values_list(NIFTI_FILES_KEY, flat=True)
         paths = []
-        for path in associated_niis:
-            p = Path(path)
-            paths.append(p)
-            if include_json:
-                json_path = (p.parent / p.stem).with_suffix(".json")
-                if json_path.exists():
-                    paths.append(json_path)
+        for scan in self.scan_set.all(_nifti__isnull=False):
+            nii_paths = scan.nifti.get_file_paths()
+            paths += nii_paths
         return paths
 
     def query_measurement_studies(self) -> models.QuerySet:
