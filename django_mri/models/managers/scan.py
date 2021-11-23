@@ -101,7 +101,7 @@ class ScanQuerySet(QuerySet):
         persistent: bool = True,
         progressbar: bool = True,
     ):
-        queryset = self.filter(_nifti__isnull=True).order_by("number")
+        queryset = self.order_by("number")
         iterator = tqdm(queryset) if progressbar else queryset
         appendices = []
         for scan in iterator:
