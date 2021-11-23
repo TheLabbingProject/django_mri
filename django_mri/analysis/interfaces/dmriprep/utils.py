@@ -6,7 +6,7 @@ from niworkflows.utils.spaces import Reference, SpatialReferences
 
 #: TheBase-specific KWARGS
 THE_BASE_BIDS_IDENTIFIERS = dict(
-    dwi_identifier={"direction": "ap"},
+    dwi_identifier={"direction": "FWD"},
     fmap_identifier={"acquisition": "dwi"},
     t1w_identifier={"ceagent": "corrected"},
     t2w_identifier={"ceagent": "corrected"},
