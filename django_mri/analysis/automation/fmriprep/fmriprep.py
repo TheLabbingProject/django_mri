@@ -7,7 +7,6 @@ from django.db.models import Q, QuerySet
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.interfaces.fmriprep.fmriprep import FmriPrep2025
 from django_mri.analysis.utils.bids_filters import FMRIPREP_FILTERS
-from django_mri.models.scan import Scan
 from django_mri.utils.utils import get_subject_model
 
 #: Associated subject model.
@@ -31,7 +30,7 @@ class fMRIPrepRunner(QuerySetRunner):
     ANALYSIS_CONFIGURATION = {
         "output-spaces": ["anat", "MNI152NLin2009cAsym"],
         "use-aroma": True,
-        "bids-filter-file": FMRIPREP_FILTERS,
+        "bids-filter-file": str(FMRIPREP_FILTERS),
     }
 
     #: Input definition key.
@@ -66,12 +65,15 @@ class fMRIPrepRunner(QuerySetRunner):
             Subjects with fMRI data
         """
         queryset = super().get_base_queryset()
-        subject_ids = set(
-            Scan.objects.filter_by_sequence_type("fMRI")
-            .exclude(description__icontains="dmri")
-            .values_list("session__subject", flat=True)
-        )
-        return queryset.filter(id__in=subject_ids)
+        return queryset.filter(
+            mri_session_set__scan__dicom__sequence_type__in=(
+                "mprage",
+                "t2w",
+                "bold",
+                "func_sberf",
+                "func_fieldmap",
+            )
+        ).distinct()
 
     def get_instance_representation(self, instance: Subject) -> List[str]:
         """
@@ -105,11 +107,5 @@ class fMRIPrepRunner(QuerySetRunner):
             Input specification dictionary
         """
         scans = instance.mri_session_set.get_scan_set()
-        for scan in scans.filter(self.SCAN_QUERY):
-            bids_destination = scan.get_bids_destination()
-            if bids_destination:
-                try:
-                    scan.nifti
-                except RuntimeError:
-                    pass
+        scans.convert_to_nifti(force=False, persistent=True, progressbar=False)
         return super().create_input_specification(instance)
