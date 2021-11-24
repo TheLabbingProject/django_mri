@@ -1,6 +1,7 @@
 """
 Definition of the :class:`NIfTI` model.
 """
+import itertools
 import json
 import logging
 from pathlib import Path
@@ -373,10 +374,13 @@ class NIfTI(TimeStampedModel):
             if appendix_path.exists():
                 files.append(appendix_path)
         if hasattr(self, "scan") and self.scan.sequence_type == "dwi_fieldmap":
-            derivates = list(
-                self.derivative_set.values_list("path", flat=True)
+            derivatives = itertools.chain.from_iterable(
+                [
+                    derivative.get_file_paths()
+                    for derivative in self.derivative_set.all()
+                ]
             )
-            files += derivates
+            files += derivatives
         return files
 
     def get_mean_volume(self, axis: int = -1) -> np.ndarray:
