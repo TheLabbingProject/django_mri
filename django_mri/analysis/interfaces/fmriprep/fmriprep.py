@@ -6,12 +6,16 @@ from pathlib import Path
 from typing import Iterable, Tuple
 
 from django.conf import settings
-
 from django_mri.analysis.interfaces.fmriprep.messages import (
-    FS_LICENSE_MISSING, RUN_FAILURE)
-from django_mri.analysis.interfaces.fmriprep.utils import (COMMAND, FLAGS,
-                                                           FREESURFER_HOME,
-                                                           OUTPUTS)
+    FS_LICENSE_MISSING,
+    RUN_FAILURE,
+)
+from django_mri.analysis.interfaces.fmriprep.utils import (
+    COMMAND,
+    FLAGS,
+    FREESURFER_HOME,
+    OUTPUTS,
+)
 
 
 class FmriPrep:

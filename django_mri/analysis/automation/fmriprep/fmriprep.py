@@ -4,9 +4,9 @@ Definition of the :class:`fMRIPrepRunner` class.
 from typing import List
 
 from django.db.models import Q, QuerySet
-
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.interfaces.fmriprep.fmriprep import FmriPrep2025
+from django_mri.analysis.utils.bids_filters import FMRIPREP_FILTERS
 from django_mri.models.scan import Scan
 from django_mri.utils.utils import get_subject_model
 
@@ -31,6 +31,7 @@ class fMRIPrepRunner(QuerySetRunner):
     ANALYSIS_CONFIGURATION = {
         "output-spaces": ["anat", "MNI152NLin2009cAsym"],
         "use-aroma": True,
+        "bids-filter-file": FMRIPREP_FILTERS,
     }
 
     #: Input definition key.
