@@ -25,11 +25,21 @@ class NIfTI(TimeStampedModel):
     #: Path of the *.nii* file within the application's media directory.
     path = models.FilePathField(max_length=1000, unique=True)
 
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="derivative_set",
+    )
+
     #: Whether the created instance is the product of a direct conversion from
     #: some raw format to NIfTI or of a manipulation of the data.
     is_raw = models.BooleanField(default=False)
 
     APPENDIX_FILES: Iterable[str] = {".json", ".bval", ".bvec"}
+    B0_THRESHOLD: int = 10
+
+    _instance: nib.nifti1.Nifti1Image = None
 
     # Used to cache JSON data to prevent multiple reads.
     _json_data = None
@@ -40,6 +50,9 @@ class NIfTI(TimeStampedModel):
     class Meta:
         verbose_name = "NIfTI"
         ordering = ("-id",)
+
+    def get_instance(self) -> nib.nifti1.Nifti1Image:
+        return nib.load(str(self.path))
 
     def get_data(self, dtype: np.dtype = np.float64) -> np.ndarray:
         """
@@ -53,7 +66,7 @@ class NIfTI(TimeStampedModel):
         np.ndarray
             Pixel data.
         """
-        return nib.load(str(self.path)).get_fdata(dtype=dtype)
+        return self.instance.get_fdata(dtype=dtype)
 
     def get_b_value(self) -> List[int]:
         """
@@ -314,7 +327,7 @@ class NIfTI(TimeStampedModel):
                     log_level,
                     f"Appended {possible_appendix} moved to {appendix_destination}.",  # noqa: E501
                 )
-        if self.is_raw and self.scan:
+        if self.is_raw and hasattr(self, "scan"):
             self._logger.log(
                 log_level, f"Found associated scan (#{self.scan.id})."
             )
@@ -359,7 +372,24 @@ class NIfTI(TimeStampedModel):
             appendix_path = base_path.with_suffix(appendix)
             if appendix_path.exists():
                 files.append(appendix_path)
+        if hasattr(self, "scan") and self.scan.sequence_type == "dwi_fieldmap":
+            derivates = list(
+                self.derivative_set.values_list("path", flat=True)
+            )
+            files += derivates
         return files
+
+    def get_mean_volume(self, axis: int = -1) -> np.ndarray:
+        data = self.get_data()
+        if data.ndim == 4:
+            if (
+                hasattr(self, "scan")
+                and self.scan.sequence_type == "dwi_fieldmap"
+            ):
+                mask = np.array(self.b_value) < self.B0_THRESHOLD
+                data = data[..., mask]
+            return data.mean(axis=axis)
+        return data
 
     @property
     def json_file(self) -> Path:
@@ -496,3 +526,9 @@ class NIfTI(TimeStampedModel):
             Uncompressed *.nii* file associated with this instance
         """
         return self.uncompress()
+
+    @property
+    def instance(self) -> nib.nifti1.Nifti1Image:
+        if self._instance is None:
+            self._instance = self.get_instance()
+        return self._instance

@@ -278,21 +278,6 @@ class Scan(TimeStampedModel):
         name = self.get_default_nifti_name()
         return directory / name
 
-    def compile_to_bids(self, bids_path: Path):
-        """
-        Fixes some BIDS related issues after NIfTI coversion.
-
-        Parameters
-        ----------
-        bids_path : Path
-            Scan's BIDS path
-        """
-        if self.sequence_type in ["bold", "func_sbref"]:
-            self.bids_manager.fix_functional_json(bids_path)
-        if self.sequence_type in ["func_fieldmap", "dwi_sbref"]:
-            self.bids_manager.modify_fieldmaps(bids_path)
-        self.bids_manager.set_participant_tsv_and_json(self)
-
     def dicom_to_nifti(
         self,
         destination: Path = None,
@@ -348,9 +333,11 @@ class Scan(TimeStampedModel):
                 else:
                     raise
             else:
-                if bids:
-                    self.compile_to_bids(destination)
                 nifti = NIfTI.objects.create(path=nifti_path, is_raw=True)
+                self._nifti = nifti
+                self.save()
+                if bids:
+                    self.bids_manager.postprocess(nifti)
                 return nifti
         else:
             message = messages.DICOM_TO_NIFTI_NO_DICOM.format(scan_id=self.id)
@@ -573,10 +560,9 @@ class Scan(TimeStampedModel):
 
     def html_plot(self):
         # First make sure an associated NIfTI instance exists or create it.
-        nii = self._nifti
-        if not nii:
+        if not self._nifti:
             try:
-                nii = self.nifti
+                self.dicom_to_nifti()
             except RuntimeError as e:
                 # In case NIfTI conversion fails, return exception message.
                 message = messages.NIFTI_CONVERSION_FAILURE_HTML.format(
@@ -584,7 +570,7 @@ class Scan(TimeStampedModel):
                 )
                 return message
             else:
-                if not isinstance(nii, NIfTI):
+                if not isinstance(self._nifti, NIfTI):
                     e = "NIfTI format generation failure"
                     message = messages.NIFTI_CONVERSION_FAILURE_HTML.format(
                         scan_id=self.id, exception=e
@@ -598,17 +584,17 @@ class Scan(TimeStampedModel):
             [flag in self.description.lower() for flag in FLAG_4D]
         )
         if not (has_3d_flag or has_4d_flag):
-            data = nii.get_data()
+            data = self.nifti.get_data()
             ndim = data.ndim
         else:
             ndim = 3 if has_3d_flag else 4
         # 3D parameters.
         if ndim == 3:
-            image = str(nii.path)
+            image = str(self.nifti.path)
             title = self.description
         # 4D parameters.
         elif ndim == 4:
-            image = mean_img(str(nii.path))
+            image = mean_img(str(self.nifti.path))
             title = f"{self.description} (Mean Image)"
         return view_img(
             image,
@@ -697,8 +683,7 @@ class Scan(TimeStampedModel):
             Associated NIfTI instance
         """
         if not isinstance(self._nifti, NIfTI):
-            self._nifti = self.dicom_to_nifti()
-            self.save()
+            self.dicom_to_nifti()
         return self._nifti
 
     @property

@@ -10,6 +10,7 @@ import warnings
 from datetime import date
 from pathlib import Path
 
+import nibabel as nib
 import pandas as pd
 from django.apps import apps
 from django.db.models import Q
@@ -108,7 +109,7 @@ class BidsManager:
         self._logger.log(log_level, start_log)
 
         # Query naive relative BIDS path, as returned by dicom_parser.
-        sample_header = scan.dicom.get_sample_header()
+        sample_header = scan.dicom.sample_header
         default_bids_path = sample_header.build_bids_path()
         # If no naive BIDS path could be generated, show warning.
         if default_bids_path is None:
@@ -141,7 +142,8 @@ class BidsManager:
 
         # Check for existing runs with the same acquisition parameters.
         acquisition_labels = bids_path.name.split("_")
-        existing_query = Q()
+        datatype = bids_path.parent.name
+        existing_query = Q(path__contains=f"/{datatype}/")
         for i, label in enumerate(acquisition_labels):
             if i == 0:
                 label = label + "_"
@@ -250,7 +252,7 @@ class BidsManager:
                 str(bids_path).replace(existing_run_label, new_run_label)
             )
 
-    def fix_functional_json(self, bids_path: Path):
+    def fix_functional_json(self, nifti: NIfTI):
         """
         Add required "TaskName" field to functional scan, as stated in BIDS
         stucture.
@@ -267,7 +269,7 @@ class BidsManager:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
-        bids_path = Path(bids_path)
+        bids_path = Path(nifti.path)
         task = str(bids_path).split("task-")[-1].split("_")[0]
         json_file = bids_path.parent / f"{bids_path.name.split('.')[0]}.json"
         with open(json_file, "r+") as f:
@@ -277,7 +279,7 @@ class BidsManager:
             json.dump(data, f, indent=4)
             f.truncate()
 
-    def modify_fieldmaps(self, bids_path):
+    def modify_fieldmaps(self, nifti: NIfTI):
         """
         Add required "IntendedFor" field to fieldmaps, as stated in BIDS
         stucture.
@@ -294,6 +296,7 @@ class BidsManager:
         .. _BIDS MRI specification:
             https://bids-specification.readthedocs.io/en/stable/04-modality-specific-files/01-magnetic-resonance-imaging-data.html
         """
+        bids_path = Path(nifti.path)
         base_name = bids_path.name.split(".")[0]
         json_path = bids_path.parent / f"{base_name}.json"
         data_type_target = re.findall(self.ACQUISITION_PATTERN, base_name)
@@ -318,6 +321,55 @@ class BidsManager:
             fout.close()
         else:
             warnings.warn(f"No target file for {bids_path} could be found!")
+
+    def postprocess(self, nifti: NIfTI):
+        """
+        Fixes some BIDS related issues after NIfTI coversion.
+
+        Parameters
+        ----------
+        bids_path : Path
+            Scan's BIDS path
+        """
+        try:
+            sequence_type = nifti.scan.sequence_type
+        except AttributeError:
+            warnings.warn(
+                f"Can't post-process NIfTI #{nifti.id} without associated scan!"  # noqa: E501
+            )
+        if sequence_type in ["bold", "func_sbref"]:
+            self.fix_functional_json(nifti)
+        if sequence_type in ["func_fieldmap"]:
+            self.modify_fieldmaps(nifti)
+        if sequence_type == "dwi_fieldmap":
+            self.create_mean_b0_fieldmap(nifti)
+        self.set_participant_tsv_and_json(nifti.scan)
+
+    def create_mean_b0_fieldmap(self, multi_fieldmap: NIfTI) -> NIfTI:
+        mean_image_data = multi_fieldmap.get_mean_volume()
+        multi_image = multi_fieldmap.instance
+        mean_image = nib.Nifti1Image(
+            mean_image_data, multi_image.affine, header=multi_image.header,
+        )
+        mean_image.header.set_data_shape(mean_image_data.shape)
+        destination = Path(
+            str(multi_fieldmap.path)
+            .replace("/dwi/", "/fmap/")
+            .replace("_dwi.", "_epi.")
+        )
+        name_parts = destination.name.split("_")
+        name_parts.insert(2, "acq-dwi")
+        destination = destination.parent / "_".join(name_parts)
+        destination.parent.mkdir(exist_ok=True, parents=True)
+        nib.save(mean_image, str(destination))
+        json_destination = (
+            destination.parent / destination.name.split(".")[0]
+        ).with_suffix(".json")
+        shutil.copyfile(multi_fieldmap.json_file, json_destination)
+        mean_nifti = NIfTI.objects.create(
+            path=destination, is_raw=False, parent=multi_fieldmap
+        )
+        self.modify_fieldmaps(mean_nifti)
 
     def set_participant_tsv_and_json(self, scan):
         """
@@ -414,7 +466,7 @@ class BidsManager:
         readme = bids_dir / "README"
         if not readme.is_file():
             readme_template = TEMPLATES_DIR / "README"
-            shutil.copy(str(readme_template), str(readme))
+            shutil.copyfile(str(readme_template), str(readme))
 
     def scaffold_bids_directory(self):
         """

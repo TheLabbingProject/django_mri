@@ -109,13 +109,9 @@ class ScanQuerySet(QuerySet):
                 continue
             elif scan._nifti:
                 scan._nifti.delete()
-            if scan.dicom.sequence_type in ("func_fieldmap", "dwi_sbref"):
+            if "fieldmap" in scan.dicom.sequence_type:
                 appendices.append(scan)
                 continue
-            scan._nifti = scan.dicom_to_nifti(persistent=persistent)
-            if scan._nifti:
-                scan.save()
+            scan.dicom_to_nifti(persistent=persistent)
         for appendix in appendices:
-            appendix._nifti = appendix.dicom_to_nifti(persistent=persistent)
-            if appendix._nifti:
-                appendix.save()
+            appendix.dicom_to_nifti(persistent=persistent)
