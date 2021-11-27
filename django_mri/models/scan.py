@@ -4,18 +4,14 @@ Definition of the :class:`Scan` model.
 import logging
 import warnings
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import IntegrityError, models
-from django_analyses.models.input import (
-    DirectoryInput,
-    FileInput,
-    Input,
-    ListInput,
-)
+from django_analyses.models.input import (DirectoryInput, FileInput, Input,
+                                          ListInput)
 from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
@@ -24,11 +20,8 @@ from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.messages import SCAN_UPDATE_NO_DICOM
 from django_mri.models.nifti import NIfTI
 from django_mri.utils.bids import BidsManager
-from django_mri.utils.utils import (
-    get_bids_manager,
-    get_group_model,
-    get_mri_root,
-)
+from django_mri.utils.utils import (get_bids_manager, get_group_model,
+                                    get_mri_root)
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
 
@@ -431,9 +424,8 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import (
-            get_mrconvert_node,
-        )
+        from django_mri.analysis.utils.get_mrconvert_node import \
+            get_mrconvert_node
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()
@@ -603,6 +595,21 @@ class Scan(TimeStampedModel):
             symmetric_cmap=False,
             title=title,
         )
+
+    def get_file_paths(self, file_format: Union[List[str], str] = None) -> List[Path]:
+        if isinstance(file_format, str):
+            file_format = [file_format]
+        paths = []
+        file_format = (
+            ["dicom", "nifti"]
+            if file_format is None
+            else [f.lower() for f in file_format]
+        )
+        if hasattr(self, "dicom") and "dicom" in file_format:
+            paths += self.dicom.get_file_paths()
+        if self._nifti and "nifti" in file_format:
+            paths += self.nifti.get_file_paths()
+        return paths
 
     @property
     def bids_manager(self):
