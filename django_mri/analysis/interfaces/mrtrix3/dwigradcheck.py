@@ -55,7 +55,9 @@ class DwiGradCheck:
         return key_command
 
     def fix_output_configuration(self, config: dict, destination: Path):
-        fsl_export = "export_fsl_bvec" in config and "export_fsl_bval" in config
+        fsl_export = (
+            "export_fsl_bvec" in config and "export_fsl_bval" in config
+        )
         mrtrix_export = "export_grad_mrtrix" in config
         if fsl_export and mrtrix_export:
             raise RuntimeError(
@@ -78,7 +80,7 @@ class DwiGradCheck:
         Parameters
         ----------
         destination : Path
-            Output files destination direcotry
+            Output files destination directory
         config : dict
             Configuration arguments for the command
 
@@ -90,7 +92,11 @@ class DwiGradCheck:
         # output_path = destination / self.DEFAULT_OUTPUT_NAME
         in_file = config.pop("in_file")
 
-        return f"dwigradcheck" + f" {in_file}" + self.set_configuration_by_keys(config)
+        return (
+            f"dwigradcheck"
+            + f" {in_file}"
+            + self.set_configuration_by_keys(config)
+        )
 
     def generate_output_dict(self, config: dict, destination: Path) -> dict:
         """

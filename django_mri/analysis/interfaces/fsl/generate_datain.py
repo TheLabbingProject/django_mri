@@ -93,7 +93,7 @@ class GenerateDatain:
         scan : ~django_mri.models.scan.Scan
             Input scan
         destination : Path
-            Output files destination direcotry
+            Output files destination directory
         config : str
             Configuration arguments for the command
 
@@ -107,7 +107,9 @@ class GenerateDatain:
         command = f"dwifslpreproc {scan.path} {output_path} {config}"
         return command + "".join(
             [
-                f" -{key}" if key in self.FLAGS and value else f" -{key} {value}"
+                f" -{key}"
+                if key in self.FLAGS and value
+                else f" -{key} {value}"
                 for key, value in self.configuration.items()
             ]
         )
