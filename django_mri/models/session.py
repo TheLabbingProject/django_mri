@@ -1,14 +1,17 @@
 """
 Definition of the :class:`Session` class.
 """
+import logging
+import shutil
 from pathlib import Path
 from typing import List
 
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
-from django_mri.models import help_text
+from django_mri.models import help_text, logs
 from django_mri.models.managers.session import SessionQuerySet
 from django_mri.utils import (
+    get_bids_dir,
     get_group_model,
     get_measurement_model,
     get_study_model,
@@ -71,6 +74,12 @@ class Session(TimeStampedModel):
     )
 
     objects = SessionQuerySet.as_manager()
+
+    BIDS_DIR_TEMPLATE: str = "ses-{date}{time}"
+    SESSION_DATE_FORMAT: str = "%Y%m%d"
+    SESSION_TIME_FORMAT: str = "%H%M"
+
+    _logger = logging.getLogger("data.mri.session")
 
     class Meta:
         ordering = ("-time",)
@@ -160,6 +169,76 @@ class Session(TimeStampedModel):
         return self.query_measurement_studies() | Study.objects.filter(
             id__in=self.study_groups.values("study__id")
         )
+
+    def get_bids_dir(self) -> Path:
+        bids_root = get_bids_dir()
+        date = self.time.date().strftime(self.SESSION_DATE_FORMAT)
+        time = self.time.time().strftime(self.SESSION_TIME_FORMAT)
+        session_dir_name = self.BIDS_DIR_TEMPLATE.format(date=date, time=time)
+        return bids_root / session_dir_name
+
+    def delete_bids_dir(self):
+        # Log BIDS directory deletion start.
+        delete_start_log = logs.SESSION_BIDS_DELETE_START.format(pk=self.id)
+        self._logger.debug(delete_start_log)
+        path = self.get_bids_dir()
+        if path.is_dir():
+            # Delete.
+            try:
+                shutil.rmtree(path)
+            except Exception as e:
+                # Log exception and re-raise.
+                failure_log = logs.SESSION_BIDS_DELETE_FAILURE.format(
+                    pk=self.id, path=path, exception=e
+                )
+                self._logger.warn(failure_log)
+                raise
+            else:
+                # Log existing directory deletion success.
+                delete_end_log = logs.SESSION_BIDS_DELETE_END.format(
+                    pk=self.id, path=path
+                )
+                self._logger.debug(delete_end_log)
+        else:
+            # Log no directory found at the expected path.
+            abort_log = logs.SESSION_BIDS_DELETE_EMPTY.format(
+                pk=self.id, path=path
+            )
+            self._logger.debug(abort_log)
+
+    def convert_to_nifti(
+        self,
+        force: bool = False,
+        persistent: bool = True,
+        progressbar: bool = False,
+        progressbar_position: int = 0,
+    ):
+        # Log session data conversion start.
+        start_log = logs.SESSION_NIFTI_CONVERSION_START.format(pk=self.id)
+        self._logger.debug(start_log)
+        # If *force* is True, start off by deleting the existing BIDS
+        # directory for this session, which should contain prior (supported)
+        # conversion results.
+        if force:
+            self.delete_bids_dir()
+        try:
+            self.scan_set.convert_to_nifti(
+                force=force,
+                persistent=persistent,
+                progressbar=progressbar,
+                progressbar_position=progressbar_position,
+            )
+        except Exception as e:
+            # Log exception and re-raise.
+            failure_log = logs.SESSION_NIFTI_CONVERSION_FAILURE.format(
+                pk=self.id, exception=e
+            )
+            self._logger.warn(failure_log)
+            raise
+        else:
+            # Log session data conversion success.
+            success_log = logs.SESSION_NIFTI_CONVERSION_END.format(pk=self.id)
+            self._logger.debug(success_log)
 
     @property
     def subject_age(self) -> float:

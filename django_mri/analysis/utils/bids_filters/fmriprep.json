@@ -1,0 +1,7 @@
+{
+  "func": { "suffix": "bold" },
+  "sbref": { "suffix": "sbref", "datatype": "func" },
+  "fmap": { "suffix": "epi", "acquisition": "func" },
+  "t1w": { "ceagent": "corrected" },
+  "t2w": { "ceagent": "corrected" }
+}

@@ -62,13 +62,15 @@ class BidsManager:
         """
         today = date.today()
         try:
-            return (
+            years = (
                 today.year
                 - born.year
                 - ((today.month, today.day) < (born.month, born.day))
             )
         except AttributeError:
             return self.NA_LABEL
+        else:
+            return str(years) if years < 89 else "89+"
 
     def get_subject_data(self, scan):
         """
@@ -88,7 +90,7 @@ class BidsManager:
             "handedness": subject.dominant_hand.lower()
             if subject.dominant_hand in ["R", "L", "A"]
             else self.NA_LABEL,
-            "age": age if age < 89 else "89+",
+            "age": age,
             "sex": subject.sex if subject.sex else self.NA_LABEL,
         }
         return subject_dict

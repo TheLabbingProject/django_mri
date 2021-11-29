@@ -6,14 +6,14 @@ from pathlib import Path
 from typing import Iterable, Tuple
 
 import bids
-from django.conf import settings
-from dwiprep.dwiprep import DmriPrepManager
-
 from django_mri.analysis.interfaces.dmriprep.utils import (
-    OUTPUTS, THE_BASE_BIDS_IDENTIFIERS, THE_BASE_SMRIPREP_KWARGS)
-from django_mri.analysis.interfaces.fmriprep.messages import (
-    FS_LICENSE_MISSING, RUN_FAILURE)
+    OUTPUTS,
+    THE_BASE_BIDS_IDENTIFIERS,
+    THE_BASE_SMRIPREP_KWARGS,
+)
+from django_mri.analysis.interfaces.fmriprep.messages import FS_LICENSE_MISSING
 from django_mri.analysis.interfaces.fmriprep.utils import FREESURFER_HOME
+from dwiprep.dwiprep import DmriPrepManager
 
 bids.config.set_option("extension_initial_dot", True)
 
@@ -253,7 +253,8 @@ class DmriPrep:
 
     def init_dmriprep_instance(self) -> DmriPrepManager:
         """
-        Initiates a *DmriPrepMangager* instance to build preprocessing workflow.
+        Initiates a *DmriPrepMangager* instance to build preprocessing
+        workflow.
 
         Returns
         -------
@@ -288,9 +289,7 @@ class DmriPrep:
             In case of failed execution, raises an appropriate error
         """
         manager = self.init_dmriprep_instance()
-        workflows = manager.preprocess_subjects()
-        for pariticipant_label, workflow in workflows.items():
-            workflow.run()
+        manager.run()
         return self.generate_output_dict()
 
 
