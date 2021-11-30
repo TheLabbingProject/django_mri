@@ -4,15 +4,7 @@ Utilities for the
 """
 
 #: Command line template to format for execution.
-<<<<<<< HEAD
-<<<<<<< HEAD
-COMMAND = "singularity run -e {security_options} -B {bids_parent}:/work,{destination_parent}:/output,{freesurfer_license}:/fs_license /my_images/qsiprep-{version}.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
-=======
 COMMAND = "singularity run -e {security_options} -B {bids_parent}:/work,{destination_parent}:/output,{freesurfer_license}:/fs_license {singularity_image_root}/qsiprep-{version}.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
->>>>>>> singularity_images
-=======
-COMMAND = "singularity run -e {security_options} -B {bids_parent}:/work,{destination_parent}:/output,{freesurfer_license}:/fs_license {singularity_image_root}/qsiprep-{version}.simg /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
->>>>>>> singularity_images
 
 #: Default FreeSurfer home directory.
 FREESURFER_HOME: str = "/usr/local/freesurfer"

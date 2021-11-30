@@ -16,14 +16,7 @@ from django_mri.analysis.interfaces.qsiprep.utils import (
     FREESURFER_HOME,
     OUTPUTS,
 )
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 from django_mri.utils import get_singularity_root
->>>>>>> singularity_images
-=======
-from django_mri.utils import get_singularity_root
->>>>>>> singularity_images
 
 
 class QsiPrep:
@@ -142,14 +135,7 @@ class QsiPrep:
         """
         fs_license = self.find_fs_license()
         analysis_level = self.configuration.pop("analysis_level")
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         singularity_image_root = get_singularity_root()
->>>>>>> singularity_images
-=======
-        singularity_image_root = get_singularity_root()
->>>>>>> singularity_images
         command = COMMAND.format(
             bids_parent=self.nifti_root.parent,
             destination_parent=self.destination.parent,
@@ -159,14 +145,7 @@ class QsiPrep:
             freesurfer_license=fs_license,
             version=self.__version__,
             security_options=self.security_options,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
             singularity_image_root=singularity_image_root,
->>>>>>> singularity_images
-=======
-            singularity_image_root=singularity_image_root,
->>>>>>> singularity_images
         )
         return command + self.set_configuration_by_keys()
 
