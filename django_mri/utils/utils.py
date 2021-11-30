@@ -8,7 +8,6 @@ import pytz
 from django.apps import apps
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
-
 from django_mri.apps import DjangoMriConfig
 
 #: The name of the subdirectory under MEDIA_ROOT in which MRI data will be
@@ -41,6 +40,9 @@ DEFAULT_MEASUREMENT_MODEL = "research.MeasurementDefinition"
 
 #: Default value for an MRI data share root directory
 DATA_SHARE_ROOT_DEFAULT = "/mnt/"
+
+#: Default singularity images root
+DEFAULT_SINGULARITY_IMAGE_ROOT = "/my_images"
 
 
 def get_subject_model():
@@ -145,6 +147,16 @@ def get_dicom_root() -> Path:
     Returns the path of the directory in which DICOM data should be saved.
     """
     return get_mri_root() / DEFAULT_DICOM_DIR_NAME
+
+
+def get_singularity_root() -> Path:
+    """
+    Returns the path of the directory in which singularity images are stored.
+    """
+    path = getattr(
+        settings, "SINGULARITY_IMAGE_ROOT", DEFAULT_SINGULARITY_IMAGE_ROOT
+    )
+    return Path(path)
 
 
 EMPTY_SESSION_TIME: datetime.time = datetime.time()

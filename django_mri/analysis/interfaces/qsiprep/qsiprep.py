@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import Iterable, Tuple
 
 from django.conf import settings
-from django_mri.analysis.interfaces.fmriprep.messages import (
+from django_mri.analysis.interfaces.qsiprep.messages import (
     FS_LICENSE_MISSING,
     RUN_FAILURE,
 )
-from django_mri.analysis.interfaces.fmriprep.utils import (
+from django_mri.analysis.interfaces.qsiprep.utils import (
     COMMAND,
     FLAGS,
     FREESURFER_HOME,
@@ -19,16 +19,16 @@ from django_mri.analysis.interfaces.fmriprep.utils import (
 from django_mri.utils import get_singularity_root
 
 
-class FmriPrep:
+class QsiPrep:
     """
-    An interface for the *fmriprep* preprocessing pipeline.
+    An interface for the *qsiprep* preprocessing pipeline.
 
     References
     ----------
-    * fmriprep_
+    * qsiprep_
 
     .. _fmriprep:
-       https://fmriprep.org/en/stable/index.html
+       https://qsiprep.readthedocs.io/en/latest/
     """
 
     #: Binary configurations.
@@ -40,8 +40,8 @@ class FmriPrep:
     #: Default FreeSurfer home directory.
     DEFAULT_FREESURFER_HOME: Path = Path(FREESURFER_HOME)
 
-    #: FmriPrep output pattern.
-    FMRIPREP_OUTPUT_PATTERN: str = (
+    #: QsiPrep output pattern.
+    QSIPREP_OUTPUT_PATTERN: str = (
         "{main_dir}/**/{sub_dir}/sub-{subject_id}_{session_id}_{output_id}"
     )
 
@@ -49,7 +49,7 @@ class FmriPrep:
     FS_OUTPUT_PATTERN: str = "{main_dir}/**/*{output_id}"
 
     #: Session results pattern.
-    SESSION_PATTERN: str = "fmriprep/sub-{subject_id}/ses-*"
+    SESSION_PATTERN: str = "qsiprep/sub-{subject_id}/ses-*"
 
     __version__ = None
 
@@ -103,7 +103,7 @@ class FmriPrep:
 
     def set_configuration_by_keys(self):
         """
-        Builds command for fmriprep CLI (via singularity) based on user's
+        Builds command for qsiprep CLI (via singularity) based on user's
         specifications.
 
         Returns
@@ -178,7 +178,7 @@ class FmriPrep:
         )
         return self.destination.rglob(pattern)
 
-    def generate_fmriprep_outputs(
+    def generate_qsiprep_outputs(
         self,
         main_dir: str,
         sub_dir: str,
@@ -187,7 +187,7 @@ class FmriPrep:
         output_id: str,
     ) -> Iterable[Path]:
         """
-        Generate fmriprep output paths.
+        Generate qsiprep output paths.
 
         Parameters
         ----------
@@ -207,7 +207,7 @@ class FmriPrep:
         Path
             Output paths
         """
-        pattern = self.FMRIPREP_OUTPUT_PATTERN.format(
+        pattern = self.QSIPREP_OUTPUT_PATTERN.format(
             main_dir=main_dir,
             sub_dir=sub_dir,
             subject_id=subject_id,
@@ -221,7 +221,7 @@ class FmriPrep:
     ):
         """
         uses the destination and some default dictionary to locate specific
-        output files of *fmriprep*.
+        output files of *qsiprep*.
 
         Parameters
         ----------
@@ -237,7 +237,7 @@ class FmriPrep:
             outputs = list(self.generate_fs_outputs(main_dir, output_id))
         elif main_dir == "fmriprep":
             outputs = list(
-                self.generate_fmriprep_outputs(
+                self.generate_qsiprep_outputs(
                     main_dir, sub_dir, subject_id, session_id, output_id
                 )
             )
@@ -274,7 +274,7 @@ class FmriPrep:
 
     def run(self) -> dict:
         """
-        Runs *fmriprep* with the provided *bids_dir* as input.
+        Runs *qsiprep* with the provided *bids_dir* as input.
         If *destination* is not specified, output files will be created within
         *bids_dir*\'s parent directory.
 
@@ -303,21 +303,5 @@ class FmriPrep:
         return self.get_security_options()
 
 
-class FmriPrep2021(FmriPrep):
-    __version__ = "20.2.1"
-
-
-class FmriPrep2022(FmriPrep):
-    __version__ = "20.2.2"
-
-
-class FmriPrep2023(FmriPrep):
-    __version__ = "20.2.3"
-
-
-class FmriPrep2024(FmriPrep):
-    __version__ = "20.2.4"
-
-
-class FmriPrep2025(FmriPrep):
-    __version__ = "20.2.5"
+class QsiPrep0143(QsiPrep):
+    __version__ = "0.14.3"
