@@ -1,6 +1,7 @@
 """
 General app utilities.
 """
+
 from django_mri.utils.utils import (
     get_bids_dir,
     get_bids_manager,
@@ -9,6 +10,7 @@ from django_mri.utils.utils import (
     get_measurement_model,
     get_mri_root,
     get_session_by_series,
+    get_singularity_root,
     get_study_model,
     get_subject_model,
 )
