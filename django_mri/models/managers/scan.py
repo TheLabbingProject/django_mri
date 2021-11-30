@@ -2,12 +2,14 @@
 Definition of the :class:`ScanQuerySet` class.
 """
 import logging
+import warnings
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Union
 
 from django.db.models import QuerySet
 from django_dicom.models.image import Image as DicomImage
+from django_mri.models.managers import logs
 from django_mri.utils.scan_type import ScanType
 from tqdm import tqdm
 
@@ -16,6 +18,8 @@ class ScanQuerySet(QuerySet):
     """
     Custom manager for the :class:`~django_mri.models.scan.Scan` class.
     """
+
+    _logger = logging.getLogger("data.mri.scan")
 
     def import_dicom_data(
         self, path: Path, progressbar: bool = True, report: bool = True
@@ -86,6 +90,55 @@ class ScanQuerySet(QuerySet):
             )
         return {ScanType.DICOM.value: dicom_scans}
 
+    def delete_nifti(
+        self, progressbar: bool = False, progressbar_position: int = 0,
+    ):
+        # Log NIfTI delete start.
+        start_log = logs.SCAN_SET_NIFTI_DELETE_START.format(count=self.count())
+        self._logger.debug(start_log)
+        # Filter to only iterate scans with associated NIfTI instances.
+        queryset = self.filter(_nifti__isnull=False)
+        # Handle empty queryset.
+        if not queryset.exists():
+            # Log and return.
+            abort_log = logs.SCAN_SET_NIFTI_DELETE_EMPTY.format(
+                count=self.count()
+            )
+            self._logger.debug(abort_log)
+            return
+        iterator = (
+            tqdm(
+                queryset,
+                unit="NIfTI",
+                desc="Deleting",
+                position=progressbar_position,
+                leave=not progressbar_position,
+            )
+            if progressbar
+            else queryset
+        )
+        # Delete associated NIfTI instances. This must be done by iteration
+        # rather than an update, in order to trigger the post_save() signal
+        # which removed the files from the media directory.
+        n_deleted = 0
+        try:
+            for scan in iterator:
+                scan.nifti.delete()
+                n_deleted += 1
+        except Exception as e:
+            # Log exception and re-raise.
+            failure_log = logs.SCAN_SET_NIFTI_DELETE_FAILURE.format(
+                n_deleted=n_deleted, n_total=queryset.count(), exception=e
+            )
+            self._logger.warn(failure_log)
+            raise
+        else:
+            # Log success and return.
+            success_log = logs.SCAN_SET_NIFTI_DELETE_SUCCESS.format(
+                count=self.count()
+            )
+            self._logger.debug(success_log)
+
     def sync_bids(
         self, progressbar: bool = True, log_level: int = logging.DEBUG
     ):
@@ -97,21 +150,67 @@ class ScanQuerySet(QuerySet):
     def convert_to_nifti(
         self,
         force: bool = False,
-        log_level: int = logging.DEBUG,
         persistent: bool = True,
-        progressbar: bool = True,
+        progressbar: bool = False,
+        progressbar_position: int = 0,
     ):
-        queryset = self.order_by("number")
-        iterator = tqdm(queryset) if progressbar else queryset
-        appendices = []
-        for scan in iterator:
-            if scan._nifti and not force:
-                continue
-            elif scan._nifti:
-                scan._nifti.delete()
-            if "fieldmap" in scan.dicom.sequence_type:
-                appendices.append(scan)
-                continue
-            scan.dicom_to_nifti(persistent=persistent)
-        for appendix in appendices:
-            appendix.dicom_to_nifti(persistent=persistent)
+        # Log start.
+        start_log = logs.SCAN_SET_NIFTI_CONVERSION_START.format(
+            count=self.count()
+        )
+        self._logger.debug(start_log)
+        if force:
+            self.delete_nifti(
+                progressbar=progressbar,
+                progressbar_position=progressbar_position,
+            )
+        # Run by scan order and create progressbar if required.
+        queryset = self.filter(_nifti__isnull=True).order_by("number")
+        # Query fieldmaps to convert only after their "IntendedFor" targets
+        # have been converted (required for correct BIDS postprocessing).
+        fieldmaps = queryset.filter(dicom__sequence_type__contains="fieldmap")
+        non_fieldmaps = queryset.exclude(
+            dicom__sequence_type__contains="fieldmap"
+        )
+        if fieldmaps.exists():
+            # Log fieldmaps detected and will be converted in the end.
+            fieldmaps_log = logs.SCAN_SET_NIFTI_CONVERSION_FIELDMAPS.format(
+                n_fieldmaps=fieldmaps.count(), n_total=non_fieldmaps.count()
+            )
+            self._logger.debug(fieldmaps_log)
+        non_fieldmaps_iterator = (
+            tqdm(
+                non_fieldmaps,
+                unit="scan",
+                desc="Scans",
+                position=progressbar_position,
+                leave=not progressbar_position,
+            )
+            if progressbar
+            else non_fieldmaps
+        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
+            # Convert non-fieldmap scans.
+            for scan in non_fieldmaps_iterator:
+                scan.dicom_to_nifti(persistent=persistent)
+            # Convert fieldmaps.
+            if fieldmaps.exists():
+                fieldmap_iterator = (
+                    tqdm(
+                        fieldmaps,
+                        unit="scan",
+                        desc="Fieldmaps",
+                        position=progressbar_position,
+                        leave=not progressbar_position,
+                    )
+                    if progressbar
+                    else fieldmaps
+                )
+                for fieldmap in fieldmap_iterator:
+                    fieldmap.dicom_to_nifti(persistent=persistent)
+        # Log conversion succcess.
+        success_log = logs.SCAN_SET_NIFTI_CONVERSION_SUCCESS.format(
+            count=queryset.count()
+        )
+        self._logger.debug(success_log)

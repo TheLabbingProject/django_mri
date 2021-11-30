@@ -59,7 +59,7 @@ class MRConvert:
         Parameters
         ----------
         destination : Path
-            Output files destination direcotry
+            Output files destination directory
         config : dict
             Configuration arguments for the command
 
@@ -125,5 +125,7 @@ class MRConvert:
         command = self.generate_command(self.configuration)
         raise_exception = os.system(command)
         if raise_exception:
-            raise RuntimeError(f"Failed to run mrconvert!\nExecuted command: {command}")
+            raise RuntimeError(
+                f"Failed to run mrconvert!\nExecuted command: {command}"
+            )
         return self.generate_output_dict(destination)

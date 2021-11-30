@@ -12,12 +12,6 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
-from nilearn.plotting.html_document import HTMLDocument
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.request import Request
-from rest_framework.response import Response
-
 from django_analyses.serializers.run import RunSerializer
 from django_dicom.models import Series
 from django_mri.filters.scan_filter import ScanFilter
@@ -26,6 +20,11 @@ from django_mri.serializers import ScanSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
 from django_mri.views.utils import fix_bokeh_script
+from nilearn.plotting.html_document import HTMLDocument
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 HOST_NAME: str = getattr(settings, "APP_IP", "localhost")
 BOKEH_URL: str = f"http://{HOST_NAME}:5006/series_viewer"
@@ -249,6 +248,26 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
                 json_file = Path(instance.nifti.json_file)
                 if json_file.exists():
                     zip_file.write(json_file, json_file.name)
+        response = HttpResponse(
+            buffer.getvalue(), content_type=ZIP_CONTENT_TYPE
+        )
+        content_disposition = CONTENT_DISPOSITION.format(instance_id="scans")
+        response["Content-Disposition"] = content_disposition
+        return response
+
+    @action(detail=False, methods=["get"])
+    def to_zip(
+        self, request: Request, file_formats: str, scan_ids: str
+    ) -> HttpResponse:
+        file_formats = file_formats.split(",")
+        scan_ids = [int(pk) for pk in scan_ids.split(",")]
+        queryset = Scan.objects.filter(id__in=scan_ids)
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as zip_file:
+            for scan in queryset:
+                file_paths = scan.get_file_paths(file_format=file_formats)
+                for path in file_paths:
+                    zip_file.write(path, path.relative_to(settings.MEDIA_ROOT))
         response = HttpResponse(
             buffer.getvalue(), content_type=ZIP_CONTENT_TYPE
         )

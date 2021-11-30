@@ -59,7 +59,7 @@ class Dwi2Tensor:
         Parameters
         ----------
         destination : Path
-            Output files destination direcotry
+            Output files destination directory
         config : dict
             Configuration arguments for the command
 

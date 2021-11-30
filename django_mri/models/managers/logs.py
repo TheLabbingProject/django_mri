@@ -1,0 +1,15 @@
+"""
+Log message string templates for the :mod:`~django_mri.models.managers` module.
+"""
+SCAN_SET_NIFTI_CONVERSION_START: str = "Converting {count} scan instances to NIfTI..."
+SCAN_SET_NIFTI_CONVERSION_FIELDMAPS: str = "Fieldmaps detected ({n_fieldmaps}/{n_total}), conversion will be run separately in the end."
+SCAN_SET_NIFTI_CONVERSION_SUCCESS: str = "Successfully converted {count} scan instances to NIfTI."
+SCAN_SET_NIFTI_DELETE_START: str = "Deleting NIfTI instances and files associated with a queryset consisting of {count} scan instances..."
+SCAN_SET_NIFTI_DELETE_EMPTY: str = "No existing NIfTI instances found for any of the {count} provided scan instances."
+SCAN_SET_NIFTI_DELETE_SUCCESS: str = "Successfully deleted {count} NIfTI instances."
+SCAN_SET_NIFTI_DELETE_FAILURE: str = "Failed to complete NIfTI deletion after {n_deleted}/{n_total} iterations with the following exception:\n{exception}"
+SESSION_SET_NIFTI_CONVERSION_START: str = "Starting NIfTI conversion over {count} MRI session instances..."
+SESSION_SET_NIFTI_CONVERSION_SUCCESS: str = "Successfully completed NIfTI conversion over {count} MRI session instances."
+SESSION_SET_NIFTI_CONVERSION_FAILURE: str = "Failed to complete NIfTI conversion after {n_converted}/{n_total} MRI sessions."
+SESSION_SET_NIFTI_CONVERSION_EMPTY: str = "No MRI sessions found, NIfTI conversion finished."
+# flake8: noqa: E501
