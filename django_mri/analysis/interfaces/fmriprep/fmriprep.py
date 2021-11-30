@@ -16,6 +16,7 @@ from django_mri.analysis.interfaces.fmriprep.utils import (
     FREESURFER_HOME,
     OUTPUTS,
 )
+from django_mri.utils import get_singularity_root
 
 
 class FmriPrep:
@@ -134,6 +135,7 @@ class FmriPrep:
         """
         fs_license = self.find_fs_license()
         analysis_level = self.configuration.pop("analysis_level")
+        singularity_image_root = get_singularity_root()
         command = COMMAND.format(
             bids_parent=self.nifti_root.parent,
             destination_parent=self.destination.parent,
@@ -143,6 +145,7 @@ class FmriPrep:
             freesurfer_license=fs_license,
             version=self.__version__,
             security_options=self.security_options,
+            singularity_image_root=singularity_image_root,
         )
         return command + self.set_configuration_by_keys()
 

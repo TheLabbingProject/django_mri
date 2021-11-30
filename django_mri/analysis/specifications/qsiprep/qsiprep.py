@@ -62,23 +62,23 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": FileInputDefinition,
         "description": "a JSON file describing custom BIDS input filters using PyBIDS.",
     },
-    "bids-database-dir": {
+    "bids_database_dir": {
         "type": DirectoryInputDefinition,
         "description": "Path to an existing PyBIDS database folder, for faster indexing (especially useful for large datasets).",
     },
-    "interactive-reports-only": {
+    "interactive_reports_only": {
         "type": BooleanInputDefinition,
         "description": "create interactive report json files on already preprocessed data.",
     },
-    "recon-only": {
+    "recon_only": {
         "type": BooleanInputDefinition,
         "description": "run only reconstruction, assumes preprocessing has already completed.",
     },
-    "recon-spec": {
+    "recon_spec": {
         "type": FileInputDefinition,
         "description": "json file specifying a reconstruction pipeline to be run after preprocessing.",
     },
-    "recon-input": {
+    "recon_input": {
         "type": StringInputDefinition,
         "description": "use this directory as inputs to qsirecon. This option skips qsiprep.",
     },
@@ -86,7 +86,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "maximum number of threads across all processes.",
     },
+<<<<<<< HEAD
     "omp-nthreads": {
+=======
+    "omp_nthreads": {
+>>>>>>> singularity_images
         "type": IntegerInputDefinition,
         "description": "maximum number of threads per-process",
     },
@@ -94,6 +98,7 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "upper bound memory limit for fMRIPrep processes",
     },
+<<<<<<< HEAD
     "low-mem": {
         "type": BooleanInputDefinition,
         "description": "attempt to reduce memory usage (will increase disk usage in working directory)",
@@ -107,6 +112,21 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "run anatomical workflows only",
     },
     "dwi-only": {
+=======
+    "low_mem": {
+        "type": BooleanInputDefinition,
+        "description": "attempt to reduce memory usage (will increase disk usage in working directory)",
+    },
+    "use_plugin": {
+        "type": FileInputDefinition,
+        "description": "nipype plugin configuration file",
+    },
+    "anat_only": {
+        "type": BooleanInputDefinition,
+        "description": "run anatomical workflows only",
+    },
+    "dwi_only": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "ignore anatomical (T1w/T2w) data and process DWIs only",
     },
@@ -126,9 +146,15 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "longitudinal": {
         "type": BooleanInputDefinition,
+<<<<<<< HEAD
         "description": "treat dataset as longitudinal - may increase runtime",
     },
     "b0-threshold": {
+=======
+        "description": "treat dataset as longitudinal _ may increase runtime",
+    },
+    "b0_threshold": {
+>>>>>>> singularity_images
         "type": FloatInputDefinition,
         "description": "any value in the .bval file less than this will be considered a b=0 image. Current default threshold = 100; this threshold can be lowered or increased. Note, setting this too high can result in inaccurate results.",
     },
@@ -136,16 +162,25 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "window size in voxels for image-based denoising.",
     },
+<<<<<<< HEAD
     "denoise-method": {
+=======
+    "denoise_method": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["dwidenoise", "patch2self", "none"],
         "description": "Image-based denoising method. ",
     },
+<<<<<<< HEAD
     "unringing-method": {
+=======
+    "unringing_method": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["none", "mrdegibbs"],
         "description": "Image-based Gibbs unringing method.",
     },
+<<<<<<< HEAD
     "dwi-no-biascorr": {
         "type": BooleanInputDefinition,
         "description": "skip b0-based dwi spatial bias correction",
@@ -155,6 +190,17 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "skip re-scaling dwi scans to have matching b=0 intensities",
     },
     "denoise-after-combining": {
+=======
+    "dwi_no_biascorr": {
+        "type": BooleanInputDefinition,
+        "description": "skip b0-based dwi spatial bias correction",
+    },
+    "no_b0_harmonization": {
+        "type": BooleanInputDefinition,
+        "description": "skip re-scaling dwi scans to have matching b=0 intensities",
+    },
+    "denoise_after_combining": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "run dwidenoise after combining dwis. Requires --combine-all-dwis",
     },
@@ -162,36 +208,64 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "description": "don’t attempt to combine dwis from multiple runs. Each will be processed separately.",
     },
+<<<<<<< HEAD
     "distortion-group-merge": {
+=======
+    "distortion_group_merge": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["concat", "average", "none"],
         "description": "How to combine images across distorted groups.",
     },
+<<<<<<< HEAD
     "write-local-bvecs": {
         "type": BooleanInputDefinition,
         "description": "write a series of voxelwise bvecs, relevant if writing preprocessed dwis to template space.",
     },
     "b0-to-t1w-transform": {
+=======
+    "write_local_bvecs": {
+        "type": BooleanInputDefinition,
+        "description": "write a series of voxelwise bvecs, relevant if writing preprocessed dwis to template space.",
+    },
+    "b0_to_t1w_transform": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["Rigid", "Affine"],
         "description": "Degrees of freedom when registering b0 to T1w images. 6 degrees (rotation and translation) are used by default.",
     },
+<<<<<<< HEAD
     "intramodal-template-iters": {
         "type": IntegerInputDefinition,
         "description": "Number of iterations for finding the midpoint image from the b0 templates from all groups.",
     },
     "intramodal-template-transform": {
+=======
+    "intramodal_template_iters": {
+        "type": IntegerInputDefinition,
+        "description": "Number of iterations for finding the midpoint image from the b0 templates from all groups.",
+    },
+    "intramodal_template_transform": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["Rigid", "Affine", "BSplineSyN", "SyN"],
         "description": "Transformation used for building the intramodal template.",
     },
     # Motion correction and coregistration
+<<<<<<< HEAD
     "b0-motion-corr-to": {
+=======
+    "b0_motion_corr_to": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["iterative", "first"],
         "description": "align to the “first” b0 volume or do an “iterative” registration of all b0 images to their midpoint image.",
     },
+<<<<<<< HEAD
     "hmc-transform": {
+=======
+    "hmc_transform": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["Affine", "Rigid"],
         "description": "transformation to be optimized during head motion correction.",
@@ -201,7 +275,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "choices": ["3dSHORE", "eddy", "eddy"],
         "description": "model used to generate target images for hmc. If “none” the non-b0 images will be warped using the same transform as their nearest b0 image. If “3dSHORE”, SHORELine will be used. If “eddy_ingress”, the dwis are assumed to have been run through fsls eddy.",
     },
+<<<<<<< HEAD
     "eddy-config": {
+=======
+    "eddy_config": {
+>>>>>>> singularity_images
         "type": FileInputDefinition,
         "description": "path to a json file with settings for the call to eddy.",
     },
@@ -209,6 +287,7 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "number of SHORELine iterations.",
     },
+<<<<<<< HEAD
     "impute-slice-threshold": {
         "type": IntegerInputDefinition,
         "description": "impute data in slices that are this many SDs from expected. If 0 (default), no slices will be imputed.",
@@ -253,10 +332,35 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     ### Specific options for ANTs registrations ###
     "skull-strip-template": {
+=======
+    "impute_slice_threshold": {
+        "type": IntegerInputDefinition,
+        "description": "impute data in slices that are this many SDs from expected. If 0 (default), no slices will be imputed.",
+    },
+    "force_no_bbr": {
+        "type": BooleanInputDefinition,
+        "description": "Do not use boundary-based registration (no goodness-of-fit checks)",
+    },
+    "medial_surface_nan": {
+        "type": BooleanInputDefinition,
+        "description": "Replace medial wall values with NaNs on functional GIFTI files. Only performed for GIFTI files mapped to a freesurfer subject (fsaverage or fsnative).",
+    },
+    "dummy_scans": {
+        "type": IntegerInputDefinition,
+        "description": "Number of non steady state volumes.",
+    },
+    "random_seed": {
+        "type": IntegerInputDefinition,
+        "description": "Initialize the random seed for the workflow",
+    },
+    ### Specific options for ANTs registrations ###
+    "skull_strip_template": {
+>>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["OASIS", "NKI"],
         "description": "select a template for skull-stripping with antsBrainExtraction",
     },
+<<<<<<< HEAD
     "skull-strip-fixed-seed": {
         "type": BooleanInputDefinition,
         "description": "do not use a random seed for skull-stripping - will ensure run-to-run replicability when used with –omp-nthreads 1 and matching –random-seed <int>",
@@ -276,24 +380,61 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "fit a B-Spline field using least-squares (experimental)",
     },
     "fmap-no-demean": {
+=======
+    "skull_strip_fixed_seed": {
+        "type": BooleanInputDefinition,
+        "description": "do not use a random seed for skull-stripping - will ensure run-to-run replicability when used with –omp-nthreads 1 and matching –random-seed <int>",
+    },
+    "skip_t1_based_spatial_normalization": {
+        "type": BooleanInputDefinition,
+        "description": "skip running the t1w-based normalization to template space.",
+    },
+    "skull_strip_t1w": {
+        "type": StringInputDefinition,
+        "choices": ["auto", "skip", "force"],
+        "description": "determiner for T1_weighted skull stripping (‘force’ ensures skull stripping, ‘skip’ ignores skull stripping, and ‘auto’ applies brain extraction based on the outcome of a heuristic to check whether the brain is already masked).",
+    },
+    ### Specific options for handling fieldmaps ###
+    "fmap_bspline": {
+        "type": BooleanInputDefinition,
+        "description": "fit a B-Spline field using least-squares (experimental)",
+    },
+    "fmap_no_demean": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "do not remove median (within mask) from fieldmap",
     },
     ### Specific options for SyN distortion correction ###
+<<<<<<< HEAD
     "use-syn-sdc": {
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL: Use fieldmap-free distortion correction",
     },
     "force-syn": {
+=======
+    "use_syn_sdc": {
+        "type": BooleanInputDefinition,
+        "description": "EXPERIMENTAL: Use fieldmap-free distortion correction",
+    },
+    "force_syn": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL/TEMPORARY: Use SyN correction in addition to fieldmap correction, if available",
     },
     ### Specific options for FreeSurfer preprocessing ###
+<<<<<<< HEAD
     "fs-license-file": {
         "type": FileInputDefinition,
         "description": "Path to FreeSurfer license key file.",
     },
     "do-reconall": {
+=======
+    "fs_license_file": {
+        "type": FileInputDefinition,
+        "description": "Path to FreeSurfer license key file.",
+    },
+    "do_reconall": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "Run the FreeSurfer recon-all pipeline",
     },
@@ -302,24 +443,41 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "description": "orces unwarping to use files from the fmap directory instead of using an RPEdir scan from the same session.",
     },
+<<<<<<< HEAD
     "fmap-bspline": {
         "type": BooleanInputDefinition,
         "description": "fit a B-Spline field using least-squares (experimental)",
     },
     "fmap-no-demean": {
+=======
+    "fmap_bspline": {
+        "type": BooleanInputDefinition,
+        "description": "fit a B-Spline field using least-squares (experimental)",
+    },
+    "fmap_no_demean": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "do not remove median (within mask) from fieldmap.",
     },
     ### Specific options for SyN distortion correction ###
+<<<<<<< HEAD
     "use-syn-sdc": {
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL: Use fieldmap-free distortion correction.",
     },
     "force-syn": {
+=======
+    "use_syn_sdc": {
+        "type": BooleanInputDefinition,
+        "description": "EXPERIMENTAL: Use fieldmap-free distortion correction.",
+    },
+    "force_syn": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL/TEMPORARY: Use SyN correction in addition to fieldmap correction, if available.",
     },
     ### Other options ###
+<<<<<<< HEAD
     "work-dir": {
         "type": DirectoryInputDefinition,
         "description": "path where intermediate results should be stored",
@@ -337,6 +495,25 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "Write workflow graph.",
     },
     "stop-on-first-crash": {
+=======
+    "work_dir": {
+        "type": DirectoryInputDefinition,
+        "description": "path where intermediate results should be stored",
+    },
+    "resource_monitor": {
+        "type": BooleanInputDefinition,
+        "description": "enable Nipype’s resource monitoring to keep track of memory and CPU usage",
+    },
+    "reports_only": {
+        "type": BooleanInputDefinition,
+        "description": "only generate reports, don’t run workflows. This will only rerun report aggregation, not reportlet generation for specific nodes.",
+    },
+    "write_graph": {
+        "type": BooleanInputDefinition,
+        "description": "Write workflow graph.",
+    },
+    "stop_on_first_crash": {
+>>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "Force stopping on first crash, even if a work directory was specified.",
     },
