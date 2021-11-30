@@ -87,7 +87,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "maximum number of threads across all processes.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "omp-nthreads": {
+=======
+    "omp_nthreads": {
+>>>>>>> singularity_images
 =======
     "omp_nthreads": {
 >>>>>>> singularity_images
@@ -98,6 +102,7 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "upper bound memory limit for fMRIPrep processes",
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "low-mem": {
         "type": BooleanInputDefinition,
@@ -113,6 +118,8 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "dwi-only": {
 =======
+=======
+>>>>>>> singularity_images
     "low_mem": {
         "type": BooleanInputDefinition,
         "description": "attempt to reduce memory usage (will increase disk usage in working directory)",
@@ -126,6 +133,9 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "run anatomical workflows only",
     },
     "dwi_only": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "ignore anatomical (T1w/T2w) data and process DWIs only",
@@ -147,9 +157,15 @@ QSIPREP_INPUT_SPECIFICATION = {
     "longitudinal": {
         "type": BooleanInputDefinition,
 <<<<<<< HEAD
+<<<<<<< HEAD
         "description": "treat dataset as longitudinal - may increase runtime",
     },
     "b0-threshold": {
+=======
+        "description": "treat dataset as longitudinal _ may increase runtime",
+    },
+    "b0_threshold": {
+>>>>>>> singularity_images
 =======
         "description": "treat dataset as longitudinal _ may increase runtime",
     },
@@ -163,7 +179,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "window size in voxels for image-based denoising.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "denoise-method": {
+=======
+    "denoise_method": {
+>>>>>>> singularity_images
 =======
     "denoise_method": {
 >>>>>>> singularity_images
@@ -172,7 +192,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "Image-based denoising method. ",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "unringing-method": {
+=======
+    "unringing_method": {
+>>>>>>> singularity_images
 =======
     "unringing_method": {
 >>>>>>> singularity_images
@@ -180,6 +204,7 @@ QSIPREP_INPUT_SPECIFICATION = {
         "choices": ["none", "mrdegibbs"],
         "description": "Image-based Gibbs unringing method.",
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "dwi-no-biascorr": {
         "type": BooleanInputDefinition,
@@ -191,6 +216,8 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "denoise-after-combining": {
 =======
+=======
+>>>>>>> singularity_images
     "dwi_no_biascorr": {
         "type": BooleanInputDefinition,
         "description": "skip b0-based dwi spatial bias correction",
@@ -200,6 +227,9 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "skip re-scaling dwi scans to have matching b=0 intensities",
     },
     "denoise_after_combining": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "run dwidenoise after combining dwis. Requires --combine-all-dwis",
@@ -209,7 +239,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "don’t attempt to combine dwis from multiple runs. Each will be processed separately.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "distortion-group-merge": {
+=======
+    "distortion_group_merge": {
+>>>>>>> singularity_images
 =======
     "distortion_group_merge": {
 >>>>>>> singularity_images
@@ -218,22 +252,29 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "How to combine images across distorted groups.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "write-local-bvecs": {
         "type": BooleanInputDefinition,
         "description": "write a series of voxelwise bvecs, relevant if writing preprocessed dwis to template space.",
     },
     "b0-to-t1w-transform": {
 =======
+=======
+>>>>>>> singularity_images
     "write_local_bvecs": {
         "type": BooleanInputDefinition,
         "description": "write a series of voxelwise bvecs, relevant if writing preprocessed dwis to template space.",
     },
     "b0_to_t1w_transform": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["Rigid", "Affine"],
         "description": "Degrees of freedom when registering b0 to T1w images. 6 degrees (rotation and translation) are used by default.",
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "intramodal-template-iters": {
         "type": IntegerInputDefinition,
@@ -241,11 +282,16 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "intramodal-template-transform": {
 =======
+=======
+>>>>>>> singularity_images
     "intramodal_template_iters": {
         "type": IntegerInputDefinition,
         "description": "Number of iterations for finding the midpoint image from the b0 templates from all groups.",
     },
     "intramodal_template_transform": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["Rigid", "Affine", "BSplineSyN", "SyN"],
@@ -253,7 +299,11 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     # Motion correction and coregistration
 <<<<<<< HEAD
+<<<<<<< HEAD
     "b0-motion-corr-to": {
+=======
+    "b0_motion_corr_to": {
+>>>>>>> singularity_images
 =======
     "b0_motion_corr_to": {
 >>>>>>> singularity_images
@@ -262,7 +312,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "align to the “first” b0 volume or do an “iterative” registration of all b0 images to their midpoint image.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "hmc-transform": {
+=======
+    "hmc_transform": {
+>>>>>>> singularity_images
 =======
     "hmc_transform": {
 >>>>>>> singularity_images
@@ -276,7 +330,11 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "model used to generate target images for hmc. If “none” the non-b0 images will be warped using the same transform as their nearest b0 image. If “3dSHORE”, SHORELine will be used. If “eddy_ingress”, the dwis are assumed to have been run through fsls eddy.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "eddy-config": {
+=======
+    "eddy_config": {
+>>>>>>> singularity_images
 =======
     "eddy_config": {
 >>>>>>> singularity_images
@@ -287,6 +345,7 @@ QSIPREP_INPUT_SPECIFICATION = {
         "type": IntegerInputDefinition,
         "description": "number of SHORELine iterations.",
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "impute-slice-threshold": {
         "type": IntegerInputDefinition,
@@ -333,6 +392,8 @@ QSIPREP_INPUT_SPECIFICATION = {
     ### Specific options for ANTs registrations ###
     "skull-strip-template": {
 =======
+=======
+>>>>>>> singularity_images
     "impute_slice_threshold": {
         "type": IntegerInputDefinition,
         "description": "impute data in slices that are this many SDs from expected. If 0 (default), no slices will be imputed.",
@@ -355,11 +416,15 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     ### Specific options for ANTs registrations ###
     "skull_strip_template": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": StringInputDefinition,
         "choices": ["OASIS", "NKI"],
         "description": "select a template for skull-stripping with antsBrainExtraction",
     },
+<<<<<<< HEAD
 <<<<<<< HEAD
     "skull-strip-fixed-seed": {
         "type": BooleanInputDefinition,
@@ -381,6 +446,8 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "fmap-no-demean": {
 =======
+=======
+>>>>>>> singularity_images
     "skull_strip_fixed_seed": {
         "type": BooleanInputDefinition,
         "description": "do not use a random seed for skull-stripping - will ensure run-to-run replicability when used with –omp-nthreads 1 and matching –random-seed <int>",
@@ -400,11 +467,15 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "fit a B-Spline field using least-squares (experimental)",
     },
     "fmap_no_demean": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "do not remove median (within mask) from fieldmap",
     },
     ### Specific options for SyN distortion correction ###
+<<<<<<< HEAD
 <<<<<<< HEAD
     "use-syn-sdc": {
         "type": BooleanInputDefinition,
@@ -412,16 +483,22 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "force-syn": {
 =======
+=======
+>>>>>>> singularity_images
     "use_syn_sdc": {
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL: Use fieldmap-free distortion correction",
     },
     "force_syn": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL/TEMPORARY: Use SyN correction in addition to fieldmap correction, if available",
     },
     ### Specific options for FreeSurfer preprocessing ###
+<<<<<<< HEAD
 <<<<<<< HEAD
     "fs-license-file": {
         "type": FileInputDefinition,
@@ -429,11 +506,16 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "do-reconall": {
 =======
+=======
+>>>>>>> singularity_images
     "fs_license_file": {
         "type": FileInputDefinition,
         "description": "Path to FreeSurfer license key file.",
     },
     "do_reconall": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "Run the FreeSurfer recon-all pipeline",
@@ -444,22 +526,29 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "orces unwarping to use files from the fmap directory instead of using an RPEdir scan from the same session.",
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     "fmap-bspline": {
         "type": BooleanInputDefinition,
         "description": "fit a B-Spline field using least-squares (experimental)",
     },
     "fmap-no-demean": {
 =======
+=======
+>>>>>>> singularity_images
     "fmap_bspline": {
         "type": BooleanInputDefinition,
         "description": "fit a B-Spline field using least-squares (experimental)",
     },
     "fmap_no_demean": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "do not remove median (within mask) from fieldmap.",
     },
     ### Specific options for SyN distortion correction ###
+<<<<<<< HEAD
 <<<<<<< HEAD
     "use-syn-sdc": {
         "type": BooleanInputDefinition,
@@ -467,16 +556,22 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "force-syn": {
 =======
+=======
+>>>>>>> singularity_images
     "use_syn_sdc": {
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL: Use fieldmap-free distortion correction.",
     },
     "force_syn": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "EXPERIMENTAL/TEMPORARY: Use SyN correction in addition to fieldmap correction, if available.",
     },
     ### Other options ###
+<<<<<<< HEAD
 <<<<<<< HEAD
     "work-dir": {
         "type": DirectoryInputDefinition,
@@ -496,6 +591,8 @@ QSIPREP_INPUT_SPECIFICATION = {
     },
     "stop-on-first-crash": {
 =======
+=======
+>>>>>>> singularity_images
     "work_dir": {
         "type": DirectoryInputDefinition,
         "description": "path where intermediate results should be stored",
@@ -513,6 +610,9 @@ QSIPREP_INPUT_SPECIFICATION = {
         "description": "Write workflow graph.",
     },
     "stop_on_first_crash": {
+<<<<<<< HEAD
+>>>>>>> singularity_images
+=======
 >>>>>>> singularity_images
         "type": BooleanInputDefinition,
         "description": "Force stopping on first crash, even if a work directory was specified.",
