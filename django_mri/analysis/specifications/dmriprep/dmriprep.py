@@ -215,6 +215,21 @@ DMRIPREP_OUTPUT_SPECIFICATION = {
         "element_type": "FIL",
         "description": "Preprocessed dMRI NIfTI series in anatomical space.",
     },
+    "coreg_preproc_dwi_json": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Coregistered dMRI's json.",
+    },
+    "coreg_preproc_dwi_bvec": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Coregistered dMRI's .bvec.",
+    },
+    "coreg_preproc_dwi_bval": {
+        "type": ListOutputDefinition,
+        "element_type": "FIL",
+        "description": "Coregistered dMRI's .bval.",
+    },
     "coreg_preproc_epiref_nii": {
         "type": ListOutputDefinition,
         "element_type": "FIL",
