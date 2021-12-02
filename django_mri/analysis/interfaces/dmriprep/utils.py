@@ -13,7 +13,7 @@ THE_BASE_BIDS_IDENTIFIERS = dict(
 )
 
 THE_BASE_SMRIPREP_KWARGS = dict(
-    freesurfer=True,
+    freesurfer=False,
     hires=True,
     longitudinal=False,
     omp_nthreads=1,
