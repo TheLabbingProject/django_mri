@@ -247,7 +247,6 @@ class DmriPrep:
                 output_dict[subject_id][key] = self.find_output(
                     key, subject_id, "*"
                 )
-                print(key, "-" * 4, output_dict[subject_id][key])
         if len(output_dict) == 1:
             return output_dict.get(subject_id)
         return output_dict
