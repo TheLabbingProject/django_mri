@@ -1,14 +1,14 @@
 """
 Definition of the :class:`ScanFilter` class.
 """
-from django_filters import rest_framework as filters
-
 from django_dicom.models.utils.sequence_type import SEQUENCE_TYPE_CHOICES
+from django_filters import rest_framework as filters
 from django_mri.filters.utils import LOOKUP_CHOICES, NumberInFilter
 from django_mri.models.scan import Scan
-from django_mri.utils.utils import get_group_model
+from django_mri.utils.utils import get_group_model, get_study_model
 
 Group = get_group_model()
+Study = get_study_model()
 
 
 class ScanFilter(filters.FilterSet):
@@ -24,7 +24,7 @@ class ScanFilter(filters.FilterSet):
     scan_time = filters.DateTimeFromToRangeFilter("time")
     created = filters.DateTimeFromToRangeFilter("created")
     institution_name = filters.AllValuesFilter("institution_name")
-    dicom_id_in = NumberInFilter(field_name="dicom__id", lookup_expr="in")
+    dicom_id_in = NumberInFilter(field_name="dicom", lookup_expr="in")
     sequence_type = filters.MultipleChoiceFilter(
         field_name="dicom__sequence_type",
         # Exclude the null value choices because it doesn't seem to integrate
@@ -43,8 +43,21 @@ class ScanFilter(filters.FilterSet):
     subject_last_name = filters.LookupChoiceFilter(
         "session__subject__last_name", lookup_choices=LOOKUP_CHOICES,
     )
+    study = filters.ModelMultipleChoiceFilter(
+        queryset=Study.objects.all(), field_name="study_groups__study"
+    )
     study_groups = filters.ModelMultipleChoiceFilter(
         queryset=Group.objects.all()
+    )
+    procedure = NumberInFilter(
+        field_name="session__measurement__procedure",
+        lookup_expr="in",
+        label="Procedure ID is in",
+    )
+    measurement = NumberInFilter(
+        field_name="session__measurement",
+        lookup_expr="in",
+        label="Measurement definition ID is in",
     )
 
     class Meta:
