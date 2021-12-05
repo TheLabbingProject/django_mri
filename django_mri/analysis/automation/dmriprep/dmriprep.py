@@ -50,8 +50,10 @@ class dMRIPrepRunner(QuerySetRunner):
             Subjects with fMRI data
         """
         queryset = super().get_base_queryset()
-        q = Q(mri_session_set__scan__dicom__sequence_type="dwi") & Q(
-            mri_session_set__scan__dicom__sequence_type="mprage"
+        q = (
+            Q(mri_session_set__scan__dicom__sequence_type="dwi")
+            and Q(mri_session_set__scan__dicom__sequence_type="mprage")
+            and Q(mri_session_set__scan__dicom__sequence_type="dwi_fieldmap")
         )
         return queryset.filter(q)
 
