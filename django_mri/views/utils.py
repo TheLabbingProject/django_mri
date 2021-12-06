@@ -1,6 +1,12 @@
+from typing import Dict
+
 from bs4 import BeautifulSoup
 
-DEFAULT_DESTINATION_ID = "bk-app"
+DEFAULT_DESTINATION_ID: str = "bk-app"
+CSV_CONTENT_TYPE: str = "text/csv"
+SESSIONS_CSV_HEADERS: Dict[str, str] = {
+    "Content-Disposition": 'attachment; filename="sessions.csv"'
+}
 
 
 def fix_bokeh_script(

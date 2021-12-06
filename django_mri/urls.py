@@ -87,4 +87,9 @@ urlpatterns = [
         views.SessionViewSet.as_view({"get": "nifti_zip"}),
         name="session_nifti_zip",
     ),
+    path(
+        "mri/session/to_csv/",
+        views.SessionViewSet.as_view({"get": "to_csv"}),
+        name="sessions_csv",
+    ),
 ]

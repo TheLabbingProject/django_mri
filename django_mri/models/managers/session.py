@@ -14,18 +14,24 @@ from tqdm import tqdm
 #: Session fields to include in an exported DataFrame.
 DATAFRAME_FIELDS = (
     "id",
-    "subject__id",
-    "measurement__title",
     "time",
+    "subject__id",
+    "subject__id_number",
+    "subject__first_name",
+    "subject__last_name",
+    "measurement__title",
     "irb",
     "scan_count",
 )
 #: Column names to use when exporting a Session queryset as a DataFrame.
 DATAFRAME_COLUMNS = (
-    "ID",
-    "Subject ID",
-    "Measurement",
+    "Session PK",
     "Time",
+    "Subject PK",
+    "Subject ID",
+    "First Name",
+    "Last Name",
+    "Data Acquisition",
     "IRB Approval",
     "Scan Count",
 )
@@ -83,7 +89,7 @@ class SessionQuerySet(QuerySet):
         values = queryset.values(*DATAFRAME_FIELDS)
         df = pd.DataFrame(values)
         df.columns = DATAFRAME_COLUMNS
-        return df.set_index("ID").sort_index()
+        return df.set_index("Session PK").sort_index()
 
     def convert_to_nifti(
         self,
