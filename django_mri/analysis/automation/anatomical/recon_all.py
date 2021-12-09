@@ -3,11 +3,11 @@ Definition of the :class:`ReconAllRunner` class.
 """
 from typing import List
 
-from nipype.interfaces.freesurfer import ReconAll
-
-from django_mri.analysis.automation.anatomical.preprocessing import \
-    AnatomicalPreprocessing
+from django_mri.analysis.automation.anatomical.preprocessing import (
+    AnatomicalPreprocessing,
+)
 from django_mri.models.scan import Scan
+from nipype.interfaces.freesurfer import ReconAll
 
 
 class ReconAllRunner(AnatomicalPreprocessing):

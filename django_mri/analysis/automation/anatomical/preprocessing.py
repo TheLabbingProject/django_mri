@@ -2,25 +2,17 @@
 Definition of the :class:`AnatomicalPreprocessing` base class.
 """
 import logging
+from typing import Tuple
 
 from django.db.models import Q, QuerySet
-
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.automation.anatomical import messages
 from django_mri.models.scan import Scan
 
-#: MPRAGE DICOM scan parameters.
-MPRAGE_FILTER = {
-    "dicom__scanning_sequence": ["GR", "IR"],
-    "dicom__sequence_variant": ["SK", "SP", "MP"],
-}
-#: SPGRs, unfortunately, don't have a uniform DICOM parameters profile. We'll
-#: simply use the description to filter out any SPGR scans.
-SPGR_DESCRIPTION = "SPGR"
+#: Anatomical sequences to be in included in the input queryset.
+ANATOMICAL_SEQUENCES: Tuple[str] = ("mprage", "spgr")
 #: Joined MPRAGE and SPGR query.
-ANATOMICAL_QUERY = Q(**MPRAGE_FILTER) | Q(
-    description__icontains=SPGR_DESCRIPTION
-)
+ANATOMICAL_QUERY = Q(dicom__sequence_type__in=ANATOMICAL_SEQUENCES)
 
 
 class AnatomicalPreprocessing(QuerySetRunner):
