@@ -2,11 +2,10 @@ from pathlib import Path
 from typing import List, Union
 
 import pandas as pd
+from django_mri.analysis.parsers.recon_all.stats import ReconAllStats
 
-from django_mri.analysis.automation.recon_all.stats import ReconAllStats
 
-
-class ReconAllResults:
+class ReconAllOutputParser:
     STATS_DIR = "stats"
 
     def __init__(self, path: Path):
@@ -30,3 +29,6 @@ class ReconAllResults:
                         all_stats = all_stats.append(stats)
             indices = ["Subject ID"] + ReconAllStats.INDICES
             return all_stats.reset_index().set_index(indices)
+
+    def parse(self) -> pd.DataFrame:
+        return self.stats.to_dataframe()

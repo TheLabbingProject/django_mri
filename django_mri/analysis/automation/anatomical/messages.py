@@ -1,7 +1,7 @@
 """
 Default messages for automated anatomical preprocessing.
 """
-from django_mri.analysis.automation.utils import bcolors
+from django_mri.analysis.utils import bcolors
 
 #: Report the successful creation of an asynchronous execution task.
 EXECUTION_STARTED = (

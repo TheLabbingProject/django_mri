@@ -9,8 +9,9 @@ import pandas as pd
 import seaborn as sns
 
 from django_analyses.models.analysis_version import AnalysisVersion
-from django_analyses.models.input.definitions.input_definition import \
-    InputDefinition
+from django_analyses.models.input.definitions.input_definition import (
+    InputDefinition,
+)
 from django_analyses.models.pipeline.node import Node
 from django_analyses.models.run import Run
 from django_mri.analysis.automation.recon_all import messages
@@ -176,7 +177,7 @@ def get_t1_scans(run_id: int) -> List[Scan]:
 
 def query_run_info(all_stats: pd.DataFrame) -> pd.DataFrame:
     """
-    Fixes the results returned by the :class:`ReconAllResults` class to replace
+    Fixes the results returned by the :class:`ReconAllOutputParser` class to replace
     the "Subject ID" column with "Run ID" and add information.
 
     Parameters
