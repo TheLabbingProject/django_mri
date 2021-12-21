@@ -43,6 +43,18 @@ from django_mri.analysis.specifications.fmriprep.fmriprep import (
     FMRIPREP_INPUT_SPECIFICATION,
     FMRIPREP_OUTPUT_SPECIFICATION,
 )
+from django_mri.analysis.specifications.freesurfer.calabel import (
+    CA_LABEL_INPUT_SPECIFICATION,
+    CA_LABEL_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.freesurfer.caslabel import (
+    CAS_LABEL_INPUT_SPECIFICATION,
+    CAS_LABEL_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.freesurfer.parcellation_stats import (
+    PARCELLATION_STATS_INPUT_SPECIFICATION,
+    PARCELLATION_STATS_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.freesurfer.recon_all import (
     RECON_ALL_INPUT_SPECIFICATION,
     RECON_ALL_OUTPUT_SPECIFICATION,
@@ -167,7 +179,13 @@ from django_mri.analysis.specifications.yalab.mutual_information_score import (
     MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION,
     MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION,
 )
-from nipype.interfaces.freesurfer import ReconAll
+from nipype.interfaces.freesurfer import (
+    CALabel,
+    MRIsCALabel,
+    ParcellationStats,
+    ReconAll,
+)
+from nipype.interfaces.freesurfer.preprocess import CALabelInputSpec
 from nipype.interfaces.fsl import (
     BET,
     FAST,
@@ -421,6 +439,45 @@ analysis_definitions = [
                 "output": RECON_ALL_OUTPUT_SPECIFICATION,
                 "nested_results_attribute": "outputs.get_traitsfree",
                 "max_parallel": 10,
+            }
+        ],
+    },
+    {
+        "title": "CALabel",
+        "description": "Label subcortical structures based in GCA model.",  # noqa: E501
+        "versions": [
+            {
+                "title": CALabel().version or "1.0",
+                "description": f"Default FreeSurfer mri_ca_label version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": CA_LABEL_INPUT_SPECIFICATION,
+                "output": CA_LABEL_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "MriSCALabel",
+        "description": "For a single subject, produces an annotation file, in which each cortical surface vertex is assigned a neuroanatomical label.",  # noqa: E501
+        "versions": [
+            {
+                "title": MRIsCALabel().version or "1.0",
+                "description": f"Default FreeSurfer mris_ca_label version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": CAS_LABEL_INPUT_SPECIFICATION,
+                "output": CAS_LABEL_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
+            }
+        ],
+    },
+    {
+        "title": "AnatomicalStats",
+        "description": "Computes a number of anatomical properties.",  # noqa: E501
+        "versions": [
+            {
+                "title": ParcellationStats().version or "1.0",
+                "description": f"Default FreeSurfer mris_anatomical_stats version for nipype {_NIPYPE_VERSION}.",  # noqa: E501
+                "input": PARCELLATION_STATS_INPUT_SPECIFICATION,
+                "output": PARCELLATION_STATS_OUTPUT_SPECIFICATION,
+                "nested_results_attribute": "outputs.get_traitsfree",
             }
         ],
     },
