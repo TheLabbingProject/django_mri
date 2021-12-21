@@ -38,7 +38,12 @@ from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143
 from django_mri.analysis.interfaces.yalab.mutual_information_score import (
     MutualInformationScore,
 )
-from nipype.interfaces.freesurfer import ReconAll
+from nipype.interfaces.freesurfer import (
+    CALabel,
+    MRIsCALabel,
+    ParcellationStats,
+    ReconAll,
+)
 from nipype.interfaces.fsl import (
     BET,
     FLIRT,
@@ -79,6 +84,9 @@ interfaces = {
     "mean_image": {MeanImage().version: MeanImage},
     "robustfov": {RobustFOV().version: RobustFOV},
     "ReconAll": {ReconAll().version: ReconAll},
+    "CALabel": {CALabel().version: CALabel},
+    "MriSCALabel": {MRIsCALabel().version: MRIsCALabel},
+    "AnatomicalStats": {ParcellationStats().version: ParcellationStats},
     "SUSAN": {SUSAN().version: SUSAN},
     "topup": {TopupWrapper.version: TopupWrapper},
     "eddy": {Eddy().version: Eddy},
