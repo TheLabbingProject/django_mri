@@ -218,4 +218,6 @@ class ScanQuerySet(QuerySet):
     def filter_by_collaborators(
         self, collaborators: Union[Model, List[Model]]
     ) -> QuerySet:
-        return self.filter(study_groups__study__collaborators=collaborators)
+        return self.filter(
+            study_groups__study__collaborators=collaborators
+        ).distinct()
