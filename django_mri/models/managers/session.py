@@ -5,11 +5,14 @@ import logging
 
 import pandas as pd
 from bokeh.plotting import Figure
-from django.db.models import Count
-from django.db.models.query import QuerySet
+from django.db.models import Count, Model, QuerySet
 from django_mri.models.managers import logs
 from django_mri.plots.session import plot_measurement_by_month
+from django_mri.utils import get_group_model, get_study_model
 from tqdm import tqdm
+
+Group = get_group_model()
+Study = get_study_model()
 
 #: Session fields to include in an exported DataFrame.
 DATAFRAME_FIELDS = (
@@ -146,3 +149,19 @@ class SessionQuerySet(QuerySet):
                 count=queryset.count()
             )
             self._logger.debug(success_log)
+
+    def filter_by_studies(self, studies: QuerySet) -> QuerySet:
+        return self.filter(scan__study_groups__study__in=studies).distinct()
+
+    def filter_by_collaborator(self, user: Model) -> QuerySet:
+        return self.filter_by_studies(user.study_set.all())
+
+    def query_study_groups(self) -> QuerySet:
+        return Group.objects.filter(
+            id__in=self.values("scan__study_groups")
+        ).distinct()
+
+    def query_studies(self) -> QuerySet:
+        return Study.objects.filter(
+            id__in=self.values("scan__study_groups__study")
+        ).distinct()

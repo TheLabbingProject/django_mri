@@ -69,14 +69,7 @@ class SessionViewSet(
         queryset = super().filter_queryset(queryset)
         if user.is_superuser:
             return queryset
-        user_collaborations = set(user.study_set.values_list("id", flat=True))
-        by_procedure = queryset.filter(
-            measurement__procedure__study__id__in=user_collaborations
-        )
-        by_scan_association = queryset.filter(
-            scan__study_groups__study__id__in=user_collaborations
-        )
-        return (by_procedure | by_scan_association).distinct()
+        return queryset.filter_by_collaborator(user)
 
     @action(detail=True, methods=["get"])
     def dicom_zip(self, request: Request, pk: int) -> HttpResponse:

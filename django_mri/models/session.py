@@ -163,12 +163,12 @@ class Session(TimeStampedModel):
     def query_study_groups(self) -> models.QuerySet:
         return Group.objects.filter(
             id__in=self.scan_set.values("study_groups")
-        )
+        ).distinct()
 
     def query_studies(self) -> models.QuerySet:
-        return self.query_measurement_studies() | Study.objects.filter(
+        return Study.objects.filter(
             id__in=self.study_groups.values("study__id")
-        )
+        ).distinct()
 
     def get_bids_dir(self) -> Path:
         bids_root = get_bids_dir()

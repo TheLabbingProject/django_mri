@@ -5,9 +5,9 @@ import logging
 import warnings
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Union
+from typing import Iterable, List, Union
 
-from django.db.models import QuerySet
+from django.db.models import Model, Q, QuerySet
 from django_dicom.models.image import Image as DicomImage
 from django_mri.models.managers import logs
 from django_mri.utils.scan_type import ScanType
@@ -214,3 +214,8 @@ class ScanQuerySet(QuerySet):
             count=queryset.count()
         )
         self._logger.debug(success_log)
+
+    def filter_by_collaborators(
+        self, collaborators: Union[Model, List[Model]]
+    ) -> QuerySet:
+        return self.filter(study_groups__study__collaborators=collaborators)

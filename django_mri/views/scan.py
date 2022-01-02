@@ -95,7 +95,7 @@ class ScanViewSet(DefaultsMixin, viewsets.ModelViewSet):
         queryset = super().filter_queryset(queryset)
         if user.is_staff or user.is_superuser:
             return queryset
-        return queryset.filter(study_groups__study__collaborators=user)
+        return queryset.filter_by_collaborators(user)
 
     # @action(detail=False, methods=["POST"])
     # def from_file(self, request):
