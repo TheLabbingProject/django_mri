@@ -10,12 +10,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinValueValidator
 from django.db import IntegrityError, models
-from django_analyses.models.input import (
-    DirectoryInput,
-    FileInput,
-    Input,
-    ListInput,
-)
+from django_analyses.models.input import (DirectoryInput, FileInput, Input,
+                                          ListInput)
 from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from django_mri.analysis.interfaces.dcm2niix import Dcm2niix
@@ -24,20 +20,13 @@ from django_mri.models.managers.scan import ScanQuerySet
 from django_mri.models.messages import SCAN_UPDATE_NO_DICOM
 from django_mri.models.nifti import NIfTI
 from django_mri.utils.bids import BidsManager
-from django_mri.utils.utils import (
-    get_bids_manager,
-    get_group_model,
-    get_mri_root,
-)
+from django_mri.utils.utils import (get_bids_manager, get_group_model,
+                                    get_mri_root)
 from nilearn.image import mean_img
 from nilearn.plotting import cm, view_img
 
 FLAG_3D = "mprage", "spgr", "flair", "t1", "t2"
 FLAG_4D = "fmri", "dmri"
-REGISTERED_DESCRIPTIONS: Dict[str, str] = {
-    "T1w_MPR1": "mprage",
-    "T2w_SPC1": "t2w",
-}
 
 
 class Scan(TimeStampedModel):
@@ -242,7 +231,8 @@ class Scan(TimeStampedModel):
         """
         if self.dicom:
             return self.dicom.sequence_type
-        return REGISTERED_DESCRIPTIONS.get(self.description)
+        if self._nifti:
+            return self.nifti.infer_sequence_type()
 
     def get_default_nifti_dir(self) -> Path:
         """
@@ -436,9 +426,8 @@ class Scan(TimeStampedModel):
         Path
             Created file path
         """
-        from django_mri.analysis.utils.get_mrconvert_node import (
-            get_mrconvert_node,
-        )
+        from django_mri.analysis.utils.get_mrconvert_node import \
+            get_mrconvert_node
 
         node, created = get_mrconvert_node()
         out_file = self.get_default_mif_path()

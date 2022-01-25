@@ -5,15 +5,23 @@ import itertools
 import json
 import logging
 from pathlib import Path
-from typing import Iterable, List, Union
+from typing import Dict, Iterable, List, Union
 
 import nibabel as nib
 import numpy as np
 from django.db import IntegrityError, models
 from django_analyses.models.input import FileInput, ListInput
 from django_extensions.db.models import TimeStampedModel
-from django_mri.models.messages import NIFTI_FILE_MISSING
+from django_mri.models.messages import (
+    NIFTI_FILE_MISSING,
+    PROCESSED_SEQUENCE_TYPE,
+)
 from django_mri.utils.compression import compress, uncompress
+
+REGISTERED_DESCRIPTIONS: Dict[str, str] = {
+    "T1w_MPR1": "mprage",
+    "T2w_SPC1": "t2w",
+}
 
 
 class NIfTI(TimeStampedModel):
@@ -394,6 +402,13 @@ class NIfTI(TimeStampedModel):
                 data = data[..., mask]
             return data.mean(axis=axis)
         return data
+
+    def infer_sequence_type(self) -> str:
+        if not self.is_raw:
+            raise TypeError(PROCESSED_SEQUENCE_TYPE)
+        # TODO: Enable sequence detection using dicom_parser and JSON sidecar
+        # if available.
+        return REGISTERED_DESCRIPTIONS.get(self.scan.description)
 
     @property
     def json_file(self) -> Path:
