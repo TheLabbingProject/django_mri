@@ -21,6 +21,10 @@ from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2023,
     FmriPrep2024,
     FmriPrep2025,
+    FmriPrep2026,
+    FmriPrep2027,
+    FmriPrep2100,
+    FmriPrep2101,
 )
 from django_mri.analysis.interfaces.fsl.fast import FastWrapper
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
@@ -111,6 +115,10 @@ interfaces = {
         FmriPrep2023.__version__: FmriPrep2023,
         FmriPrep2024.__version__: FmriPrep2024,
         FmriPrep2025.__version__: FmriPrep2025,
+        FmriPrep2026.__version__: FmriPrep2026,
+        FmriPrep2027.__version__: FmriPrep2027,
+        FmriPrep2100.__version__: FmriPrep2100,
+        FmriPrep2101.__version__: FmriPrep2101,
     },
     "QSIPrep": {QsiPrep0143.__version__: QsiPrep0143},
     "dMRIPrep": {DmriPrep010.__version__: DmriPrep010},

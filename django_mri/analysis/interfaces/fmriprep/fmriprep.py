@@ -321,3 +321,19 @@ class FmriPrep2024(FmriPrep):
 
 class FmriPrep2025(FmriPrep):
     __version__ = "20.2.5"
+
+
+class FmriPrep2026(FmriPrep):
+    __version__ = "20.2.6"
+
+
+class FmriPrep2027(FmriPrep):
+    __version__ = "20.2.7"
+
+
+class FmriPrep2100(FmriPrep):
+    __version__ = "21.0.0"
+
+
+class FmriPrep2101(FmriPrep):
+    __version__ = "21.0.1"

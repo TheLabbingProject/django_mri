@@ -5,7 +5,7 @@ from typing import List
 
 from django.db.models import Q, QuerySet
 from django_analyses.runner.queryset_runner import QuerySetRunner
-from django_mri.analysis.interfaces.fmriprep.fmriprep import FmriPrep2025
+from django_mri.analysis.interfaces.fmriprep.fmriprep import FmriPrep2101
 from django_mri.analysis.utils.bids_filters import FMRIPREP_FILTERS
 from django_mri.utils.utils import get_subject_model
 
@@ -23,7 +23,7 @@ class fMRIPrepRunner(QuerySetRunner):
 
     #: :class:`~django_analyses.models.analysis_version.AnalysisVersion`
     #: instance title.
-    ANALYSIS_VERSION_TITLE = FmriPrep2025.__version__
+    ANALYSIS_VERSION_TITLE = FmriPrep2101.__version__
 
     #: :class:`~django_analyses.models.pipeline.node.Node` instance
     #: configuration.
