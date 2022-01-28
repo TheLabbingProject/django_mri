@@ -12,7 +12,7 @@ from django_mri.models.scan import Scan
 #: Anatomical sequences to be in included in the input queryset.
 ANATOMICAL_SEQUENCES: Tuple[str] = ("mprage", "spgr")
 #: Joined MPRAGE and SPGR query.
-ANATOMICAL_QUERY = Q(dicom__sequence_type__in=ANATOMICAL_SEQUENCES)
+DICOM_ANATOMICAL_QUERY = Q(dicom__sequence_type__in=ANATOMICAL_SEQUENCES)
 
 
 class AnatomicalPreprocessing(QuerySetRunner):
@@ -62,7 +62,20 @@ class AnatomicalPreprocessing(QuerySetRunner):
         """
         queryset = super().filter_queryset(queryset, log_level)
         self.log_filter_start(log_level)
-        queryset = queryset.filter(ANATOMICAL_QUERY).order_by("-time")
+        dicom_candidates = list(
+            queryset.filter(DICOM_ANATOMICAL_QUERY).values_list(
+                "id", flat=True
+            )
+        )
+        nifti_candidates = [
+            scan.id
+            for scan in queryset.filter(
+                dicom__isnull=True, _nifti__isnull=False
+            )
+            if scan.sequence_type in ANATOMICAL_SEQUENCES
+        ]
+        candidate_ids = dicom_candidates + nifti_candidates
+        queryset = queryset.filter(id__in=candidate_ids).order_by("-time")
         self.log_filter_end(n_candidates=queryset.count(), log_level=log_level)
         return queryset
 
