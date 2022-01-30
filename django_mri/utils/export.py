@@ -13,7 +13,7 @@ def get_bids_root() -> Path:
     return MEDIA_ROOT / get_bids_dir()
 
 
-def get_recon_all_export_destination(run) -> Path:
+def get_recon_all_export_destination(run, path) -> Path:
     MRI_ROOT = get_mri_root()
     MEDIA_ROOT = get_media_root()
     BIDS_ROOT = get_bids_root()
@@ -27,35 +27,46 @@ def get_recon_all_export_destination(run) -> Path:
     raw_destination = (
         MRI_ROOT / "derivatives" / analysis_id / path.relative_to(BIDS_ROOT)
     ).relative_to(MEDIA_ROOT)
-    return Path(str(raw_destination).split(".")[0])
+    destintation_dir = Path(str(raw_destination).split(".")[0])
+    return destintation_dir / Path(path).relative_to(run.path)
 
 
-def get_fmriprep_export_destination(run) -> Path:
+def get_fmriprep_export_destination(run, path) -> Path:
     MRI_ROOT = get_mri_root()
     MEDIA_ROOT = get_media_root()
     analysis_id = (
         str(run.analysis_version).replace(" ", "_").replace(".", "").lower()
     )
     participant_label = run.get_input("participant_label")[0]
-    return Path(
+    destination_dir = Path(
         str(
             MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
-        ).replace("/fmriprep/", "/")
+        )
     ).relative_to(MEDIA_ROOT)
+    return destination_dir / "/".join(
+        [
+            part
+            for part in Path(path).relative_to(run.path).parts[2:]
+            if part != "fmriprep"
+        ]
+    )
 
 
-def get_dmriprep_export_destination(run) -> Path:
+def get_dmriprep_export_destination(run, path) -> Path:
     MRI_ROOT = get_mri_root()
     MEDIA_ROOT = get_media_root()
     analysis_id = (
         str(run.analysis_version).replace(" ", "_").replace(".", "").lower()
     )
     participant_label = run.get_input("participant_label")[0]
-    return Path(
+    destination_dir = Path(
         str(
             MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
-        ).replace("/dmriprep/", "/")
+        )
     ).relative_to(MEDIA_ROOT)
+    return destination_dir / "/".join(
+        Path(path).relative_to(run.path).parts[2:]
+    )
 
 
 EXPORT_MUTATORS = {
