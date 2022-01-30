@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from django.conf import settings
@@ -39,15 +40,14 @@ def get_fmriprep_export_destination(run, path) -> Path:
     )
     participant_label = run.get_input("participant_label")[0]
     destination_dir = Path(
-        str(
-            MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
-        )
+        str(MRI_ROOT / "derivatives" / analysis_id)
     ).relative_to(MEDIA_ROOT)
     return destination_dir / "/".join(
-        [
+        ["" if path.suffix == ".html" else f"sub-{participant_label}"]
+        + [
             part
             for part in Path(path).relative_to(run.path).parts
-            if part != "fmriprep"
+            if part != "fmriprep" and not re.match(r"^sub-[0-9]*&", part)
         ]
     )
 
