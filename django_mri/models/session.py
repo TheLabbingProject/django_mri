@@ -6,7 +6,17 @@ import shutil
 from pathlib import Path
 from typing import List
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django_analyses.models.input.definitions.integer_input_definition import (
+    IntegerInputDefinition,
+)
+from django_analyses.models.input.definitions.list_input_definition import (
+    ListInputDefinition,
+)
+from django_analyses.models.input.types.integer_input import IntegerInput
+from django_analyses.models.input.types.list_input import ListInput
+from django_analyses.models.run import Run
 from django_extensions.db.models import TimeStampedModel
 from django_mri.models import help_text, logs
 from django_mri.models.managers.session import SessionQuerySet
@@ -169,6 +179,28 @@ class Session(TimeStampedModel):
         return Study.objects.filter(
             id__in=self.study_groups.values("study__id")
         ).distinct()
+
+    def query_run_set(self) -> models.QuerySet:
+        content_type = ContentType.objects.get_for_model(self)
+        list_input_definitions = ListInputDefinition.objects.filter(
+            content_type=content_type
+        )
+        integer_input_definitions = IntegerInputDefinition.objects.filter(
+            content_type=content_type
+        )
+        list_inputs = ListInput.objects.filter(
+            definition__in=list_input_definitions, value__contains=self.id
+        )
+        integer_inputs = IntegerInput.objects.filter(
+            definition__in=integer_input_definitions, value=self.id
+        )
+        run_ids = set(list_inputs.values_list("run", flat=True)) | set(
+            integer_inputs.values_list("run", flat=True)
+        )
+        runs = Run.objects.none()
+        for scan in self.scan_set.all():
+            runs |= scan.query_run_set()
+        return Run.objects.filter(id__in=run_ids) | runs
 
     def get_bids_dir(self) -> Path:
         bids_root = get_bids_dir()
