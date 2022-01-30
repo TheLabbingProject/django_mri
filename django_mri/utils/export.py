@@ -43,7 +43,7 @@ def get_fmriprep_export_destination(run, path) -> Path:
         str(MRI_ROOT / "derivatives" / analysis_id)
     ).relative_to(MEDIA_ROOT)
     return destination_dir / "/".join(
-        ["" if path.suffix == ".html" else f"sub-{participant_label}"]
+        ["" if Path(path).suffix == ".html" else f"sub-{participant_label}"]
         + [
             part
             for part in Path(path).relative_to(run.path).parts
