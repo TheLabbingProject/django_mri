@@ -3,12 +3,13 @@ from pathlib import Path
 from django.conf import settings
 from django_mri.utils import get_bids_dir, get_mri_root
 
-MEDIA_ROOT = Path(settings.MEDIA_ROOT)
-BIDS_DIR = MEDIA_ROOT / get_bids_dir()
+
 MRI_ROOT = get_mri_root()
 
 
 def get_recon_all_export_destination(run) -> Path:
+    BIDS_DIR = MEDIA_ROOT / get_bids_dir()
+    MEDIA_ROOT = Path(settings.MEDIA_ROOT)
     t1_files = [
         i for i in run.input_set.all() if i.definition.key == "T1_files"
     ][0]
