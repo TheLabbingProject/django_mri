@@ -13,7 +13,12 @@ def get_recon_all_export_destination(run) -> Path:
         i for i in run.input_set.all() if i.definition.key == "T1_files"
     ][0]
     path = Path(t1_files.query_related_instance()[0].path)
-    raw_destination = MRI_ROOT / "derivatives" / path.relative_to(BIDS_DIR)
+    analysis_id = (
+        str(run.analysis_version).replace(" ", "_").replace(".", "").lower()
+    )
+    raw_destination = (
+        MRI_ROOT / "derivatives" / analysis_id / path.relative_to(BIDS_DIR)
+    )
     return Path(str(raw_destination).split(".")[0])
 
 
