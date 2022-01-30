@@ -4,7 +4,6 @@ from django.conf import settings
 from django_mri.utils import get_bids_dir, get_mri_root
 
 
-
 def get_recon_all_export_destination(run) -> Path:
     MRI_ROOT = get_mri_root()
     MEDIA_ROOT = Path(settings.MEDIA_ROOT)
@@ -18,7 +17,7 @@ def get_recon_all_export_destination(run) -> Path:
     )
     raw_destination = (
         MRI_ROOT / "derivatives" / analysis_id / path.relative_to(BIDS_DIR)
-    )
+    ).relative_to(MEDIA_ROOT)
     return Path(str(raw_destination).split(".")[0])
 
 
