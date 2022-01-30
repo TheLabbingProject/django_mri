@@ -37,13 +37,29 @@ def get_fmriprep_export_destination(run) -> Path:
         str(run.analysis_version).replace(" ", "_").replace(".", "").lower()
     )
     participant_label = run.get_input("participant_label")[0]
-    return (
-        MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
+    return Path(
+        str(
+            MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
+        ).replace("/fmriprep/", "/")
+    ).relative_to(MEDIA_ROOT)
+
+
+def get_dmriprep_export_destination(run) -> Path:
+    MRI_ROOT = get_mri_root()
+    MEDIA_ROOT = get_media_root()
+    analysis_id = (
+        str(run.analysis_version).replace(" ", "_").replace(".", "").lower()
+    )
+    participant_label = run.get_input("participant_label")[0]
+    return Path(
+        str(
+            MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
+        ).replace("/dmriprep/", "/")
     ).relative_to(MEDIA_ROOT)
 
 
 EXPORT_MUTATORS = {
     "ReconAll": get_recon_all_export_destination,
     "fMRIPrep": get_fmriprep_export_destination,
-    "dMRIPrep": get_fmriprep_export_destination,
+    "dMRIPrep": get_dmriprep_export_destination,
 }
