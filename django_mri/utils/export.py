@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from django_analyses.models.utils import get_media_root
+from django.conf import settings
 from django_mri.utils import get_bids_dir, get_mri_root
 
-MEDIA_ROOT = Path(get_media_root())
+MEDIA_ROOT = Path(settings.MEDIA_ROOT)
 BIDS_DIR = MEDIA_ROOT / get_bids_dir()
 MRI_ROOT = get_mri_root()
 
