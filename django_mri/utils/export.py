@@ -46,7 +46,7 @@ def get_fmriprep_export_destination(run, path) -> Path:
     return destination_dir / "/".join(
         [
             part
-            for part in Path(path).relative_to(run.path).parts[2:]
+            for part in Path(path).relative_to(run.path).parts
             if part != "fmriprep"
         ]
     )
