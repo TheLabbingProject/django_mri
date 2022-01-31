@@ -26,6 +26,10 @@ from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2023,
     FmriPrep2024,
     FmriPrep2025,
+    FmriPrep2026,
+    FmriPrep2027,
+    FmriPrep2100,
+    FmriPrep2101,
 )
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
@@ -185,7 +189,6 @@ from nipype.interfaces.freesurfer import (
     ParcellationStats,
     ReconAll,
 )
-from nipype.interfaces.freesurfer.preprocess import CALabelInputSpec
 from nipype.interfaces.fsl import (
     BET,
     FAST,
@@ -674,6 +677,30 @@ analysis_definitions = [
             {
                 "title": FmriPrep2025.__version__,
                 "description": "fMRIprep v20.2.5.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2026.__version__,
+                "description": "fMRIprep v20.2.6.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2027.__version__,
+                "description": "fMRIprep v20.2.7.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2100.__version__,
+                "description": "fMRIprep v21.0.0.",
+                "input": FMRIPREP_INPUT_SPECIFICATION,
+                "output": FMRIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": FmriPrep2101.__version__,
+                "description": "fMRIprep v21.0.1.",
                 "input": FMRIPREP_INPUT_SPECIFICATION,
                 "output": FMRIPREP_OUTPUT_SPECIFICATION,
             },
