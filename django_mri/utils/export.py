@@ -40,14 +40,18 @@ def get_fmriprep_export_destination(run, path) -> Path:
     )
     participant_label = run.get_input("participant_label")[0]
     destination_dir = Path(
-        str(MRI_ROOT / "derivatives" / analysis_id)
+        str(
+            MRI_ROOT / "derivatives" / analysis_id / f"sub-{participant_label}"
+        )
     ).relative_to(MEDIA_ROOT)
+    path = Path(path)
+    if re.match(r"^sub-[0-9]*\.html$", path.name):
+        return destination_dir.parent / path.name
     return destination_dir / "/".join(
-        ["" if Path(path).suffix == ".html" else f"sub-{participant_label}"]
-        + [
+        [
             part
-            for part in Path(path).relative_to(run.path).parts
-            if part != "fmriprep" and not re.match(r"^sub-[0-9]*&", part)
+            for part in path.relative_to(run.path).parts
+            if part != "fmriprep" and not re.match(r"^sub-[0-9]*$", part)
         ]
     )
 
