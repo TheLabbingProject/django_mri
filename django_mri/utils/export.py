@@ -21,12 +21,14 @@ def get_recon_all_export_destination(run, path) -> Path:
     t1_files = [
         i for i in run.input_set.all() if i.definition.key == "T1_files"
     ][0]
-    path = Path(t1_files.query_related_instance()[0].path)
+    relative_destination = Path(
+        t1_files.query_related_instance()[0].path
+    ).relative_to(BIDS_ROOT)
     analysis_id = (
         str(run.analysis_version).replace(" ", "_").replace(".", "").lower()
     )
     raw_destination = (
-        MRI_ROOT / "derivatives" / analysis_id / path.relative_to(BIDS_ROOT)
+        MRI_ROOT / "derivatives" / analysis_id / relative_destination
     ).relative_to(MEDIA_ROOT)
     destintation_dir = Path(str(raw_destination).split(".")[0])
     return destintation_dir / Path(path).relative_to(run.path)
