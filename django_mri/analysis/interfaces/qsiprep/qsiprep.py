@@ -235,7 +235,7 @@ class QsiPrep:
         main_dir, sub_dir, output_id = self.OUTPUTS.get(partial_output)
         if main_dir == "freesurfer":
             outputs = list(self.generate_fs_outputs(main_dir, output_id))
-        elif main_dir == "fmriprep":
+        elif main_dir == "qsiprep":
             outputs = list(
                 self.generate_qsiprep_outputs(
                     main_dir, sub_dir, subject_id, session_id, output_id
