@@ -3,6 +3,7 @@ Definition of the :class:`fMRIPrepRunner` class.
 """
 from typing import List
 
+from django.conf import settings
 from django.db.models import Q, QuerySet
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.interfaces.fmriprep.fmriprep import FmriPrep2101
@@ -31,6 +32,7 @@ class fMRIPrepRunner(QuerySetRunner):
         "output-spaces": ["anat", "MNI152NLin2009cAsym"],
         "use-aroma": True,
         "bids-filter-file": str(FMRIPREP_FILTERS),
+        "work-dir": settings.MEDIA_ROOT,
     }
 
     #: Input definition key.
