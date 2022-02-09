@@ -1,5 +1,5 @@
 """
-Definition of the :class:`FmriPrep` interface.
+Definition of the :class:`QsiPrep` interface.
 """
 import os
 from pathlib import Path

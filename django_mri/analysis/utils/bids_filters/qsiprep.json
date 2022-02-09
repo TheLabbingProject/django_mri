@@ -1,0 +1,6 @@
+{
+  "dwi": { "suffix": "dwi", "direction": "FWD" },
+  "sbref": { "suffix": "sbref", "datatype": "dwi" },
+  "t1w": { "ceagent": "corrected" },
+  "t2w": { "ceagent": "corrected" }
+}
