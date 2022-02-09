@@ -7,7 +7,7 @@ from itertools import chain
 from pathlib import Path
 from typing import Iterable, List, Union
 
-from django.db.models import Model, Q, QuerySet
+from django.db.models import Model, QuerySet
 from django_dicom.models.image import Image as DicomImage
 from django_mri.models.managers import logs
 from django_mri.utils.scan_type import ScanType
