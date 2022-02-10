@@ -233,6 +233,7 @@ FMRIPREP_INPUT_SPECIFICATION = {
     "work-dir": {
         "type": DirectoryInputDefinition,
         "description": "path where intermediate results should be stored",
+        "default": "/output/work",
     },
     "clean-workdir": {
         "type": BooleanInputDefinition,

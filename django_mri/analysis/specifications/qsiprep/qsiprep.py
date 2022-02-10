@@ -301,6 +301,7 @@ QSIPREP_INPUT_SPECIFICATION = {
     "work_dir": {
         "type": DirectoryInputDefinition,
         "description": "path where intermediate results should be stored",
+        "default": "default": "/output/work",
     },
     "resource_monitor": {
         "type": BooleanInputDefinition,

@@ -7,7 +7,7 @@ from django.db.models import Q, QuerySet
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.interfaces.fmriprep.fmriprep import FmriPrep2101
 from django_mri.analysis.utils.bids_filters import FMRIPREP_FILTERS
-from django_mri.utils.utils import get_bids_dir, get_subject_model
+from django_mri.utils.utils import get_subject_model
 
 #: Associated subject model.
 Subject = get_subject_model()
@@ -31,7 +31,6 @@ class fMRIPrepRunner(QuerySetRunner):
         "output-spaces": ["anat", "MNI152NLin2009cAsym"],
         "use-aroma": True,
         "bids-filter-file": str(FMRIPREP_FILTERS),
-        "work-dir": str(get_bids_dir().parent),
     }
 
     #: Input definition key.

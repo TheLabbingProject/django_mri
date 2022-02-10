@@ -7,7 +7,7 @@ from django.db.models import Q, QuerySet
 from django_analyses.runner.queryset_runner import QuerySetRunner
 from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143
 from django_mri.analysis.utils.bids_filters import QSIPREP_FILTERS
-from django_mri.utils.utils import get_bids_dir, get_subject_model
+from django_mri.utils.utils import get_subject_model
 
 #: Associated subject model.
 Subject = get_subject_model()
@@ -30,7 +30,6 @@ class QSIPrepRunner(QuerySetRunner):
     ANALYSIS_CONFIGURATION = {
         "output_resolution": 1.6,
         "bids-filter-file": str(QSIPREP_FILTERS),
-        "work_dir": str(get_bids_dir().parent),
     }
 
     #: Input definition key.
