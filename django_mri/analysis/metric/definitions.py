@@ -1,0 +1,3 @@
+from django_mri.analysis.metric.freesurfer import RECON_ALL_ANATOMICAL_STATS
+
+METRIC_DEFINITIONS = RECON_ALL_ANATOMICAL_STATS
