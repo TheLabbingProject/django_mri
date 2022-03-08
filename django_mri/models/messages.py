@@ -1,7 +1,7 @@
 """
 A module storing strings used to display messages.
 """
-
+BRAIN_REGION_KEY: str = "Brain region defintion must include a title or an index."
 DICOM_TO_NIFTI_NO_DICOM: str = "Failed to convert scan #{scan_id} from DICOM to NIfTI! No DICOM series is related to this scan."
 SCAN_UPDATE_NO_DICOM: str = "No DICOM data associated with MRI scan {pk}!"
 NIFTI_CONVERSION_FAILURE_HTML: str = "Failed to convert scan #{scan_id} to NIfTI with the following exception:<br>{exception}"
