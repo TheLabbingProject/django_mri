@@ -1,41 +1,41 @@
 REGIONS = [
     {
-        "title": "G_and_S_frontomargin",
+        "title": "G&S_frontomargin",
         "index": 1,
         "description": "Fronto-marginal gyrus (of Wernicke) and sulcus.",
     },
     {
-        "title": "G_and_S_occipital_inf",
+        "title": "G&S_occipital_inf",
         "index": 2,
         "description": "Inferior occipital gyrus (O3) and sulcus.",
     },
     {
-        "title": "G_and_S_paracentral",
+        "title": "G&S_paracentral",
         "index": 3,
         "description": "Paracentral lobule and sulcus.",
     },
     {
-        "title": "G_and_S_subcentral",
+        "title": "G&S_subcentral",
         "index": 4,
         "description": "Subcentral gyrus (central operculum) and sulci.",
     },
     {
-        "title": "G_and_S_transv_frontopol",
+        "title": "G&S_transv_frontopol",
         "index": 5,
         "description": "Transverse frontopolar gyri and sulci.",
     },
     {
-        "title": "G_and_S_cingul-Ant",
+        "title": "G&S_cingul-Ant",
         "index": 6,
         "description": "Anterior part of the cingulate gyrus and sulcus (ACC).",
     },
     {
-        "title": "G_and_S_cingul-Mid-Ant",
+        "title": "G&S_cingul-Mid-Ant",
         "index": 7,
         "description": "Middle-anterior part of the cingulate gyrus and sulcus (aMCC).",
     },
     {
-        "title": "G_and_S_cingul-Mid-Post",
+        "title": "G&S_cingul-Mid-Post",
         "index": 8,
         "description": "Middle-posterior part of the cingulate gyrus and sulcus (pMCC).",
     },
@@ -76,7 +76,7 @@ REGIONS = [
         "description": "Superios frontal gyrus (F1).",
     },
     {
-        "title": "G_Ins_lg_and_S_cent_ins",
+        "title": "G_Ins_lg&S_cent_ins",
         "index": 17,
         "description": "Long insular gyrus and central sulcus of the insula.",
     },
@@ -259,17 +259,17 @@ REGIONS = [
         "description": "Sulcus intermedius primus (of Jensen).",
     },
     {
-        "title": "S_intrapariet_and_P_trans",
+        "title": "S_intrapariet&P_trans",
         "index": 56,
         "description": "Intraparietal sulcus (interparietal sulcus) and transverse parietal sulci.",
     },
     {
-        "title": "S_oc_middle_and_Lunatus",
+        "title": "S_oc_middle&Lunatus",
         "index": 57,
         "description": "Middle occipital sulcus and lunatus sulcus.",
     },
     {
-        "title": "S_oc_sup_and_transversal",
+        "title": "S_oc_sup&transversal",
         "index": 58,
         "description": "Superior occipital sulcus and transverse occipital sulcus.",
     },
@@ -284,7 +284,7 @@ REGIONS = [
         "description": "Lateral occipito-temporal sulcus.",
     },
     {
-        "title": "S_oc-temp_med_and_Lingual",
+        "title": "S_oc-temp_med&Lingual",
         "index": 61,
         "description": "Medial occipito-temporal sulcus (collateral sulcus) and lingual sulcus.",
     },

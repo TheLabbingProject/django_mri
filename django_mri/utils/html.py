@@ -8,6 +8,10 @@ from pygments.lexers import JsonLexer
 
 ADMIN_VIEW_NAMES = {
     "AnalysisVersion": "admin:django_analyses_analysisversion_change",
+    "Atlas": "admin:django_mri_atlas_change",
+    "Region": "admin:django_mri_region_change",
+    "Score": "admin:django_mri_score_change",
+    "Metric": "admin:django_mri_metric_change",
     "Node": "admin:django_analyses_node_change",
     "MeasurementDefinition": "admin:research_measurementdefinition_change",
     "Series": "admin:django_dicom_series_change",

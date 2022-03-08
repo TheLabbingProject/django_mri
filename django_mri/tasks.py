@@ -6,9 +6,17 @@ from pathlib import Path
 from typing import Union
 
 from celery import shared_task
+from django_analyses.models.run import Run
 
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.scan import Scan
+from django_mri.models.score import Score
+
+
+@shared_task(name="django_mri.create-scores")
+def create_scores(run_id: int):
+    run = Run.objects.get(id=run_id)
+    Score.objects.from_run(run)
 
 
 @shared_task(name="django_mri.import-data")

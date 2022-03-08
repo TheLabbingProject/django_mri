@@ -19,13 +19,17 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django_analyses.models.run import Run
 from nonrelated_inlines.admin import NonrelatedStackedInline
 
-from django_analyses.models.run import Run
+from django_mri.models.atlas import Atlas
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.irb_approval import IrbApproval
+from django_mri.models.metric import Metric
 from django_mri.models.nifti import NIfTI
+from django_mri.models.region import Region
 from django_mri.models.scan import Scan
+from django_mri.models.score import Score
 from django_mri.models.session import Session
 from django_mri.utils import get_measurement_model
 from django_mri.utils.html import Html
@@ -562,8 +566,108 @@ class IrbApprovalAdmin(admin.ModelAdmin):
     list_display = "id", "institution", "number", "document"
 
 
+class MetricAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.metric.Metric` model to the admin
+    interface.
+    """
+
+    list_display = (
+        "id",
+        "title",
+        "description",
+    )
+
+
+class AtlasAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.atlas.Atlas` model to the admin
+    interface.
+    """
+
+    list_display = (
+        "id",
+        "title",
+        "description",
+        "symmetric",
+        "n_regions",
+    )
+
+    def n_regions(self, instance: Atlas) -> int:
+        return instance.region_set.count()
+
+    n_regions.short_description = "# Regions"
+
+
+class RegionAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.region.Region` model to the admin
+    interface.
+    """
+
+    list_display = (
+        "id",
+        "atlas",
+        "index",
+        "hemisphere",
+        "title",
+        "description",
+        "subcortical",
+    )
+
+
+class ScoreAdmin(admin.ModelAdmin):
+    """
+    Adds the :class:`~django_mri.models.score.Score` model to the admin
+    interface.
+    """
+
+    list_display = (
+        "id",
+        "_run",
+        "atlas",
+        "index",
+        "hemisphere",
+        "region_title",
+        "_metric",
+        "value",
+    )
+    list_filter = ("region__atlas", "region__hemisphere", "metric")
+    search_fields = ("region__title",)
+
+    def _run(self, instance: Score) -> str:
+        model_name = instance.run.__class__.__name__
+        pk = instance.run.id
+        return Html.admin_link(model_name, pk)
+
+    def atlas(self, instance: Score) -> str:
+        model_name = instance.region.atlas.__class__.__name__
+        pk = instance.region.atlas.id
+        text = instance.region.atlas.title
+        return Html.admin_link(model_name, pk, text)
+
+    def index(self, instance: Score) -> int:
+        return instance.region.index
+
+    def hemisphere(self, instance: Score) -> str:
+        return instance.region.get_hemisphere_display()
+
+    def region_title(self, instance: Score) -> str:
+        return instance.region.title
+
+    def _metric(self, instance: Score) -> str:
+        model_name = instance.metric.__class__.__name__
+        pk = instance.metric.id
+        text = instance.metric.title
+        return Html.admin_link(model_name, pk, text)
+
+
 admin.site.register(DataDirectory, DataDirectoryAdmin)
 admin.site.register(IrbApproval, IrbApprovalAdmin)
 admin.site.register(NIfTI, NiftiAdmin)
 admin.site.register(Scan, ScanAdmin)
 admin.site.register(Session, SessionAdmin)
+admin.site.register(Atlas, AtlasAdmin)
+admin.site.register(Metric, MetricAdmin)
+admin.site.register(Region, RegionAdmin)
+admin.site.register(Score, ScoreAdmin)
