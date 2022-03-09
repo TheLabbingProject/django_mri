@@ -64,7 +64,7 @@ REGIONS = [
 DESCRIPTION: str = """An automated labeling system for subdividing the human cerebral cortex on MRI scans into gyral based regions of interest.
 Desikan, R. S., Ségonne, F., Fischl, B., Quinn, B. T., Dickerson, B. C., Blacker, D., ... & Killiany, R. J. (2006). An automated labeling system for subdividing the human cerebral cortex on MRI scans into gyral based regions of interest. Neuroimage, 31(3), 968-980."""
 DESIKAN_KILLIANY = {
-    "title": "Desikan-Kiliany",
+    "title": "Desikan-Killiany",
     "description": DESCRIPTION,
     "symmetric": True,
     "regions": REGIONS,

@@ -33,10 +33,12 @@ class RegionQuerySet(QuerySet):
         """
         symmetric = atlas.symmetric or definition.get("symmetric", False)
         if symmetric:
-            definition["hemisphere"] = "L"
-            left, _ = self.get_or_create(atlas=atlas, **definition)
-            definition["hemisphere"] = "R"
-            right, _ = self.get_or_create(atlas=atlas, **definition)
+            left, _ = self.get_or_create(
+                atlas=atlas, hemisphere="L", **definition
+            )
+            right, _ = self.get_or_create(
+                atlas=atlas, hemisphere="R", **definition
+            )
             return left, right
         return self.get_or_create(atlas=atlas, **definition)[0]
 

@@ -577,6 +577,10 @@ class MetricAdmin(admin.ModelAdmin):
         "title",
         "description",
     )
+    search_fields = (
+        "title",
+        "description",
+    )
 
 
 class AtlasAdmin(admin.ModelAdmin):
@@ -592,6 +596,11 @@ class AtlasAdmin(admin.ModelAdmin):
         "symmetric",
         "n_regions",
     )
+    search_fields = (
+        "title",
+        "description",
+    )
+    list_filter = ("symmetric",)
 
     def n_regions(self, instance: Atlas) -> int:
         return instance.region_set.count()
@@ -612,6 +621,11 @@ class RegionAdmin(admin.ModelAdmin):
         "hemisphere",
         "title",
         "description",
+        "subcortical",
+    )
+    list_filter = (
+        "atlas",
+        "hemisphere",
         "subcortical",
     )
 
