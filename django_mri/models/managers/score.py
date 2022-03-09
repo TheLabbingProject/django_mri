@@ -2,7 +2,8 @@
 Definition of the :class:`ScoreManager` class.
 """
 import pandas as pd
-from django.db.models import Manager, QuerySet
+from django.db.models import F, Manager, QuerySet
+from django.db.models.aggregates import Avg, StdDev
 from django_analyses.models.run import Run
 from django_mri.models.atlas import Atlas
 from django_mri.models.managers import messages
@@ -113,3 +114,8 @@ class ScoreQuerySet(QuerySet):
 
     def _repr_html_(self) -> pd.DataFrame:
         return self.to_dataframe()
+
+    def standardize(self) -> QuerySet:
+        average = self.aggregate(Avg("value"))["value__avg"]
+        std_dev = self.aggregate(StdDev("value"))["value__stddev"]
+        return self.annotate(standardized=(F("value") - average) / std_dev)
