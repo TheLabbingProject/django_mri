@@ -58,4 +58,8 @@ class ReconAllStats:
         # Fix `object` columns
         for column_name in COLUMNS_TO_INT:
             stats[column_name] = stats[column_name].astype("int64")
+        stats.index = stats.index.set_levels(
+            stats.index.levels[-1].str.replace("_and_", "&"),
+            level="Region Name",
+        )
         return stats
