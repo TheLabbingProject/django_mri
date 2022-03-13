@@ -30,6 +30,7 @@ REGION_INDEX: str = "The index of this region within the atlas."
 REGION_DESCRIPTION: str = "A description of this region."
 REGION_SUBCORTICAL: str = "Whether this region is subcortical or not."
 
+SCORE_ORIGIN: str = "The scan or scans from which this score was derived."
 SCORE_REGION: str = "The brain region for which this score was calculated."
 SCORE_METRIC: str = "The metric represented by this score."
 SCORE_VALUE: str = "Calculated score value."

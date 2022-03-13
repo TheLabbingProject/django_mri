@@ -14,10 +14,15 @@ class Score(models.Model):
     particular :class:`~django_analyses.models.run.Run` instance.
     """
 
+    origin = models.ManyToManyField(
+        "django_mri.Scan", help_text=help_text.SCORE_ORIGIN,
+    )
     region = models.ForeignKey(
         "django_mri.Region",
         on_delete=models.CASCADE,
         help_text=help_text.SCORE_REGION,
+        blank=True,
+        null=True,
     )
     metric = models.ForeignKey(
         "django_mri.Metric",
@@ -44,7 +49,9 @@ class Score(models.Model):
         str
             Score string representation
         """
-        return f"{self.region} [{self.metric}] = {self.value}"
+        if self.region:
+            return f"{self.metric} [{self.region}] = {self.value}"
+        return f"{self.metric} = {self.value}"
 
     def to_series(self) -> pd.Series:
         d = {

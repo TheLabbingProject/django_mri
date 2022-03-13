@@ -32,6 +32,7 @@ from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2101,
 )
 from django_mri.analysis.interfaces.fsl.fsl_anat import FslAnat
+from django_mri.analysis.interfaces.mriqc.mriqc import MRIQC2100rc2
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
@@ -122,6 +123,10 @@ from django_mri.analysis.specifications.fsl.susan import (
 from django_mri.analysis.specifications.fsl.topup import (
     TOPUP_INPUT_SPECIFICATION,
     TOPUP_OUTPUT_SPECIFICATION,
+)
+from django_mri.analysis.specifications.mriqc import (
+    MRIQC_INPUT_SPECIFICATION,
+    MRIQC_OUTPUT_SPECIFICATION,
 )
 from django_mri.analysis.specifications.mrtrix3.bias_correct import (
     BIAS_CORRECT_INPUT_SPECIFICATION,
@@ -727,6 +732,18 @@ analysis_definitions = [
                 "description": "Beta version",
                 "input": DMRIPREP_INPUT_SPECIFICATION,
                 "output": DMRIPREP_OUTPUT_SPECIFICATION,
+            },
+        ],
+    },
+    {
+        "title": "MRIQC",
+        "description": "MRIQC extracts no-reference IQMs (image quality metrics) from structural (T1w and T2w) and functional MRI (magnetic resonance imaging) data.",  # noqa: E501
+        "versions": [
+            {
+                "title": MRIQC2100rc2.__version__,
+                "description": "Version 21.0.0rc2.",
+                "input": MRIQC_INPUT_SPECIFICATION,
+                "output": MRIQC_OUTPUT_SPECIFICATION,
             },
         ],
     },

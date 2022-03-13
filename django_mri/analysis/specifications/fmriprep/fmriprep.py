@@ -4,19 +4,16 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 .. _recon_all:
    https://surfer.nmr.mgh.harvard.edu/fswiki/recon-all
 """
-
-from django.conf import settings
-from traits.trait_types import String
-
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      DirectoryInputDefinition,
-                                                      FileInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_analyses.models.output.definitions import (FileOutputDefinition,
-                                                       ListOutputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    DirectoryInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import ListOutputDefinition
 
 #: *fmriprep* input specification.
 FMRIPREP_INPUT_SPECIFICATION = {

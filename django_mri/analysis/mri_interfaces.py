@@ -32,6 +32,7 @@ from django_mri.analysis.interfaces.fsl.topup import TopupWrapper
 from django_mri.analysis.interfaces.matlab.spm.cat12.segmentation import (
     Segmentation as Cat12Segmentation,
 )
+from django_mri.analysis.interfaces.mriqc.mriqc import MRIQC2100rc2
 from django_mri.analysis.interfaces.mrtrix3.dwi2tensor import Dwi2Tensor
 from django_mri.analysis.interfaces.mrtrix3.dwifslpreproc import DwiFslPreproc
 from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
@@ -122,4 +123,5 @@ interfaces = {
     },
     "QSIPrep": {QsiPrep0143.__version__: QsiPrep0143},
     "dMRIPrep": {DmriPrep010.__version__: DmriPrep010},
+    "MRIQC": {MRIQC2100rc2.__version__: MRIQC2100rc2},
 }
