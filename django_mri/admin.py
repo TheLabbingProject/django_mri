@@ -638,7 +638,10 @@ class ScoreAdmin(admin.ModelAdmin):
 
     list_display = (
         "id",
+        "_origin_id",
+        "_origin_description",
         "_run",
+        "_analysis_version",
         "atlas",
         "index",
         "hemisphere",
@@ -646,28 +649,71 @@ class ScoreAdmin(admin.ModelAdmin):
         "_metric",
         "value",
     )
-    list_filter = ("region__atlas", "region__hemisphere", "metric")
-    search_fields = ("region__title",)
+    list_filter = (
+        "region__atlas",
+        "region__hemisphere",
+        "run__analysis_version",
+        "metric",
+    )
+    search_fields = (
+        "id",
+        "origin__id",
+        "run__id",
+        "region__title",
+        "origin__description",
+    )
+
+    def _origin_id(self, instance: Score) -> str:
+        return mark_safe(
+            "\n".join(
+                [
+                    Html.admin_link(scan.__class__.__name__, scan.id)
+                    for scan in instance.origin.all()
+                ]
+            )
+        )
+
+    def _origin_description(self, instance: Score) -> str:
+        return "\n".join([scan.description for scan in instance.origin.all()])
 
     def _run(self, instance: Score) -> str:
         model_name = instance.run.__class__.__name__
         pk = instance.run.id
         return Html.admin_link(model_name, pk)
 
-    def atlas(self, instance: Score) -> str:
-        model_name = instance.region.atlas.__class__.__name__
-        pk = instance.region.atlas.id
-        text = instance.region.atlas.title
+    def _analysis_version(self, instance: Score) -> str:
+        model_name = instance.run.analysis_version.__class__.__name__
+        pk = instance.run.analysis_version.id
+        text = str(instance.run.analysis_version)
         return Html.admin_link(model_name, pk, text)
 
+    def atlas(self, instance: Score) -> str:
+        try:
+            model_name = instance.region.atlas.__class__.__name__
+        except AttributeError:
+            pass
+        else:
+            pk = instance.region.atlas.id
+            text = instance.region.atlas.title
+            return Html.admin_link(model_name, pk, text)
+
     def index(self, instance: Score) -> int:
-        return instance.region.index
+        try:
+            return instance.region.index
+        except AttributeError:
+            pass
 
     def hemisphere(self, instance: Score) -> str:
-        return instance.region.get_hemisphere_display()
+        try:
+            return instance.region.get_hemisphere_display()
+        except AttributeError:
+            pass
 
     def region_title(self, instance: Score) -> str:
-        return instance.region.title
+        try:
+            return instance.region.title
+        except AttributeError:
+            pass
 
     def _metric(self, instance: Score) -> str:
         model_name = instance.metric.__class__.__name__

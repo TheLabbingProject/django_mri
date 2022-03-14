@@ -3,7 +3,7 @@ Utilities for the :mod:`~django_mri.analysis.interfaces.mriqc` module.
 """
 
 #: Command line template to format for execution.
-COMMAND = "docker run --tmpfs /run --tmpfs /tmp --rm -it -v {bids_parent}:/data:ro -v {destination_parent}:/out nipreps/mriqc:{version} /data/{bids_name} /out/{destination_name} {analysis_level}"  # noqa: E501
+COMMAND = "singularity run -e -B {bids_parent}:/data:ro,{destination_parent}:/out:rw {singularity_image_root}/mriqc-{version}.simg /data/{bids_name} /out/{destination_name} {analysis_level}"  # noqa: E501
 
 #: "Flags" indicate parameters that are specified without any arguments, i.e.
 #: they are a switch for some binary configuration.

@@ -131,7 +131,7 @@ MRIQC_INPUT_SPECIFICATION = {
     "work-dir": {
         "type": DirectoryInputDefinition,
         "description": "Path where intermediate results should be stored.",
-        "default": "/output/work",
+        "default": "/out/work",
     },
 }
 #: *MRIQC* output specification.

@@ -7,6 +7,7 @@ from typing import Tuple
 
 from django_mri.analysis.interfaces.mriqc.messages import RUN_FAILURE
 from django_mri.analysis.interfaces.mriqc.utils import COMMAND, FLAGS
+from django_mri.utils import get_singularity_root
 
 
 class MRIQC:
@@ -74,6 +75,7 @@ class MRIQC:
             Complete execution command
         """
         analysis_level = self.configuration.pop("analysis_level")
+        singularity_image_root = get_singularity_root()
         command = COMMAND.format(
             bids_parent=self.nifti_root.parent,
             destination_parent=self.destination.parent,
@@ -81,6 +83,7 @@ class MRIQC:
             destination_name=self.destination.name,
             analysis_level=analysis_level,
             version=self.__version__,
+            singularity_image_root=singularity_image_root,
         )
         return command + self.set_configuration_by_keys()
 
@@ -134,3 +137,6 @@ class MRIQC:
 
 class MRIQC2100rc2(MRIQC):
     __version__ = "21.0.0rc2"
+
+
+# TODO TEST singuldary
