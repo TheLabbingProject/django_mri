@@ -1,22 +1,21 @@
 """
-Definition of the :class:`FmriPrep` interface.
+Definition of the :class:`dmriprep` interface.
 """
 import os
 from pathlib import Path
 from typing import Iterable, Tuple
 
 from django.conf import settings
-from django_mri.analysis.interfaces.fmriprep.messages import (
+from django_mri.analysis.interfaces.dmriprep.messages import (
     FS_LICENSE_MISSING,
     RUN_FAILURE,
 )
-from django_mri.analysis.interfaces.fmriprep.utils import (
+from django_mri.analysis.interfaces.dmriprep.utils import (
     COMMAND,
     FLAGS,
     FREESURFER_HOME,
     OUTPUTS,
 )
-from django_mri.utils import get_singularity_root
 
 
 class DmriPrep:
@@ -27,8 +26,8 @@ class DmriPrep:
     ----------
     * dmriprep_
 
-    .. _fmriprep:
-       https://fmriprep.org/en/stable/index.html
+    .. _dmriprep:
+       https://github.com/GalBenZvi/dmriprep
     """
 
     #: Binary configurations.
@@ -40,8 +39,8 @@ class DmriPrep:
     #: Default FreeSurfer home directory.
     DEFAULT_FREESURFER_HOME: Path = Path(FREESURFER_HOME)
 
-    #: FmriPrep output pattern.
-    FMRIPREP_OUTPUT_PATTERN: str = (
+    #: dmriprep output pattern.
+    DMRIPREP_OUTPUT_PATTERN: str = (
         "{main_dir}/**/{sub_dir}/sub-{subject_id}_{session_id}_{output_id}"
     )
 
@@ -49,13 +48,13 @@ class DmriPrep:
     FS_OUTPUT_PATTERN: str = "{main_dir}/**/*{output_id}"
 
     #: Session results pattern.
-    SESSION_PATTERN: str = "fmriprep/sub-{subject_id}/ses-*"
+    SESSION_PATTERN: str = "dmriprep/sub-{subject_id}/ses-*"
 
     __version__ = None
 
     def __init__(self, **kwargs):
         """
-        Initializes a new :class:`FmriPrep` interface instance.
+        Initializes a new :class:`dmriprep` interface instance.
         """
         self.nifti_root, self.analysis_root = self.set_input_and_output_roots()
         self.destination = self.analysis_root / kwargs.pop("destination")
@@ -103,7 +102,7 @@ class DmriPrep:
 
     def set_configuration_by_keys(self):
         """
-        Builds command for fmriprep CLI (via singularity) based on user's
+        Builds command for dmriprep CLI (via singularity) based on user's
         specifications.
 
         Returns
@@ -135,7 +134,6 @@ class DmriPrep:
         """
         fs_license = self.find_fs_license()
         analysis_level = self.configuration.pop("analysis_level")
-        singularity_image_root = get_singularity_root()
         command = COMMAND.format(
             bids_parent=self.nifti_root.parent,
             destination_parent=self.destination.parent,
@@ -143,9 +141,6 @@ class DmriPrep:
             destination_name=self.destination.name,
             analysis_level=analysis_level,
             freesurfer_license=fs_license,
-            version=self.__version__,
-            security_options=self.security_options,
-            singularity_image_root=singularity_image_root,
         )
         return command + self.set_configuration_by_keys()
 
@@ -178,7 +173,7 @@ class DmriPrep:
         )
         return self.destination.rglob(pattern)
 
-    def generate_fmriprep_outputs(
+    def generate_dmriprep_outputs(
         self,
         main_dir: str,
         sub_dir: str,
@@ -187,7 +182,7 @@ class DmriPrep:
         output_id: str,
     ) -> Iterable[Path]:
         """
-        Generate fmriprep output paths.
+        Generate dmriprep output paths.
 
         Parameters
         ----------
@@ -207,7 +202,7 @@ class DmriPrep:
         Path
             Output paths
         """
-        pattern = self.FMRIPREP_OUTPUT_PATTERN.format(
+        pattern = self.dmriprep_OUTPUT_PATTERN.format(
             main_dir=main_dir,
             sub_dir=sub_dir,
             subject_id=subject_id,
@@ -221,7 +216,7 @@ class DmriPrep:
     ):
         """
         uses the destination and some default dictionary to locate specific
-        output files of *fmriprep*.
+        output files of *dmriprep*.
 
         Parameters
         ----------
@@ -235,9 +230,9 @@ class DmriPrep:
         main_dir, sub_dir, output_id = self.OUTPUTS.get(partial_output)
         if main_dir == "freesurfer":
             outputs = list(self.generate_fs_outputs(main_dir, output_id))
-        elif main_dir == "fmriprep":
+        elif main_dir == "dmriprep":
             outputs = list(
-                self.generate_fmriprep_outputs(
+                self.generate_dmriprep_outputs(
                     main_dir, sub_dir, subject_id, session_id, output_id
                 )
             )
@@ -274,7 +269,7 @@ class DmriPrep:
 
     def run(self) -> dict:
         """
-        Runs *fmriprep* with the provided *bids_dir* as input.
+        Runs *dmriprep* with the provided *bids_dir* as input.
         If *destination* is not specified, output files will be created within
         *bids_dir*\'s parent directory.
 
@@ -282,7 +277,7 @@ class DmriPrep:
         -------
         dict
             Dictionary with keys and values corresponding to descriptions and
-            files of *fmriprep*\'s outputs accordingly
+            files of *dmriprep*\'s outputs accordingly
 
         Raises
         ------
@@ -297,43 +292,3 @@ class DmriPrep:
             )
             raise RuntimeError(message)
         return self.generate_output_dict()
-
-    @property
-    def security_options(self) -> str:
-        return self.get_security_options()
-
-
-class FmriPrep2021(FmriPrep):
-    __version__ = "20.2.1"
-
-
-class FmriPrep2022(FmriPrep):
-    __version__ = "20.2.2"
-
-
-class FmriPrep2023(FmriPrep):
-    __version__ = "20.2.3"
-
-
-class FmriPrep2024(FmriPrep):
-    __version__ = "20.2.4"
-
-
-class FmriPrep2025(FmriPrep):
-    __version__ = "20.2.5"
-
-
-class FmriPrep2026(FmriPrep):
-    __version__ = "20.2.6"
-
-
-class FmriPrep2027(FmriPrep):
-    __version__ = "20.2.7"
-
-
-class FmriPrep2100(FmriPrep):
-    __version__ = "21.0.0"
-
-
-class FmriPrep2101(FmriPrep):
-    __version__ = "21.0.1"
