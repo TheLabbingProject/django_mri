@@ -19,7 +19,7 @@ import warnings
 import nipype
 from django.conf import settings
 from django_mri.analysis import messages
-from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep010
+from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep040
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
     FmriPrep2022,
@@ -728,7 +728,7 @@ analysis_definitions = [
         "description": "A robust preprocessing pipeline for dMRI data.",  # noqa: E501
         "versions": [
             {
-                "title": DmriPrep010.__version__,
+                "title": DmriPrep040.__version__,
                 "description": "Beta version",
                 "input": DMRIPREP_INPUT_SPECIFICATION,
                 "output": DMRIPREP_OUTPUT_SPECIFICATION,

@@ -292,3 +292,7 @@ class DmriPrep:
             )
             raise RuntimeError(message)
         return self.generate_output_dict()
+
+
+class DmriPrep040(DmriPrep):
+    __version__ = "0.4.0"
