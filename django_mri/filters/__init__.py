@@ -16,6 +16,11 @@ For more information, see:
    https://django-filter.readthedocs.io/en/stable/guide/rest_framework.html
 """
 
+from django_mri.filters.atlas_filter import AtlasFilter
+from django_mri.filters.irb_approval_filter import IrbApprovalFilter
+from django_mri.filters.metric_filter import MetricFilter
+from django_mri.filters.region_filter import RegionFilter
 from django_mri.filters.scan_filter import ScanFilter
+from django_mri.filters.score_filter import ScoreFilter
 
 # flake8: noqa: E401

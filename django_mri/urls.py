@@ -28,6 +28,10 @@ router.register(r"scan", views.ScanViewSet)
 router.register(r"nifti", views.NiftiViewSet)
 router.register(r"session", views.SessionViewSet)
 router.register(r"irb_approval", views.IrbApprovalViewSet)
+router.register(r"atlas", views.AtlasViewSet)
+router.register(r"metric", views.MetricViewSet)
+router.register(r"region", views.RegionViewSet)
+router.register(r"score", views.ScoreViewSet)
 
 
 urlpatterns = [
