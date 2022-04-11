@@ -1,37 +1,34 @@
 """
-Definition of the :class:`dmriprep` interface.
+Definition of the :class:`DmriPrep` interface.
 """
 import os
 from pathlib import Path
 from typing import Iterable, Tuple
 
-from django.conf import settings
-from django_mri.analysis.interfaces.dmriprep.messages import (
-    FS_LICENSE_MISSING,
-    RUN_FAILURE,
-)
+import bids
 from django_mri.analysis.interfaces.dmriprep.utils import (
-    COMMAND,
-    FLAGS,
-    FREESURFER_HOME,
     OUTPUTS,
+    THE_BASE_BIDS_IDENTIFIERS,
+    THE_BASE_SMRIPREP_KWARGS,
 )
+from django_mri.analysis.interfaces.fmriprep.messages import FS_LICENSE_MISSING
+from django_mri.analysis.interfaces.fmriprep.utils import FREESURFER_HOME
+from dwiprep.dwiprep import DmriPrepManager
+
+bids.config.set_option("extension_initial_dot", True)
 
 
 class DmriPrep:
     """
-    An interface for the *dmriprep* preprocessing pipeline.
+    An interface for the *dwiprep* preprocessing pipeline.
 
     References
     ----------
     * dmriprep_
 
     .. _dmriprep:
-       https://github.com/GalBenZvi/dmriprep
+       https://github.com/GalBenZvi/dwiprep
     """
-
-    #: Binary configurations.
-    FLAGS = FLAGS
 
     #: Expected outputs.
     OUTPUTS = OUTPUTS
@@ -39,7 +36,7 @@ class DmriPrep:
     #: Default FreeSurfer home directory.
     DEFAULT_FREESURFER_HOME: Path = Path(FREESURFER_HOME)
 
-    #: dmriprep output pattern.
+    #: DmriPrep output pattern.
     DMRIPREP_OUTPUT_PATTERN: str = (
         "{main_dir}/**/{sub_dir}/sub-{subject_id}_{session_id}_{output_id}"
     )
@@ -52,12 +49,26 @@ class DmriPrep:
 
     __version__ = None
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        bids_identifiers: dict = None,
+        smriprep_kwargs: dict = None,
+        **kwargs,
+    ):
         """
-        Initializes a new :class:`dmriprep` interface instance.
+        Initializes a new :class:`DmriPrep` interface instance.
         """
-        self.nifti_root, self.analysis_root = self.set_input_and_output_roots()
+        (
+            self.bids_directory,
+            self.analysis_root,
+        ) = self.set_input_and_output_roots()
         self.destination = self.analysis_root / kwargs.pop("destination")
+        self.bids_identifiers = (
+            bids_identifiers or THE_BASE_BIDS_IDENTIFIERS.copy()
+        )
+        self.smriprep_kwargs = (
+            smriprep_kwargs or THE_BASE_SMRIPREP_KWARGS.copy()
+        )
         self.configuration = kwargs
 
     def set_input_and_output_roots(self) -> Tuple[Path, Path]:
@@ -102,7 +113,7 @@ class DmriPrep:
 
     def set_configuration_by_keys(self):
         """
-        Builds command for dmriprep CLI (via singularity) based on user's
+        Builds command for fmriprep CLI (via singularity) based on user's
         specifications.
 
         Returns
@@ -122,33 +133,6 @@ class DmriPrep:
                 key_addition += f" {value}"
             key_command += key_addition
         return key_command
-
-    def generate_command(self) -> str:
-        """
-        Returns the command to be executed in order to run the analysis.
-
-        Returns
-        -------
-        str
-            Complete execution command
-        """
-        fs_license = self.find_fs_license()
-        analysis_level = self.configuration.pop("analysis_level")
-        command = COMMAND.format(
-            bids_parent=self.nifti_root.parent,
-            destination_parent=self.destination.parent,
-            bids_name=self.nifti_root.name,
-            destination_name=self.destination.name,
-            analysis_level=analysis_level,
-            freesurfer_license=fs_license,
-        )
-        return command + self.set_configuration_by_keys()
-
-    def get_security_options(self) -> str:
-        options = getattr(settings, "SINGULARITY_SECURITY_OPTIONS", "")
-        if options:
-            return f'--security="{options}"'
-        return ""
 
     def generate_fs_outputs(
         self, main_dir: str, output_id: str
@@ -182,7 +166,7 @@ class DmriPrep:
         output_id: str,
     ) -> Iterable[Path]:
         """
-        Generate dmriprep output paths.
+        Generate fmriprep output paths.
 
         Parameters
         ----------
@@ -202,7 +186,7 @@ class DmriPrep:
         Path
             Output paths
         """
-        pattern = self.dmriprep_OUTPUT_PATTERN.format(
+        pattern = self.DMRIPREP_OUTPUT_PATTERN.format(
             main_dir=main_dir,
             sub_dir=sub_dir,
             subject_id=subject_id,
@@ -216,7 +200,7 @@ class DmriPrep:
     ):
         """
         uses the destination and some default dictionary to locate specific
-        output files of *dmriprep*.
+        output files of *fmriprep*.
 
         Parameters
         ----------
@@ -267,6 +251,26 @@ class DmriPrep:
             return output_dict.get(subject_id)
         return output_dict
 
+    def init_dmriprep_instance(self) -> DmriPrepManager:
+        """
+        Initiates a *DmriPrepMangager* instance to build preprocessing
+        workflow.
+
+        Returns
+        -------
+        DmriPrep
+            An instanciated *DmriPrepManager*
+        """
+        particpant_label = self.configuration.get("participant_label")
+        dmriprep = DmriPrepManager(
+            bids_dir=self.bids_directory,
+            destination=self.destination,
+            participant_label=particpant_label,
+            smriprep_kwargs=self.smriprep_kwargs,
+            **self.bids_identifiers,
+        )
+        return dmriprep
+
     def run(self) -> dict:
         """
         Runs *dmriprep* with the provided *bids_dir* as input.
@@ -284,15 +288,10 @@ class DmriPrep:
         RuntimeError
             In case of failed execution, raises an appropriate error
         """
-        command = self.generate_command()
-        raised_exception = os.system(command)
-        if raised_exception:
-            message = RUN_FAILURE.format(
-                command=command, exception=raised_exception
-            )
-            raise RuntimeError(message)
+        manager = self.init_dmriprep_instance()
+        manager.run()
         return self.generate_output_dict()
 
 
-class DmriPrep040(DmriPrep):
-    __version__ = "0.4.0"
+class DmriPrep010(DmriPrep):
+    __version__ = "0.1.0"

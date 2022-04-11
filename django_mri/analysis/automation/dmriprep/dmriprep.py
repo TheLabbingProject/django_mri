@@ -5,7 +5,8 @@ from typing import List
 
 from django.db.models import Q, QuerySet
 from django_analyses.runner.queryset_runner import QuerySetRunner
-from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep010
+from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep040
+from django_mri.analysis.utils.bids_filters import DMRIPREP_FILTERS
 from django_mri.utils.utils import get_subject_model
 
 #: Associated subject model.
@@ -22,7 +23,7 @@ class dMRIPrepRunner(QuerySetRunner):
 
     #: :class:`~django_analyses.models.analysis_version.AnalysisVersion`
     #: instance title.
-    ANALYSIS_VERSION_TITLE = DmriPrep010.__version__
+    ANALYSIS_VERSION_TITLE = DmriPrep040.__version__
 
     #: :class:`~django_analyses.models.pipeline.node.Node` instance
 
@@ -36,6 +37,15 @@ class dMRIPrepRunner(QuerySetRunner):
     INPUT_GENERATION_PROGRESSBAR_KWARGS = {
         "unit": "subject",
         "desc": "Converting MRI scans to NIfTI",
+    }
+
+    #: TheBase Configuration
+    ANALYSIS_CONFIGURATION = {
+        "analysis_level": "participant",
+        "output-spaces": ["MNI152NLin2009cAsym", "MNI152NLin6Asym", "anat"],
+        "fs-no-reconall": True,
+        "skip-bids-validation": True,
+        "bids-filter-file": str(DMRIPREP_FILTERS),
     }
 
     def get_base_queryset(self) -> QuerySet:

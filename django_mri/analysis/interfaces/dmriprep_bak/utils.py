@@ -1,39 +1,30 @@
 """
 Utilities for the
-:class:`~django_mri.analysis.interfaces.dmriprep.dmriprep.dmriprep` interface.
+:class:`~django_mri.analysis.interfaces.dmriprep.dmriprep.DmriPrep` interface.
 """
+from niworkflows.utils.spaces import Reference, SpatialReferences
 
-#: Command line template to format for execution.
-COMMAND = "dmriprep {bids_parent}/{bids_name} {destination_parent}/{destination_name} {analysis_level} --fs-license-file {freesurfer_license}"  # noqa: E501
-
-#: Default FreeSurfer home directory.
-FREESURFER_HOME: str = "/usr/local/freesurfer"
-
-#: "Flags" indicate parameters that are specified without any arguments, i.e.
-#: they are a switch for some binary configuration.
-FLAGS = (
-    "skip-bids-validation",
-    "low-mem",
-    "anat-only",
-    "boilerplate",
-    "longitudinal",
-    "skull-strip-fixed-seed",
-    "fmap-bspline",
-    "fmap-no-demean",
-    "use-syn-sdc",
-    "force-syn",
-    "no-submm-recon",
-    "fs-no-reconall",
-    "clean-workdir",
-    "resource-monitor",
-    "reports-only",
-    "write-graph",
-    "stop-on-first-crash",
-    "notrack",
-    "sloppy",
+#: TheBase-specific KWARGS
+THE_BASE_BIDS_IDENTIFIERS = dict(
+    dwi_identifier={"direction": "FWD", "suffix": "dwi"},
+    fmap_identifier={"acquisition": "dwi"},
+    t1w_identifier={"ceagent": "corrected"},
+    t2w_identifier={"ceagent": "corrected"},
 )
 
-#: Dictionary of expeected outputs by key.
+THE_BASE_SMRIPREP_KWARGS = dict(
+    freesurfer=False,
+    hires=True,
+    longitudinal=False,
+    omp_nthreads=1,
+    skull_strip_mode="force",
+    skull_strip_template=Reference("OASIS30ANTs"),
+    spaces=SpatialReferences(
+        spaces=["MNI152NLin2009cAsym", "fsaverage5", "anat"]
+    ),
+)
+
+#: Outputs
 OUTPUTS = {
     # Anatomicals
     "native_T1w": ["dmriprep", "anat", "desc-preproc_T1w.nii.gz"],
@@ -96,92 +87,101 @@ OUTPUTS = {
     "pial": ["dmriprep", "anat", "hemi-*_pial.surf.gii"],
     "midthickness": ["dmriprep", "anat", "hemi-*_midthickness.surf.gii"],
     "inflated": ["dmriprep", "anat", "hemi-*_inflated.surf.gii"],
-    # DWI
-    "native_dwi_image": [
+    # dmri
+    "native_preproc_dwi_nii": [
         "dmriprep",
         "dwi",
-        "*space-dwi_desc-preproc_dwi.nii.gz",
+        "dir-*space-orig_desc-preproc_dwi.nii.gz",
     ],
-    "native_dwi_bvec": [
+    "native_preproc_dwi_json": [
         "dmriprep",
         "dwi",
-        "*space-dwi_desc-preproc_dwi.bvec",
+        "*space-orig_desc-preproc_dwi.json",
     ],
-    "native_dwi_bval": [
+    "native_preproc_dwi_bvec": [
         "dmriprep",
         "dwi",
-        "*space-dwi_desc-preproc_dwi.bval",
+        "*space-orig_desc-preproc_dwi.bvec",
     ],
-    "native_dwi_json": [
+    "native_preproc_dwi_bval": [
         "dmriprep",
         "dwi",
-        "*space-dwi_desc-preproc_dwi.json",
+        "*space-orig_desc-preproc_dwi.bval",
     ],
-    "native_dwiref_image": [
+    "native_preproc_epi_ref_file": [
         "dmriprep",
         "dwi",
-        "*space-dwi_desc-preproc_epiref.nii.gz",
+        "*space-orig_desc-preproc_epiref.nii.gz",
     ],
-    "native_dwiref_json": [
+    "native_preproc_epiref_json": [
         "dmriprep",
         "dwi",
-        "*space-dwi_desc-preproc_epiref.json",
+        "*space-orig_desc-preproc_epiref.json",
     ],
-    "coreg_dwi_image": [
+    "coreg_preproc_dwi_nii": [
         "dmriprep",
         "dwi",
-        "*space-T1w_desc-preproc_dwi.nii.gz",
+        "*space-anat_desc-preproc_dwi.nii.gz",
     ],
-    "coreg_dwi_bvec": [
+    "coreg_preproc_dwi_bvec": [
         "dmriprep",
         "dwi",
-        "*space-T1w_desc-preproc_dwi.bvec",
+        "*space-anat_desc-preproc_dwi.bvec",
     ],
-    "coreg_dwi_bval": [
+    "coreg_preproc_dwi_bval": [
         "dmriprep",
         "dwi",
-        "*space-T1w_desc-preproc_dwi.bval",
+        "*space-anat_desc-preproc_dwi.bval",
     ],
-    "coreg_dwi_json": [
+    "coreg_preproc_dwi_json": [
         "dmriprep",
         "dwi",
-        "*space-T1w_desc-preproc_dwi.json",
+        "*space-anat_desc-preproc_dwi.json",
     ],
-    "coreg_dwiref_image": [
+    "coreg_preproc_epiref_nii": [
         "dmriprep",
         "dwi",
-        "*space-T1w_desc-preproc_epiref.nii.gz",
-    ],
-    "coreg_dwiref_json": [
-        "dmriprep",
-        "dwi",
-        "*space-T1w_desc-preproc_epiref.json",
-    ],
-    "native_dwi_brain_mask": [
-        "dmriprep",
-        "dwi",
-        "*space-T1w_desc-brain_mask.nii.gz",
-    ],
-    "native_preproc_bold": [
-        "dmriprep",
-        "dwi",
-        "*space-dwi_desc-brain_mask.nii.gz",
-    ],
-    "coreg_preproc_bold": [
-        "dmriprep",
-        "dwi",
-        "*space-T1w_desc-brain_mask.nii.gz",
+        "*space-anat_desc-preproc_epiref.nii.gz",
     ],
     "native_to_anat_transform": [
         "dmriprep",
         "dwi",
-        "*from-dwi_to-T1w_mode-image_xfm.txt",
+        "*from-epiref_to-T1w_mode-image_xfm.txt",
     ],
     "anat_to_native_transform": [
         "dmriprep",
         "dwi",
-        "*from-T1w_to-dwi_mode-image_xfm.txt",
+        "*from-epiref_to-T1w_mode-image_xfm.txt",
     ],
+    "phasediff_fmap_nii": [
+        "dmriprep",
+        "fmap",
+        "_desc-phasediff_fieldmap.nii.gz",
+    ],
+    "phasediff_fmap_json": [
+        "dmriprep",
+        "fmap",
+        "desc-phasediff_fieldmap.json",
+    ],
+    "native_fa": ["dmriprep", "dwi", "*space-orig_desc-fa_epiref.nii.gz",],
+    "native_adc": ["dmriprep", "dwi", "*space-orig_desc-adc_epiref.nii.gz",],
+    "native_ad": ["dmriprep", "dwi", "*space-orig_desc-ad_epiref.nii.gz",],
+    "native_rd": ["dmriprep", "dwi", "*space-orig_desc-rd_epiref.nii.gz",],
+    "native_cl": ["dmriprep", "dwi", "*space-orig_desc-cl_epiref.nii.gz",],
+    "native_cp": ["dmriprep", "dwi", "*space-orig_desc-cp_epiref.nii.gz",],
+    "native_cs": ["dmriprep", "dwi", "*space-orig_desc-cs_epiref.nii.gz",],
+    "native_evec": ["dmriprep", "dwi", "*space-orig_desc-evec_epiref.nii.gz",],
+    "native_eval": ["dmriprep", "dwi", "*space-orig_desc-eval_epiref.nii.gz",],
+    "coreg_fa": ["dmriprep", "dwi", "*space-anat_desc-fa_epiref.nii.gz",],
+    "coreg_adc": ["dmriprep", "dwi", "*space-anat_desc-adc_epiref.nii.gz",],
+    "coreg_ad": ["dmriprep", "dwi", "*space-anat_desc-ad_epiref.nii.gz",],
+    "coreg_rd": ["dmriprep", "dwi", "*space-anat_desc-rd_epiref.nii.gz",],
+    "coreg_cl": ["dmriprep", "dwi", "*space-anat_desc-cl_epiref.nii.gz",],
+    "coreg_cp": ["dmriprep", "dwi", "*space-anat_desc-cp_epiref.nii.gz",],
+    "coreg_cs": ["dmriprep", "dwi", "*space-anat_desc-cs_epiref.nii.gz",],
+    "coreg_evec": ["dmriprep", "dwi", "*space-anat_desc-evec_epiref.nii.gz",],
+    "coreg_eval": ["dmriprep", "dwi", "*space-anat_desc-eval_epiref.nii.gz",],
+    # Freesurfer
     "freesurfer_T1": ["freesurfer", "mri", "T1.mgz"],
     "freesurfer_rawavg": ["freesurfer", "mri", "rawavg.mgz"],
     "freesurfer_orig": ["freesurfer", "mri", "orig.mgz"],
@@ -196,5 +196,4 @@ OUTPUTS = {
     "freesurfer_wmparc": ["freesurfer", "mri", "wmparc.mgz"],
     "freesurfer_wmparc_stats": ["freesurfer", "stats", "wmparc.stats"],
     "freesurfer_BA_stats": ["freesurfer", "stats", ".BA_exvivo*.stats"],
-    # TODO: Finish outputs dictionary.
 }
