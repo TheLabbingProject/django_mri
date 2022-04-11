@@ -41,6 +41,7 @@ class dMRIPrepRunner(QuerySetRunner):
 
     #: TheBase Configuration
     ANALYSIS_CONFIGURATION = {
+        "analysis_level": "participant",
         "output-spaces": ["MNI152NLin2009cAsym", "MNI152NLin6Asym", "anat"],
         "fs-no-reconall": True,
         "skip-bids-validation": True,
