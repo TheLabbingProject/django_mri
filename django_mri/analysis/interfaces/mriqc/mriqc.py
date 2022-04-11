@@ -137,6 +137,3 @@ class MRIQC:
 
 class MRIQC2100rc2(MRIQC):
     __version__ = "21.0.0rc2"
-
-
-# TODO TEST singuldary

@@ -343,7 +343,35 @@ class BidsManager:
             self.fix_functional_json(nifti)
         if sequence_type in ["func_fieldmap"]:
             self.modify_fieldmaps(nifti)
+        if sequence_type == "dwi_fieldmap":
+            self.create_mean_b0_fieldmap(nifti)
         self.set_participant_tsv_and_json(nifti.scan)
+
+    def create_mean_b0_fieldmap(self, multi_fieldmap: NIfTI) -> NIfTI:
+        mean_image_data = multi_fieldmap.get_mean_volume()
+        multi_image = multi_fieldmap.instance
+        mean_image = nib.Nifti1Image(
+            mean_image_data, multi_image.affine, header=multi_image.header,
+        )
+        mean_image.header.set_data_shape(mean_image_data.shape)
+        destination = Path(
+            str(multi_fieldmap.path)
+            .replace("/dwi/", "/fmap/")
+            .replace("_dwi.", "_epi.")
+        )
+        name_parts = destination.name.split("_")
+        name_parts.insert(2, "acq-dwi")
+        destination = destination.parent / "_".join(name_parts)
+        destination.parent.mkdir(exist_ok=True, parents=True)
+        nib.save(mean_image, str(destination))
+        json_destination = (
+            destination.parent / destination.name.split(".")[0]
+        ).with_suffix(".json")
+        shutil.copyfile(multi_fieldmap.json_file, json_destination)
+        mean_nifti = NIfTI.objects.create(
+            path=destination, is_raw=False, parent=multi_fieldmap
+        )
+        self.modify_fieldmaps(mean_nifti)
 
     def set_participant_tsv_and_json(self, scan):
         """

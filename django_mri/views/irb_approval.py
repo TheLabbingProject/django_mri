@@ -1,15 +1,17 @@
-from rest_framework import viewsets
-
+"""
+Definition of the :class:`IrbApprovalViewSet` class.
+"""
 from django_mri.filters.irb_approval_filter import IrbApprovalFilter
 from django_mri.models.irb_approval import IrbApproval
 from django_mri.serializers.irb_approval import IrbApprovalSerializer
 from django_mri.views.defaults import DefaultsMixin
 from django_mri.views.pagination import StandardResultsSetPagination
+from rest_framework import viewsets
 
 
 class IrbApprovalViewSet(DefaultsMixin, viewsets.ModelViewSet):
     """
-    API endpoint that allows scans to be viewed or edited.
+    API endpoint that allows IRB Approval instances to be viewed or edited.
     """
 
     pagination_class = StandardResultsSetPagination
