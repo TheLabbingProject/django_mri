@@ -6,10 +6,6 @@ from django.db.models import F, Manager, QuerySet
 from django.db.models.aggregates import Avg, StdDev
 from django_analyses.models.run import Run
 from django_mri.analysis.score.scorers import get_scorer
-from django_mri.models.atlas import Atlas
-from django_mri.models.managers import messages
-from django_mri.models.metric import Metric
-from django_mri.models.region import Region
 
 
 class ScoreManager(Manager):
@@ -41,14 +37,11 @@ class ScoreManager(Manager):
 
 class ScoreQuerySet(QuerySet):
     def to_dataframe(self) -> pd.DataFrame:
-        return (
-            pd.concat([score.to_series() for score in self.all()], axis=1)
-            .T.set_index(
-                ["Run ID", "Atlas", "Hemisphere", "Region", "Metric"],
-                drop=True,
-            )["Score"]
-            .unstack("Metric")
-        )
+        df = pd.concat([score.to_series() for score in self.all()], axis=1).T
+        df = df.dropna(axis=1, how="all")
+        if "Region" in df.columns:
+            return df.set_index(["Run ID", "Origin", "Atlas", "Hemisphere", "Region", "Metric"], drop=True)["Score"].unstack("Metric")
+        return df.set_index(["Run ID", "Origin", "Metric"], drop=True)["Score"].unstack("Metric")
 
     def _repr_html_(self) -> pd.DataFrame:
         return self.to_dataframe()

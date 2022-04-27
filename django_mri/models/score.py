@@ -56,13 +56,15 @@ class Score(models.Model):
     def to_series(self) -> pd.Series:
         d = {
             "Run ID": self.run.id,
+            "Origin": self.origin.values_list("id", flat=True) if self.origin else None,
             "Analysis": self.run.analysis_version.analysis.title,
             "Version": self.run.analysis_version.title,
-            "Atlas": self.region.atlas.title,
-            "Index": self.region.index,
-            "Hemisphere": self.region.hemisphere,
-            "Region": self.region.title,
+            "Atlas": self.region.atlas.title if self.region else None,
+            "Index": self.region.index if self.region else None,
+            "Hemisphere": self.region.hemisphere if self.region else None,
+            "Region": self.region.title if self.region else None,
             "Metric": self.metric.title,
             "Score": self.value,
         }
+        d["Origin"] = d["Origin"][0] if len(d["Origin"]) == 1 else d["Origin"]
         return pd.Series(d, name=self.id)

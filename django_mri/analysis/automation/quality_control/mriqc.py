@@ -44,12 +44,7 @@ class MriqcRunner(QuerySetRunner):
     }
 
     #: Subject scan filtering to apply before running NIfTI conversion.
-    SCAN_QUERY: Q = Q(_nifti__isnull=True) & ~(
-        Q(description__icontains="IR-EPI")
-        | Q(description__icontains="IREPI")
-        | Q(description__icontains="localizer")
-        | Q(description__icontains="cmrr")
-    )
+    SCAN_QUERY: Q = Q(_nifti__isnull=True) & (Q(dicom__sequence_type="mprage") | Q(dicom__sequence_type="flair") | Q(dicom__sequence_type="t2w") | Q(dicom__sequence_type="bold"))
 
     def get_base_queryset(self) -> QuerySet:
         """
