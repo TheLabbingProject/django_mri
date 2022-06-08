@@ -26,8 +26,7 @@ jobs:
           name: Upgrade pip
           command: pip install --upgrade pip setuptools wheel
       - python/install-packages:
-          pip-dependency-file: dev-requirements.txt
-          pkg-manager: pip
+          pip-dependency-file: requirements-dev.txt
       - run: pip install tox
       - run:
           name: Test using tox
