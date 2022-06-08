@@ -44,4 +44,4 @@ class DjangoMriConfig(AppConfig):
         try:
             self.bids_manager.scaffold_bids_directory()
         except PermissionError as e:
-            warnings.warn(e)
+            warnings.warn(str(e))
