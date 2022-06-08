@@ -8,6 +8,7 @@ References
 .. _Django applications:
    https://docs.djangoproject.com/en/3.0/ref/applications/#module-django.apps
 """
+import warnings
 
 from django.apps import AppConfig
 
@@ -40,4 +41,7 @@ class DjangoMriConfig(AppConfig):
         from django_mri.utils.bids import BidsManager
 
         self.bids_manager = BidsManager()
-        self.bids_manager.scaffold_bids_directory()
+        try:
+            self.bids_manager.scaffold_bids_directory()
+        except PermissionError as e:
+            warnings.warn(e)
