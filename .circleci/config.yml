@@ -7,6 +7,7 @@ orbs:
 jobs:
   build-and-test:
     working_directory: ~/django_mri
+    executor: python/default
     docker:
       - image: themattrix/tox
         environment:
@@ -21,12 +22,12 @@ jobs:
           POSTGRES_PASSWORD: password
     steps:
       - checkout
-      - python/load-cache
       - run:
           name: Upgrade pip
           command: pip install --upgrade pip setuptools wheel
-      - python/install-deps
-      - python/save-cache
+      - python/install-packages:
+          pip-dependency-file: dev-requirements.txt
+          pkg-manager: pip
       - run: pip install tox
       - run:
           name: Test using tox
