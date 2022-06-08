@@ -6,15 +6,18 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 """
 
 from django.conf import settings
-
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      DirectoryInputDefinition,
-                                                      FileInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_analyses.models.output.definitions import (FileOutputDefinition,
-                                                       ListOutputDefinition)
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    DirectoryInputDefinition,
+    FileInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import (
+    FileOutputDefinition,
+    ListOutputDefinition,
+)
 
 #: *recon_all* input specification.
 RECON_ALL_INPUT_SPECIFICATION = {
@@ -73,6 +76,7 @@ RECON_ALL_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "required": False,
         "description": "Whether to use the provided T2 image to generate an improved pial surface estimation.",  # noqa: E501
+        "default": False,
     },
     "FLAIR_file": {
         "type": FileInputDefinition,
@@ -83,6 +87,7 @@ RECON_ALL_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "required": False,
         "description": "Whether to use the provided FLAIR image to generate an improved pial surface estimation.",  # noqa: E501
+        "default": False,
     },
     "parallel": {
         "type": BooleanInputDefinition,
@@ -103,6 +108,7 @@ RECON_ALL_INPUT_SPECIFICATION = {
         "type": BooleanInputDefinition,
         "required": False,
         "description": "Assume scan parameters are MGH MPRAGE protocol, which produces darker grey matter.",  # noqa: E501
+        "default": False,
     },
     "big_ventricles": {
         "type": BooleanInputDefinition,
