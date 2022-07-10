@@ -17,6 +17,7 @@ Example
 import warnings
 
 import nipype
+from brainprint import Brainprint
 from django.conf import settings
 from django_mri.analysis import messages
 from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep040
@@ -40,6 +41,10 @@ from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143
+from django_mri.analysis.specifications.brainprint import (
+    BRAINPRINT_INPUT_SPECIFICATION,
+    BRAINPRINT_OUTPUT_SPECIFICATION,
+)
 from django_mri.analysis.specifications.dmriprep.dmriprep import (
     DMRIPREP_INPUT_SPECIFICATION,
     DMRIPREP_OUTPUT_SPECIFICATION,
@@ -744,6 +749,18 @@ analysis_definitions = [
                 "description": "Version 21.0.0rc2.",
                 "input": MRIQC_INPUT_SPECIFICATION,
                 "output": MRIQC_OUTPUT_SPECIFICATION,
+            },
+        ],
+    },
+    {
+        "title": "Brainprint",
+        "description": "Computes brainprint descriptors using the brainprint package interface.",  # noqa: E501
+        "versions": [
+            {
+                "title": Brainprint.__version__,
+                "description": f"Version {Brainprint.__version__}.",
+                "input": BRAINPRINT_INPUT_SPECIFICATION,
+                "output": BRAINPRINT_OUTPUT_SPECIFICATION,
             },
         ],
     },

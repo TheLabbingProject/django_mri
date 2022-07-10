@@ -14,6 +14,7 @@ References
 .. _Simplified Analysis Integration Example:
    https://django-analyses.readthedocs.io/en/latest/user_guide/analysis_integration/simplified_example.html
 """
+from brainprint import Brainprint
 from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep040
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
@@ -124,4 +125,5 @@ interfaces = {
     "QSIPrep": {QsiPrep0143.__version__: QsiPrep0143},
     "dMRIPrep": {DmriPrep040.__version__: DmriPrep040},
     "MRIQC": {MRIQC2100rc2.__version__: MRIQC2100rc2},
+    "Brainprint": {Brainprint.__version__: Brainprint},
 }

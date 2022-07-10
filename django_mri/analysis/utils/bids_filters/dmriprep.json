@@ -1,7 +1,16 @@
 {
-  "dwi": { "suffix": "dwi", "direction": "FWD" },
-  "sbref": { "suffix": "sbref", "datatype": "dwi" },
-  "fmap": { "suffix": "epi", "acquisition": "dwi" },
-  "t1w": { "ceagent": "corrected" },
-  "t2w": { "ceagent": "corrected" }
+  "dwi": {
+    "suffix": "dwi",
+    "direction": "FWD"
+  },
+  "fmap": {
+    "suffix": "epi",
+    "acquisition": "dwi"
+  },
+  "t1w": {
+    "ceagent": "corrected"
+  },
+  "t2w": {
+    "ceagent": "corrected"
+  }
 }

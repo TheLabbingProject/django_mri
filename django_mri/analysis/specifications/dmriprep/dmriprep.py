@@ -6,17 +6,20 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
 """
 
 from django.conf import settings
+from django_analyses.models.input.definitions import (
+    BooleanInputDefinition,
+    DirectoryInputDefinition,
+    FileInputDefinition,
+    FloatInputDefinition,
+    IntegerInputDefinition,
+    ListInputDefinition,
+    StringInputDefinition,
+)
+from django_analyses.models.output.definitions import (
+    FileOutputDefinition,
+    ListOutputDefinition,
+)
 from traits.trait_types import String
-
-from django_analyses.models.input.definitions import (BooleanInputDefinition,
-                                                      DirectoryInputDefinition,
-                                                      FileInputDefinition,
-                                                      FloatInputDefinition,
-                                                      IntegerInputDefinition,
-                                                      ListInputDefinition,
-                                                      StringInputDefinition)
-from django_analyses.models.output.definitions import (FileOutputDefinition,
-                                                       ListOutputDefinition)
 
 #: *dmriprep* input specification.
 DMRIPREP_INPUT_SPECIFICATION = {
@@ -26,8 +29,15 @@ DMRIPREP_INPUT_SPECIFICATION = {
         "required": True,
         "description": "Path to output directory",
     },
+    "analysis_level": {
+        "type": StringInputDefinition,
+        "choices": ["participant"],
+        "required": False,
+        "default": "participant",
+        "description": "processing stage to be run, only “participant” in the case of fMRIPrep (see BIDS-Apps specification).",  # noqa: E501
+    },
     ### Options to handle performance ###
-    "bids_validate": {
+    "skip-bids-validation": {
         "type": BooleanInputDefinition,
         "description": "assume the input dataset is BIDS compliant and skip the validation",  # noqa: E501
         "default": True,
@@ -39,14 +49,85 @@ DMRIPREP_INPUT_SPECIFICATION = {
         "description": "a space delimited list of participant identifiers or a single identifier (the sub- prefix can be removed)",  # noqa: E501
         "is_configuration": False,
     },
+    "bids-filter-file": {
+        "type": FileInputDefinition,
+        "description": "a JSON file describing custom BIDS input filters using PyBIDS.",
+    },
+    ### Workflow configuration ###
+    "output-spaces": {
+        "type": ListInputDefinition,
+        "element_type": "STR",
+        "description": "Standard and non-standard spaces to resample anatomical and functional images to.",
+    },
     ### Specific options for FreeSurfer preprocessing ###
-    "fs_subjects_dir": {
+    "fs-license-file": {
+        "type": FileInputDefinition,
+        "description": "Path to FreeSurfer license key file.",
+    },
+    "fs-subjects-dir": {
         "type": DirectoryInputDefinition,
         "description": "Path to existing FreeSurfer subjects directory to reuse.",
     },
-    "work_dir": {
+    ### Surface preprocessing options ###
+    "no-submm-recon": {
+        "type": BooleanInputDefinition,
+        "description": "disable sub-millimeter (hires) reconstruction",
+    },
+    "cifti-output": {
+        "type": StringInputDefinition,
+        "choices": ["91k", "170k"],
+        "description": "output preprocessed BOLD as a CIFTI dense timeseries. Optionally, the number of grayordinate can be specified (default is 91k, which equates to 2mm resolution)",
+    },
+    "fs-no-reconall": {
+        "type": BooleanInputDefinition,
+        "description": "disable FreeSurfer surface preprocessing.",
+    },
+    ### Other options ###
+    "output-layout": {
+        "type": StringInputDefinition,
+        "choices": ["bids", "legacy"],
+        "description": "Organization of outputs.",
+    },
+    "work-dir": {
         "type": DirectoryInputDefinition,
         "description": "path where intermediate results should be stored",
+    },
+    "clean-workdir": {
+        "type": BooleanInputDefinition,
+        "description": "Clears working directory of contents. Use of this flag is notrecommended when running concurrent processes of fMRIPrep.",
+    },
+    "resource-monitor": {
+        "type": BooleanInputDefinition,
+        "description": "enable Nipype’s resource monitoring to keep track of memory and CPU usage",
+    },
+    "reports-only": {
+        "type": BooleanInputDefinition,
+        "description": "only generate reports, don’t run workflows. This will only rerun report aggregation, not reportlet generation for specific nodes.",
+    },
+    "config-file": {
+        "type": FileInputDefinition,
+        "description": "Use pre-generated configuration file. Values in file will be overridden by command-line arguments.",
+    },
+    "write-graph": {
+        "type": BooleanInputDefinition,
+        "description": "Write workflow graph.",
+    },
+    "stop-on-first-crash": {
+        "type": BooleanInputDefinition,
+        "description": "Force stopping on first crash, even if a work directory was specified.",
+    },
+    "notrack": {
+        "type": BooleanInputDefinition,
+        "description": "Opt-out of sending tracking information of this run to the FMRIPREP developers.",
+    },
+    "debug": {
+        "type": StringInputDefinition,
+        "choices": ["compcor", "all"],
+        "description": "Debug mode(s) to enable. ‘all’ is alias for all available modes.",
+    },
+    "sloppy": {
+        "type": BooleanInputDefinition,
+        "description": "Use low-quality tools for speed - TESTING ONLY",
     },
 }
 #: *dMRIprep* output specification.

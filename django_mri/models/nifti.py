@@ -111,7 +111,7 @@ class NIfTI(TimeStampedModel):
             with open(file_name, "r") as file_object:
                 content = file_object.read()
             content = content.splitlines()[0].split(" ")
-            return [int(value) for value in content]
+            return [int(value) for value in content if value != ""]
 
     def get_b_vector(self) -> List[List[float]]:
         """

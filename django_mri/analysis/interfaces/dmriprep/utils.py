@@ -12,7 +12,7 @@ FREESURFER_HOME: str = "/usr/local/freesurfer"
 #: "Flags" indicate parameters that are specified without any arguments, i.e.
 #: they are a switch for some binary configuration.
 FLAGS = (
-    "skip_bids_validation",
+    "skip-bids-validation",
     "low-mem",
     "anat-only",
     "boilerplate",
@@ -132,9 +132,21 @@ OUTPUTS = {
         "dwi",
         "*space-T1w_desc-preproc_dwi.nii.gz",
     ],
-    "coreg_dwi_bvec": ["dmriprep", "dwi", "*space-T1w_desc-preproc_dwi.bvec",],
-    "coreg_dwi_bval": ["dmriprep", "dwi", "*space-T1w_desc-preproc_dwi.bval",],
-    "coreg_dwi_json": ["dmriprep", "dwi", "*space-T1w_desc-preproc_dwi.json",],
+    "coreg_dwi_bvec": [
+        "dmriprep",
+        "dwi",
+        "*space-T1w_desc-preproc_dwi.bvec",
+    ],
+    "coreg_dwi_bval": [
+        "dmriprep",
+        "dwi",
+        "*space-T1w_desc-preproc_dwi.bval",
+    ],
+    "coreg_dwi_json": [
+        "dmriprep",
+        "dwi",
+        "*space-T1w_desc-preproc_dwi.json",
+    ],
     "coreg_dwiref_image": [
         "dmriprep",
         "dwi",
