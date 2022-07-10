@@ -168,9 +168,9 @@ class ScanQuerySet(QuerySet):
         queryset = self.filter(_nifti__isnull=True).order_by("number")
         # Query fieldmaps to convert only after their "IntendedFor" targets
         # have been converted (required for correct BIDS postprocessing).
-        fieldmaps = queryset.filter(dicom__sequence_type__contains="fieldmap")
+        fieldmaps = queryset.filter(dicom__sequence_type__contains="func_fieldmap")
         non_fieldmaps = queryset.exclude(
-            dicom__sequence_type__contains="fieldmap"
+            dicom__sequence_type__contains="fufieldmap"
         )
         if fieldmaps.exists():
             # Log fieldmaps detected and will be converted in the end.
