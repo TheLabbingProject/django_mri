@@ -43,6 +43,7 @@ class BidsManager:
     RUN_LABEL_PATTERN: str = "run-[0-9]*"
     RUN_LABEL_TEMPLATE: str = "run-{index}"
     NA_LABEL: str = "n/a"
+    EPI_DATATYPES = ["func", "dwi"]
 
     _logger = logging.getLogger("data.mri.bids")
 
@@ -301,28 +302,33 @@ class BidsManager:
         bids_path = Path(nifti.path)
         base_name = bids_path.name.split(".")[0]
         json_path = bids_path.parent / f"{base_name}.json"
-        data_type_target = re.findall(self.ACQUISITION_PATTERN, base_name)
-        if data_type_target == []:
-            message = BIDS_NO_ACQ_LABEL.format(base_name=base_name)
-            print(message)
-        else:
-            data_type_target = data_type_target[0]
+        # data_type_target = re.findall(self.ACQUISITION_PATTERN, base_name)
+        # if data_type_target == []:
+        #     message = BIDS_NO_ACQ_LABEL.format(base_name=base_name)
+        #     print(message)
+        # else:
+        #     data_type_target = data_type_target[0]
         session_dir = json_path.parent.parent
-        target_pattern = f"{data_type_target}/*.nii*"
-        targets = [p for p in session_dir.glob(target_pattern)]
-
-        if targets:
-            fin = open(json_path, "r")
-            data = json.load(fin)
-            fin.close()
-            data["IntendedFor"] = [
-                os.sep.join(target.parts[-3:]) for target in targets
-            ]
-            fout = open(json_path, "w")
-            json.dump(data, fout, indent=4)
-            fout.close()
-        else:
-            warnings.warn(f"No target file for {bids_path} could be found!")
+        for data_type_target in self.EPI_DATA_TYPES:
+            target_pattern = f"{data_type_target}/*.nii*"
+            targets = [p for p in session_dir.glob(target_pattern)]
+            if targets:
+                targets = [
+                    str(t.relative_to(session_dir.parent)) for t in targets
+                ]
+                fin = open(json_path, "r")
+                data = json.load(fin)
+                fin.close()
+                intended_for = data.get("IntendedFor", [])
+                intended_for += [t for t in targets if t not in intended_for]
+                data["IntendedFor"] = intended_for
+                fout = open(json_path, "w")
+                json.dump(data, fout, indent=4)
+                fout.close()
+            else:
+                warnings.warn(
+                    f"No target file for {bids_path} could be found!"
+                )
 
     def postprocess(self, nifti: NIfTI):
         """
@@ -343,8 +349,8 @@ class BidsManager:
             self.fix_functional_json(nifti)
         if sequence_type in ["func_fieldmap"]:
             self.modify_fieldmaps(nifti)
-        if sequence_type == "dwi_fieldmap":
-            self.create_mean_b0_fieldmap(nifti)
+        # if sequence_type == "dwi_fieldmap":
+        #     self.create_mean_b0_fieldmap(nifti)
         self.set_participant_tsv_and_json(nifti.scan)
 
     def create_mean_b0_fieldmap(self, multi_fieldmap: NIfTI) -> NIfTI:
