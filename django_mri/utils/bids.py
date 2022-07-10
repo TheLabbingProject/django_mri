@@ -309,7 +309,7 @@ class BidsManager:
         # else:
         #     data_type_target = data_type_target[0]
         session_dir = json_path.parent.parent
-        for data_type_target in self.EPI_DATA_TYPES:
+        for data_type_target in self.EPI_DATATYPES:
             target_pattern = f"{data_type_target}/*.nii*"
             targets = [p for p in session_dir.glob(target_pattern)]
             if targets:
