@@ -3,7 +3,7 @@ Celery tasks provided by the *django_mri* app.
 """
 from datetime import datetime
 from pathlib import Path
-from typing import Union
+from typing import Iterable, Union
 
 from celery import shared_task
 from django_analyses.models.run import Run
@@ -11,6 +11,7 @@ from django_analyses.models.run import Run
 from django_mri.models.data_directory import DataDirectory
 from django_mri.models.scan import Scan
 from django_mri.models.score import Score
+from django_mri.utils.utils import get_subject_model
 
 
 @shared_task(name="django_mri.create-scores")
@@ -58,3 +59,14 @@ def import_data(
         Scan.objects.import_path(
             data_directory, progressbar=False, report=False
         )
+
+
+@shared_task(name="django_mri.build-bids-directory")
+def build_bids_directory(
+    subject_ids: Iterable[str], force: bool = False, persistent: bool = True
+):
+    Subject = get_subject_model()
+    subjects = Subject.objects.filter(id__in=subject_ids)
+    subjects.build_bids_directory(
+        progressbar=False, force=force, persistent=persistent
+    )

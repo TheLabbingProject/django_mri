@@ -5,7 +5,6 @@ Input and output specification dictionaries for FreeSurfer's recon_all_ script.
    https://surfer.nmr.mgh.harvard.edu/fswiki/recon-all
 """
 
-from django.conf import settings
 from django_analyses.models.input.definitions import (
     BooleanInputDefinition,
     DirectoryInputDefinition,
@@ -15,14 +14,17 @@ from django_analyses.models.input.definitions import (
     ListInputDefinition,
     StringInputDefinition,
 )
-from django_analyses.models.output.definitions import (
-    FileOutputDefinition,
-    ListOutputDefinition,
-)
-from traits.trait_types import Bool, String
+from django_analyses.models.output.definitions import ListOutputDefinition
+from django_mri.utils.utils import get_bids_dir
 
 #: *qsiprep* input specification.
 QSIPREP_INPUT_SPECIFICATION = {
+    "study_id": {
+        "type": IntegerInputDefinition,
+        "required": False,
+        "default": None,
+        "description": "An integer representing a specific study.",
+    },
     "destination": {
         "type": StringInputDefinition,
         "dynamic_default": "{run_id}",

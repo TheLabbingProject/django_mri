@@ -91,7 +91,9 @@ class ScanQuerySet(QuerySet):
         return {ScanType.DICOM.value: dicom_scans}
 
     def delete_nifti(
-        self, progressbar: bool = False, progressbar_position: int = 0,
+        self,
+        progressbar: bool = False,
+        progressbar_position: int = 0,
     ):
         # Log NIfTI delete start.
         start_log = logs.SCAN_SET_NIFTI_DELETE_START.format(count=self.count())
@@ -168,9 +170,11 @@ class ScanQuerySet(QuerySet):
         queryset = self.filter(_nifti__isnull=True).order_by("number")
         # Query fieldmaps to convert only after their "IntendedFor" targets
         # have been converted (required for correct BIDS postprocessing).
-        fieldmaps = queryset.filter(dicom__sequence_type__contains="func_fieldmap")
+        fieldmaps = queryset.filter(
+            dicom__sequence_type__contains="func_fieldmap"
+        )
         non_fieldmaps = queryset.exclude(
-            dicom__sequence_type__contains="fufieldmap"
+            dicom__sequence_type__contains="func_fieldmap"
         )
         if fieldmaps.exists():
             # Log fieldmaps detected and will be converted in the end.

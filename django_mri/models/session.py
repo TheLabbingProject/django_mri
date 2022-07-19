@@ -21,7 +21,6 @@ from django_extensions.db.models import TimeStampedModel
 from django_mri.models import help_text, logs
 from django_mri.models.managers.session import SessionQuerySet
 from django_mri.utils import (
-    get_bids_dir,
     get_group_model,
     get_measurement_model,
     get_study_model,
@@ -203,7 +202,7 @@ class Session(TimeStampedModel):
         return Run.objects.filter(id__in=run_ids) | runs
 
     def get_bids_dir(self) -> Path:
-        bids_root = get_bids_dir()
+        bids_root = self.subject.get_bids_directory()
         date = self.time.date().strftime(self.SESSION_DATE_FORMAT)
         time = self.time.time().strftime(self.SESSION_TIME_FORMAT)
         session_dir_name = self.BIDS_DIR_TEMPLATE.format(date=date, time=time)

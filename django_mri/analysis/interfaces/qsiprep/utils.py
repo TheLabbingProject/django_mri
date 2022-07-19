@@ -4,7 +4,7 @@ Utilities for the
 """
 
 #: Command line template to format for execution.
-COMMAND = "singularity run -e {security_options} -B {bids_parent}:/work,{destination_parent}:/output,{freesurfer_license}:/fs_license {singularity_image_root}/qsiprep-{version}.sif /work/{bids_name} /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
+COMMAND = "singularity run -e {security_options} -B {bids_origin},{bids_root}:/bids_root,{destination_parent}:/output,{freesurfer_license}:/fs_license {singularity_image_root}/qsiprep-{version}.sif /bids_root /output/{destination_name} {analysis_level} --fs-license-file /fs_license"  # noqa: E501
 
 #: Default FreeSurfer home directory.
 FREESURFER_HOME: str = "/usr/local/freesurfer"
@@ -131,8 +131,16 @@ OUTPUTS = {
         "dwi",
         "*space-T1w_desc-preproc_dwi.b",
     ],
-    "native_eddy_cnr": ["qsiprep", "dwi", "*space-T1w_desc-eddy_cnr.nii.gz",],
-    "native_dwi_qc": ["qsiprep", "dwi", "*dwiqc.json",],
+    "native_eddy_cnr": [
+        "qsiprep",
+        "dwi",
+        "*space-T1w_desc-eddy_cnr.nii.gz",
+    ],
+    "native_dwi_qc": [
+        "qsiprep",
+        "dwi",
+        "*dwiqc.json",
+    ],
     "native_dwi_sliceqc": ["qsiprep", "dwi", "*desc-SliceQC_dwi.json"],
     "native_dwi_imageqc": ["qsiprep", "dwi", "*desc-ImageQC_dwi.json"],
     "confounds_tsv": ["qsiprep", "dwi", "*_confounds.tsv"],

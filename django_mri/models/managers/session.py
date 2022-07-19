@@ -2,6 +2,7 @@
 Definition of the :class:`SessionQuerySet` class.
 """
 import logging
+from typing import Iterable
 
 import pandas as pd
 from bokeh.plotting import Figure
@@ -157,11 +158,17 @@ class SessionQuerySet(QuerySet):
         return self.filter_by_studies(user.study_set.all())
 
     def query_study_groups(self) -> QuerySet:
-        return Group.objects.filter(
-            id__in=self.values("scan__study_groups")
-        ).distinct()
+        group_ids = self.values("scan__study_groups")
+        return Group.objects.filter(id__in=group_ids).distinct()
 
     def query_studies(self) -> QuerySet:
-        return Study.objects.filter(
-            id__in=self.values("scan__study_groups__study")
-        ).distinct()
+        study_ids = self.values("scan__study_groups__study")
+        return Study.objects.filter(id__in=study_ids).distinct()
+
+    def filter_by_sequence_types(
+        self, sequence_types: Iterable[str]
+    ) -> QuerySet:
+        queryset = self.all()
+        for sequence in sequence_types:
+            queryset = queryset.filter(scan__dicom__sequence_type=sequence)
+        return queryset.distinct()

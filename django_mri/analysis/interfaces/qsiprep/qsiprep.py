@@ -3,20 +3,16 @@ Definition of the :class:`QsiPrep` interface.
 """
 import os
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Union
 
 from django.conf import settings
 from django_mri.analysis.interfaces.qsiprep.messages import (
-    FS_LICENSE_MISSING,
-    RUN_FAILURE,
-)
-from django_mri.analysis.interfaces.qsiprep.utils import (
-    COMMAND,
-    FLAGS,
-    FREESURFER_HOME,
-    OUTPUTS,
-)
+    FS_LICENSE_MISSING, RUN_FAILURE)
+from django_mri.analysis.interfaces.qsiprep.utils import (COMMAND, FLAGS,
+                                                          FREESURFER_HOME,
+                                                          OUTPUTS)
 from django_mri.utils import get_singularity_root
+from django_mri.utils.utils import get_bids_dir
 
 
 class QsiPrep:
@@ -53,15 +49,44 @@ class QsiPrep:
 
     __version__ = None
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        analysis_root: Union[Path, str] = None,
+        **kwargs,
+    ):
         """
         Initializes a new :class:`FmriPrep` interface instance.
         """
-        self.nifti_root, self.analysis_root = self.set_input_and_output_roots()
+        self.analysis_root = self.set_output_root(analysis_root)
         self.destination = self.analysis_root / kwargs.pop("destination")
         self.configuration = kwargs
+        self.bids_root = self.set_input_root()
 
-    def set_input_and_output_roots(self) -> Tuple[Path, Path]:
+    def set_input_root(self) -> Path:
+        """
+        Query input configuration for a study id,
+        if it exists - bids root will be set to the study's.
+        Otherwise, it will be set to the database's.
+
+        Returns
+        -------
+        Path
+            Path to a BIDS-valid directory.
+        """
+        from research.models.study import Study
+
+        study_id = self.configuration.pop("study_id")
+        try:
+            study = Study.objects.get(id=study_id)
+        except Study.DoesNotExist:
+            return get_bids_dir()
+        else:
+            return study.data_directory
+
+    def set_output_root(
+        self,
+        analysis_root: Union[Path, str] = None,
+    ) -> Tuple[Path, Path]:
         """
         Sets the input and output directories to be mounted by singularity
 
@@ -73,7 +98,9 @@ class QsiPrep:
         from django_mri.utils import get_mri_root
 
         mri_root = get_mri_root()
-        return mri_root / "rawdata", mri_root.parent / "analysis"
+        if not analysis_root:
+            analysis_root = mri_root.parent / "analysis"
+        return analysis_root
 
     def find_fs_license(self) -> Path:
         """
@@ -92,9 +119,7 @@ class QsiPrep:
         try:
             return self.configuration.pop("fs-license-file")
         except KeyError:
-            fs_home = os.getenv(
-                "FREESURFER_HOME", self.DEFAULT_FREESURFER_HOME
-            )
+            fs_home = os.getenv("FREESURFER_HOME", self.DEFAULT_FREESURFER_HOME)
             license_file = Path(fs_home) / "license.txt"
             if license_file.exists():
                 return license_file
@@ -135,11 +160,12 @@ class QsiPrep:
         """
         fs_license = self.find_fs_license()
         analysis_level = self.configuration.pop("analysis_level")
+
         singularity_image_root = get_singularity_root()
         command = COMMAND.format(
-            bids_parent=self.nifti_root.parent,
+            bids_origin=str(get_bids_dir()),
+            bids_root=self.bids_root,
             destination_parent=self.destination.parent,
-            bids_name=self.nifti_root.name,
             destination_name=self.destination.name,
             analysis_level=analysis_level,
             freesurfer_license=fs_license,
@@ -155,9 +181,7 @@ class QsiPrep:
             return f'--security="{options}"'
         return ""
 
-    def generate_fs_outputs(
-        self, main_dir: str, output_id: str
-    ) -> Iterable[Path]:
+    def generate_fs_outputs(self, main_dir: str, output_id: str) -> Iterable[Path]:
         """
         Generate FreeSurfer output paths.
 
@@ -171,11 +195,9 @@ class QsiPrep:
         Yields
         -------
         Path
-            Output paths
+
         """
-        pattern = self.FS_OUTPUT_PATTERN.format(
-            main_dir=main_dir, output_id=output_id
-        )
+        pattern = self.FS_OUTPUT_PATTERN.format(main_dir=main_dir, output_id=output_id)
         return self.destination.rglob(pattern)
 
     def generate_qsiprep_outputs(
@@ -216,9 +238,7 @@ class QsiPrep:
         )
         return self.destination.rglob(pattern)
 
-    def find_output(
-        self, partial_output: str, subject_id: str, session_id: str
-    ):
+    def find_output(self, partial_output: str, subject_id: str, session_id: str):
         """
         uses the destination and some default dictionary to locate specific
         output files of *qsiprep*.
@@ -265,9 +285,7 @@ class QsiPrep:
             #     subject_id=subject_id
             # )
             for key in self.OUTPUTS:
-                output_dict[subject_id][key] = self.find_output(
-                    key, subject_id, "*"
-                )
+                output_dict[subject_id][key] = self.find_output(key, subject_id, "*")
         if len(output_dict) == 1:
             return output_dict.get(subject_id)
         return output_dict
@@ -292,9 +310,7 @@ class QsiPrep:
         command = self.generate_command()
         raised_exception = os.system(command)
         if raised_exception:
-            message = RUN_FAILURE.format(
-                command=command, exception=raised_exception
-            )
+            message = RUN_FAILURE.format(command=command, exception=raised_exception)
             raise RuntimeError(message)
         return self.generate_output_dict()
 
@@ -305,3 +321,7 @@ class QsiPrep:
 
 class QsiPrep0143(QsiPrep):
     __version__ = "0.14.3"
+
+
+class QsiPrep0160RC3(QsiPrep):
+    __version__ = "0.16.0RC3"

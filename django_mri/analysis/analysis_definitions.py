@@ -40,7 +40,7 @@ from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
-from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143
+from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143,QsiPrep0160RC3
 from django_mri.analysis.specifications.brainprint import (
     BRAINPRINT_INPUT_SPECIFICATION,
     BRAINPRINT_OUTPUT_SPECIFICATION,
@@ -725,7 +725,14 @@ analysis_definitions = [
                 "description": "QSIprep v0.14.3.",
                 "input": QSIPREP_INPUT_SPECIFICATION,
                 "output": QSIPREP_OUTPUT_SPECIFICATION,
+            },
+            {
+                "title": QsiPrep0160RC3.__version__,
+                "description": "QSIprep v0.16.0RC3",
+                "input": QSIPREP_INPUT_SPECIFICATION,
+                "output": QSIPREP_OUTPUT_SPECIFICATION,
             }
+
         ],
     },
     {

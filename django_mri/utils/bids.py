@@ -3,19 +3,18 @@ Definition of the :class:`Bids` class.
 """
 import json
 import logging
-import os
 import re
 import shutil
 import warnings
 from datetime import date
 from pathlib import Path
+from typing import Union
 
 import nibabel as nib
 import pandas as pd
 from django.apps import apps
 from django.db.models import Q
 from django_mri.utils import logs
-from django_mri.utils.messages import BIDS_NO_ACQ_LABEL
 from django_mri.utils.utils import get_bids_dir
 
 BASE_DIR = Path(__file__).parent
@@ -46,6 +45,10 @@ class BidsManager:
     EPI_DATATYPES = ["func", "dwi"]
 
     _logger = logging.getLogger("data.mri.bids")
+
+    def __init__(self, bids_dir: Union[Path, str] = None) -> None:
+        self.bids_dir = bids_dir or get_bids_dir()
+        self.bids_dir.mkdir(exist_ok=True, parents=True)
 
     def calculate_age(self, born: date) -> float:
         """
@@ -302,12 +305,6 @@ class BidsManager:
         bids_path = Path(nifti.path)
         base_name = bids_path.name.split(".")[0]
         json_path = bids_path.parent / f"{base_name}.json"
-        # data_type_target = re.findall(self.ACQUISITION_PATTERN, base_name)
-        # if data_type_target == []:
-        #     message = BIDS_NO_ACQ_LABEL.format(base_name=base_name)
-        #     print(message)
-        # else:
-        #     data_type_target = data_type_target[0]
         session_dir = json_path.parent.parent
         for data_type_target in self.EPI_DATATYPES:
             target_pattern = f"{data_type_target}/*.nii*"
@@ -316,15 +313,13 @@ class BidsManager:
                 targets = [
                     str(t.relative_to(session_dir.parent)) for t in targets
                 ]
-                fin = open(json_path, "r")
-                data = json.load(fin)
-                fin.close()
+                with open(json_path, "r") as json_file:
+                    data = json.load(json_file)
                 intended_for = data.get("IntendedFor", [])
                 intended_for += [t for t in targets if t not in intended_for]
                 data["IntendedFor"] = intended_for
-                fout = open(json_path, "w")
-                json.dump(data, fout, indent=4)
-                fout.close()
+                with open(json_path, "w") as json_file:
+                    json.dump(data, json_file, indent=4)
             else:
                 warnings.warn(
                     f"No target file for {bids_path} could be found!"
@@ -349,35 +344,7 @@ class BidsManager:
             self.fix_functional_json(nifti)
         if sequence_type in ["func_fieldmap"]:
             self.modify_fieldmaps(nifti)
-        # if sequence_type == "dwi_fieldmap":
-        #     self.create_mean_b0_fieldmap(nifti)
         self.set_participant_tsv_and_json(nifti.scan)
-
-    def create_mean_b0_fieldmap(self, multi_fieldmap: NIfTI) -> NIfTI:
-        mean_image_data = multi_fieldmap.get_mean_volume()
-        multi_image = multi_fieldmap.instance
-        mean_image = nib.Nifti1Image(
-            mean_image_data, multi_image.affine, header=multi_image.header,
-        )
-        mean_image.header.set_data_shape(mean_image_data.shape)
-        destination = Path(
-            str(multi_fieldmap.path)
-            .replace("/dwi/", "/fmap/")
-            .replace("_dwi.", "_epi.")
-        )
-        name_parts = destination.name.split("_")
-        name_parts.insert(2, "acq-dwi")
-        destination = destination.parent / "_".join(name_parts)
-        destination.parent.mkdir(exist_ok=True, parents=True)
-        nib.save(mean_image, str(destination))
-        json_destination = (
-            destination.parent / destination.name.split(".")[0]
-        ).with_suffix(".json")
-        shutil.copyfile(multi_fieldmap.json_file, json_destination)
-        mean_nifti = NIfTI.objects.create(
-            path=destination, is_raw=False, parent=multi_fieldmap
-        )
-        self.modify_fieldmaps(mean_nifti)
 
     def set_participant_tsv_and_json(self, scan):
         """
@@ -400,12 +367,10 @@ class BidsManager:
         .. _BIDS complementary files:
             https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
-        bids_dir = get_bids_dir()
-        bids_dir.mkdir(exist_ok=True, parents=True)
 
         subject_dict = self.get_subject_data(scan)
 
-        participants_tsv = bids_dir / self.PARTICIPANTS_FILE_NAME
+        participants_tsv = self.bids_dir / self.PARTICIPANTS_FILE_NAME
         participants_json = participants_tsv.with_suffix(".json")
         for participants_file in [participants_tsv, participants_json]:
             if not participants_file.is_file():
@@ -438,9 +403,7 @@ class BidsManager:
         .. _BIDS complementary files:
             https://bids-specification.readthedocs.io/en/stable/03-modality-agnostic-files.html
         """
-        bids_dir = get_bids_dir()
-        bids_dir.mkdir(exist_ok=True, parents=True)
-        description_file = bids_dir / self.DATASET_DESCRIPTION_FILE_NAME
+        description_file = self.bids_dir / self.DATASET_DESCRIPTION_FILE_NAME
         if not description_file.is_file():
             description_template = TEMPLATES_DIR / description_file.name
             description_file.parent.mkdir(exist_ok=True)
@@ -458,9 +421,7 @@ class BidsManager:
         .. _BIDS validator specifications:
             https://neuroimaging-core-docs.readthedocs.io/en/latest/pages/bids-validator.html
         """
-        bids_dir = get_bids_dir()
-        bids_dir.mkdir(exist_ok=True, parents=True)
-        bidsignore = bids_dir / ".bidsignore"
+        bidsignore = self.bids_dir / ".bidsignore"
         with open(bidsignore, "w+") as in_file:
             in_file.write("**/*ignore-bids*\n")
 
@@ -469,9 +430,7 @@ class BidsManager:
         It is recommended by BIDS specifications to have a README file at the
         base of our project, so we create a blank one for further usage.
         """
-        bids_dir = get_bids_dir()
-        bids_dir.mkdir(exist_ok=True, parents=True)
-        readme = bids_dir / "README"
+        readme = self.bids_dir / "README"
         if not readme.is_file():
             readme_template = TEMPLATES_DIR / "README"
             shutil.copyfile(str(readme_template), str(readme))

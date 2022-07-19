@@ -40,7 +40,7 @@ from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
-from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143
+from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143, QsiPrep0160RC3
 from django_mri.analysis.interfaces.yalab.mutual_information_score import (
     MutualInformationScore,
 )
@@ -122,7 +122,10 @@ interfaces = {
         FmriPrep2100.__version__: FmriPrep2100,
         FmriPrep2101.__version__: FmriPrep2101,
     },
-    "QSIPrep": {QsiPrep0143.__version__: QsiPrep0143},
+    "QSIPrep": {
+        QsiPrep0143.__version__: QsiPrep0143,
+        QsiPrep0160RC3.__version__: QsiPrep0160RC3,
+    },
     "dMRIPrep": {DmriPrep040.__version__: DmriPrep040},
     "MRIQC": {MRIQC2100rc2.__version__: MRIQC2100rc2},
     "Brainprint": {Brainprint.__version__: Brainprint},

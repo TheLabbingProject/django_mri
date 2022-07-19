@@ -1,7 +1,6 @@
 """
 General app utilities.
 """
-
 from django_mri.utils.utils import (
     get_bids_dir,
     get_bids_manager,

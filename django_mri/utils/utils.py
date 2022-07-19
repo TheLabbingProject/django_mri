@@ -14,10 +14,12 @@ from django_mri.apps import DjangoMriConfig
 #: saved.
 DEFAULT_MRI_DIR_NAME = "MRI"
 
-#: The name of the subdirectory under MEDIA_ROOT in which BIDS dataset will be saved
+#: The name of the subdirectory under MEDIA_ROOT in which BIDS dataset will be
+# saved
 DEFAULT_BIDS_DIR_NAME = "rawdata"
 
-#: The name of the subdirectory under MEDIA_ROOT in which analyses results will be saved
+#: The name of the subdirectory under MEDIA_ROOT in which analyses results
+# will be saved
 DEFAULT_ANALYSIS_DIR_NAME = "ANALYSIS"
 DEFAULT_ANALYSIS_PATH = Path(settings.MEDIA_ROOT) / DEFAULT_ANALYSIS_DIR_NAME
 
@@ -136,7 +138,8 @@ def get_bids_dir() -> Path:
 
 def get_analysis_dir() -> Path:
     """
-    Returns the path of the directory in which analyses' results should be saved.
+    Returns the path of the directory in which analyses' results should be
+    saved.
     """
     path = getattr(settings, "ANALYSIS_BASE_PATH", DEFAULT_ANALYSIS_PATH)
     return Path(path)
