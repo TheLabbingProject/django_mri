@@ -17,8 +17,39 @@ Example
 import warnings
 
 import nipype
-from brainprint import Brainprint
 from django.conf import settings
+from nipype.interfaces.freesurfer import (
+    CALabel,
+    MRIsCALabel,
+    ParcellationStats,
+    ReconAll,
+)
+from nipype.interfaces.fsl import (
+    BET,
+    FAST,
+    FLIRT,
+    FNIRT,
+    SUSAN,
+    TOPUP,
+    ApplyTOPUP,
+    BinaryMaths,
+    Eddy,
+    ExtractROI,
+    MeanImage,
+    Merge,
+    Reorient2Std,
+    RobustFOV,
+)
+from nipype.interfaces.fsl.base import no_fsl
+from nipype.interfaces.mrtrix3 import (
+    ConstrainedSphericalDeconvolution,
+    DWIBiasCorrect,
+    DWIDenoise,
+    Generate5tt,
+    MRDeGibbs,
+    ResponseSD,
+)
+
 from django_mri.analysis import messages
 from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep040
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
@@ -40,11 +71,7 @@ from django_mri.analysis.interfaces.mrtrix3.dwigradcheck import DwiGradCheck
 from django_mri.analysis.interfaces.mrtrix3.mrcat import MRCat
 from django_mri.analysis.interfaces.mrtrix3.mrconvert import MRConvert
 from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
-from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143,QsiPrep0160RC3
-from django_mri.analysis.specifications.brainprint import (
-    BRAINPRINT_INPUT_SPECIFICATION,
-    BRAINPRINT_OUTPUT_SPECIFICATION,
-)
+from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143, QsiPrep0160RC3
 from django_mri.analysis.specifications.dmriprep.dmriprep import (
     DMRIPREP_INPUT_SPECIFICATION,
     DMRIPREP_OUTPUT_SPECIFICATION,
@@ -192,37 +219,6 @@ from django_mri.analysis.specifications.spm.cat12.segmentation import (
 from django_mri.analysis.specifications.yalab.mutual_information_score import (
     MUTUAL_INFORMATION_SCORE_INPUT_SPECIFICATION,
     MUTUAL_INFORMATION_SCORE_OUTPUT_SPECIFICATION,
-)
-from nipype.interfaces.freesurfer import (
-    CALabel,
-    MRIsCALabel,
-    ParcellationStats,
-    ReconAll,
-)
-from nipype.interfaces.fsl import (
-    BET,
-    FAST,
-    FLIRT,
-    FNIRT,
-    SUSAN,
-    TOPUP,
-    ApplyTOPUP,
-    BinaryMaths,
-    Eddy,
-    ExtractROI,
-    MeanImage,
-    Merge,
-    Reorient2Std,
-    RobustFOV,
-)
-from nipype.interfaces.fsl.base import no_fsl
-from nipype.interfaces.mrtrix3 import (
-    ConstrainedSphericalDeconvolution,
-    DWIBiasCorrect,
-    DWIDenoise,
-    Generate5tt,
-    MRDeGibbs,
-    ResponseSD,
 )
 
 #: Warn if FSL is not accessible.
@@ -756,18 +752,6 @@ analysis_definitions = [
                 "description": "Version 21.0.0rc2.",
                 "input": MRIQC_INPUT_SPECIFICATION,
                 "output": MRIQC_OUTPUT_SPECIFICATION,
-            },
-        ],
-    },
-    {
-        "title": "Brainprint",
-        "description": "Computes brainprint descriptors using the brainprint package interface.",  # noqa: E501
-        "versions": [
-            {
-                "title": Brainprint.__version__,
-                "description": f"Version {Brainprint.__version__}.",
-                "input": BRAINPRINT_INPUT_SPECIFICATION,
-                "output": BRAINPRINT_OUTPUT_SPECIFICATION,
             },
         ],
     },
