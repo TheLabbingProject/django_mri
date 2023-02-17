@@ -1,8 +1,10 @@
 bokeh~=2.0
 bs4~=0.0
 celery>=5.1.2
+dicom_parser~=1.2
+Django~=4.1
+django-celery-results
 django-nonrelated-inlines~=0.1
-Django~=3.1
 django-celery-beat~=2.1
 djangorestframework~=3.12
 django-extensions~=3.1
@@ -15,10 +17,7 @@ numpy~=1.20
 tqdm~=4.40
 scikit-learn~=0.22
 smriprep~=0.8
-git+https://github.com/celery/django-celery-results.git@master#egg=django-celery-results
 git+https://github.com/TheLabbingProject/django_analyses.git@master#egg=django_analyses
 git+https://github.com/TheLabbingProject/django_dicom.git@master#egg=django_dicom
-git+https://github.com/open-dicom/dicom_parser.git@main#egg=dicom_parser
 git+https://github.com/GalBenZvi/nipype@master#egg=nipype
 git+https://github.com/GalBenZvi/dwiprep@master#egg=dwiprep
-git+https://github.com/ZviBaratz/BrainPrint-python@main#egg=brainprint

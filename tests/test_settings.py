@@ -13,7 +13,7 @@ env = environ.Env(
 environ.Env.read_env()
 
 DEBUG = False
-ALLOWED_HOSTS = "*"
+ALLOWED_HOSTS = ["localhost"]
 SECRET_KEY = "sa8!1ep_9#36qw@i-3j(a4uikiobleh03jl8v_3!n^^dsm9oyc"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "rest_framework",
+    "rest_framework.authtoken",
     "django_celery_results",
     "django_mri",
     "django_dicom",
