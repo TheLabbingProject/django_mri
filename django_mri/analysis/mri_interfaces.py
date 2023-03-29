@@ -14,7 +14,35 @@ References
 .. _Simplified Analysis Integration Example:
    https://django-analyses.readthedocs.io/en/latest/user_guide/analysis_integration/simplified_example.html
 """
-from brainprint import Brainprint
+from nipype.interfaces.freesurfer import (
+    CALabel,
+    MRIsCALabel,
+    ParcellationStats,
+    ReconAll,
+)
+from nipype.interfaces.fsl import (
+    BET,
+    FLIRT,
+    FNIRT,
+    SUSAN,
+    ApplyTOPUP,
+    BinaryMaths,
+    Eddy,
+    ExtractROI,
+    MeanImage,
+    Merge,
+    Reorient2Std,
+    RobustFOV,
+)
+from nipype.interfaces.mrtrix3 import (
+    ConstrainedSphericalDeconvolution,
+    DWIBiasCorrect,
+    DWIDenoise,
+    Generate5tt,
+    MRDeGibbs,
+    ResponseSD,
+)
+
 from django_mri.analysis.interfaces.dmriprep.dmriprep import DmriPrep040
 from django_mri.analysis.interfaces.fmriprep.fmriprep import (
     FmriPrep2021,
@@ -43,34 +71,6 @@ from django_mri.analysis.interfaces.mrtrix3.tensor2metric import Tensor2metric
 from django_mri.analysis.interfaces.qsiprep.qsiprep import QsiPrep0143, QsiPrep0160RC3
 from django_mri.analysis.interfaces.yalab.mutual_information_score import (
     MutualInformationScore,
-)
-from nipype.interfaces.freesurfer import (
-    CALabel,
-    MRIsCALabel,
-    ParcellationStats,
-    ReconAll,
-)
-from nipype.interfaces.fsl import (
-    BET,
-    FLIRT,
-    FNIRT,
-    SUSAN,
-    ApplyTOPUP,
-    BinaryMaths,
-    Eddy,
-    ExtractROI,
-    MeanImage,
-    Merge,
-    Reorient2Std,
-    RobustFOV,
-)
-from nipype.interfaces.mrtrix3 import (
-    ConstrainedSphericalDeconvolution,
-    DWIBiasCorrect,
-    DWIDenoise,
-    Generate5tt,
-    MRDeGibbs,
-    ResponseSD,
 )
 
 #: A dictionary that should be imported in the project's settings and included
@@ -128,5 +128,4 @@ interfaces = {
     },
     "dMRIPrep": {DmriPrep040.__version__: DmriPrep040},
     "MRIQC": {MRIQC2100rc2.__version__: MRIQC2100rc2},
-    "Brainprint": {Brainprint.__version__: Brainprint},
 }
